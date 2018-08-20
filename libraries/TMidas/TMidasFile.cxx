@@ -20,7 +20,7 @@
 #include "TRunInfo.h"
 #include "TGRSIDetectorInformation.h"
 #include "TGRSIMnemonic.h"
-#include "GVersion.h"
+#include "GRSIDataVersion.h"
 
 /// \cond CLASSIMP
 ClassImp(TMidasFile)
@@ -238,8 +238,8 @@ bool TMidasFile::Open(const char* filename)
 
 	SetFileOdb();
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
-	TRunInfo::ClearVersion();
-	TRunInfo::SetVersion(GRSI_RELEASE);
+	TRunInfo::ClearLibraryVersion();
+	TRunInfo::SetLibraryVersion(GRSIDATA_RELEASE);
 
 	TGRSIDetectorInformation* detInfo = new TGRSIDetectorInformation();
 	TRunInfo::SetDetectorInformation(detInfo);
