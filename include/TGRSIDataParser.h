@@ -1,5 +1,5 @@
-#ifndef TTRIUMFDATAPARSER_H
-#define TTRIUMFDATAPARSER_H
+#ifndef TGRSIDARAPARSER_H
+#define TGRSIDARAPARSER_H
 
 /** \addtogroup Sorting
  *  @{
@@ -7,9 +7,9 @@
 
 /////////////////////////////////////////////////////////////////
 ///
-/// \class TTriumfDataParser
+/// \class TGRSIDataParser
 ///
-/// The TTriumfDataParser is the DAQ dependent part of GRSISort.
+/// The TGRSIDataParser is the DAQ dependent part of GRSISort.
 /// It takes a "DAQ-dependent"-flavoured MIDAS file and
 /// converts it into a generic TFragment that the rest of
 /// GRSISort can deal with. This is where event word masks
@@ -41,10 +41,10 @@
 #include "TRawEvent.h"
 #include "TMidasEvent.h"
 
-class TTriumfDataParser : public TDataParser {
+class TGRSIDataParser : public TDataParser {
 public:
-   TTriumfDataParser();
-   ~TTriumfDataParser();
+   TGRSIDataParser();
+   ~TGRSIDataParser();
 
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);
    enum class EBank { kWFDN = 0, kGRF1 = 1, kGRF2 = 2, kGRF3 = 3, kGRF4 = 4, kFME0 = 5, kFME1 = 6, kFME2 = 7, kFME3 = 8 };
