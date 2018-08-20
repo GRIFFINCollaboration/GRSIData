@@ -131,7 +131,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libTriumf.so
+all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
@@ -159,7 +159,7 @@ lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_lin
 lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) include/GRSIDataVersion.h | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
-lib/libTriumf.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) include/GRSIDataVersion.h
+lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) include/GRSIDataVersion.h
 	$(call run_and_test,$(CPP) -fPIC $(shell $(FIND) .build/libraries -name "*.o") $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) $(MAIN_O_FILES) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 .build/%.o: %.$(SRC_SUFFIX)
