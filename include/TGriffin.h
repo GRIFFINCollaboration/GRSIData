@@ -129,7 +129,7 @@ private:
    static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fSuppressionCriterion;
 #endif
 
-	std::vector<TDetectorHit*> fGriffinLowGainHits;// = fHits;
+	std::vector<TDetectorHit*>& fGriffinLowGainHits = fHits; //!<! Reference to default hit vector (needs to be transient)
    std::vector<TDetectorHit*>  fGriffinHighGainHits; //  The set of crystal hits
 
    // static bool fSetBGOHits;                //!<!  Flag that determines if BGOHits are being measured
