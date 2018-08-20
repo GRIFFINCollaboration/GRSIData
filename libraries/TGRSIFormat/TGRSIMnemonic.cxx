@@ -27,47 +27,8 @@ ClassImp(TGRSIMnemonic)
 
 void TGRSIMnemonic::Clear(Option_t*)
 {
-   fArrayPosition = -1;
-   fSegment       = -1;
-   fSystemString.clear();
+	TMnemonic::Clear();
    fSystem = ESystem::kClear;
-   fSubSystemString.clear();
-   fSubSystem = EMnemonic::kClear;
-   fArraySubPositionString.clear();
-   fArraySubPosition = EMnemonic::kClear;
-   fCollectedChargeString.clear();
-   fCollectedCharge = EMnemonic::kClear;
-   fOutputSensorString.clear();
-   fOutputSensor = EMnemonic::kClear;
-}
-
-void TGRSIMnemonic::EnumerateMnemonic(std::string mnemonic_word, EMnemonic& mnemonic_enum)
-{
-
-   char mnemonic_char = mnemonic_word[0];
-
-   switch(mnemonic_char) {
-		case 'A': mnemonic_enum = EMnemonic::kA; break;
-		case 'B': mnemonic_enum = EMnemonic::kB; break;
-		case 'C': mnemonic_enum = EMnemonic::kC; break;
-		case 'D': mnemonic_enum = EMnemonic::kD; break;
-		case 'E': mnemonic_enum = EMnemonic::kE; break;
-		case 'F': mnemonic_enum = EMnemonic::kF; break;
-		case 'G': mnemonic_enum = EMnemonic::kG; break;
-		case 'I': mnemonic_enum = EMnemonic::kI; break;
-		case 'L': mnemonic_enum = EMnemonic::kL; break;
-		case 'M': mnemonic_enum = EMnemonic::kM; break;
-		case 'N': mnemonic_enum = EMnemonic::kN; break;
-		case 'P': mnemonic_enum = EMnemonic::kP; break;
-		case 'Q': mnemonic_enum = EMnemonic::kQ; break;
-		case 'R': mnemonic_enum = EMnemonic::kR; break;
-		case 'S': mnemonic_enum = EMnemonic::kS; break;
-		case 'T': mnemonic_enum = EMnemonic::kT; break;
-		case 'W': mnemonic_enum = EMnemonic::kW; break;
-		case 'X': mnemonic_enum = EMnemonic::kX; break;
-		case 'Z': mnemonic_enum = EMnemonic::kZ; break;
-		default: mnemonic_enum  = EMnemonic::kClear;
-	};
 }
 
 void TGRSIMnemonic::EnumerateSystem()
@@ -166,28 +127,13 @@ void TGRSIMnemonic::Parse(std::string* name)
       }
       return;
    }
-   std::string buf;
-   fSystemString.assign(*name, 0, 2);
-   fSubSystemString.assign(*name, 2, 1);
-   EnumerateMnemonic(fSubSystemString, fSubSystem);
-   buf.clear();
-   buf.assign(*name, 3, 2);
-   fArrayPosition = static_cast<uint16_t>(atoi(buf.c_str()));
-   fArraySubPositionString.assign(*name, 5, 1);
-   EnumerateMnemonic(fArraySubPositionString, fArraySubPosition);
-   fCollectedChargeString.assign(*name, 6, 1);
-   EnumerateMnemonic(fCollectedChargeString, fCollectedCharge);
-   buf.clear();
-   buf.assign(*name, 7, 2);
-   fSegment = static_cast<uint16_t>(atoi(buf.c_str()));
-   fOutputSensorString.assign(*name, 9, 1);
-   EnumerateMnemonic(fOutputSensorString, fOutputSensor);
+	TMnemonic::Parse(name);
    // Enumerating the fSystemString must come last as the details of other parts of
    // the mnemonic must be known
    EnumerateSystem();
 
    if(fSystem == ESystem::kSiLi) {
-      buf.clear();
+		std::string buf;
       buf.assign(*name, 7, 2);
       fSegment = static_cast<uint16_t>(strtol(buf.c_str(), nullptr, 16));
    }
@@ -195,15 +141,9 @@ void TGRSIMnemonic::Parse(std::string* name)
    return;
 }
 
-void TGRSIMnemonic::Parse(const char* name)
-{
-   std::string sname = name;
-   Parse(&sname);
-}
-
 void TGRSIMnemonic::Print(Option_t*) const
 {
-   printf("======MNEMONIC ======\n");
+   printf("====== GRSIMNEMONIC ======\n");
    printf("fArrayPosition           = %i\n", fArrayPosition);
    printf("fSegment                 = %i\n", fSegment);
    printf("fSystemString            = %s\n", fSystemString.c_str());
@@ -242,6 +182,5 @@ TClass* TGRSIMnemonic::GetClassType() const
 		case ESystem::kGeneric:       fClassType = TGenericDetector::Class(); break;
 		default:                      fClassType = nullptr;
    };
-
    return fClassType;
 }

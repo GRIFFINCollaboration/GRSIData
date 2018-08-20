@@ -392,14 +392,17 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    if(frag == nullptr || chan == nullptr) {
       return;
    }
-   if(chan->GetMnemonic()->OutputSensor() == TMnemonic::EMnemonic::kA) {
-   }
+	const TMnemonic* mnemonic = chan->GetMnemonic();
+	if(mnemonic == nullptr) {
+		std::cerr<<"Trying to add fragment to TGriffin w/o mnemonic in TChannel!"<<std::endl;
+		return;
+	}
 
-   switch(chan->GetMnemonic()->SubSystem()) {
+   switch(mnemonic->SubSystem()) {
 		case TMnemonic::EMnemonic::kG:
 			{
 				TGriffinHit* geHit = new TGriffinHit(*frag);
-				switch(chan->GetMnemonic()->OutputSensor()) {
+				switch(mnemonic->OutputSensor()) {
 					case TMnemonic::EMnemonic::kA:
 						GetHitVector(EGainBits::kLowGain).push_back(std::move(geHit));
 						break;
