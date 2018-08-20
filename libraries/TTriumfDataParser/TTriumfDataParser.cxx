@@ -74,7 +74,6 @@ int TTriumfDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
       case 0x8001:
          // end of file ODB
 #ifdef HAS_XML
-			std::cout<<__PRETTY_FUNCTION__<<std::endl;
          TXMLOdb*  odb     = new TXMLOdb(event->GetData(), event->GetDataSize());
          TRunInfo* runInfo = TRunInfo::Get();
          TXMLNode* node    = odb->FindPath("/Runinfo/Stop time binary");
