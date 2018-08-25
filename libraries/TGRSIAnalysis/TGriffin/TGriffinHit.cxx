@@ -94,7 +94,7 @@ bool TGriffinHit::CompareEnergy(const TGriffinHit* lhs, const TGriffinHit* rhs)
    return (lhs->GetEnergy() > rhs->GetEnergy());
 }
 
-void TGriffinHit::Add(const TGRSIDetectorHit* hit)
+void TGriffinHit::Add(const TDetectorHit* hit)
 {
 	const TGriffinHit* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
 	if(griffinHit == nullptr) {

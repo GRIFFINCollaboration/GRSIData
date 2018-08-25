@@ -98,7 +98,7 @@ endif
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags --glibs)
-GRSI_LIBFLAGS := $(shell grsi-config --cflags --all-libs)
+GRSI_LIBFLAGS := $(shell grsi-config --cflags --libs)
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
 #SANDBOX_O_FILES := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard Sandbox/*.$(SRC_SUFFIX)))
@@ -156,10 +156,10 @@ lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
 
-lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) include/GRSIDataVersion.h | lib
+lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | include/GRSIDataVersion.h lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
-lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) include/GRSIDataVersion.h
+lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) | include/GRSIDataVersion.h
 	$(call run_and_test,$(CPP) -fPIC $(shell $(FIND) .build/libraries -name "*.o") $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) $(MAIN_O_FILES) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 .build/%.o: %.$(SRC_SUFFIX)
