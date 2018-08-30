@@ -1,5 +1,5 @@
-#ifndef TTRIUMFDATAPARSEREXCEPTION_H
-#define TTRIUMFDATAPARSEREXCEPTION_H
+#ifndef TGRSIDATAPARSEREXCEPTION_H
+#define TGRSIDATAPARSEREXCEPTION_H
 /** \addtogroup Sorting
  *  @{
  */
@@ -10,21 +10,21 @@
 #include <exception>
 #include <string>
 
-#include "TTriumfDataParser.h"
+#include "TGRSIDataParser.h"
 
-class TTriumfDataParserException : public std::exception {
+class TGRSIDataParserException : public std::exception {
 public:
-   TTriumfDataParserException(TTriumfDataParser::EDataParserState state, int failedWord, bool multipleErrors);
-   ~TTriumfDataParserException() override;
+   TGRSIDataParserException(TGRSIDataParser::EDataParserState state, int failedWord, bool multipleErrors);
+   ~TGRSIDataParserException() override;
 
    const char* what() const noexcept override;
 
    int                                 GetFailedWord() { return fFailedWord; }
-   TTriumfDataParser::EDataParserState GetParserState() { return fParserState; }
+   TGRSIDataParser::EDataParserState GetParserState() { return fParserState; }
    bool                                GetMultipleErrors() { return fMultipleErrors; }
 
 private:
-   TTriumfDataParser::EDataParserState fParserState;
+   TGRSIDataParser::EDataParserState fParserState;
    int                                 fFailedWord;
    bool                                fMultipleErrors;
    std::string                         fMessage;

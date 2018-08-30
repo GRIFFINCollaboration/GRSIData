@@ -308,7 +308,7 @@ TVector3 TTigress::GetPosition(const TTigressHit& hit, double dist, bool smear)
 
 TVector3 TTigress::GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist, bool smear)
 {
-	if(!GetVectorsBuilt){
+	if(!GetVectorsBuilt()){
 		BuildVectors();
 	}
 
@@ -329,8 +329,6 @@ TVector3 TTigress::GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist, 
 
 	return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr];
 }	
-
-
 
 void TTigress::BuildVectors(){
 	for(int Back=0;Back<2;Back++){

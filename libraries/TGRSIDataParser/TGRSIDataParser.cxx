@@ -1,5 +1,5 @@
-#include "TTriumfDataParser.h"
-#include "TTriumfDataParserException.h"
+#include "TGRSIDataParser.h"
+#include "TGRSIDataParserException.h"
 
 #include "TChannel.h"
 #include "Globals.h"
@@ -17,17 +17,17 @@
 #include "TFragment.h"
 #include "TBadFragment.h"
 
-TTriumfDataParser::TTriumfDataParser()
+TGRSIDataParser::TGRSIDataParser()
    : TDataParser()
 {
 	fState = EDataParserState::kGood;
 }
 
-TTriumfDataParser::~TTriumfDataParser()
+TGRSIDataParser::~TGRSIDataParser()
 {
 }
 
-int TTriumfDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
+int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 {
 	std::shared_ptr<TMidasEvent> event = std::static_pointer_cast<TMidasEvent>(rawEvent);
    int   banksize;
@@ -40,13 +40,13 @@ int TTriumfDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          if((banksize = event->LocateBank(nullptr, "WFDN", &ptr)) > 0) {
             frags = TigressDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event->GetSerialNumber(), event->GetTimeStamp());
          } else if((banksize = event->LocateBank(nullptr, "GRF1", &ptr)) > 0) {
-            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TTriumfDataParser::EBank::kGRF1, event);
+            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF1, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF2", &ptr)) > 0) {
-            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TTriumfDataParser::EBank::kGRF2, event);
+            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF2, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF3", &ptr)) > 0) {
-            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TTriumfDataParser::EBank::kGRF3, event);
+            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF3, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF4", &ptr)) > 0) {
-            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TTriumfDataParser::EBank::kGRF4, event);
+            frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF4, event);
          } else if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
             frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize);
          } else if(!TGRSIOptions::Get()->SuppressErrors()) {
@@ -108,7 +108,7 @@ int TTriumfDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    return frags;
 }
 
-int TTriumfDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned int midasSerialNumber, time_t midasTime)
+int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned int midasSerialNumber, time_t midasTime)
 {
    /// Converts A MIDAS File from the Tigress DAQ into a TFragment.
    int                        NumFragsFound = 0;
@@ -206,13 +206,13 @@ int TTriumfDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned 
    return NumFragsFound;
 }
 
-void TTriumfDataParser::SetTIGAddress(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
+void TGRSIDataParser::SetTIGAddress(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
 {
    /// Sets the digitizer address of the 'currentFrag' TFragment
    currentFrag->SetAddress(static_cast<int32_t>(0x00ffffff & value));
 }
 
-void TTriumfDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
+void TGRSIDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
 {
    /// Sets the waveform for a Tigress event.
 
@@ -240,7 +240,7 @@ void TTriumfDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragme
    return;
 }
 
-void TTriumfDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
+void TGRSIDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
 {
    /// Sets the CFD of a Tigress Event.
 
@@ -249,14 +249,14 @@ void TTriumfDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragmen
    return;
 }
 
-void TTriumfDataParser::SetTIGLed(uint32_t, const std::shared_ptr<TFragment>&)
+void TGRSIDataParser::SetTIGLed(uint32_t, const std::shared_ptr<TFragment>&)
 {
    /// Sets the LED of a Tigress event.
    // No longer used anywhere
    //  currentFrag->SetLed( int32_t(value & 0x07ffffff) );
 }
 
-void TTriumfDataParser::SetTIGCharge(uint32_t value, const std::shared_ptr<TFragment>& currentFragment)
+void TGRSIDataParser::SetTIGCharge(uint32_t value, const std::shared_ptr<TFragment>& currentFragment)
 {
    /// Sets the integrated charge of a Tigress event.
    TChannel* chan = currentFragment->GetChannel();
@@ -288,7 +288,7 @@ void TTriumfDataParser::SetTIGCharge(uint32_t value, const std::shared_ptr<TFrag
    currentFragment->SetCharge(charge);
 }
 
-bool TTriumfDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
+bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
 {
    /// Sets the Trigger ID of a Tigress event.
    if((value & 0xf0000000) != 0x80000000) {
@@ -324,7 +324,7 @@ bool TTriumfDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TF
    return true;
 }
 
-bool TTriumfDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFragment>& currentFrag)
+bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFragment>& currentFrag)
 {
    /// Sets the Timestamp of a Tigress Event
    for(int x = 0; x < 10; x++) { // finds the timestamp.
@@ -419,7 +419,7 @@ bool TTriumfDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TF
 /////////////***************************************************************/////////////
 /////////////***************************************************************/////////////
 
-int TTriumfDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event)
+int TGRSIDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event)
 {
    // loop over words in event to find fragment header
    int totalFrags = 0;
@@ -429,7 +429,7 @@ int TTriumfDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBa
          int words;
          try {
             words = GriffinDataToFragment(&data[index], size - index, bank, event->GetSerialNumber(), event->GetTimeStamp());
-         } catch(TTriumfDataParserException& e) {
+         } catch(TGRSIDataParserException& e) {
             words = -e.GetFailedWord();
             if(!TGRSIOptions::Get()->SuppressErrors()) {
                if(!TGRSIOptions::Get()->LogErrors()) {
@@ -485,7 +485,7 @@ int TTriumfDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBa
    return totalFrags;
 }
 
-int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber,
+int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber,
                                        time_t midasTime)
 {
    /// Converts a Griffin flavoured MIDAS file into a TFragment and returns the number of words processed (or the
@@ -531,7 +531,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
          } else {
             multipleErrors = true;
          }
-         throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+         throw TGRSIDataParserException(fState, failedWord, multipleErrors);
       }
       return GriffinDataToScalerEvent(data, eventFrag->GetAddress());
    }
@@ -614,7 +614,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
             multipleErrors = true;
          }
          Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-         throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+         throw TGRSIDataParserException(fState, failedWord, multipleErrors);
          break;
       case 0xc: // The c packet type is for waveforms
          if(!fNoWaveforms) {
@@ -656,7 +656,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                   multipleErrors = true;
                }
                Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-               throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+               throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             }
 
             // the way we insert the fragment(s) depends on the module type and bank:
@@ -681,7 +681,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                      multipleErrors = true;
                   }
                   Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-                  throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+                  throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                }
                eventFrag->SetCfd(tmpCfd[0]);
                if(fRecordDiag) {
@@ -701,7 +701,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                   multipleErrors = true;
                }
                Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-               throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+               throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             }
             for(size_t h = 0; h < tmpCharge.size(); ++h) {
                eventFrag->SetCharge(tmpCharge[h]);
@@ -750,7 +750,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                multipleErrors = true;
             }
             Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-            throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+            throw TGRSIDataParserException(fState, failedWord, multipleErrors);
          }
          break;
       case 0xf:
@@ -764,7 +764,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                multipleErrors = true;
             }
             Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-            throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+            throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             break;
 			case EBank::kGRF2: // from May 2015 to the end of 2015 0xf denoted a psd-word from a 4G
             if(x + 1 < size) {
@@ -781,7 +781,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                   multipleErrors = true;
                }
                Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-               throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+               throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             }
             break;
 			case EBank::kGRF3: // from 2016 on we're back to reserving 0xf for faults
@@ -794,7 +794,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                multipleErrors = true;
             }
             Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-            throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+            throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             break;
          default: printf("This bank not yet defined.\n"); break;
          }
@@ -826,7 +826,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                      multipleErrors = true;
                   }
                   Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-                  throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+                  throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                }
                break;
 				case EBank::kGRF3: // bank 3 has 2 words with (5 high bits IntLength, 26 Charge)(9 low bits IntLength, 22 Cfd)
@@ -849,7 +849,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                      multipleErrors = true;
                   }
                   Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-                  throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+                  throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                }
                break;
 				case EBank::kGRF4: // bank 4 can have more than one integration (up to four), but these have to be combined with
@@ -940,7 +940,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                      multipleErrors = true;
                   }
                   Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-                  throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+                  throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                }
                break;
             default:
@@ -955,7 +955,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                   multipleErrors = true;
                }
                Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-               throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+               throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                break;
             }
             break;
@@ -978,7 +978,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                   multipleErrors = true;
                }
                Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-               throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+               throw TGRSIDataParserException(fState, failedWord, multipleErrors);
             }
             // for descant types (6,10,11) there are two more words for banks > GRF2 (bank GRF2 used 0xf packet and bank
             // GRF1 never had descant)
@@ -999,7 +999,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                      multipleErrors = true;
                   }
                   Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-                  throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+                  throw TGRSIDataParserException(fState, failedWord, multipleErrors);
                }
             }
             break;
@@ -1015,7 +1015,7 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
                multipleErrors = true;
             }
             Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-            throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+            throw TGRSIDataParserException(fState, failedWord, multipleErrors);
          } // switch(eventFrag->GetModuleType())
          break;
       } // switch(packet)
@@ -1029,11 +1029,11 @@ int TTriumfDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank ban
       multipleErrors = true;
    }
    Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
-   throw TTriumfDataParserException(fState, failedWord, multipleErrors);
+   throw TGRSIDataParserException(fState, failedWord, multipleErrors);
    return -x;
 }
 
-bool TTriumfDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
+bool TGRSIDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
 {
    if((value & 0xf0000000) != 0x80000000) {
       return false;
@@ -1083,7 +1083,7 @@ bool TTriumfDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFra
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
+bool TGRSIDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
 {
    /// Sets the Griffin Master Filter Pattern
    if((value & 0xc0000000) != 0x00000000) {
@@ -1106,7 +1106,7 @@ bool TTriumfDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::sh
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFMasterFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFMasterFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Sets the Griffin master filter ID and PPG
    if((value & 0x80000000) != 0x00000000) {
@@ -1117,7 +1117,7 @@ bool TTriumfDataParser::SetGRIFMasterFilterId(uint32_t value, const std::shared_
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFChannelTriggerId(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFChannelTriggerId(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Sets the Griffin Channel Trigger ID
    if((value & 0xf0000000) != 0x90000000) {
@@ -1127,7 +1127,7 @@ bool TTriumfDataParser::SetGRIFChannelTriggerId(uint32_t value, const std::share
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFNetworkPacket(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFNetworkPacket(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Ignores the network packet number (for now)
    if((value & 0xf0000000) != 0xd0000000) {
@@ -1145,7 +1145,7 @@ bool TTriumfDataParser::SetGRIFNetworkPacket(uint32_t value, const std::shared_p
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFTimeStampLow(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFTimeStampLow(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Sets the lower 28 bits of the griffin time stamp
    if((value & 0xf0000000) != 0xa0000000) {
@@ -1156,7 +1156,7 @@ bool TTriumfDataParser::SetGRIFTimeStampLow(uint32_t value, const std::shared_pt
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Sets the Griffin waveform if record_waveform is set to true
    if(frag->GetWaveform()->size() > (100000)) {
@@ -1175,7 +1175,7 @@ bool TTriumfDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TF
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// Sets the Griffin deadtime and the upper 14 bits of the timestamp
    if((value & 0xf0000000) != 0xb0000000) {
@@ -1186,7 +1186,7 @@ bool TTriumfDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TF
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFCc(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFCc(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// set the short integration and the lower 9 bits of the long integration
    if(frag->GetCcShort() != 0 || frag->GetCcLong() != 0) {
@@ -1197,7 +1197,7 @@ bool TTriumfDataParser::SetGRIFCc(uint32_t value, const std::shared_ptr<TFragmen
    return true;
 }
 
-bool TTriumfDataParser::SetGRIFPsd(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFPsd(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
    /// set the zero crossing and the higher 10 bits of the long integration
    if(frag->GetZc() != 0) { // low bits of ccLong have already been set
@@ -1208,7 +1208,7 @@ bool TTriumfDataParser::SetGRIFPsd(uint32_t value, const std::shared_ptr<TFragme
    return true;
 }
 
-int TTriumfDataParser::GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int, time_t)
+int TGRSIDataParser::GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int, time_t)
 {
    auto* ppgEvent = new TPPGData;
    int   x        = 1; // We have already read the header so we can skip the 0th word.
@@ -1257,7 +1257,7 @@ int TTriumfDataParser::GriffinDataToPPGEvent(uint32_t* data, int size, unsigned 
    return -x;
 }
 
-bool TTriumfDataParser::SetNewPPGPattern(uint32_t value, TPPGData* ppgevent)
+bool TGRSIDataParser::SetNewPPGPattern(uint32_t value, TPPGData* ppgevent)
 {
    if((value & 0xf0000000) != 0x00000000) {
       return false;
@@ -1266,13 +1266,13 @@ bool TTriumfDataParser::SetNewPPGPattern(uint32_t value, TPPGData* ppgevent)
    return true;
 }
 
-bool TTriumfDataParser::SetOldPPGPattern(uint32_t value, TPPGData* ppgevent)
+bool TGRSIDataParser::SetOldPPGPattern(uint32_t value, TPPGData* ppgevent)
 {
    ppgevent->SetOldPPG(value & 0x0fffffff);
    return true;
 }
 
-bool TTriumfDataParser::SetPPGNetworkPacket(uint32_t value, TPPGData* ppgevent)
+bool TGRSIDataParser::SetPPGNetworkPacket(uint32_t value, TPPGData* ppgevent)
 {
    // Ignores the network packet number (for now)
    //   printf("value = 0x%08x    |   frag->NetworkPacketNumber = %i   \n",value,frag->NetworkPacketNumber);
@@ -1285,19 +1285,19 @@ bool TTriumfDataParser::SetPPGNetworkPacket(uint32_t value, TPPGData* ppgevent)
    return true;
 }
 
-bool TTriumfDataParser::SetPPGLowTimeStamp(uint32_t value, TPPGData* ppgevent)
+bool TGRSIDataParser::SetPPGLowTimeStamp(uint32_t value, TPPGData* ppgevent)
 {
    ppgevent->SetLowTimeStamp(value & 0x0fffffff);
    return true;
 }
 
-bool TTriumfDataParser::SetPPGHighTimeStamp(uint32_t value, TPPGData* ppgevent)
+bool TGRSIDataParser::SetPPGHighTimeStamp(uint32_t value, TPPGData* ppgevent)
 {
    ppgevent->SetHighTimeStamp(value & 0x0fffffff);
    return true;
 }
 
-int TTriumfDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
+int TGRSIDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
 {
    auto* scalerEvent = new TScalerData;
    scalerEvent->SetAddress(address);
@@ -1315,7 +1315,7 @@ int TTriumfDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3); // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerLowTS;
       failedWord = x;
-      throw TTriumfDataParserException(fState, failedWord, false);
+      throw TGRSIDataParserException(fState, failedWord, false);
    }
    // followed by four scaler words (32 bits each)
    for(int i = 0; i < 4; ++i) {
@@ -1323,7 +1323,7 @@ int TTriumfDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
          TParsingDiagnostics::Get()->BadFragment(-3); // use detector type -3 for scaler data
          fState     = EDataParserState::kBadScalerValue;
          failedWord = x;
-         throw TTriumfDataParserException(fState, failedWord, false);
+         throw TGRSIDataParserException(fState, failedWord, false);
       }
    }
    // and finally the trailer word with the highest 24 bits of the timestamp
@@ -1332,7 +1332,7 @@ int TTriumfDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3); // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerHighTS;
       failedWord = x;
-      throw TTriumfDataParserException(fState, failedWord, false);
+      throw TGRSIDataParserException(fState, failedWord, false);
    }
 
    if(scalerType == 0) { // deadtime scaler
@@ -1345,14 +1345,14 @@ int TTriumfDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3); // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerType;
       failedWord = x;
-      throw TTriumfDataParserException(fState, failedWord, false);
+      throw TGRSIDataParserException(fState, failedWord, false);
    }
 
    TParsingDiagnostics::Get()->GoodFragment(-3); // use detector type -3 for scaler data
    return x;
 }
 
-bool TTriumfDataParser::SetScalerNetworkPacket(uint32_t value, TScalerData* scalerEvent)
+bool TGRSIDataParser::SetScalerNetworkPacket(uint32_t value, TScalerData* scalerEvent)
 {
    if((value >> 28) != 0xd) {
       return false;
@@ -1361,7 +1361,7 @@ bool TTriumfDataParser::SetScalerNetworkPacket(uint32_t value, TScalerData* scal
    return true;
 }
 
-bool TTriumfDataParser::SetScalerLowTimeStamp(uint32_t value, TScalerData* scalerEvent)
+bool TGRSIDataParser::SetScalerLowTimeStamp(uint32_t value, TScalerData* scalerEvent)
 {
    if((value >> 28) != 0xa) {
       return false;
@@ -1370,7 +1370,7 @@ bool TTriumfDataParser::SetScalerLowTimeStamp(uint32_t value, TScalerData* scale
    return true;
 }
 
-bool TTriumfDataParser::SetScalerHighTimeStamp(uint32_t value, TScalerData* scalerEvent, int& type)
+bool TGRSIDataParser::SetScalerHighTimeStamp(uint32_t value, TScalerData* scalerEvent, int& type)
 {
    if((value >> 28) != 0xe || (value & 0xff) != (scalerEvent->GetLowTimeStamp() >> 20)) {
       return false;
@@ -1380,13 +1380,13 @@ bool TTriumfDataParser::SetScalerHighTimeStamp(uint32_t value, TScalerData* scal
    return true;
 }
 
-bool TTriumfDataParser::SetScalerValue(int index, uint32_t value, TScalerData* scalerEvent)
+bool TGRSIDataParser::SetScalerValue(int index, uint32_t value, TScalerData* scalerEvent)
 {
    scalerEvent->SetScaler(index, value);
    return true;
 }
 
-int TTriumfDataParser::CaenToFragment(uint32_t* data, int size)
+int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
 {
    /// Converts a Caen flavoured MIDAS events into TFragments and returns the number of events processed
    std::shared_ptr<TFragment> eventFrag = std::make_shared<TFragment>();
@@ -1599,7 +1599,7 @@ int TTriumfDataParser::CaenToFragment(uint32_t* data, int size)
 /////////////***************************************************************/////////////
 /////////////***************************************************************/////////////
 
-int TTriumfDataParser::EPIXToScalar(float* data, int size, unsigned int midasSerialNumber, time_t midasTime)
+int TGRSIDataParser::EPIXToScalar(float* data, int size, unsigned int midasSerialNumber, time_t midasTime)
 {
 	int                         NumFragsFound = 1;
 	std::shared_ptr<TEpicsFrag> EXfrag        = std::make_shared<TEpicsFrag>();

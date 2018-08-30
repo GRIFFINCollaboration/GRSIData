@@ -68,7 +68,7 @@ public:
    bool InFilter(Int_t); //!<!
 
    static bool CompareEnergy(const TGriffinHit*, const TGriffinHit*); //!<!
-   void        Add(const TGRSIDetectorHit*);                      //!<!
+   void        Add(const TDetectorHit*) override;                     //!<!
 
 public:
    void Clear(Option_t* opt = "") override;       //!<!

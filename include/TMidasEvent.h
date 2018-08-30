@@ -78,13 +78,7 @@ public:
    void SwapBytesEventHeader();   ///< convert event header between little-endian (Linux-x86) and big endian (MacOS-PPC)
    int  SwapBytes(bool) override; ///< convert event data between little-endian (Linux-x86) and big endian (MacOS-PPC)
 
-   //int Process(TDataParser& parser) override;
-
 protected:
-   //int ProcessEPICS(float* ptr, int& dSize, TDataParser& parser);
-   //int ProcessTIGRESS(uint32_t* ptr, int& dSize, TDataParser& parser);
-   //int ProcessGRIFFIN(uint32_t* ptr, int& dSize, TDataParser::EBank bank, TDataParser& parser);
-
    TMidas_EVENT_HEADER fEventHeader;   ///< event header
    char*               fData;          ///< event data buffer
    int                 fBanksN;        ///< number of banks in this event

@@ -42,7 +42,8 @@ public:
    TGriffinHit* GetGriffinLowGainHit(const int& i);                                              //!<!
    TGriffinHit* GetGriffinHighGainHit(const int& i);                                             //!<!
    TGriffinHit* GetGriffinHit(const Int_t& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
-   TGRSIDetectorHit* GetHit(const Int_t& idx = 0);
+   using TDetector::GetHit;
+   TDetectorHit* GetHit(const int& idx);
    Short_t GetLowGainMultiplicity() const { return fGriffinLowGainHits.size(); }
    Short_t GetHighGainMultiplicity() const { return fGriffinHighGainHits.size(); }
    Short_t GetMultiplicity() const override { return GetMultiplicity(GetDefaultGainType()); }
@@ -181,7 +182,9 @@ public:
 
 private:
    // This is where the general untouchable functions live.
+   const std::vector<TDetectorHit*>& GetHitVector() const override { return GetHitVector(fDefaultGainType); }      //!<!
    std::vector<TDetectorHit*>& GetHitVector(const EGainBits& gain_type);      //!<!
+   const std::vector<TDetectorHit*>& GetHitVector(const EGainBits& gain_type) const;      //!<!
    std::vector<TDetectorHit*>& GetAddbackVector(const EGainBits& gain_type);  //!<!
    std::vector<UShort_t>& GetAddbackFragVector(const EGainBits& gain_type); //!<!
    TGriffinHit* GetGriffinHit(const Int_t& i, const EGainBits& gain_type);  //!<!

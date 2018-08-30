@@ -235,6 +235,15 @@ Short_t TGriffin::GetMultiplicity(const EGainBits& gain_type) const
    return 0;
 }
 
+const std::vector<TDetectorHit*>& TGriffin::GetHitVector(const EGainBits& gain_type) const
+{
+   switch(gain_type) {
+		case EGainBits::kLowGain:  return fGriffinLowGainHits;
+		case EGainBits::kHighGain: return fGriffinHighGainHits;
+   };
+	return fGriffinLowGainHits;
+}
+
 std::vector<TDetectorHit*>& TGriffin::GetHitVector(const EGainBits& gain_type)
 {
    switch(gain_type) {
@@ -296,7 +305,7 @@ void TGriffin::SetCrossTalk(const EGainBits& gain_type, const Bool_t flag) const
    };
 }
 
-TGRSIDetectorHit* TGriffin::GetHit(const Int_t& idx)
+TDetectorHit* TGriffin::GetHit(const Int_t& idx)
 {
    return GetGriffinHit(idx);
 }
