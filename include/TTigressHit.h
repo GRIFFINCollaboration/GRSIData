@@ -58,11 +58,7 @@ public:
    Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
    Double_t GetFitTime() const { return fTimeFit; }         //!<!
 
-   UShort_t GetArrayNumber() const override
-   {
-      int number = 4 * (GetDetector() - 1) + GetCrystal();
-      return number;
-   }
+   UShort_t GetArrayNumber() const override { return 4 * (GetDetector() - 1) + GetCrystal(); }
 
    inline double GetDoppler(double beta, TVector3* vec = nullptr)
    {
