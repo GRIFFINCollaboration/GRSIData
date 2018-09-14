@@ -111,7 +111,6 @@ void TMidasEvent::SetData(uint32_t size, char* data)
    fData          = data;
    fAllocatedByUs = false;
    SwapBytes(false);
-	std::cout<<__PRETTY_FUNCTION__<<": set headers fDataSize to "<<fEventHeader.fDataSize<<std::endl;
 }
 
 uint16_t TMidasEvent::GetEventId() const
