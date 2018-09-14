@@ -62,23 +62,14 @@ private:
    void                   RemoveHits(std::vector<TSharcHit>*, std::set<int>*); //!<!
 
    // TODO: I think this class could be sped up with a flag method on these transient vectors.
+	// Not sure what is supposed to get sped up here, the transient vectors are only used
+	// to store fragments in them before the hits are build.
+	// After that these vectors aren't used again.
    std::vector<TFragment> fFrontFragments; //!
    std::vector<TFragment> fBackFragments;  //!
    std::vector<TFragment> fPadFragments;   //!
 
 public:
-   // static helper functions to make analysis easier.
-   // static double GetReconstructedEnergy(TVector3 pos, int det, double edel, double epad=0.0, char ion='p');//!
-   // static double GetReconstructedEnergy(int det, int fs, int bs, double edel, double epad=0.0, char ion='p')
-   //{ return GetReconstructedEnergy(GetPosition(det,fs,bs),det,edel,epad,ion); } //!
-
-   // takes ekin and returns edel and epad (NB detector thicknesses must be correct!)
-   // static std::vector<double> GetMeasuredEnergy(TVector3 pos, int det, double ekin, char ion='p', Option_t *opt="",
-   // double edel=-1.0);//!
-   // static std::vector<double> GetMeasuredEnergy(int det, int fs, int bs, double ekin, char ion='p', Option_t *opt="",
-   // double edel=-1.0)
-   //      {return GetMeasuredEnergy(GetPosition(det,fs,bs),det,ekin,ion,opt,edel); } //!
-
    static double GetDetectorThickness(TSharcHit& hit, double dist = -1.0); //!
    static double GetDeadLayerThickness(TSharcHit& hit);                    //!
    static double GetPadThickness(TSharcHit& hit);                          //!
