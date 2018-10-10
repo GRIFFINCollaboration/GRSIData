@@ -101,20 +101,8 @@ TGRSIMnemonic::EDigitizer TGRSIMnemonic::EnumerateDigitizer(std::string name)
    if(name.compare("TIG64") == 0) {
       return EDigitizer::kTIG64;
    }
-   if(name.compare("CAEN8") == 0) {
-      return EDigitizer::kCAEN8;
-   }
    if(name.compare("CAEN") == 0) {
       return EDigitizer::kCaen;
-   }
-   if(name.compare("PIXIE") == 0) {
-      return EDigitizer::kPixie;
-   }
-   if(name.compare("FASTPIXIE") == 0) {
-      return EDigitizer::kFastPixie;
-   }
-   if(name.compare("PIXIETAPEMOVE") == 0) {
-      return EDigitizer::kPixieTapeMove;
    }
    return EDigitizer::kDefault;
 }

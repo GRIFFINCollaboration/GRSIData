@@ -725,8 +725,13 @@ void TMidasFile::SetGRIFFOdb()
    node                        = fOdb->FindPath(temp.c_str());
    std::vector<double> offsets = fOdb->ReadDoubleArray(node);
 
+   temp = path;
+   temp.append("/digitizer");
+   node                          = fOdb->FindPath(temp.c_str());
+   std::vector<std::string> digitizer = fOdb->ReadStringArray(node);
+
    if((address.size() == names.size()) && (names.size() == gains.size()) && (gains.size() == offsets.size()) &&
-      offsets.size() == type.size()) {
+      (offsets.size() == type.size()) && (type.size() == digitizer.size())) {
       // all good.
       for(size_t x = 0; x < address.size(); x++) {
          TChannel* tempChan = TChannel::GetChannel(address.at(x)); // names.at(x).c_str());
@@ -741,6 +746,7 @@ void TMidasFile::SetGRIFFOdb()
          tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
+         tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
          // TChannel::UpdateChannel(tempChan);
          TChannel::AddChannel(tempChan, "overwrite");
       }
