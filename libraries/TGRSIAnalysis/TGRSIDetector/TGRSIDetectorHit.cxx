@@ -66,12 +66,6 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
       //10 bit CFD for 0-2ns => divide by 512
       dTime = GetTimeStamp() * 10. + channel->CalibrateCFD((GetCfd() + gRandom->Uniform()) / 512.);
       return SetTime(dTime - 10. * (channel->GetTZero(GetEnergy())));
-		case TGRSIMnemonic::EDigitizer::kPixie:
-		dTime = GetTimeStamp() * 10. + channel->CalibrateCFD(fCfd/3276.8);// CFD is reported as 15bit interpolation of 10 ns
-		return SetTime(dTime - 10. * (channel->GetTZero(GetEnergy())));
-		case TGRSIMnemonic::EDigitizer::kFastPixie:
-		dTime = GetTimeStamp() * 10. + channel->CalibrateCFD(fCfd/6553.6);// CFD is reported as 16bit interpolation of 10 ns
-		return SetTime(dTime - 10. * (channel->GetTZero(GetEnergy())));
 		default:
 		dTime = static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform());
 		return SetTime(10. * (dTime - channel->GetTZero(GetEnergy())));
