@@ -104,6 +104,7 @@ TGRSIMnemonic::EDigitizer TGRSIMnemonic::EnumerateDigitizer(std::string name)
    if(name.compare("CAEN") == 0) {
       return EDigitizer::kCaen;
    }
+	std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', and 'CAEN'!"<<std::endl;
    return EDigitizer::kDefault;
 }
 
