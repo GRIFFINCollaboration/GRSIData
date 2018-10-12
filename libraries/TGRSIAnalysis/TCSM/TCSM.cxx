@@ -51,11 +51,11 @@ void TCSM::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
    // if this is the first time we got this detector number we make a new vector (of a vector) of fragments
    if(fFragments.find(chan->GetMnemonic()->ArrayPosition()) == fFragments.end()) {
       fFragments[chan->GetMnemonic()->ArrayPosition()].resize(
-         2, std::vector<std::vector<std::pair<TFragment, TMnemonic>>>(2));
+         2, std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>(2));
    }
 
    fFragments[chan->GetMnemonic()->ArrayPosition()][type][orientation].push_back(
-      std::make_pair(*frag, *(chan->GetMnemonic())));
+      std::make_pair(*frag, *static_cast<const TGRSIMnemonic*>(chan->GetMnemonic())));
 }
 
 void TCSM::BuildHits()
@@ -128,7 +128,7 @@ TVector3 TCSM::GetPosition(int detector, char pos, int horizontalstrip, int vert
    return Pos;
 }
 
-void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TMnemonic>>>& strips, std::vector<TDetectorHit*>& hitVector)
+void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>& strips, std::vector<TDetectorHit*>& hitVector)
 {
    /// Build hits from horizontal (index = 0) and vertical (index = 1) strips into the hitVector
    if(strips[0].empty() && strips[1].empty()) {
@@ -194,7 +194,7 @@ void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TMnemonic>>>& st
    }
 }
 
-TCSMHit* TCSM::MakeHit(std::pair<TFragment, TMnemonic>& h, std::pair<TFragment, TMnemonic>& v)
+TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragment, TGRSIMnemonic>& v)
 {
    TCSMHit* csmHit = new TCSMHit;
 
@@ -238,8 +238,8 @@ TCSMHit* TCSM::MakeHit(std::pair<TFragment, TMnemonic>& h, std::pair<TFragment, 
    return csmHit;
 }
 
-TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TMnemonic>>& hhV,
-                      std::vector<std::pair<TFragment, TMnemonic>>& vvV)
+TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
+                      std::vector<std::pair<TFragment, TGRSIMnemonic>>& vvV)
 {
    TCSMHit* csmHit = new TCSMHit;
 
@@ -518,7 +518,7 @@ void TCSM::OldBuilddEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetecto
    }
 }
 
-void TCSM::RecoverHit(char orientation, std::pair<TFragment, TMnemonic>& hit, std::vector<TDetectorHit*>& hits)
+void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit, std::vector<TDetectorHit*>& hits)
 {
    if(!RECOVERHITS) {
       return;

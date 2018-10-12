@@ -7,7 +7,6 @@
 #include "TRandom.h"
 #include "TMath.h"
 #include "TInterpreter.h"
-#include "TMnemonic.h"
 
 #include "TGRSIOptions.h"
 

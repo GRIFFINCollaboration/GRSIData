@@ -11,7 +11,6 @@
 #include "TGriffin.h"
 #include "TDescant.h"
 #include "TFragment.h"
-#include "TMnemonic.h"
 #include "TLaBr.h"
 #include "TZeroDegree.h"
 #include "TSceptar.h"

@@ -6,6 +6,8 @@
 #include "Globals.h"
 #include "TClass.h"
 
+enum class EDigitizer : char { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen };
+
 class TGRSIMnemonic : public TMnemonic {
 public:
    TGRSIMnemonic() : TMnemonic() { Clear(); }
@@ -46,13 +48,12 @@ public:
 		kTdrPlastic,
 		kClear            //28
    };
-   enum class EDigitizer { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen };
 
    ESystem   System() const { return fSystem; }
 
    void Parse(std::string* name) override;
 
-   static EDigitizer EnumerateDigitizer(std::string name);
+   void EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType) override;
 
 	TClass* GetClassType() const override;
    void Print(Option_t* opt = "") const override;
