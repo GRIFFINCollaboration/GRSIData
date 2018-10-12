@@ -25,7 +25,7 @@
 #include "TChannel.h"
 #include "TDetector.h"
 #include "TCSMHit.h"
-#include "TMnemonic.h"
+#include "TGRSIMnemonic.h"
 
 class TCSM : public TDetector {
 public:
@@ -44,19 +44,19 @@ public:
    void BuildHits() override;
 
 private:
-   std::map<int16_t, std::vector<std::vector<std::vector<std::pair<TFragment, TMnemonic>>>>> fFragments; //!<!
+   std::map<int16_t, std::vector<std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>>> fFragments; //!<!
    double               fAlmostEqualWindow;
 
    static int fCfdBuildDiff; //!<! largest acceptable time difference between events (clock ticks)  (50 ns)
 
-   void BuildVH(std::vector<std::vector<std::pair<TFragment, TMnemonic>>>&, std::vector<TDetectorHit*>&);
+   void BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>&, std::vector<TDetectorHit*>&);
    void BuilddEE(std::vector<std::vector<TDetectorHit*>>&, std::vector<TDetectorHit*>&);
    void OldBuilddEE(std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&);
    void MakedEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetectorHit*>& EHitVec, std::vector<TDetectorHit*>& BuiltHits);
-   TCSMHit* MakeHit(std::pair<TFragment, TMnemonic>&, std::pair<TFragment, TMnemonic>&);
-   TCSMHit* MakeHit(std::vector<std::pair<TFragment, TMnemonic>>&, std::vector<std::pair<TFragment, TMnemonic>>&);
+   TCSMHit* MakeHit(std::pair<TFragment, TGRSIMnemonic>&, std::pair<TFragment, TGRSIMnemonic>&);
+   TCSMHit* MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>&, std::vector<std::pair<TFragment, TGRSIMnemonic>>&);
    TCSMHit* CombineHits(TDetectorHit*, TDetectorHit*);
-   void    RecoverHit(char, std::pair<TFragment, TMnemonic>&, std::vector<TDetectorHit*>&);
+   void    RecoverHit(char, std::pair<TFragment, TGRSIMnemonic>&, std::vector<TDetectorHit*>&);
    bool    AlmostEqual(int, int);
    bool    AlmostEqual(double, double);
 

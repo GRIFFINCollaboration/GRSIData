@@ -1,5 +1,4 @@
 #include "TGenericDetector.h"
-#include "TMnemonic.h"
 
 #include "TClass.h"
 #include <cmath>

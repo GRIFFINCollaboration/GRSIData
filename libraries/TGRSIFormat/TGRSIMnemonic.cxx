@@ -86,25 +86,25 @@ void TGRSIMnemonic::EnumerateSystem()
    }
 }
 
-TGRSIMnemonic::EDigitizer TGRSIMnemonic::EnumerateDigitizer(std::string name)
+void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType)
 {
+	std::string name = digitizerName.Value();
    std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+	EDigitizer tmpType = EDigitizer::kDefault;
    if(name.compare("GRF16") == 0) {
-      return EDigitizer::kGRF16;
-   }
-   if(name.compare("GRF4G") == 0) {
-      return EDigitizer::kGRF4G;
-   }
-   if(name.compare("TIG10") == 0) {
-      return EDigitizer::kTIG10;
-   }
-   if(name.compare("TIG64") == 0) {
-      return EDigitizer::kTIG64;
-   }
-   if(name.compare("CAEN") == 0) {
-      return EDigitizer::kCaen;
-   }
-   return EDigitizer::kDefault;
+		tmpType = EDigitizer::kGRF16;
+   } else if(name.compare("GRF4G") == 0) {
+		tmpType = EDigitizer::kGRF4G;
+   } else if(name.compare("TIG10") == 0) {
+		tmpType = EDigitizer::kTIG10;
+   } else if(name.compare("TIG64") == 0) {
+		tmpType = EDigitizer::kTIG64;
+   } else if(name.compare("CAEN") == 0) {
+		tmpType = EDigitizer::kCaen;
+   } else {
+		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', and 'CAEN'!"<<std::endl;
+	}
+	digitizerType.Set(tmpType, digitizerName.Priority());
 }
 
 void TGRSIMnemonic::Parse(std::string* name)
