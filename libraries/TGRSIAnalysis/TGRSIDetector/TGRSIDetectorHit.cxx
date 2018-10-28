@@ -48,6 +48,7 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
       Error("GetTime", "No TChannel exists for address 0x%08x", GetAddress());
       return SetTime(10. * (static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform())));
    }
+	
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
 		Double_t dTime;
 		case EDigitizer::kGRF16:

@@ -1,4 +1,4 @@
-// TMidasEvent.h TMidasFile.h
+// TXMLOdb.h TMidasEvent.h TMidasFile.h
 
 
 #ifdef __CINT__
@@ -8,6 +8,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class TXMLOdb+;
 #pragma link C++ class TMidasEvent+;
 #pragma link C++ class TMidasFile+;
 
