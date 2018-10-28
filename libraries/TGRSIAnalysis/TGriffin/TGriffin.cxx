@@ -185,11 +185,21 @@ Double_t TGriffin::GetEnergyNonlinearity(int chan, double energy)
    return 0.0;
 }
 
-void TGriffin::Print(Option_t*) const
+void TGriffin::Print(Option_t* opt) const
 {
    std::cout<<"Griffin Contains: "<<std::endl;
    std::cout<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
+	if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
+		for(auto hit : fGriffinLowGainHits) {
+			static_cast<TGriffinHit*>(hit)->Print();
+		}
+	}
    std::cout<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
+	if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
+		for(auto hit : fGriffinHighGainHits) {
+			static_cast<TGriffinHit*>(hit)->Print();
+		}
+	}
 
    if(IsAddbackSet(EGainBits::kLowGain)) {
       std::cout<<std::setw(6)<<fAddbackLowGainHits.size()<<" Low gain addback hits"<<std::endl;
