@@ -110,7 +110,9 @@ void TGriffinHit::Add(const TDetectorHit* hit)
    } else {
       SetTime(GetTime());
    }
+	std::cout<<"Add: "<<GetEnergy()<<" + "<<griffinHit->GetEnergy();
    SetEnergy(GetEnergy() + griffinHit->GetEnergy());
+	std::cout<<" = "<<GetEnergy()<<std::endl;
    // this has to be done at the very end, otherwise GetEnergy() might not work
    SetCharge(0);
    // Add all of the pileups.This should be changed when the max number of pileups changes
