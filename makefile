@@ -136,7 +136,7 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h
+$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) lib/libGRSIData.so include/GRSIDataVersion.h
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
