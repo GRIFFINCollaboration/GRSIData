@@ -378,11 +378,6 @@ Short_t TGriffin::GetAddbackMultiplicity(const EGainBits& gain_type)
    if(ab_vec.empty()) {
 		CreateAddback(hit_vec, ab_vec, frag_vec);
       SetAddback(gain_type, true);
-		std::cout<<"created "<<ab_vec.size()<<" addback hits (";
-		for(auto h : ab_vec) { std::cout<<h->GetDetector()<<"/"<<h->GetCrystal()<<" - "<<h->GetEnergy()<<" "; }
-		std::cout<<") from "<<hit_vec.size()<<" hits (";
-		for(auto h : hit_vec) { std::cout<<h->GetDetector()<<"/"<<h->GetCrystal()<<" - "<<h->GetEnergy()<<" "; }
-		std::cout<<")"<<std::endl;
    }
 
    return ab_vec.size();
@@ -819,11 +814,6 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo, const EGainB
    if(ab_vec.empty()) {
 		CreateSuppressedAddback(bgo, hit_vec, ab_vec, frag_vec);
       SetSuppressedAddback(gain_type, true);
-		std::cout<<"created "<<ab_vec.size()<<" suppressed addback hits (";
-		for(auto h : ab_vec) { std::cout<<h->GetDetector()<<"/"<<h->GetCrystal()<<" - "<<h->GetEnergy()<<" "; }
-		std::cout<<") from "<<hit_vec.size()<<" hits (";
-		for(auto h : hit_vec) { std::cout<<h->GetDetector()<<"/"<<h->GetCrystal()<<" - "<<h->GetEnergy()<<" "; }
-		std::cout<<")"<<std::endl;
    }
 
    return ab_vec.size();
