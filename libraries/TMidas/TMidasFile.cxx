@@ -376,6 +376,48 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
    return bytes_read;
 }
 
+void TMidasFile::Skip(size_t nofEvents)
+{
+	TMidasEvent ev;
+	for(size_t i = 0; i < nofEvents; ++i) {
+		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
+			ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - fReadBuffer.size());
+		}
+
+		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
+			return;
+		}
+
+		ev.Clear();
+		memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), fReadBuffer.data(), sizeof(TMidas_EVENT_HEADER));
+		if(fDoByteSwap) {
+			printf("Swapping bytes\n");
+			ev.SwapBytesEventHeader();
+		}
+		if(!ev.IsGoodSize()) {
+			fLastErrno = -1;
+			fLastError.assign("Invalid event size");
+			return;
+		}
+
+		size_t event_size = ev.GetDataSize();
+		size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
+
+		if(fReadBuffer.size() < total_size) {
+			ReadMoreBytes(total_size - fReadBuffer.size());
+		}
+
+		if(fReadBuffer.size() < total_size) {
+			return;
+		}
+
+		size_t bytes_read = fReadBuffer.size();
+		fBytesRead += bytes_read;
+		fCurrentEventNumber++;
+		fReadBuffer.clear();
+	}
+}
+
 void TMidasFile::ReadMoreBytes(size_t bytes)
 {
    size_t initial_size = fReadBuffer.size();
