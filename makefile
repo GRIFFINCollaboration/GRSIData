@@ -127,7 +127,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(EXECUTABLES)
+all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(EXECUTABLES) $(HISTOGRAM_SO)
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
@@ -136,7 +136,7 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h
+$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) lib/libGRSIData.so include/GRSIDataVersion.h
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
@@ -144,6 +144,9 @@ lib: include/GRSIDataVersion.h
 
 include/GRSIDataVersion.h:
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+
+lib/lib%.so: .build/histos/%.o | include/GRSIDataVersion.h lib
+	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
