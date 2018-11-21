@@ -58,7 +58,7 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
             std::cout<<"can not find:  "<<name<<std::endl;
             return nullptr;
          }
-         mats.push_back(dynamic_cast<TH2*>(in_file->Get(name.c_str())));
+         mats.push_back(m);
       }
    }
 
@@ -206,7 +206,7 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
 
 void FixAll(TFile* in_file, TFile*)
 {
-   // This function only loops over 16 clvoers (always does) and uses the 1332 keV gamma ray in 60Co
+   // This function only loops over 16 clovers (always does) and uses the 1332 keV gamma ray in 60Co
    // We might want to make this coding a little "softer"
    double energies[2] = {1173.228, 1332.492};
    for(int d = 1; d <= 16; d++) {
@@ -230,11 +230,7 @@ int main(int argc, char** argv)
    }
 
    auto* in_file = new TFile(argv[1]);
-   if(in_file == nullptr) {
-      printf("Failed to open file '%s'!\n", argv[1]);
-      return 1;
-   }
-   if(!in_file->IsOpen()) {
+   if(in_file == nullptr || !in_file->IsOpen()) {
       printf("Failed to open file '%s'!\n", argv[1]);
       return 1;
    }
