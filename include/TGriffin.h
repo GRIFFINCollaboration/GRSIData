@@ -148,8 +148,8 @@ private:
    mutable std::vector<UShort_t> fAddbackLowGainFrags;  //!<! Number of crystals involved in creating in the addback hit
    mutable std::vector<UShort_t> fAddbackHighGainFrags; //!<! Number of crystals involved in creating in the addback hit
 
-   std::vector<TDetectorHit*> fSuppressedLowGainHits;  //  The set of suppressed crystal hits
-   std::vector<TDetectorHit*> fSuppressedHighGainHits; //  The set of suppressed crystal hits
+   std::vector<TDetectorHit*> fSuppressedLowGainHits;  //!<!  The set of suppressed crystal hits
+   std::vector<TDetectorHit*> fSuppressedHighGainHits; //!<!  The set of suppressed crystal hits
 
    mutable std::vector<TDetectorHit*> fSuppressedAddbackLowGainHits;  //!<! Used to create suppressed addback hits on the fly
    mutable std::vector<TDetectorHit*> fSuppressedAddbackHighGainHits; //!<! Used to create suppressed addback hits on the fly

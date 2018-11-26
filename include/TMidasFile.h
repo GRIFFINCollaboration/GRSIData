@@ -48,6 +48,7 @@ public:
    bool Write(const std::shared_ptr<TMidasEvent>& midasEvent,
               Option_t*                           opt = ""); ///< Write one event to the output file
 #endif
+	void Skip(size_t nofEvents) override; ///< Skip nofEvents from the file
    std::string Status(bool long_file_description = true) override;
 
 #ifndef __CINT__
