@@ -1,5 +1,7 @@
 #include <string>
 
+#include "TClassRef.h"
+
 #include "TMidasFile.h"
 #include "TGRSIDataParser.h"
 #include "GRSIDataVersion.h"
@@ -14,4 +16,4 @@ extern "C" void DestroyParser(TGRSIDataParser* obj) { delete obj; }
 
 extern "C" std::string LibraryVersion() { return std::string(GRSIDATA_RELEASE); }
 
-extern "C" void InitLibrary() { TChannel::SetMnemonicClass(TGRSIMnemonic::Class()); }
+extern "C" void InitLibrary() { TChannel::SetMnemonicClass(TClassRef("TGRSIMnemonic")); }
