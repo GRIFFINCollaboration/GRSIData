@@ -38,7 +38,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
       case 1:
          event->SetBankList();
          if((banksize = event->LocateBank(nullptr, "WFDN", &ptr)) > 0) {
-            frags = TigressDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event->GetSerialNumber(), event->GetTimeStamp());
+            frags = TigressDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF1", &ptr)) > 0) {
             frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF1, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF2", &ptr)) > 0) {
@@ -69,6 +69,8 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          event->SetBankList();
          if((banksize = event->LocateBank(nullptr, "MSRD", &ptr)) > 0) {
 				EPIXToScalar(reinterpret_cast<float*>(ptr), banksize, event->GetSerialNumber(), event->GetTimeStamp());
+				// EPIXToScalar will only ever read a single fragment
+            event->IncrementGoodFrags();
          }
          break;
       case 0x8001:
@@ -108,13 +110,13 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    return frags;
 }
 
-int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned int midasSerialNumber, time_t midasTime)
+int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
 {
    /// Converts A MIDAS File from the Tigress DAQ into a TFragment.
    int                        NumFragsFound = 0;
    std::shared_ptr<TFragment> eventFrag     = std::make_shared<TFragment>();
-   eventFrag->SetDaqTimeStamp(midasTime);
-   eventFrag->SetDaqId(midasSerialNumber);
+   eventFrag->SetDaqTimeStamp(event->GetSerialNumber());
+   eventFrag->SetDaqId(event->GetTimeStamp());
 
    int      x     = 0;
    uint32_t dword = *(data + x);
@@ -124,7 +126,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
 
    if(!SetTIGTriggerID(dword, eventFrag)) {
       printf(RED "Setting TriggerId (0x%08x) failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", dword,
-             midasSerialNumber);
+             event->GetSerialNumber());
       return -x;
    }
    x += 1;
@@ -132,7 +134,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
    // There can be a tigger bit pattern between the header and the time !   pcb.
 
    if(!SetTIGTimeStamp((data + x), eventFrag)) {
-      printf(RED "%i Setting TimeStamp failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", x, midasSerialNumber);
+      printf(RED "%i Setting TimeStamp failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", x, event->GetSerialNumber());
       return -x;
    }
    // int temp_charge =  0;
@@ -171,6 +173,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
 
             Push(fGoodOutputQueues, transferfrag);
             NumFragsFound++;
+            event->IncrementGoodFrags();
 
             // printf("transferfrag = 0x%08x\n",transferfrag); fflush(stdout);
             // printf("transferfrag->GetTimeStamp() = %lu\n",transferfrag->GetTimeStamp()); fflush(stdout);
@@ -180,6 +183,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
             std::shared_ptr<TFragment> transferfrag = std::make_shared<TFragment>(*eventFrag);
             Push(fGoodOutputQueues, transferfrag);
             NumFragsFound++;
+            event->IncrementGoodFrags();
             eventFrag = nullptr;
             return NumFragsFound;
          }

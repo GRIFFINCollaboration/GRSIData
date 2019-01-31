@@ -78,11 +78,11 @@ public:
 #ifndef __CINT__
 	int Process(std::shared_ptr<TRawEvent>) override;
 	int ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event);
+   int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 #endif
 
 public:
-   int TigressDataToFragment(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0,
                              time_t midasTime = 0);
    int GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
