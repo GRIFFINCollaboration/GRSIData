@@ -48,7 +48,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          } else if((banksize = event->LocateBank(nullptr, "GRF4", &ptr)) > 0) {
             frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF4, event);
          } else if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
-            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize);
+            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          } else if(!TGRSIOptions::Get()->SuppressErrors()) {
             printf(DRED "\nUnknown bank in midas event #%d" RESET_COLOR "\n", event->GetSerialNumber());
          }
@@ -61,7 +61,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          break;
       case 3:
          if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
-            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize);
+            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          }
          break;
       case 4:
@@ -1386,7 +1386,7 @@ bool TGRSIDataParser::SetScalerValue(int index, uint32_t value, TScalerData* sca
    return true;
 }
 
-int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
+int TGRSIDataParser::CaenToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
 {
    /// Converts a Caen flavoured MIDAS events into TFragments and returns the number of events processed
    std::shared_ptr<TFragment> eventFrag = std::make_shared<TFragment>();
@@ -1420,7 +1420,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
          }
 			return -w;
 		}
-		//uint8_t boardId = data[w]>>27; // GEO address of board (can be set via register 0xef08 for VME)
+		uint8_t boardId = data[w]>>27; // GEO address of board (can be set via register 0xef08 for VME)
 		//uint16_t pattern = (data[w]>>8) & 0x7fff; // value read from LVDS I/O (VME only)
 		uint8_t channelMask = data[w++]&0xff; // which channels are in this board aggregate
 		++w;//uint32_t boardCounter = data[w++]&0x7fffff; // ??? "counts the board aggregate"
@@ -1483,7 +1483,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
 			// read channel data
 			for(int ev = 0; ev < (numWords-2)/eventSize; ++ev) { // -2 = 2 header words for channel aggregate
 				eventFrag->SetDaqTimeStamp(boardTime);
-				eventFrag->SetAddress(0x8000 + channel + (data[w]>>31)); // highest bit indicates odd channel
+				eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w]>>31)); // highest bit indicates odd channel
             if(eventFrag->GetAddress() == 0x8000) eventFrag->SetDetectorType(9); //ZDS will always be in channel 0
             else                                  eventFrag->SetDetectorType(6);
             // these timestamps are in 2ns units, but the "normal" timestamps are in 10ns units
@@ -1585,6 +1585,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
 				Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
             eventFrag->Clear();
             ++nofFragments;
+            event->IncrementGoodFrags();
 			} // while(w < size)
 		} // for(uint8_t channel = 0; channel < 16; channel += 2)
 	} // for(int board = 0; w < size; ++board)
