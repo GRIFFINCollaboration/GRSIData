@@ -78,27 +78,29 @@ private:
    //  detector types to switch over in Set()
    //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
 
-	bool fDescantAncillary{false};  // Descant is in the ancillary detector locations
+	bool fDescantAncillary{false};  ///< Descant is in the ancillary detector locations
 
-   bool fTigress{false}; // flag for Tigress on/off
-   bool fSharc{false};   // flag for Sharc on/off
-   bool fTriFoil{false}; // flag for TriFoil on/off
-   bool fRf{false};      // flag for RF on/off
-   bool fCSM{false};     // flag for CSM on/off
-   bool fSpice{false};   // flag for Spice on/off
-   bool fTip{false};     // flag for Tip on/off
-   bool fS3{false};      // flag for S3 on/off
-   bool fGeneric{false}; // flag for Generic on/off
-   bool fBambino{false}; // flag for Bambino on/off
+   bool fTigress{false}; ///< flag for Tigress on/off
+   bool fSharc{false};   ///< flag for Sharc on/off
+   bool fTriFoil{false}; ///< flag for TriFoil on/off
+   bool fRf{false};      ///< flag for RF on/off
+   bool fCSM{false};     ///< flag for CSM on/off
+   bool fSpice{false};   ///< flag for Spice on/off
+   bool fTip{false};     ///< flag for Tip on/off
+   bool fS3{false};      ///< flag for S3 on/off
+   bool fGeneric{false}; ///< flag for Generic on/off
+   bool fBambino{false}; ///< flag for Bambino on/off
 
-   bool fGriffin{false};    // flag for Griffin on/off
-   bool fSceptar{false};    // flag for Sceptar on/off
-   bool fPaces{false};      // flag for Paces on/off
-   bool fDante{false};      // flag for LaBr on/off
-   bool fZeroDegree{false}; // flag for Zero Degree Scintillator on/off
-   bool fDescant{false};    // flag for Descant on/off
+   bool fGriffin{false};    ///< flag for Griffin on/off
+   bool fSceptar{false};    ///< flag for Sceptar on/off
+   bool fPaces{false};      ///< flag for Paces on/off
+   bool fDante{false};      ///< flag for LaBr on/off
+   bool fZeroDegree{false}; ///< flag for Zero Degree Scintillator on/off
+   bool fDescant{false};    ///< flag for Descant on/off
 
-   bool fBgo{false};        // flag for Bgo on/off
+   bool fBgo{false};        ///< flag for Bgo on/off
+
+	bool fSortByTriggerId{false}; ///< flag to sort by trigger ID instead of time stamp
 
    /// \cond CLASSIMP
    ClassDefOverride(TGRSIDetectorInformation, 1); // Contains the run-dependent information.

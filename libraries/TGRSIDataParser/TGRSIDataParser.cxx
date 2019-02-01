@@ -38,7 +38,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
       case 1:
          event->SetBankList();
          if((banksize = event->LocateBank(nullptr, "WFDN", &ptr)) > 0) {
-            frags = TigressDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event->GetSerialNumber(), event->GetTimeStamp());
+            frags = TigressDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF1", &ptr)) > 0) {
             frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF1, event);
          } else if((banksize = event->LocateBank(nullptr, "GRF2", &ptr)) > 0) {
@@ -48,7 +48,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          } else if((banksize = event->LocateBank(nullptr, "GRF4", &ptr)) > 0) {
             frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF4, event);
          } else if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
-            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize);
+            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          } else if(!TGRSIOptions::Get()->SuppressErrors()) {
             printf(DRED "\nUnknown bank in midas event #%d" RESET_COLOR "\n", event->GetSerialNumber());
          }
@@ -61,7 +61,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          break;
       case 3:
          if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
-            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize);
+            frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          }
          break;
       case 4:
@@ -69,6 +69,8 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          event->SetBankList();
          if((banksize = event->LocateBank(nullptr, "MSRD", &ptr)) > 0) {
 				EPIXToScalar(reinterpret_cast<float*>(ptr), banksize, event->GetSerialNumber(), event->GetTimeStamp());
+				// EPIXToScalar will only ever read a single fragment
+            event->IncrementGoodFrags();
          }
          break;
       case 0x8001:
@@ -108,13 +110,13 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    return frags;
 }
 
-int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned int midasSerialNumber, time_t midasTime)
+int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
 {
    /// Converts A MIDAS File from the Tigress DAQ into a TFragment.
    int                        NumFragsFound = 0;
    std::shared_ptr<TFragment> eventFrag     = std::make_shared<TFragment>();
-   eventFrag->SetDaqTimeStamp(midasTime);
-   eventFrag->SetDaqId(midasSerialNumber);
+   eventFrag->SetDaqTimeStamp(event->GetSerialNumber());
+   eventFrag->SetDaqId(event->GetTimeStamp());
 
    int      x     = 0;
    uint32_t dword = *(data + x);
@@ -124,7 +126,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
 
    if(!SetTIGTriggerID(dword, eventFrag)) {
       printf(RED "Setting TriggerId (0x%08x) failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", dword,
-             midasSerialNumber);
+             event->GetSerialNumber());
       return -x;
    }
    x += 1;
@@ -132,7 +134,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
    // There can be a tigger bit pattern between the header and the time !   pcb.
 
    if(!SetTIGTimeStamp((data + x), eventFrag)) {
-      printf(RED "%i Setting TimeStamp failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", x, midasSerialNumber);
+      printf(RED "%i Setting TimeStamp failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", x, event->GetSerialNumber());
       return -x;
    }
    // int temp_charge =  0;
@@ -171,6 +173,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
 
             Push(fGoodOutputQueues, transferfrag);
             NumFragsFound++;
+            event->IncrementGoodFrags();
 
             // printf("transferfrag = 0x%08x\n",transferfrag); fflush(stdout);
             // printf("transferfrag->GetTimeStamp() = %lu\n",transferfrag->GetTimeStamp()); fflush(stdout);
@@ -180,6 +183,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, unsigned in
             std::shared_ptr<TFragment> transferfrag = std::make_shared<TFragment>(*eventFrag);
             Push(fGoodOutputQueues, transferfrag);
             NumFragsFound++;
+            event->IncrementGoodFrags();
             eventFrag = nullptr;
             return NumFragsFound;
          }
@@ -1386,7 +1390,7 @@ bool TGRSIDataParser::SetScalerValue(int index, uint32_t value, TScalerData* sca
    return true;
 }
 
-int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
+int TGRSIDataParser::CaenToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
 {
    /// Converts a Caen flavoured MIDAS events into TFragments and returns the number of events processed
    std::shared_ptr<TFragment> eventFrag = std::make_shared<TFragment>();
@@ -1420,7 +1424,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
          }
 			return -w;
 		}
-		//uint8_t boardId = data[w]>>27; // GEO address of board (can be set via register 0xef08 for VME)
+		uint8_t boardId = data[w]>>27; // GEO address of board (can be set via register 0xef08 for VME)
 		//uint16_t pattern = (data[w]>>8) & 0x7fff; // value read from LVDS I/O (VME only)
 		uint8_t channelMask = data[w++]&0xff; // which channels are in this board aggregate
 		++w;//uint32_t boardCounter = data[w++]&0x7fffff; // ??? "counts the board aggregate"
@@ -1483,7 +1487,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
 			// read channel data
 			for(int ev = 0; ev < (numWords-2)/eventSize; ++ev) { // -2 = 2 header words for channel aggregate
 				eventFrag->SetDaqTimeStamp(boardTime);
-				eventFrag->SetAddress(0x8000 + channel + (data[w]>>31)); // highest bit indicates odd channel
+				eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w]>>31)); // highest bit indicates odd channel
             if(eventFrag->GetAddress() == 0x8000) eventFrag->SetDetectorType(9); //ZDS will always be in channel 0
             else                                  eventFrag->SetDetectorType(6);
             // these timestamps are in 2ns units, but the "normal" timestamps are in 10ns units
@@ -1585,6 +1589,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size)
 				Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
             eventFrag->Clear();
             ++nofFragments;
+            event->IncrementGoodFrags();
 			} // while(w < size)
 		} // for(uint8_t channel = 0; channel < 16; channel += 2)
 	} // for(int board = 0; w < size; ++board)
