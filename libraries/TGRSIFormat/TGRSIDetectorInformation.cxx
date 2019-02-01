@@ -22,10 +22,10 @@ TGRSIDetectorInformation::~TGRSIDetectorInformation() = default;
 
 TEventBuildingLoop::EBuildMode TGRSIDetectorInformation::BuildMode() const
 {
-	if(Griffin()) {
-		return TEventBuildingLoop::EBuildMode::kTimestamp;
+	if(fSortByTriggerId) {
+		return TEventBuildingLoop::EBuildMode::kTriggerId;
 	}
-	return TEventBuildingLoop::EBuildMode::kTriggerId;
+	return TEventBuildingLoop::EBuildMode::kTimestamp;
 }
 
 void TGRSIDetectorInformation::Print(Option_t* opt) const
@@ -93,6 +93,11 @@ void TGRSIDetectorInformation::Set()
    for(iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
       std::string channelname = iter->second->GetName();
 
+		// check if we have an old TIG digitizer, in that case sort by trigger ID (instead of time stamp)
+		// don't need to check again if we already found one, so include check for fSortByTriggerId being true
+		if(!fSortByTriggerId && (iter->second->GetDigitizerType() == EDigitizer::kTIG10 || iter->second->GetDigitizerType() == EDigitizer::kTIG64)) {
+			fSortByTriggerId = true;
+		}
       //  detector system type.
       //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
       switch(static_cast<const TGRSIMnemonic*>(iter->second->GetMnemonic())->System()) {
