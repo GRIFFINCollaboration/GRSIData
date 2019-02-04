@@ -664,6 +664,16 @@ void TMidasFile::SetFileOdb()
    fOdb = new TXMLOdb(fOdbEvent->GetData(), fOdbEvent->GetDataSize());
    TChannel::DeleteAllChannels();
 
+   SetRunInfo(fOdbEvent->GetTimeStamp());
+
+   // Check for EPICS variables
+   SetEPICSOdb();
+
+	if(TGRSIOptions::Get()->IgnoreOdbChannels()) {
+      printf(DYELLOW "\tskipping odb channel information stored in file.\n" RESET_COLOR);
+		return;
+	}
+
    // Check to see if we are running a GRIFFIN or TIGRESS experiment
    TXMLNode* node = fOdb->FindPath("/Experiment");
    if(!node->HasChildren()) {
@@ -689,11 +699,6 @@ void TMidasFile::SetFileOdb()
       //		fIamGriffin = true;
       SetGRIFFOdb();
    }
-
-   SetRunInfo(fOdbEvent->GetTimeStamp());
-
-   // Check for EPICS variables
-   SetEPICSOdb();
 #endif
 }
 
