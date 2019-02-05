@@ -32,7 +32,7 @@ public:
    Int_t    GetPreamp() const;
    Int_t    GetPin() const;
    bool     MagnetShadow() const;
-   Double_t GetTimeFit() const {// In 10ns tstamp units
+   Double_t GetTimeFit() const {// In ns tstamp units
       TChannel* channel = GetChannel();
       if(channel != nullptr) return fTimeFit+channel->GetTZero(GetEnergy());
       return fTimeFit;
@@ -44,7 +44,7 @@ public:
    Int_t    GetTimeStampLow() { return GetTimeStamp() & 0x0fffffff; }
    Double_t GetTimeFitns() const
    {
-      return (GetTimeStamp()+GetTimeFit())*10.;
+      return GetTimeStamp()+GetTimeFit();
    }   
    Double_t GetTimeFitCfd() const
    {
@@ -97,7 +97,6 @@ public:
       double gamma  = 1 / (sqrt(1 - pow(beta, 2)));
 
       return ((E + 511 - beta * costhe * sqrt(E * (E + 1022))) * gamma) - 511;
-      ;
    }
 
    unsigned int GetAddbackSize()

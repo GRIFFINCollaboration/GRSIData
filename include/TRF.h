@@ -37,7 +37,7 @@ public:
    Double_t GetTimeFitns() const
    {
       if(fTime != 0 && fTime < 1000 && fTime > -1000) {
-         return TimeStamp()*10. + fTime; // 
+         return TimeStamp() + fTime; // 
       }
       return 0;
    }

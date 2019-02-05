@@ -10,7 +10,6 @@
 
 const Double_t ps          = 1E-3;
 const Double_t ns          = 1.;
-const Double_t ts_units    = 10*ns;
 const Double_t us          = 1E3;
 const Double_t ms          = 1E6;
 const Double_t s           = 1E9;
@@ -84,7 +83,7 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
 
    if(grif != nullptr) {
       for(auto g1 = 0; g1 < grif->GetMultiplicity(); ++g1){
-         obj.FillHistogram("GRIFFIN","gE_Cyc",5000,0,5000, grif->GetGriffinHit(g1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(g1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+         obj.FillHistogram("GRIFFIN","gE_Cyc",5000,0,5000, grif->GetGriffinHit(g1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(g1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
          if(scep != nullptr){
             bool beta_found = false;
             for(auto b1 = 0; b1 < scep->GetMultiplicity(); ++b1){
@@ -137,12 +136,12 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
       }
       for(auto a1 = 0; a1 < grif->GetAddbackMultiplicity(); ++a1){
 		   obj.FillHistogram("GRIFFIN","aE", 5000, 0, 5000, grif->GetAddbackHit(a1)->GetEnergy());
-		   obj.FillHistogram("GRIFFIN","aE_Cyc", 5000, 0, 5000, grif->GetAddbackHit(a1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(a1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+		   obj.FillHistogram("GRIFFIN","aE_Cyc", 5000, 0, 5000, grif->GetAddbackHit(a1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(a1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
          if(zds != nullptr){
             bool beta_found = false;
             for(auto z1 = 0; z1 < zds->GetMultiplicity(); ++z1){
                if(PromptCoincidence(zds->GetZeroDegreeHit(z1),grif->GetAddbackHit(a1)) && !beta_found ){
-                  obj.FillHistogram("GRIFFIN","aEZ_Cyc",8000,0,8000,grif->GetAddbackHit(a1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(a1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+                  obj.FillHistogram("GRIFFIN","aEZ_Cyc",8000,0,8000,grif->GetAddbackHit(a1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetHit(a1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
                   beta_found = true;
                }
             }
@@ -155,11 +154,11 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
             bool beta_found = false;
             for(auto b1 = 0; b1 < scep->GetMultiplicity(); ++b1){
                if(PromptCoincidence(scep->GetSceptarHit(b1),grif->GetSuppressedAddbackHit(as1)) && !beta_found ){
-                  obj.FillHistogram("GRIFFIN","aESB_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+                  obj.FillHistogram("GRIFFIN","aESB_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
                   beta_found = true;
 
                   if(!zds_or_scep_found){
-                     obj.FillHistogram("GRIFFIN","aESbeta_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+                     obj.FillHistogram("GRIFFIN","aESbeta_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
                      zds_or_scep_found = true;
                   }
                }
@@ -169,10 +168,10 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
             bool beta_found = false;
             for(auto z1 = 0; z1 < zds->GetMultiplicity(); ++z1){
                if(PromptCoincidence(zds->GetZeroDegreeHit(z1),grif->GetSuppressedAddbackHit(as1)) && !beta_found ){
-                  obj.FillHistogram("GRIFFIN","aESZ_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+                  obj.FillHistogram("GRIFFIN","aESZ_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
                   beta_found = true;
                   if(!zds_or_scep_found){
-                     obj.FillHistogram("GRIFFIN","aESbeta_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+                     obj.FillHistogram("GRIFFIN","aESbeta_Cyc",8000,0,8000,grif->GetSuppressedAddbackHit(as1)->GetEnergy(),kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(grif->GetSuppressedAddbackHit(as1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
                      zds_or_scep_found = true;
                   }
                }
@@ -252,14 +251,14 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
    if(zds != nullptr){
       for(auto z1 = 0; z1 < zds->GetMultiplicity(); ++z1){
          obj.FillHistogram("ZDS","ZE",2500,0,65000,zds->GetHit(z1)->GetEnergy(),2,1,3,zds->GetHit(z1)->GetDetector());
-         obj.FillHistogram("ZDS","z_Cyc",1000,0,10000,zds->GetHit(z1)->GetEnergy(), kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(zds->GetHit(z1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+         obj.FillHistogram("ZDS","z_Cyc",1000,0,10000,zds->GetHit(z1)->GetEnergy(), kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(zds->GetHit(z1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
       }
    }
    if(scep != nullptr){
       for(auto b1 = 0; b1 < scep->GetMultiplicity(); ++b1){
          obj.FillHistogram("SCEPTAR","bE",10000,0,6e7,scep->GetHit(b1)->GetEnergy(),20,1,21,scep->GetHit(b1)->GetDetector());
          obj.FillHistogram("HitPatterns", "bHP", 21,0,21,scep->GetHit(b1)->GetDetector());
-         obj.FillHistogram("SCEPTAR","b_Cyc", kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(scep->GetHit(b1)->GetTimeStamp()*ts_units))%(kCycleLength-less_background)+less_background)/s);
+         obj.FillHistogram("SCEPTAR","b_Cyc", kCycleLength*20/s,0,kCycleLength/s,(((ULong64_t)(scep->GetHit(b1)->GetTimeStamp()*ns))%(kCycleLength-less_background)+less_background)/s);
       }
    }
    if(descant != nullptr){
