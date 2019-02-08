@@ -31,6 +31,7 @@ public:
 
    virtual Double_t GetTime(const ETimeFlag& correct_flag = ETimeFlag::kAll,
                             Option_t*     opt          = "") const override; ///< Returns a time value to the nearest nanosecond!
+	virtual Int_t    GetTimeStampUnit() const override;
 	
    /// \cond CLASSIMP
    ClassDefOverride(TGRSIDetectorHit, 11) // Stores the information for a detector hit

@@ -410,8 +410,8 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
       // return true;
    };
    if(timestamplow > -1 && timestamphigh > -1) {
-		// combine low and high time stamp bits and multiply by 10 to get from 100 MHz clock to 1 ns units
-      currentFrag->SetTimeStamp(((timestamphigh<<24) + timestamplow) * 10);
+		// combine low and high time stamp bits
+      currentFrag->SetTimeStamp((timestamphigh<<24) + timestamplow);
       return true;
    }
 
@@ -727,11 +727,11 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
                      // 0x"<<fLastTimeStampMap[eventFrag->GetAddress()];
                      // reconstruct the high bits of the timestamp from the high bits of the last time stamp of the
                      // same address after converting the saved timestamp back to 10 ns units
-                     if((eventFrag->GetTimeStamp()/10 & 0x0fffffff) <
-                        (fLastTimeStampMap[eventFrag->GetAddress()]/10 & 0x0fffffff)) {
+                     if((eventFrag->GetTimeStamp() & 0x0fffffff) <
+                        (fLastTimeStampMap[eventFrag->GetAddress()] & 0x0fffffff)) {
                         // we had a wrap-around of the low time stamp, so we need to set the high bits to the old
                         // high bits plus one
-                        eventFrag->AppendTimeStamp((((fLastTimeStampMap[eventFrag->GetAddress()]/10 >> 28) + 1)<<28)*10);
+                        eventFrag->AppendTimeStamp(((fLastTimeStampMap[eventFrag->GetAddress()] >> 28) + 1)<<28);
                      } else {
                         eventFrag->AppendTimeStamp(fLastTimeStampMap[eventFrag->GetAddress()] & 0x3fff0000000);
                      }
@@ -1158,7 +1158,7 @@ bool TGRSIDataParser::SetGRIFTimeStampLow(uint32_t value, const std::shared_ptr<
       return false;
    }
    // we always get the lower 28 bits first
-   frag->SetTimeStamp((value & 0x0fffffff) * 10);
+   frag->SetTimeStamp(value & 0x0fffffff);
    return true;
 }
 
@@ -1188,7 +1188,8 @@ bool TGRSIDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TFra
       return false;
    }
    frag->SetDeadTime((value & 0x0fffc000) >> 14);
-   frag->AppendTimeStamp((static_cast<Long64_t>(value & 0x00003fff)<<28) * 10);
+	// AppendTimeStamp simply adds the new value (not bitwise operation), so we just add the high bits
+   frag->AppendTimeStamp(static_cast<Long64_t>(value & 0x00003fff)<<28);
    return true;
 }
 
@@ -1293,12 +1294,18 @@ bool TGRSIDataParser::SetPPGNetworkPacket(uint32_t value, TPPGData* ppgevent)
 
 bool TGRSIDataParser::SetPPGLowTimeStamp(uint32_t value, TPPGData* ppgevent)
 {
+	// the PPG stores the raw values of low and high timestamp
+	// SetTimeStamp caluculates the correct (multiplied by 10) timestamp from these
+	// and is called by both SetLowTimeStamp and SetHighTimeStamp
    ppgevent->SetLowTimeStamp(value & 0x0fffffff);
    return true;
 }
 
 bool TGRSIDataParser::SetPPGHighTimeStamp(uint32_t value, TPPGData* ppgevent)
 {
+	// the PPG stores the raw values of low and high timestamp
+	// SetTimeStamp caluculates the correct (multiplied by 10) timestamp from these
+	// and is called by both SetLowTimeStamp and SetHighTimeStamp
    ppgevent->SetHighTimeStamp(value & 0x0fffffff);
    return true;
 }
@@ -1369,6 +1376,8 @@ bool TGRSIDataParser::SetScalerNetworkPacket(uint32_t value, TScalerData* scaler
 
 bool TGRSIDataParser::SetScalerLowTimeStamp(uint32_t value, TScalerData* scalerEvent)
 {
+	// the scaler stores the raw values of low and high timestamp
+	// GetTimeStamp caluculates the correct (multiplied by 10) timestamp from these
    if((value >> 28) != 0xa) {
       return false;
    }
@@ -1378,6 +1387,8 @@ bool TGRSIDataParser::SetScalerLowTimeStamp(uint32_t value, TScalerData* scalerE
 
 bool TGRSIDataParser::SetScalerHighTimeStamp(uint32_t value, TScalerData* scalerEvent, int& type)
 {
+	// the scaler stores the raw values of low and high timestamp
+	// GetTimeStamp caluculates the correct (multiplied by 10) timestamp from these
    if((value >> 28) != 0xe || (value & 0xff) != (scalerEvent->GetLowTimeStamp() >> 20)) {
       return false;
    }
@@ -1490,8 +1501,8 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size, std::shared_ptr<TM
 				eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w]>>31)); // highest bit indicates odd channel
             if(eventFrag->GetAddress() == 0x8000) eventFrag->SetDetectorType(9); //ZDS will always be in channel 0
             else                                  eventFrag->SetDetectorType(6);
-            // these timestamps are in 2ns units, so we multiply by 2 by shifting one to the left
-				eventFrag->SetTimeStamp((data[w] & 0x7fffffff)<<1);
+            // these timestamps are in 2ns units
+				eventFrag->SetTimeStamp(data[w] & 0x7fffffff);
             ++w;
 				if(waveform) {
 					if(w + numSampleWords >= size) { // need to read at least the sample words plus the charge/extra word
@@ -1532,8 +1543,7 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size, std::shared_ptr<TM
 					switch(extraFormat) {
 						case 0: // [31:16] extended time stamp, [15:0] baseline*4
 							//eventFrag->Baseline(data[w]&0xffff);
-							//shift by 16 not 15 to include conversion from 2 ns units
-							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<16);
+							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<15);
 							break;
 						case 1: // [31:16] extended time stamp, 15 trigger lost, 14 over range, 13 1024 triggers, 12 n lost triggers
 							eventFrag->SetNetworkPacketNumber((data[w]>>12)&0xf);
@@ -1541,12 +1551,10 @@ int TGRSIDataParser::CaenToFragment(uint32_t* data, int size, std::shared_ptr<TM
 							//eventFrag->KiloCount(((data[w]>>13)&0x1) == 0x1);
 							//eventFrag->OverRange(((data[w]>>14)&0x1) == 0x1);
 							//eventFrag->LostTrigger(((data[w]>>15)&0x1) == 0x1);
-							//shift by 16 not 15 to include conversion from 2 ns units
-							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<16);
+							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<15);
 							break;
 						case 2: // [31:16] extended time stamp,  15 trigger lost, 14 over range, 13 1024 triggers, 12 n lost triggers, [9:0] fine time stamp
-							//shift by 16 not 15 to include conversion from 2 ns units
-							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<16);
+							eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() | static_cast<uint64_t>(data[w]&0xffff0000)<<15);
 							eventFrag->SetCfd(data[w]&0x3ff);
 							eventFrag->SetNetworkPacketNumber((data[w]>>12)&0xf);
 							//eventFrag->NLostCount(((data[w]>>12)&0x1) == 0x1);

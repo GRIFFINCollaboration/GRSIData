@@ -73,3 +73,23 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
 	}
    return 0.;
 }
+
+Int_t TGRSIDetectorHit::GetTimeStampUnit() const
+{
+   TChannel* channel = GetChannel();
+   if(channel == nullptr) {
+      return 1;
+   }
+   
+   switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
+      case EDigitizer::kGRF16:
+      case EDigitizer::kGRF4G:
+      case EDigitizer::kTIG10:
+			return 10;
+      case EDigitizer::kCaen:
+			return 2;
+      default:
+			return 1;
+   }
+   return 1;
+}
