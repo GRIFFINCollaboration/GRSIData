@@ -56,7 +56,7 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
 		channel->CalibrateCFD((GetCfd() + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
 		return SetTime(dTime - channel->GetTZero(GetEnergy()));
 		case EDigitizer::kGRF4G:
-		dTime = GetTimeStamp() + channel->CalibrateCFD((fCfd >> 22) + ((fCfd & 0x3fffff) + gRandom->Uniform()) / 256.);
+		dTime = GetTimeStamp() + channel->CalibrateCFD((static_cast<Int_t>(fCfd) >> 22) + ((static_cast<Int_t>(fCfd) & 0x3fffff) + gRandom->Uniform()) / 256.);
 		return SetTime(dTime - channel->GetTZero(GetEnergy()));
 		case EDigitizer::kTIG10:
 		dTime = (GetTimeStamp() & (~0x7fffff)) +
@@ -74,22 +74,3 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
    return 0.;
 }
 
-Int_t TGRSIDetectorHit::GetTimeStampUnit() const
-{
-   TChannel* channel = GetChannel();
-   if(channel == nullptr) {
-      return 1;
-   }
-   
-   switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
-      case EDigitizer::kGRF16:
-      case EDigitizer::kGRF4G:
-      case EDigitizer::kTIG10:
-			return 10;
-      case EDigitizer::kCaen:
-			return 2;
-      default:
-			return 1;
-   }
-   return 1;
-}

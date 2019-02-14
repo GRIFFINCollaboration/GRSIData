@@ -76,17 +76,17 @@ bool TZeroDegreeHit::InFilter(Int_t)
    return true;
 }
 
-Int_t TZeroDegreeHit::GetCfd() const
+Float_t TZeroDegreeHit::GetCfd() const
 {
    /// special function for TZeroDegreeHit to return CFD after mapping out the high bits
    /// which are the remainder between the 125 MHz data and the 100 MHz timestamp clock
-   return fCfd & 0x3fffff;
+   return (static_cast<Int_t>(fCfd) & 0x3fffff) + gRandom->Uniform();
 }
 
 Int_t TZeroDegreeHit::GetRemainder() const
 {
    /// returns the remainder between 100 MHz/10ns timestamp and 125 MHz/8 ns data in ns
-   return fCfd >> 22;
+   return static_cast<Int_t>(fCfd) >> 22;
 }
 
 void TZeroDegreeHit::Clear(Option_t*)
@@ -217,7 +217,7 @@ Int_t TZeroDegreeHit::CalculateCfdAndMonitor(double attenuation, unsigned int de
 
    // correct for remainder between the 100MHz timestamp and the 125MHz start of the waveform
    // we save this in the upper bits, otherwise we can't correct the waveform themselves
-   cfd = (cfd & 0x3fffff) | (fCfd & 0x7c00000);
+   cfd = (cfd & 0x3fffff) | (static_cast<Int_t>(fCfd) & 0x7c00000);
 
    return cfd;
 }

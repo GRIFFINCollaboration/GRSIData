@@ -761,6 +761,14 @@ void TMidasFile::SetGRIFFOdb()
    temp.append("/datatype");
    node                  = fOdb->FindPath(temp.c_str());
    std::vector<int> type = fOdb->ReadIntArray(node);
+	if(type.empty()) {
+		// failed to read array from /DAQ/MSC/datatype, so try to read /DAQ/MSC/DetType
+		temp = path;
+		temp.append("/DetType");
+		node = fOdb->FindPath(temp.c_str());
+		type = fOdb->ReadIntArray(node);
+		std::cout<<"failed to find ODB path /DAQ/MSC/datatype, using "<<type.size()<<" entries from /DAQ/MSC/DetType instead"<<std::endl;
+	}
 
    temp = path;
    temp.append("/gain");
@@ -781,7 +789,7 @@ void TMidasFile::SetGRIFFOdb()
       (offsets.size() == type.size())) {
       // all good. We ignore the digitizer size as this information is not present for all data
       for(size_t x = 0; x < address.size(); x++) {
-         TChannel* tempChan = TChannel::GetChannel(address.at(x)); // names.at(x).c_str());
+         TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
          if(tempChan == nullptr) {
             tempChan = new TChannel();
          }

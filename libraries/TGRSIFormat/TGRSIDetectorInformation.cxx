@@ -25,7 +25,10 @@ TEventBuildingLoop::EBuildMode TGRSIDetectorInformation::BuildMode() const
 	if(fSortByTriggerId) {
 		return TEventBuildingLoop::EBuildMode::kTriggerId;
 	}
-	return TEventBuildingLoop::EBuildMode::kTimestamp;
+	if(TGRSIOptions::Get()->AnalysisOptions()->BuildEventsByTimeStamp()) {
+		return TEventBuildingLoop::EBuildMode::kTimestamp;
+	}
+	return TEventBuildingLoop::EBuildMode::kTime;
 }
 
 void TGRSIDetectorInformation::Print(Option_t* opt) const

@@ -45,7 +45,7 @@ public:
    inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
    inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
 
-   Int_t    GetCfd() const override;
+   Float_t  GetCfd() const override;
    Int_t    GetRemainder() const;
 
    Int_t CalculateCfd(double attenuation, unsigned int delay, int halfsmoothingwindow,
