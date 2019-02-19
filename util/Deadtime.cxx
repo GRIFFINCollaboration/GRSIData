@@ -255,7 +255,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
       for(Long64_t e = 0; e < nentries; e++) {
          maple->GetEntry(e);
          if(scaler->GetAddress() == static_cast<UInt_t>(*channel)) {
-            xaxis = (scaler->GetTimeStamp() / 1e8);
+            xaxis = (scaler->GetTimeStamp() / 1e9);
             // we check both the value of the scaler and the timestamp (ts difference should be = readout time)
             if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= (double(ncycle) + clk)) {
                yaxis = (scaler->GetScaler(index) - prev);

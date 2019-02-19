@@ -53,7 +53,7 @@ public:
 
    void Parse(std::string* name) override;
 
-   void EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType) override;
+   void EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType, TPriorityValue<int>& timeStampUnit) override;
 
 	TClass* GetClassType() const override;
    void Print(Option_t* opt = "") const override;

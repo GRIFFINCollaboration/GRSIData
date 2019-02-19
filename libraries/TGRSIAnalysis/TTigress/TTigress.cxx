@@ -26,8 +26,7 @@ bool DefaultAddback(TDetectorHit* one, TDetectorHit* two)
    // Assumption for crystals and segments: higher energy = first interaction
    // Checking for Scattering FROM "one" TO "two"
 
-   // GetTime is in ns;  AddbackWindow is in 10's of ns.
-   if(std::abs(one->GetTime() - two->GetTime()) < (TGRSIOptions::AnalysisOptions()->AddbackWindow() * 10.0)) {
+   if(std::abs(one->GetTime() - two->GetTime()) < TGRSIOptions::AnalysisOptions()->AddbackWindow()) {
       // segments of crystals have been sorted by descending energy during detector construction
       // LastPosition is the position of lowest energy segment and GetPosition the highest energy segment (assumed
       // first)

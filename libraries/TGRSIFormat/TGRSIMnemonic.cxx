@@ -86,25 +86,32 @@ void TGRSIMnemonic::EnumerateSystem()
    }
 }
 
-void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType)
+void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType, TPriorityValue<int>& timeStampUnit)
 {
 	std::string name = digitizerName.Value();
    std::transform(name.begin(), name.end(), name.begin(), ::toupper);
 	EDigitizer tmpType = EDigitizer::kDefault;
+	int tmpUnit = 1;
    if(name.compare("GRF16") == 0) {
 		tmpType = EDigitizer::kGRF16;
+		tmpUnit = 10;
    } else if(name.compare("GRF4G") == 0) {
 		tmpType = EDigitizer::kGRF4G;
+		tmpUnit = 10;
    } else if(name.compare("TIG10") == 0) {
 		tmpType = EDigitizer::kTIG10;
+		tmpUnit = 10;
    } else if(name.compare("TIG64") == 0) {
 		tmpType = EDigitizer::kTIG64;
+		tmpUnit = 10;
    } else if(name.compare("CAEN") == 0) {
 		tmpType = EDigitizer::kCaen;
+		tmpUnit = 2;
    } else {
 		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', and 'CAEN'!"<<std::endl;
 	}
 	digitizerType.Set(tmpType, digitizerName.Priority());
+	timeStampUnit.Set(tmpUnit, digitizerName.Priority());
 }
 
 void TGRSIMnemonic::Parse(std::string* name)
