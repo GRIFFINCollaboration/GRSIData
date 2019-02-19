@@ -127,7 +127,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(EXECUTABLES) $(HISTOGRAM_SO)
+all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
@@ -136,9 +136,6 @@ docs: doxygen
 
 doxygen:
 	$(MAKE) -C $@
-
-$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) lib/libGRSIData.so include/GRSIDataVersion.h
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
 	@mkdir -p $@
