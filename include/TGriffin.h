@@ -49,6 +49,7 @@ public:
    Short_t GetMultiplicity() const override { return GetMultiplicity(GetDefaultGainType()); }
 
    static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 110.0); //!<!
+   static TVector3 GetDetectorPosition(int DetNbr); //!<!
    static const char* GetColorFromNumber(Int_t number);
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

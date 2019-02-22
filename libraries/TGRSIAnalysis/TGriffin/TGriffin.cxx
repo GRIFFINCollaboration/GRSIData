@@ -473,6 +473,16 @@ TVector3 TGriffin::GetPosition(int DetNbr, int CryNbr, double dist)
    return (temp_pos + shift);
 }
 
+TVector3 TGriffin::GetDetectorPosition(int DetNbr)
+{
+   // Gets the position vector for a Clover DetNbr.
+   if(DetNbr > 16) {
+      return TVector3(0, 0, 1);
+   }
+
+   return gCloverPosition[DetNbr];
+}
+
 void TGriffin::ResetFlags() const
 {
    fGriffinBits = 0;
