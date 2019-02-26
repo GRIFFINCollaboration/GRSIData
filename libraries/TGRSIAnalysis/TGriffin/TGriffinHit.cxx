@@ -177,6 +177,5 @@ Double_t TGriffinHit::GetNoCTEnergy(Option_t*) const
 
 Double_t TGriffinHit::GetEnergyNonlinearity(double energy) const
 {
-   // return 0.0;
-   return -(TGriffin::GetEnergyNonlinearity(GetArrayNumber(), energy));
+   return -(TGriffin::GetEnergyNonlinearity(GetAddress(), energy));
 }
