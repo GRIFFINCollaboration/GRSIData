@@ -116,8 +116,8 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
    /// Converts A MIDAS File from the Tigress DAQ into a TFragment.
    int                        NumFragsFound = 0;
    std::shared_ptr<TFragment> eventFrag     = std::make_shared<TFragment>();
-   eventFrag->SetDaqTimeStamp(event->GetSerialNumber());
-   eventFrag->SetDaqId(event->GetTimeStamp());
+   eventFrag->SetDaqTimeStamp(event->GetTimeStamp());
+   eventFrag->SetDaqId(event->GetSerialNumber());
 
    int      x     = 0;
    uint32_t dword = *(data + x);
