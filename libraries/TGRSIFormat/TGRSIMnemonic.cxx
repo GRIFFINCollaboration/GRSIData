@@ -107,8 +107,14 @@ void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerNam
    } else if(name.compare("CAEN") == 0) {
 		tmpType = EDigitizer::kCaen;
 		tmpUnit = 2;
+   } else if(name.compare("MADC") == 0) {
+		tmpType = EDigitizer::kMadc;
+		tmpUnit = 10;
+   } else if(name.compare("V1190") == 0) {
+		tmpType = EDigitizer::kV1190;
+		tmpUnit = 10;
    } else {
-		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', and 'CAEN'!"<<std::endl;
+		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', 'CAEN', 'MADC!' && 'V1190'!"<<std::endl;
 	}
 	digitizerType.Set(tmpType, digitizerName.Priority());
 	timeStampUnit.Set(tmpUnit, digitizerName.Priority());

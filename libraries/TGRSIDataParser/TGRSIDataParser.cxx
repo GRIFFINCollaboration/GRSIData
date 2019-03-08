@@ -49,7 +49,16 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
             frags = ProcessGriffin(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF4, event);
          } else if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
             frags = CaenToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
-         } else if(!TGRSIOptions::Get()->SuppressErrors()) {
+         } else if((banksize = event->LocateBank(nullptr, "MADC", &ptr)) > 0) {
+            frags = EmmaMadcDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+	    if((banksize = event->LocateBank(nullptr, "EMMT", &ptr)) > 0) {
+		    //TODO: make this smarter so that an error in processing EMMT bank doesn't reduce frags
+            frags += EmmaTdcDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+	    }
+	 } else if((banksize = event->LocateBank(nullptr, "EMMT", &ptr)) > 0) {
+            frags = EmmaTdcDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+         }
+else if(!TGRSIOptions::Get()->SuppressErrors()) {
             printf(DRED "\nUnknown bank in midas event #%d" RESET_COLOR "\n", event->GetSerialNumber());
          }
          break;
@@ -654,7 +663,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
             // the number of words is only set for bank >= GRF3
             // if the fragment has a waveform, we can't compare the number of words
             // the headers number of words includes the header (word 0) itself, so we need to compare to x plus one
-            if(eventFrag->GetNumberOfWords() > 0 && !eventFrag->HasWave() && eventFrag->GetNumberOfWords() != x + fOptions->WordOffset()) {
+            if(fOptions->WordOffset() >= 0 && eventFrag->GetNumberOfWords() > 0 && !eventFrag->HasWave() && eventFrag->GetNumberOfWords() != x + fOptions->WordOffset()) {
                if(fState == EDataParserState::kGood) {
                   fState     = EDataParserState::kWrongNofWords;
                   failedWord = x;
@@ -1621,3 +1630,236 @@ int TGRSIDataParser::EPIXToScalar(float* data, int size, unsigned int midasSeria
 	fScalerOutputQueue->Push(EXfrag);
 	return NumFragsFound;
 }
+
+/////////////***************************************************************/////////////
+/////////////***************************************************************/////////////
+/////////////**************************EMMA Stuff***************************/////////////
+/////////////***************************************************************/////////////
+/////////////***************************************************************/////////////
+/////////////***************************************************************/////////////
+
+static Long64_t xferhfts;     // Time stamp to be transferred from ADC to TDC; 10 ns ticks
+static time_t   xfermidts;    // Midas time stamp of events, hopefully the same
+unsigned int    xfermidsn;    // Midas serial number
+
+
+int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
+{
+	/// Converts a MIDAS File from the Emma DAQ into a TFragment.
+	int numFragsFound = 0;
+	std::shared_ptr<TFragment> eventFrag     = std::make_shared<TFragment>();
+	xfermidts = event->GetTimeStamp();// to check against EMMT bank
+	eventFrag->SetDaqTimeStamp(xfermidts);
+        xfermidsn = event->GetSerialNumber(); // to chck againts EMMT bank
+	eventFrag->SetDaqId(xfermidsn);
+	eventFrag->SetDetectorType(12);
+
+	int      x     = 0;
+	uint32_t dword = *(data + x);
+
+	uint32_t type;
+	uint32_t adcchannel;
+	uint32_t adcdata;
+	uint32_t adctimestamp;
+	uint32_t adchightimestamp;
+
+	eventFrag->SetTimeStamp(0);
+	for(x=size; x-- > 0; ) { // Reads the event backwards 
+		dword = *(data + x);
+		type  = (dword & 0xf0000000) >> 28;
+		switch(type) {
+			case 0x0: // Reads 	the charge and channel number
+				{
+					if((dword & 0x00800000) != 0) {
+						adchightimestamp=dword&0x0000ffff;
+						eventFrag->AppendTimeStamp((static_cast<Long64_t>(adchightimestamp))*static_cast<Long64_t>(0x0000000140000000) ); // 14 gives you the *5 you need
+						xferhfts = eventFrag->GetTimeStamp();
+					} else if ((dword & 0x04000000) != 0) { // GH verify that this is a good ADC reading
+						adcchannel = (dword>>16)&0x1F; // ADC Channel Number
+						adcdata = (dword & 0xfff); // ADC Charge
+						std::shared_ptr<TFragment> transferfrag = std::make_shared<TFragment>(*eventFrag);
+						transferfrag->SetCharge(static_cast<Int_t>(adcdata));
+						transferfrag->SetAddress(0x800000 + adcchannel);
+						TChannel* chan = TChannel::GetChannel(transferfrag->GetAddress());
+						if(chan == nullptr) {
+							chan = fChannel;
+						}
+						Push(fGoodOutputQueues, transferfrag);
+						numFragsFound++;
+					}
+				} 
+				break;
+
+			case 0x4: // First DWORD in event, read last and writes the fragment
+				//            numFragsFound++;
+				eventFrag = nullptr;
+				return numFragsFound;
+				break;
+
+			case 0xe:
+			case 0xf:
+			case 0xd:
+			case 0xc: // Last 30 bits of timestamp
+				adctimestamp =(dword&0x3FFFFFFF);
+				eventFrag->AppendTimeStamp( static_cast<Long64_t>(adctimestamp)*static_cast<Long64_t>(5) ) ;
+				break;
+			default: break;
+		} // end swich
+	} // end for read backwards
+
+	return numFragsFound;
+}
+
+// kludge by GH
+static uint32_t wraparoundcounter = 0xffffffff; // Needed for bad data at start of run before GRIFFIN starts
+static uint32_t lasttimestamp;     // "last" time stamp for simple wraparound algorightm
+static uint32_t countsbetweenwraps; // number of counts between wraparounds
+
+int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
+{
+	/// Building TDC events, duplicating logic from EmmaMadcDataToFragment
+	int numFragsFound = 0;
+	std::shared_ptr<TFragment> eventFrag     = std::make_shared<TFragment>();
+	eventFrag->SetDaqTimeStamp(event->GetTimeStamp());
+	eventFrag->SetDaqId(event->GetSerialNumber());
+	eventFrag->SetDetectorType(13);
+
+	int      x     = 0;
+	int failedWord = -1; // Variable stores which word we failed on (if we fail). This is somewhat duplicate information
+	// to fState, but makes things easier to track.
+	bool multipleErrors = false; // Variable to store if multiple errors occured parsing one fragment
+	uint32_t tmpTimestamp = 0;
+	uint32_t tmpAddress = 0;
+	Long64_t ts;
+
+	std::vector<uint32_t> addresses;
+	std::vector<uint32_t> charges;
+
+	// we simply loop through the data and read what we get. No checks are made that every word we want is present.
+	for(x=0; x < size; ++x) {
+		switch((data[x] >> 27) & 0x1F) {
+			case 0x8: //global header
+				eventFrag->SetModuleType(data[x] & 0x1f); // GEO
+				eventFrag->SetAcceptedChannelId((data[x] >> 5) & 0x3fffff); // event count
+				break;
+			case 0x1: //TDC header
+				tmpAddress = (data[x] >> 16) & 0x300;//16 = 24 - 8
+				eventFrag->SetChannelId((data[x] >> 12) & 0xfff); // event id
+				eventFrag->SetNetworkPacketNumber(data[x] & 0xfff); // bunch id
+				break;
+			case 0x0: // TDC measurement
+				// we can get multiple of these per event, but we need the subsequent information from the trailer etc.
+				// so we store the words for now and build fragments at the very end
+				//
+				// we use the trailing/leading bit as additional address information
+				// VB's original code: addresses.push_back(((data[x] >> 18) & 0x800) | tmpAddress | ((data[x] >> 19) & 0x7f));//15 = 26 - 11
+				addresses.push_back(0x900000 + ((data[x] >> 19) & 0xff ) );  // address = 0x00900000 + channel + 0x80 for a trailing measurement
+				charges.push_back(data[x] & 0x7ffff);
+				break;
+			case 0x3: // TDC trailer
+				if((tmpAddress != ((data[x] >> 16) & 0x300)) || (eventFrag->GetChannelId() != ((data[x] >> 12) & 0xfff))) {
+					// either the trailer tdc doesn't match the header tdc, or the trailer event id doesn't match the header event id
+					TParsingDiagnostics::Get()->BadFragment(13); // hard-coded 13 for TDC for now
+					if(fState == EDataParserState::kGood) {
+						fState     = EDataParserState::kBadFooter;
+						failedWord = x;
+					} else {
+						multipleErrors = true;
+					}
+					Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
+				}
+				eventFrag->SetNumberOfPileups(data[x] & 0xfff);
+				break;
+			case 0x4: // TDC error
+				eventFrag->SetAddress((data[x] >> 16) & 0x300);//16 = 24 - 8
+				eventFrag->SetCharge(static_cast<Int_t>((data[x]) & 0xFFF)); // error flags
+				TParsingDiagnostics::Get()->BadFragment(13); // hard-coded 13 for TDC for now
+				if(fState == EDataParserState::kGood) {
+					fState     = EDataParserState::kFault;
+					failedWord = x;
+				} else {
+					multipleErrors = true;
+				}
+				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
+				break;
+			case 0x11: // extended trigger time
+				tmpTimestamp = (data[x] & 0x7FFFFFF) << 5;
+				break;
+			case 0x10: // trailer
+				//(data[x] >> 26) & 1 - trigger lost
+				//(data[x] >> 25) & 1 - output buffer overflow
+				//(data[x] >> 24) & 1 - tdc error
+				//(data[x] >> 5) & 0xFFFF - word count
+				tmpTimestamp= tmpTimestamp | ((data[x]) & 0x1f); // GEO bits of trailer include additional 5 bits of extended trigger time
+				// GH Handle wraparound
+				if (tmpTimestamp < lasttimestamp) { // Assume this means you wrapped around
+					wraparoundcounter++; // How many times it wrapped around
+					countsbetweenwraps=0; // Reset wraparound counter
+					printf("Timestamp wraparound:  countsbetween, current, last, newcounter = ");
+					printf("%08x, %08x, %08x, %08x\n", countsbetweenwraps, tmpTimestamp, lasttimestamp, wraparoundcounter);
+				}
+				lasttimestamp=tmpTimestamp; // so far so good
+				ts = static_cast<Long64_t>(lasttimestamp); // start with 32 bits
+				ts += static_cast<Long64_t>(0x100000000)*static_cast<Long64_t>(wraparoundcounter); // add wrap around
+				ts = ts * static_cast<Long64_t>(5); // multiply by 5
+				ts = ts >> 1; // divide by 2
+				// And now that we've actually done all this:
+				// Check if there's a somewhat valid timestamp from an ADC
+				// the && 0 at the end suppresses the xfer
+				if ( (event->GetSerialNumber()==xfermidsn) && (event->GetTimeStamp()==xfermidts)) { // Valid data from prior MADC bank
+					// printf("Matching midas ts & id: hf ts MADC/EMMT %llu / %llu \n",
+					// 	xferhfts,ts);
+					eventFrag->SetTimeStamp(xferhfts);
+				} else {
+					eventFrag->SetTimeStamp(ts);
+//					printf("Failed xfer: MADC/EMMT midts, midsn, ts %llu / %llu, %llu / %llu, %llu / %llu \n",
+//						xfermidts,midasTime,xfermidsn,midasSerialNumber,xferhfts,ts);
+				}
+				// got all the data, so now we can loop over the hits and write them
+				if(addresses.size() != charges.size()) {
+					std::cout<<"Something went horribly wrong, the number of addresses read "<<addresses.size()<<" doesn't match the number of charges read "<<charges.size()<<std::endl;
+					return 0;
+				}
+				for(size_t i = 0; i < addresses.size(); ++i) {
+					size_t duped = 0;
+					size_t ii;
+					if (i>0) {
+						for (ii=0; ii<i; ii++) {
+							if (addresses[i]==addresses[ii]) {
+								duped++;
+							}
+						}
+					}
+					if (duped==0) {
+						eventFrag->SetAddress(addresses[i]);
+						eventFrag->SetCharge(static_cast<Int_t>(charges[i]));
+						Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+						++numFragsFound;
+					} 
+					// else {
+					// 	printf("Address %x hit %d times, keep only 1st\n",addresses[i],duped+1);
+					// }
+				}
+					
+				// clear the old data
+				addresses.clear();
+				charges.clear();
+				tmpTimestamp = 0;
+				tmpAddress = 0;
+				break;
+			default:
+				TParsingDiagnostics::Get()->BadFragment(13); // hard-coded 13 for TDC for now
+				if(fState == EDataParserState::kGood) {
+					fState     = EDataParserState::kUndefined;
+					failedWord = x;
+				} else {
+					multipleErrors = true;
+				}
+				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
+				break;
+
+		}
+	}
+	return numFragsFound;
+}
+
