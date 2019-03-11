@@ -52,7 +52,7 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
 		Double_t dTime;
 		case EDigitizer::kGRF16:
-		dTime = (GetTimeStamp() & (~0x3ffff)) +
+		dTime = (GetTimeStamp() & (~0x3ffff))*GetTimeStampUnit() +
 		channel->CalibrateCFD((GetCfd() + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
 		return SetTime(dTime - channel->GetTZero(GetEnergy()));
 		case EDigitizer::kGRF4G:
@@ -68,7 +68,7 @@ Double_t TGRSIDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
       dTime = GetTimeStamp() + channel->CalibrateCFD((GetCfd() + gRandom->Uniform()) / 512.);
       return SetTime(dTime - channel->GetTZero(GetEnergy()));
 		default:
-		dTime = static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform());
+		dTime = static_cast<Double_t>(((GetTimeStamp()) + gRandom->Uniform())*GetTimeStampUnit());
 		return SetTime(dTime - channel->GetTZero(GetEnergy()));
 	}
    return 0.;
