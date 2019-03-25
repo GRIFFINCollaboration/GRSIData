@@ -1795,8 +1795,8 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 				if (tmpTimestamp < lasttimestamp) { // Assume this means you wrapped around
 					wraparoundcounter++; // How many times it wrapped around
 					countsbetweenwraps=0; // Reset wraparound counter
-					printf("Timestamp wraparound:  countsbetween, current, last, newcounter = ");
-					printf("%08x, %08x, %08x, %08x\n", countsbetweenwraps, tmpTimestamp, lasttimestamp, wraparoundcounter);
+					//printf("Timestamp wraparound:  countsbetween, current, last, newcounter = ");
+					//printf("%08x, %08x, %08x, %08x\n", countsbetweenwraps, tmpTimestamp, lasttimestamp, wraparoundcounter);
 				}
 				lasttimestamp=tmpTimestamp; // so far so good
 				ts = static_cast<Long64_t>(lasttimestamp); // start with 32 bits
