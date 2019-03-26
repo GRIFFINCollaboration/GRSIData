@@ -46,7 +46,8 @@ public:
 		kTdrTigressBgo,
 		kTdrSiLi,
 		kTdrPlastic,
-		kClear            //28
+		kEmma,
+		kClear            //29
    };
 
    ESystem   System() const { return fSystem; }

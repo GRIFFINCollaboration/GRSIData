@@ -44,6 +44,7 @@ public:
    inline void SetGeneric(bool flag = true)    { fGeneric = flag; }
    inline void SetTip(bool flag = true)        { fTip = flag; }
    inline void SetBambino(bool flag = true)    { fBambino = flag; }
+   inline void SetEmma(bool flag = true)       { fEmma = flag; }
 
    inline void SetGriffin(bool flag = true)    { fGriffin = flag; }
    inline void SetSceptar(bool flag = true)    { fSceptar = flag; }
@@ -63,6 +64,7 @@ public:
    inline bool Bambino()    const { return fBambino; }
    inline bool Tip()        const { return fTip; }
    inline bool S3()         const { return fS3; }
+   inline bool Emma()         const { return fEmma; }
    inline bool Generic()    const { return fGeneric; }
 
    inline bool Griffin()    const { return fGriffin; }
@@ -90,6 +92,7 @@ private:
    bool fS3{false};      ///< flag for S3 on/off
    bool fGeneric{false}; ///< flag for Generic on/off
    bool fBambino{false}; ///< flag for Bambino on/off
+   bool fEmma{false}; ///< flag for Emma on/off
 
    bool fGriffin{false};    ///< flag for Griffin on/off
    bool fSceptar{false};    ///< flag for Sceptar on/off

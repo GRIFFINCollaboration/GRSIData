@@ -56,6 +56,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       printf("\t\tZDS:                %s\n", ZeroDegree() ? "true" : "false");
       printf("\t\tDANTE:              %s\n", Dante() ? "true" : "false");
       printf("\t\tBGO:                %s\n", Bgo() ? "true" : "false");
+      printf("\t\tEMMA:                %s\n", Emma() ? "true" : "false");
       printf("\n");
    }
 }
@@ -77,6 +78,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fS3      = false;
    fGeneric = false;
    fBambino = false;
+   fEmma        = false;
 
    fGriffin    = false;
    fSceptar    = false;
@@ -142,6 +144,9 @@ void TGRSIDetectorInformation::Set()
 				break;
 			case TGRSIMnemonic::ESystem::kBgo:
 				SetBgo();
+				break;
+			case TGRSIMnemonic::ESystem::kEmma:
+				SetEmma();
 				break;
 			case TGRSIMnemonic::ESystem::kGeneric:
 				SetGeneric();
