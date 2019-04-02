@@ -178,6 +178,12 @@ TTigressHit* TTigress::GetAddbackHit(const int& i)
 
 void TTigress::BuildHits()
 {
+	//remove all hits of segments only
+	auto remove = std::remove_if(fHits.begin(), fHits.end(), [](TDetectorHit* h) -> bool { return !(static_cast<TTigressHit*>(h)->CoreSet());});
+	if(remove != fHits.end()) {
+		std::cout<<"removing "<<std::distance(remove, fHits.end())<<" TIGRESS hits without cores out of "<<fHits.size()<<" hits"<<std::endl;
+		fHits.erase(remove, fHits.end());
+	}
 	for(auto hit : fHits) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
       if(tigressHit->GetNSegments() > 1) {
