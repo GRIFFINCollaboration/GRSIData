@@ -73,6 +73,7 @@ public:
    }
 
    bool CoreSet() const { return fCoreSet; }
+   void CoreSet(bool val) { fCoreSet = val; }
    bool BGOFired() const { return fBgoFired; }
    void SetBGOFired(bool fired) { fBgoFired = fired; }
 

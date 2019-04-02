@@ -83,6 +83,7 @@ void TTigressHit::Print(Option_t* opt) const
    printf("\tCharge: %f\n", GetCharge());
    printf("\tEnergy: %.2f\n", GetEnergy());
    printf("\tTime:   %.2f\n", GetTime());
+   printf("\tCore set: %s\n", CoreSet() ? "true" : "false");
    printf("\tBGO Fired: %s\n", BGOFired() ? "true" : "false");
    std::cout<<"\tTime:   "<<GetTimeStamp()<<"\n";
    printf("\thit contains %i segments.\n", GetNSegments());
