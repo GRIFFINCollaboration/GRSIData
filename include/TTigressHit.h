@@ -34,6 +34,7 @@ private:
 
    std::vector<TGRSIDetectorHit> fSegments;
 
+	bool    fCoreSet{false};
    bool    fBgoFired{false};
    Float_t fTimeFit{0.};
    Float_t fSig2Noise{0.};
@@ -44,7 +45,7 @@ private:
 public:
    void SetHit() {}
    /////////////////////////    /////////////////////////////////////
-   void SetCore(const TTigressHit& core) { core.Copy(*this); }                //!<!
+   void SetCore(const TTigressHit& core) { core.Copy(*this); fCoreSet = true; }                //!<!
    void AddSegment(const TGRSIDetectorHit& seg) { fSegments.push_back(seg); } //!<!
    //    void AddBGO(const TGRSIDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
    // void SetInitalHit(const int &i)     { fFirstSegment = i; }        //!<!
@@ -71,6 +72,7 @@ public:
       return tmp;
    }
 
+   bool CoreSet() const { return fCoreSet; }
    bool BGOFired() const { return fBgoFired; }
    void SetBGOFired(bool fired) { fBgoFired = fired; }
 
