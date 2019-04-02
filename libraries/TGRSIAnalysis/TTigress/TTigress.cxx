@@ -181,8 +181,9 @@ void TTigress::BuildHits()
 	//remove all hits of segments only
 	auto remove = std::remove_if(fHits.begin(), fHits.end(), [](TDetectorHit* h) -> bool { return !(static_cast<TTigressHit*>(h)->CoreSet());});
 	if(remove != fHits.end()) {
-		std::cout<<"removing "<<std::distance(remove, fHits.end())<<" TIGRESS hits without cores out of "<<fHits.size()<<" hits"<<std::endl;
+		std::cout<<"removing "<<std::distance(remove, fHits.end())<<" TIGRESS hits without cores out of "<<fHits.size()<<" hits"<<std::flush;
 		fHits.erase(remove, fHits.end());
+		std::cout<<" leaving "<<fHits.size()<<" hits!"<<std::endl;
 	}
 	for(auto hit : fHits) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
@@ -240,6 +241,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 				}
 
 				hit->CopyFragment(*frag);
+				hit->CoreSet(true);
 				if(TestGlobalBit(ETigressGlobalBits::kSetCoreWave)) {
 					frag->CopyWave(*hit);
 				}
@@ -247,6 +249,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 			}
 		}
 		corehit->CopyFragment(*frag);
+		corehit->CoreSet(true);
 		if(TestGlobalBit(ETigressGlobalBits::kSetCoreWave)) {
 			frag->CopyWave(*corehit);
 		}
