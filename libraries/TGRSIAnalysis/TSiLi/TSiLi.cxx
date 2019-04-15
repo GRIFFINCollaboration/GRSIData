@@ -22,8 +22,6 @@ double TSiLi::BaseFreq=4;
 double  TSiLi::fSiLiCoincidenceTime = 200;
 bool  TSiLi::fRejectPossibleCrosstalk = false;
 
-std::string TSiLi::fPreAmpName[8]={"RG","RB","LG","LB","LW","LR","RW","RR"};
-
 int TSiLi::FitSiLiShape = 0; // 0 no. 1 try if normal fit fail. 2 yes
 
 TSiLi::TSiLi()
