@@ -110,7 +110,6 @@ public:
 // 3 use slow TF1 with experimental oscillation
    static int FitSiLiShape;     //!<!
    static double BaseFreq;     //!<!
-   static std::string fPreAmpName[8];     //!<!
 	
 private:
    std::vector<TSiLiHit> fAddbackHits;     //!<!
