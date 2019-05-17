@@ -114,8 +114,6 @@ TVector3 TGriffin::gCloverPosition[17] = {
             TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
             TMath::Cos(TMath::DegToRad() * (135.0)))};
 
-std::map<UInt_t, TSpline*> TGriffin::fEnergyResiduals;
-
 TGriffin::TGriffin() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
@@ -167,22 +165,6 @@ void TGriffin::Clear(Option_t* opt)
    fAddbackLowGainFrags.clear();
    fAddbackHighGainFrags.clear();
    fCycleStart = 0;
-}
-
-void TGriffin::LoadEnergyResidual(UInt_t address, TSpline* residual)
-{
-   std::cout<<"Adding: "<<address<<std::endl;
-   fEnergyResiduals[address] = residual;
-}
-
-Double_t TGriffin::GetEnergyNonlinearity(UInt_t address, double energy)
-{
-   static int counter = 0;
-   counter++;
-   if(fEnergyResiduals.find(address) != fEnergyResiduals.end()) {
-      return fEnergyResiduals[address]->Eval(energy);
-   }
-   return 0.0;
 }
 
 void TGriffin::Print(Option_t* opt) const

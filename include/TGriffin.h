@@ -170,8 +170,6 @@ private:
    void SetBitNumber(EGriffinBits bit, Bool_t set) const;
    Bool_t TestBitNumber(EGriffinBits bit) const { return fGriffinBits.TestBit(bit); }
 
-   static std::map<UInt_t, TSpline*> fEnergyResiduals; //!<!
-
    // Cross-Talk stuff
 public:
    static Double_t CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, const TGriffinHit* const other_hit,
@@ -179,9 +177,6 @@ public:
    Bool_t IsCrossTalkSet(const EGainBits& gain_type) const;
    void FixLowGainCrossTalk();
    void FixHighGainCrossTalk();
-
-   static void LoadEnergyResidual(UInt_t address, TSpline* residual);
-   static Double_t GetEnergyNonlinearity(UInt_t address, double energy);
 
 private:
    // This is where the general untouchable functions live.
