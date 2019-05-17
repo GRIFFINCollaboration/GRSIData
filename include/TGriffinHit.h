@@ -47,7 +47,6 @@ public:
    /////////////////////////  Getters	/////////////////////////////////////
    inline Int_t GetFilterPattern() const { return fFilter; } //!<!
    Double_t GetNoCTEnergy(Option_t* opt = "") const;
-   Double_t GetEnergyNonlinearity(double energy) const override;
 
    /////////////////////////  Recommended Functions/////////////////////////
 
