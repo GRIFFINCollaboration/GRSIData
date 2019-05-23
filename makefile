@@ -127,7 +127,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so
+all: include/GRSIDataVersion.h $(HISTOGRAM_SO) $(LIBRARY_OUTPUT) lib/libGRSIData.so
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
