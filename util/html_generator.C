@@ -120,34 +120,33 @@ void html_generator() {
    gSystem->ListLibraries();
 
    THtmlCreator html;
-   html.SetProductName("GRSISort");
+   html.SetProductName("GRSIData");
    html.AddRootSourcePath();
    html.SetEtcDir("etc/html");
 //We must do this because of our naming convention of GRSISort directories
-   html.AddSourcePath("GROOT");
    html.AddSourcePath("TGRSIFormat"); 
-   html.AddSourcePath("TDataParser");
-   html.AddSourcePath("TGint");
-   html.AddSourcePath("TGRSILoop");
-   html.AddSourcePath("TAnalysis");
+   html.AddSourcePath("TGRSIDataParser");
+   html.AddSourcePath("TGRSIAnalysis");
    html.AddSourcePath("TMidas");
-   html.AddSourcePath("TGRSIint");
-   html.AddSourcePath("TGRSIRootIO");
-   html.AddSourcePath("TAnalysis/TAnalysisTreeBuilder");
-   html.AddSourcePath("TAnalysis/TKinematics");
-   html.AddSourcePath("TAnalysis/TNucleus");
-   html.AddSourcePath("TAnalysis/TSharc");
-   html.AddSourcePath("TAnalysis/TCSM");
-   html.AddSourcePath("TAnalysis/TGriffin");
-   html.AddSourcePath("TAnalysis/TGRSIFit");
-   html.AddSourcePath("TAnalysis/TPaces");
-   html.AddSourcePath("TAnalysis/TSceptar");
-   html.AddSourcePath("TAnalysis/TSharc");
-   html.AddSourcePath("TAnalysis/TSRIM");
-   html.AddSourcePath("TAnalysis/TGRSIDetector");
-   html.AddSourcePath("TAnalysis/TTigress");
-   html.AddSourcePath("TAnalysis/TBetaDecay");
-   html.AddSourcePath("TAnalysis/TCal");
+   html.AddSourcePath("TGRSIAnalysis/TAngularCorrelation");
+   html.AddSourcePath("TGRSIAnalysis/TCSM");
+   html.AddSourcePath("TGRSIAnalysis/TDescant");
+   html.AddSourcePath("TGRSIAnalysis/TEmma");
+   html.AddSourcePath("TGRSIAnalysis/TGenericDetector");
+   html.AddSourcePath("TGRSIAnalysis/TGriffin");
+   html.AddSourcePath("TGRSIAnalysis/TGRSIDetector");
+   html.AddSourcePath("TGRSIAnalysis/TLaBr");
+   html.AddSourcePath("TGRSIAnalysis/TPaces");
+   html.AddSourcePath("TGRSIAnalysis/TRF");
+   html.AddSourcePath("TGRSIAnalysis/TS3");
+   html.AddSourcePath("TGRSIAnalysis/TSceptar");
+   html.AddSourcePath("TGRSIAnalysis/TSharc");
+   html.AddSourcePath("TGRSIAnalysis/TSiLi");
+   html.AddSourcePath("TGRSIAnalysis/TTAC");
+   html.AddSourcePath("TGRSIAnalysis/TTigress");
+   html.AddSourcePath("TGRSIAnalysis/TTip");
+   html.AddSourcePath("TGRSIAnalysis/TTriFoil");
+   html.AddSourcePath("TGRSIAnalysis/TZeroDegree");
 
    html.RunAll();
 }
