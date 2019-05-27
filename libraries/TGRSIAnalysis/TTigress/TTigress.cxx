@@ -8,6 +8,7 @@
 #include "TInterpreter.h"
 
 #include "TGRSIOptions.h"
+#include "TSortingDiagnostics.h"
 
 /// \cond CLASSIMP
 ClassImp(TTigress)
@@ -178,13 +179,12 @@ TTigressHit* TTigress::GetAddbackHit(const int& i)
 
 void TTigress::BuildHits()
 {
-	//remove all hits of segments only
+	// remove all hits of segments only
+	// remove_if moves all elements to be removed to the end and returns an iterator to the first one to be removed
 	auto remove = std::remove_if(fHits.begin(), fHits.end(), [](TDetectorHit* h) -> bool { return !(static_cast<TTigressHit*>(h)->CoreSet());});
-	if(remove != fHits.end()) {
-		std::cout<<"removing "<<std::distance(remove, fHits.end())<<" TIGRESS hits without cores out of "<<fHits.size()<<" hits"<<std::flush;
-		fHits.erase(remove, fHits.end());
-		std::cout<<" leaving "<<fHits.size()<<" hits!"<<std::endl;
-	}
+	// using remove_if the elements to be removed are left in an undefined state so we can only log how many we are removing!
+	TSortingDiagnostics::Get()->RemovedHits(IsA(), std::distance(remove, fHits.end()), fHits.size());
+	fHits.erase(remove, fHits.end());
 	for(auto hit : fHits) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
       if(tigressHit->GetNSegments() > 1) {
