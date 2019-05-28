@@ -1,4 +1,6 @@
 #include <iostream>
+#include <numeric>
+
 #include "TEmma.h"
 #include "TRandom.h"
 #include "TMath.h"
