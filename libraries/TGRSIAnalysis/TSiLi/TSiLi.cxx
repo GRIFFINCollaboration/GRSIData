@@ -296,7 +296,8 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 			int rAC=std::abs(rA-rC),rBC=std::abs(rB-rC);
 			int sAC=std::abs(sA-sC),sBC=std::abs(sB-sC);
 
-			if(sAC>5)sAC=12-sAC;if(sBC>5)sBC=12-sBC;
+			if(sAC>5)sAC=12-sAC;
+			if(sBC>5)sBC=12-sBC;
 
 			if(rA==rB&&rB==rC){
 				//Reject events that cross 3 sectors
