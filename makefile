@@ -22,6 +22,16 @@ ROOT_PYTHON_VERSION=$(shell root-config --python-version)
 MATHMORE_INSTALLED:=$(shell root-config --has-mathmore)
 XML_INSTALLED:=$(shell root-config --has-xml)
 
+# Functions for determining the files included in a library.
+# All src files in the library directory are included.
+# If a LinkDef.h file is present in the library directory,
+#    a dictionary file will also be generated and added to the library.
+libdir          = $(shell $(FIND) libraries -name $(1) -type d)
+lib_src_files   = $(shell $(FIND) $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)")
+lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1)))
+lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
+lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
+	
 CFLAGS += -DMAJOR_ROOT_VERSION=${MAJOR_ROOT_VERSION}
 ifeq ($(ROOT_PYTHON_VERSION),2.7)
   CFLAGS += -DHAS_CORRECT_PYTHON_VERSION
@@ -107,6 +117,7 @@ EXECUTABLES     := $(patsubst %.o,$(GRSISYS)/bin/%,$(notdir $(EXE_O_FILES)))
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 FILTER_SO    := $(patsubst filters/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard filters/*.$(SRC_SUFFIX)))
+HIST_LIBS = -lTSceptar -lTGriffin -lTDescant -lTZeroDegree -lTGRSIDetector
 
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
@@ -127,7 +138,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(HISTOGRAM_SO) $(LIBRARY_OUTPUT) lib/libGRSIData.so
+all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(HISTOGRAM_SO) 
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
@@ -143,18 +154,8 @@ lib: include/GRSIDataVersion.h
 include/GRSIDataVersion.h:
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-lib/lib%.so: .build/histos/%.o | include/GRSIDataVersion.h lib
-	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
-
-# Functions for determining the files included in a library.
-# All src files in the library directory are included.
-# If a LinkDef.h file is present in the library directory,
-#    a dictionary file will also be generated and added to the library.
-libdir          = $(shell $(FIND) libraries -name $(1) -type d)
-lib_src_files   = $(shell $(FIND) $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)")
-lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1)))
-lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
-lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
+lib/lib%.so: $(LIBRARY_OUTPUT) .build/histos/%.o | include/GRSIDataVersion.h lib
+	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -Llib $(addprefix -l,$(LIBRARY_NAMES)) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | include/GRSIDataVersion.h lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
