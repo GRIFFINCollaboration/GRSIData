@@ -1,6 +1,7 @@
 #include "TGRSIDetectorInformation.h"
 
 #include <iostream>
+#include <unordered_map>
 
 #include "TROOT.h"
 
@@ -94,7 +95,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
 void TGRSIDetectorInformation::Set()
 {
    /// Sets the run info. This figures out what systems are available.
-   std::map<unsigned int, TChannel*>::iterator iter;
+   std::unordered_map<unsigned int, TChannel*>::iterator iter;
    for(iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
       std::string channelname = iter->second->GetName();
 
