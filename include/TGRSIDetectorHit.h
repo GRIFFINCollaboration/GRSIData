@@ -29,6 +29,8 @@ public:
 	TGRSIDetectorHit(const TFragment& frag) : TDetectorHit(frag) {}
    ~TGRSIDetectorHit() override;
 
+	TGRSIDetectorHit& operator=(const TGRSIDetectorHit&) = default; // explicit declaration of default assignment operator to make gcc 9.1 happy
+
    virtual Double_t GetTime(const ETimeFlag& correct_flag = ETimeFlag::kAll,
                             Option_t*     opt          = "") const override; ///< Returns a time value to the nearest nanosecond!
 	

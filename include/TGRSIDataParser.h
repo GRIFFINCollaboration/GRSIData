@@ -79,7 +79,8 @@ public:
 	int Process(std::shared_ptr<TRawEvent>) override;
 	int ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event);
         int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int CaenToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int EmmaMadcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
 	int EmmaTdcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
 #endif
