@@ -142,6 +142,7 @@ all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(HISTOGRAM_
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
+	@grep "^GRSI.ParserLibrary" ../.grsirc 2>&1 > /dev/null || printf "$(ERROR_COLOR)You need to set GRSI.ParserLibrary in your .grsirc to enable the use of this library!$(NO_COLOR)\n"
 
 docs: doxygen
 
