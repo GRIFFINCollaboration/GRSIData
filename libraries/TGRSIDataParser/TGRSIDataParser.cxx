@@ -1681,9 +1681,9 @@ int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr
 				}
 				return -w;
 			}
-			bool dualTrace      = ((data[w]>>31) == 0x1);
-			bool energyEnabled  = ((data[w]>>30) == 0x1);
-			bool timeEnabled    = ((data[w]>>29) == 0x1);
+			//bool dualTrace      = ((data[w]>>31) == 0x1);
+			//bool energyEnabled  = ((data[w]>>30) == 0x1);
+			//bool timeEnabled    = ((data[w]>>29) == 0x1);
 			bool extras         = (((data[w]>>28) & 0x1) == 0x1);
 			bool waveform       = (((data[w]>>27) & 0x1) == 0x1);
 			uint8_t extraFormat = ((data[w]>>24) & 0x7);
