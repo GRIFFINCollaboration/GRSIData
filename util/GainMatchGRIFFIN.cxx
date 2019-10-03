@@ -943,9 +943,7 @@ int main(int argc, char **argv) {
 	}
 
 	if(argc>2) {
-		// this hard-coded limit is VERY BAD! it should be changed at a later date.
-		char buffer[500];
-		sprintf(buffer,"hadd calib_hsts_summed.root ");
+		std::string buffer = "hadd calib_hsts_summed.root ";
 		for(int i=1;i<argc;i++) {
 			calibfileName = argv[i];
 			if(calibfileName.find_last_of("/") != std::string::npos) {
@@ -953,7 +951,7 @@ int main(int argc, char **argv) {
 			} else {
 				calibfileName.insert(0,"calib_hsts_");
 			}
-			sprintf(buffer,"%s %s",buffer,calibfileName.c_str());
+			buffer += calibfileName + " ";
 		}
 		calibfileName = "calib_hsts_summed.root";
 		calib_hst_name = new char[calibfileName.length()+1];
@@ -961,7 +959,7 @@ int main(int argc, char **argv) {
 		// if we don't want to make the histograms again, we probably also don't want to re-sum them and delete the graphs
 		if(do_make_calibration_histograms) {
 			gSystem->Exec(Form("rm %s",calibfileName.c_str()));
-			gSystem->Exec(buffer);
+			gSystem->Exec(buffer.c_str());
 		}
 	}
 
@@ -1006,9 +1004,7 @@ int main(int argc, char **argv) {
 	}
 
 	if(argc>2) {
-		// this hard-coded limit is VERY BAD! it should be changed at a later date.
-		char buffer[500];
-		sprintf(buffer,"hadd newcal_summed.root ");
+		std::string buffer = "hadd newcal_summed.root ";
 		for(int i=1;i<argc;i++) {
 			newfileName = argv[i];
 			if(newfileName.find_last_of("/") != std::string::npos) {
@@ -1016,7 +1012,7 @@ int main(int argc, char **argv) {
 			} else {
 				newfileName.insert(0,"newcal_");
 			}
-			sprintf(buffer,"%s %s",buffer,newfileName.c_str());
+			buffer += newfileName + " ";
 		}
 		newfileName = "newcal_summed.root";
 		test_file_name = new char[newfileName.length()+1];
@@ -1024,7 +1020,7 @@ int main(int argc, char **argv) {
 		// if we don't want to make recalibrate, we probably also don't want to re-sum them.
 		if(do_recalibrate_spectra) {
 			gSystem->Exec(Form("rm %s",newfileName.c_str()));
-			gSystem->Exec(buffer);
+			gSystem->Exec(buffer.c_str());
 		}
 	}
 

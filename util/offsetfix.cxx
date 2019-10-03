@@ -87,7 +87,8 @@ public:
                //    frag->ChannelAddress += 0x8000;
                break;
             default: printf("This bank not yet defined.\n"); break;
-            }
+            };
+				break;
          case 0xa0000000: timelow  = value & 0x0fffffff; break;
          case 0xb0000000: timehigh = value & 0x00003fff; break;
          };
@@ -649,6 +650,7 @@ bool ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
 						break;
 					default: printf("This bank not yet defined.\n"); break;
 				};
+				break;
 			case 0xa0000000: timelow  = value & 0x0fffffff; break;
 			case 0xb0000000: timehigh = value & 0x00003fff; break;
 		};
