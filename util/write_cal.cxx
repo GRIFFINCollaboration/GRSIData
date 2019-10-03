@@ -60,13 +60,13 @@ int main(int argc, char** argv) {
 	TTAC* tac = nullptr;
 	TGriffin* grif = nullptr;
 
-   if(tree->SetBranchAddress("TLaBr", &labr) == TTree::kMissingBranch) {
+   if(AnalysisTree->SetBranchAddress("TLaBr", &labr) == TTree::kMissingBranch) {
 		labr = new TLaBr;
 	}
-   if(tree->SetBranchAddress("TTAC", &tac) == TTree::kMissingBranch) {
+   if(AnalysisTree->SetBranchAddress("TTAC", &tac) == TTree::kMissingBranch) {
 		tac = new TTAC;
 	}
-   if(tree->SetBranchAddress("TGriffin", &grif) == TTree::kMissingBranch) {
+   if(AnalysisTree->SetBranchAddress("TGriffin", &grif) == TTree::kMissingBranch) {
 		grif = new TGriffin;
 	}
 
