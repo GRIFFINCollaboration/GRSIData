@@ -138,7 +138,15 @@ void TGriffin::Copy(TObject& rhs) const
    TSuppressed::Copy(rhs);
 
    static_cast<TGriffin&>(rhs).fGriffinLowGainHits   = fGriffinLowGainHits;
+	for(size_t i = 0; i < fGriffinLowGainHits.size(); ++i) {
+		static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i] = new TGriffinHit;
+		*(static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i]) = *fGriffinLowGainHits[i];
+	}
    static_cast<TGriffin&>(rhs).fGriffinHighGainHits  = fGriffinHighGainHits;
+	for(size_t i = 0; i < fGriffinHighGainHits.size(); ++i) {
+		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit;
+		*(static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i]) = *fGriffinHighGainHits[i];
+	}
    static_cast<TGriffin&>(rhs).fAddbackLowGainHits   = fAddbackLowGainHits;
    static_cast<TGriffin&>(rhs).fAddbackHighGainHits  = fAddbackHighGainHits;
    static_cast<TGriffin&>(rhs).fAddbackLowGainFrags  = fAddbackLowGainFrags;
