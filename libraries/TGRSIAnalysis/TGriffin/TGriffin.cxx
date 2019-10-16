@@ -137,23 +137,29 @@ void TGriffin::Copy(TObject& rhs) const
    // Copy function.
    TSuppressed::Copy(rhs);
 
-   static_cast<TGriffin&>(rhs).fGriffinLowGainHits   = fGriffinLowGainHits;
+   static_cast<TGriffin&>(rhs).fGriffinLowGainHits.resize(fGriffinLowGainHits.size());
 	for(size_t i = 0; i < fGriffinLowGainHits.size(); ++i) {
-		static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i] = new TGriffinHit;
-		*(static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i]) = *fGriffinLowGainHits[i];
+		static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinLowGainHits[i]));
 	}
-   static_cast<TGriffin&>(rhs).fGriffinHighGainHits  = fGriffinHighGainHits;
+   static_cast<TGriffin&>(rhs).fGriffinHighGainHits.resize(fGriffinHighGainHits.size());
 	for(size_t i = 0; i < fGriffinHighGainHits.size(); ++i) {
-		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit;
-		*(static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i]) = *fGriffinHighGainHits[i];
+		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinHighGainHits[i]));
 	}
-   static_cast<TGriffin&>(rhs).fAddbackLowGainHits   = fAddbackLowGainHits;
-   static_cast<TGriffin&>(rhs).fAddbackHighGainHits  = fAddbackHighGainHits;
-   static_cast<TGriffin&>(rhs).fAddbackLowGainFrags  = fAddbackLowGainFrags;
-   static_cast<TGriffin&>(rhs).fAddbackHighGainFrags = fAddbackHighGainFrags;
+	// not copying addback or suppressed vectors
+   static_cast<TGriffin&>(rhs).fGriffinBits          = 0;
+   static_cast<TGriffin&>(rhs).fAddbackLowGainHits.clear();
+   static_cast<TGriffin&>(rhs).fAddbackHighGainHits.clear();
+   static_cast<TGriffin&>(rhs).fAddbackLowGainFrags.clear();
+   static_cast<TGriffin&>(rhs).fAddbackHighGainFrags.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedLowGainHits.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedHighGainHits.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedAddbackLowGainHits.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedAddbackHighGainHits.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedAddbackLowGainFrags.clear();
+   static_cast<TGriffin&>(rhs).fSuppressedAddbackHighGainFrags.clear();
+
    static_cast<TGriffin&>(rhs).fSetCoreWave          = fSetCoreWave;
    static_cast<TGriffin&>(rhs).fCycleStart           = fCycleStart;
-   static_cast<TGriffin&>(rhs).fGriffinBits          = 0;
 }
 
 TGriffin::~TGriffin()
@@ -172,6 +178,13 @@ void TGriffin::Clear(Option_t* opt)
    fAddbackHighGainHits.clear();
    fAddbackLowGainFrags.clear();
    fAddbackHighGainFrags.clear();
+   fSuppressedLowGainHits.clear();
+   fSuppressedHighGainHits.clear();
+   fSuppressedAddbackLowGainHits.clear();
+   fSuppressedAddbackHighGainHits.clear();
+   fSuppressedAddbackLowGainFrags.clear();
+   fSuppressedAddbackHighGainFrags.clear();
+
    fCycleStart = 0;
 }
 
