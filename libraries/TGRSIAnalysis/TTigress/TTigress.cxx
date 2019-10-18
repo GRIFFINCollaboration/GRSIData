@@ -87,12 +87,20 @@ TTigress::TTigress(const TTigress& rhs) : TDetector()
    rhs.Copy(*this);
 }
 
-TTigress::~TTigress() = default;
+TTigress::~TTigress()
+{
+	for(auto hit : fAddbackHits) {
+		delete hit;
+	}
+}
 
 void TTigress::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
-   static_cast<TTigress&>(rhs).fAddbackHits  = fAddbackHits;
+	static_cast<TTigress&>(rhs).fAddbackHits.resize(fAddbackHits.size());
+	for(size_t i = 0; i < fAddbackHits.size(); ++i) {
+		static_cast<TTigress&>(rhs).fAddbackHits[i] = new TTigressHit(*static_cast<TTigressHit*>(fAddbackHits[i]));
+	}
    static_cast<TTigress&>(rhs).fAddbackFrags = fAddbackFrags;
    static_cast<TTigress&>(rhs).fBgos = fBgos;
    static_cast<TTigress&>(rhs).fTigressBits  = 0;
@@ -102,6 +110,9 @@ void TTigress::Clear(Option_t* opt)
 {
    // Clears the mother, and all of the hits
    TDetector::Clear(opt);
+	for(auto hit : fAddbackHits) {
+		delete hit;
+	}
    fAddbackHits.clear();
    fAddbackFrags.clear();
    fBgos.clear();
@@ -131,50 +142,53 @@ Int_t TTigress::GetAddbackMultiplicity()
    }
    // if the addback has been reset, clear the addback hits
    if(!fTigressBits.TestBit(ETigressBits::kAddbackSet)) {
-      fAddbackHits.clear();
-   } else {
-      return fAddbackHits.size();
-   }
+		for(auto hit : fAddbackHits) {
+			delete hit;
+		}
+		fAddbackHits.clear();
+	} else {
+		return fAddbackHits.size();
+	}
 
-   // use the first (highest E) tigress hit as starting point for the addback hits
-   fAddbackHits.push_back(fHits[0]);
-   fAddbackFrags.push_back(1);
+	// use the first (highest E) tigress hit as starting point for the addback hits
+	fAddbackHits.push_back(fHits[0]);
+	fAddbackFrags.push_back(1);
 
-   // loop over remaining tigress hits
-   size_t i, j;
-   for(i = 1; i < fHits.size(); i++) {
-      // check for each existing addback hit if this tigress hit should be added
-      for(j = 0; j < fAddbackHits.size(); j++) {
-         if(fAddbackCriterion(fAddbackHits[j], fHits[i])) {
-            // SumHit preserves time and position from first (highest E) hit, but adds segments so this hit becomes
-            // LastPosition()
-            static_cast<TTigressHit*>(fAddbackHits[j])->SumHit(static_cast<TTigressHit*>(fHits[i])); // Adds
-            fAddbackFrags[j]++;
-            break;
-         }
-      }
-      // if hit[i] was not added to a higher energy hit, create its own addback hit
-      if(j == fAddbackHits.size()) {
-         fAddbackHits.push_back(fHits[i]);
-         static_cast<TTigressHit*>(fAddbackHits.back())->SumHit(static_cast<TTigressHit*>(fAddbackHits.back())); // Does nothing // then why are we doing this?
-         fAddbackFrags.push_back(1);
-      }
-   }
-   fTigressBits.SetBit(ETigressBits::kAddbackSet, true);
+	// loop over remaining tigress hits
+	size_t i, j;
+	for(i = 1; i < fHits.size(); i++) {
+		// check for each existing addback hit if this tigress hit should be added
+		for(j = 0; j < fAddbackHits.size(); j++) {
+			if(fAddbackCriterion(fAddbackHits[j], fHits[i])) {
+				// SumHit preserves time and position from first (highest E) hit, but adds segments so this hit becomes
+				// LastPosition()
+				static_cast<TTigressHit*>(fAddbackHits[j])->SumHit(static_cast<TTigressHit*>(fHits[i])); // Adds
+				fAddbackFrags[j]++;
+				break;
+			}
+		}
+		// if hit[i] was not added to a higher energy hit, create its own addback hit
+		if(j == fAddbackHits.size()) {
+			fAddbackHits.push_back(fHits[i]);
+			static_cast<TTigressHit*>(fAddbackHits.back())->SumHit(static_cast<TTigressHit*>(fAddbackHits.back())); // Does nothing // then why are we doing this?
+			fAddbackFrags.push_back(1);
+		}
+	}
+	fTigressBits.SetBit(ETigressBits::kAddbackSet, true);
 
-   return fAddbackHits.size();
+	return fAddbackHits.size();
 }
 
 TTigressHit* TTigress::GetAddbackHit(const int& i)
 {
-   /// Get the ith addback hit. This function calls GetAddbackMultiplicity to check the range of the index.
-   /// This automatically calculates all addback hits if they haven't been calculated before.
-   if(i < GetAddbackMultiplicity()) {
-      return static_cast<TTigressHit*>(fAddbackHits.at(i));
-   }
-   std::cerr<<"Addback hits are out of range"<<std::endl;
-   throw grsi::exit_exception(1);
-   return nullptr;
+	/// Get the ith addback hit. This function calls GetAddbackMultiplicity to check the range of the index.
+	/// This automatically calculates all addback hits if they haven't been calculated before.
+	if(i < GetAddbackMultiplicity()) {
+		return static_cast<TTigressHit*>(fAddbackHits.at(i));
+	}
+	std::cerr<<"Addback hits are out of range"<<std::endl;
+	throw grsi::exit_exception(1);
+	return nullptr;
 }
 
 void TTigress::BuildHits()
@@ -187,36 +201,36 @@ void TTigress::BuildHits()
 	fHits.erase(remove, fHits.end());
 	for(auto hit : fHits) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
-      if(tigressHit->GetNSegments() > 1) {
-         tigressHit->SortSegments();
-      }
+		if(tigressHit->GetNSegments() > 1) {
+			tigressHit->SortSegments();
+		}
 
-      if(tigressHit->HasWave() && TGRSIOptions::AnalysisOptions()->IsWaveformFitting()) {
-         tigressHit->SetWavefit();
-      }
-   }
-   if(fHits.size() > 1) {
-      std::sort(fHits.begin(), fHits.end());
-   }
+		if(tigressHit->HasWave() && TGRSIOptions::AnalysisOptions()->IsWaveformFitting()) {
+			tigressHit->SetWavefit();
+		}
+	}
+	if(fHits.size() > 1) {
+		std::sort(fHits.begin(), fHits.end());
+	}
 
-   // Label all hits as being suppressed or not
-   for(auto fTigressHit : fHits) {
-      bool suppressed = false;
-      for(auto& fBgo : fBgos) {
-         if(fSuppressionCriterion(fTigressHit, fBgo)) {
-            suppressed = true;
-            break;
-         }
-      }
-      static_cast<TTigressHit*>(fTigressHit)->SetBGOFired(suppressed);
-   }
+	// Label all hits as being suppressed or not
+	for(auto fTigressHit : fHits) {
+		bool suppressed = false;
+		for(auto& fBgo : fBgos) {
+			if(fSuppressionCriterion(fTigressHit, fBgo)) {
+				suppressed = true;
+				break;
+			}
+		}
+		static_cast<TTigressHit*>(fTigressHit)->SetBGOFired(suppressed);
+	}
 }
 
 void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-   if(frag == nullptr || chan == nullptr) {
-      return;
-   }
+	if(frag == nullptr || chan == nullptr) {
+		return;
+	}
 
 	if((chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kG) &&
 			(chan->GetSegmentNumber() == 0 || chan->GetSegmentNumber() == 9)) { // it is a core
@@ -295,6 +309,9 @@ void TTigress::ResetAddback()
 	/// the old addback hits will be stored instead.
 	/// This should have changed now, we're using the stored tigress bits to reset the addback
 	fTigressBits.SetBit(ETigressBits::kAddbackSet, false);
+	for(auto hit : fAddbackHits) {
+		delete hit;
+	}
 	fAddbackHits.clear();
 	fAddbackFrags.clear();
 }
