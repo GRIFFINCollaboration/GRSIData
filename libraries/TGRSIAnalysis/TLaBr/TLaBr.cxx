@@ -12,8 +12,8 @@ ClassImp(TLaBr)
 bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 {
 	return ((hit->GetDetector() == bgoHit->GetDetector()) &&
-	(std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
-	(bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
+			(std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
+			(bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
 }
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TLaBr::fSuppressionCriterion = DefaultLaBrSuppression;
@@ -43,6 +43,9 @@ TLaBr::TLaBr()
 TLaBr::~TLaBr()
 {
 	// Default Destructor
+	for(auto hit : fSuppressedHits) {
+		delete hit;
+	}
 }
 
 TLaBr::TLaBr(const TLaBr& rhs) : TSuppressed()
@@ -58,6 +61,9 @@ void TLaBr::Clear(Option_t* opt)
 {
 	// Clears all of the hits
 	TSuppressed::Clear(opt);
+	for(auto hit : fSuppressedHits) {
+		delete hit;
+	}
 	fSuppressedHits.clear();
 	fLaBrBits = 0;
 }
@@ -67,8 +73,11 @@ void TLaBr::Copy(TObject& rhs) const
 	// Copies a TLaBr
 	TSuppressed::Copy(rhs);
 
-	static_cast<TLaBr&>(rhs).fSuppressedHits = fSuppressedHits;
-   static_cast<TLaBr&>(rhs).fLaBrBits       = 0;
+	static_cast<TLaBr&>(rhs).fSuppressedHits.resize(fSuppressedHits.size());
+	for(size_t i = 0; i < fSuppressedHits.size(); ++i) {
+		static_cast<TLaBr&>(rhs).fSuppressedHits[i] = new TLaBrHit(*static_cast<TLaBrHit*>(fSuppressedHits[i]));
+	}
+	static_cast<TLaBr&>(rhs).fLaBrBits       = 0;
 }
 
 TLaBr& TLaBr::operator=(const TLaBr& rhs)
@@ -95,8 +104,11 @@ void TLaBr::SetSuppressed(const bool flag)
 
 void TLaBr::ResetSuppressed()
 {
-   SetSuppressed(false);
-   fSuppressedHits.clear();
+	SetSuppressed(false);
+	for(auto hit : fSuppressedHits) {
+		delete hit;
+	}
+	fSuppressedHits.clear();
 }
 
 Short_t TLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
@@ -105,16 +117,19 @@ Short_t TLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
 	if(fHits.empty()) {
 		return 0;
 	}
-   // if the suppressed has been reset, clear the suppressed hits
-   if(!IsSuppressed()) {
-      fSuppressedHits.clear();
-   }
-   if(fSuppressedHits.empty()) {
+	// if the suppressed has been reset, clear the suppressed hits
+	if(!IsSuppressed()) {
+		for(auto hit : fSuppressedHits) {
+			delete hit;
+		}
+		fSuppressedHits.clear();
+	}
+	if(fSuppressedHits.empty()) {
 		CreateSuppressed(bgo, fHits, fSuppressedHits);
-      SetSuppressed(true);
-   }
+		SetSuppressed(true);
+	}
 
-   return fSuppressedHits.size();
+	return fSuppressedHits.size();
 }
 
 TLaBrHit* TLaBr::GetSuppressedHit(const int& i)
@@ -123,8 +138,8 @@ TLaBrHit* TLaBr::GetSuppressedHit(const int& i)
 		return static_cast<TLaBrHit*>(fSuppressedHits.at(i));
 	} catch(const std::out_of_range& oor) {
 		std::cerr<<ClassName()<<" is out of range: "<<oor.what()<<std::endl;
-      throw grsi::exit_exception(1);
-   }
+		throw grsi::exit_exception(1);
+	}
 	return nullptr;
 }
 

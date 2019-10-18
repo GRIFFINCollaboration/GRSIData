@@ -137,10 +137,7 @@ void TGriffin::Copy(TObject& rhs) const
    // Copy function.
    TSuppressed::Copy(rhs);
 
-   static_cast<TGriffin&>(rhs).fGriffinLowGainHits.resize(fGriffinLowGainHits.size());
-	for(size_t i = 0; i < fGriffinLowGainHits.size(); ++i) {
-		static_cast<TGriffin&>(rhs).fGriffinLowGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinLowGainHits[i]));
-	}
+	// no need to copy low gain, this is already taken care of by TDetector::Copy (called by TSuppressed::Copy)
    static_cast<TGriffin&>(rhs).fGriffinHighGainHits.resize(fGriffinHighGainHits.size());
 	for(size_t i = 0; i < fGriffinHighGainHits.size(); ++i) {
 		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinHighGainHits[i]));
@@ -165,9 +162,7 @@ void TGriffin::Copy(TObject& rhs) const
 TGriffin::~TGriffin()
 {
    // Default Destructor
-	for(auto hit : fGriffinLowGainHits) {
-		delete hit;
-	}
+	// no need to delete low gain hits, this is taken care of by the destructor of TDetector
 	for(auto hit : fGriffinHighGainHits) {
 		delete hit;
 	}
@@ -196,7 +191,28 @@ void TGriffin::Clear(Option_t* opt)
    // Clears the mother, and all of the hits
    ClearStatus();
    TSuppressed::Clear(opt);
-   fGriffinLowGainHits.clear();
+   // low gain hits cleared by TDetector::Clear
+	for(auto hit : fGriffinHighGainHits) {
+		delete hit;
+	}
+	for(auto hit : fAddbackLowGainHits) {
+		delete hit;
+	}
+	for(auto hit : fAddbackHighGainHits) {
+		delete hit;
+	}
+	for(auto hit : fSuppressedLowGainHits) {
+		delete hit;
+	}
+	for(auto hit : fSuppressedHighGainHits) {
+		delete hit;
+	}
+	for(auto hit : fSuppressedAddbackLowGainHits) {
+		delete hit;
+	}
+	for(auto hit : fSuppressedAddbackHighGainHits) {
+		delete hit;
+	}
    fGriffinHighGainHits.clear();
    fAddbackLowGainHits.clear();
    fAddbackHighGainHits.clear();
