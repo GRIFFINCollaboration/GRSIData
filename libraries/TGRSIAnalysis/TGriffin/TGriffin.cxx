@@ -603,8 +603,9 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 	static bool been_warned[256] = {false};
 	double      fixed_energy     = hit_to_correct->GetEnergy();
 	try {
-		fixed_energy -=
-			hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+		if(hit_to_correct->GetChannel() != nullptr) {
+			fixed_energy -= hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+		}
 	} catch(const std::out_of_range& oor) {
 		if(!been_warned[16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() +
 				other_hit->GetCrystal()]) {
