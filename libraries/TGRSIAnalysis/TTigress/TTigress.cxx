@@ -65,8 +65,11 @@ std::function<bool(TDetectorHit*, TDetectorHit*)> TTigress::fAddbackCriterion = 
 bool DefaultSuppression(TDetectorHit* tig, TBgoHit& bgo)
 {
    Int_t dCfd = static_cast<TTigressHit*>(tig)->GetCfd() - bgo.GetCfd();
-   return ((dCfd > -400 && dCfd < -80) && (tig->GetDetector() == bgo.GetDetector()) && (bgo.GetCharge() > 100.) &&
-           TTigress::BGOSuppression[tig->GetCrystal()][bgo.GetCrystal()][bgo.GetSegment() - 1]);
+   return ((dCfd > -300 && dCfd < 200) && (tig->GetDetector() == bgo.GetDetector()) && (bgo.GetEnergy() > 0));  
+// The old Suppression doesn't really work, the time gate is bad in GRIF-16s and the suppression scheme gives a bad Peak:Total - S. Gillespie
+
+//   return ((dCfd > -400 && dCfd < -80) && (tig->GetDetector() == bgo.GetDetector()) && (bgo.GetCharge() > 100.) &&
+//           TTigress::BGOSuppression[tig->GetCrystal()][bgo.GetCrystal()][bgo.GetSegment() - 1]);
 }
 
 std::function<bool(TDetectorHit*, TBgoHit&)> TTigress::fSuppressionCriterion = DefaultSuppression;

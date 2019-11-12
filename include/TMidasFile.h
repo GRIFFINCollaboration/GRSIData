@@ -83,6 +83,7 @@ private:
    void SetEPICSOdb();
    void SetTIGOdb();
    void SetGRIFFOdb();
+   void SetTIGDAQOdb();
 
 #ifdef HAS_XML
    TXMLOdb* fOdb;

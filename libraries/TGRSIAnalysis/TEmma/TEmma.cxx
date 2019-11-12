@@ -1,6 +1,5 @@
 #include <iostream>
-#include <numeric>
-
+#include <numeric>	
 #include "TEmma.h"
 #include "TRandom.h"
 #include "TMath.h"
@@ -24,12 +23,8 @@ double TEmma::fXdiff = 0;
 double TEmma::fXsum = 0;
 double TEmma::fYdiff = 0;
 double TEmma::fYsum = 0;
-double TEmma::fLdelay = 0;
-double TEmma::fRdelay = 0;
-double TEmma::fTdelay = 0;
-double TEmma::fBdelay = 0;
-double TEmma::fXlength = 80.;
-double TEmma::fYlength = 30.;
+double TEmma::fXlength = 80.; //Size of X focal plane in mm
+double TEmma::fYlength = 30.; //Size of Y focal plane in mm
 short TEmma::fFail = 0;
 
 TEmma::TEmma() : TDetector()
@@ -52,8 +47,11 @@ void TEmma::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
         static_cast<TEmma&>(rhs).fEmmaICHits   = fEmmaICHits;
+        static_cast<TEmma&>(rhs).fEmmaSiHits   = fEmmaSiHits;
+        static_cast<TEmma&>(rhs).fEmmaSSBHits   = fEmmaSSBHits;
         static_cast<TEmma&>(rhs).fEmmaTdcHits   = fEmmaTdcHits;
         static_cast<TEmma&>(rhs).fEmmaAnodeHits   = fEmmaAnodeHits;
+        static_cast<TEmma&>(rhs).fEmmaTriggerHits   = fEmmaTriggerHits;
 }
 
 TEmma::~TEmma()
@@ -75,7 +73,6 @@ TEmma& TEmma::operator=(const TEmma& rhs)
 
 void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-
   if (frag == nullptr || chan == nullptr) {
     return;
   }
@@ -84,6 +81,8 @@ void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
     fEmmaICHits.push_back(std::move(dethit));
   } else if (chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kS) { // Si at focal plane
     fEmmaSiHits.push_back(std::move(dethit));
+  } else if (chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kT) { // EMMA focal plane Trigger
+    fEmmaTriggerHits.push_back(std::move(dethit));
   } else if (chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kP) { // PGAC
     if (chan->GetMnemonic()->CollectedCharge() == TMnemonic::EMnemonic::kN) { // Anode data 
       switch (chan->GetMnemonic()->OutputSensor()) {
@@ -121,29 +120,24 @@ void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
         break;
       };
       fEmmaTdcHits.push_back(std::move(dethit));
-    } else if (chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kO) { // ORTEC SSBs at target position
-      fEmmaSSBHits.push_back(std::move(dethit));
-    } else return;
-  }
+    }
+  } else if (chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kO) { // ORTEC SSBs at target position
+    fEmmaSSBHits.push_back(std::move(dethit));
+  } else return;
 }
 
 TVector3 TEmma::GetPosition(double left, double right, double top, double bottom, double delayL, double delayR, double delayT, double delayB )
 {
 	// Calculates recoil position from PGAC TDC data including delays
 	double Xdiff = (left+delayL) - (right+delayR);
-   	double Xsum = (left+delayL) + (right+delayR);
+   	double Xsum = (left) + (right);
    	double Ydiff = (bottom+delayB) - (top+delayT);
-   	double Ysum = (bottom+delayB) + (top+delayT);
+   	double Ysum = (bottom) + (top);
 
 	double Xpos = ( Xdiff / Xsum )*fXlength;
 	double Ypos = ( Ydiff / Ysum )*fYlength;
 
 	return TVector3(Xpos, Ypos, 1);
-}
-
-TVector3 TEmma::GetPosition(double left, double right, double top, double bottom)
-{
-	return TEmma::GetPosition(left,right,top,bottom,fLdelay,fRdelay,fTdelay,fBdelay);
 }
 
 TEmmaHit* TEmma::GetICHit(const int& i)
@@ -186,6 +180,16 @@ TEmmaHit* TEmma::GetSiHit(const int& i)
    return nullptr;
 }
 
+TEmmaHit* TEmma::GetTriggerHit(const int& i)
+{
+   if(i < GetTriggerMultiplicity()) {
+      return &fEmmaTriggerHits.at(i);
+   }
+   std::cerr<<"EMMA Trigger hits are out of range"<<std::endl;
+   throw grsi::exit_exception(1);
+   return nullptr;
+}
+
 TEmmaHit* TEmma::GetSSBHit(const int& i)
 {
    if(i < GetSSBMultiplicity()) {
@@ -197,16 +201,18 @@ TEmmaHit* TEmma::GetSSBHit(const int& i)
 }
 
 void TEmma::BuildHits() 
-{ // WIP 
+{ 
   // Everything below is reproduced from the EMMA sort code given to me by Nick Esker
   // The EMMA PGAC has all cathode signals chained together in the X and Y direction with readouts at each end fed into a TDC.  
   // Build hits subtracts the trigger time (from an anode wire) and returns a left/right/up/down value which is used in GetPosition()
 
   std::vector <double> tdcArray;
   std::vector <double> icArray;
-  if (fEmmaTdcHits.size() > 3 && !fEmmaICHits.empty()) {
-    TEmmaHit * hit = new TEmmaHit;
+  if (fEmmaTdcHits.size() > 4 ) {   // Require a Good hit to contain only the PGAC TDC signals
+    TEmmaHit * hit = new TEmmaHit();
     for (size_t i = 0; i < fEmmaTdcHits.size(); ++i) { 
+      hit->SetTimeStamp(fEmmaTdcHits[i].GetTimeStamp());
+      hit->SetAddress(fEmmaTdcHits[i].GetAddress());
       if (fEmmaTdcHits[i].GetTdcNumber() < 10) tdcArray.push_back(fEmmaTdcHits[i].GetEnergy());
       if (fEmmaTdcHits[i].GetTdcNumber() == 10) hit->SetLeft(fEmmaTdcHits[i].GetEnergy());
       if (fEmmaTdcHits[i].GetTdcNumber() == 11) hit->SetRight(fEmmaTdcHits[i].GetEnergy());
@@ -214,12 +220,6 @@ void TEmma::BuildHits()
       if (fEmmaTdcHits[i].GetTdcNumber() == 13) hit->SetBottom(fEmmaTdcHits[i].GetEnergy());
     }
 
-    for (size_t k = 0; k < fEmmaICHits.size(); ++k) {
-      if (fEmmaICHits[k].GetSegment() == 1) hit->SetIC0(fEmmaICHits[k].GetEnergy());
-      icArray.push_back(fEmmaICHits[k].GetEnergy());
-    }
-    fICEnergy = std::accumulate(icArray.begin(), icArray.end(), 0.0);
-    hit->SetICSum(fICEnergy);
     if (tdcArray.size() != 0) {
       fAnodeTrigger = * std::min_element(tdcArray.begin(), tdcArray.end());
       if (hit->GetLeft() != 0 && hit->GetRight() != 0 && hit->GetTop() != 0 && hit->GetBottom() != 0 && fAnodeTrigger != 0) {
@@ -231,13 +231,14 @@ void TEmma::BuildHits()
         hit->SetAnodeTrigger(fAnodeTrigger);
         fHits.push_back(std::move(hit));
       } else {
+	printf("TDC Array Failed \n");
         fFail = 0;
         if (hit->GetLeft() == 0) fFail++;
         if (hit->GetRight() == 0) fFail++;
         if (hit->GetTop() == 0) fFail++;
         if (hit->GetBottom() == 0) fFail++;
         hit->SetFailedFill(fFail);
-        if (fFail != 0) fHits.push_back(std::move(hit));
+        fHits.push_back(std::move(hit));
       }
     } else {
       return;
@@ -253,5 +254,6 @@ void TEmma::Clear(Option_t* opt)
    fEmmaAnodeHits.clear();
    fEmmaTdcHits.clear();
    fEmmaSiHits.clear();
+   fEmmaTriggerHits.clear();
    fEmmaSSBHits.clear();
 }

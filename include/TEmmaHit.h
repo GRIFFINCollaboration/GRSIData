@@ -35,21 +35,17 @@ public:
    void SetBottom(double q) { fBottom = q; }
    void SetAnodeTrigger(double q) { fAnodeTrigger = q; }
    void SetTdcNumber(int n) { fTdcNumber = n; }
-   void SetIC0(double q) { fIC0 = q; }
-   void SetICSum(double q) {fICEnergy = q; }
    void SetFailedFill(int n) { fFail = n; }
 
    /////////////////////////  Getters	/////////////////////////////////////
    inline Int_t GetFilterPattern() const { return fFilter; } //!<!
 
    TVector3 GetPosition() const override;              //!<!
-
+   TVector3 GetPosition(double delayL, double delayR, double delayT, double delayB) const;              //!<!
    Double_t GetLeft() const {return fLeft; }
    Double_t GetRight() const {return fRight; }
    Double_t GetTop() const {return fTop; }
    Double_t GetBottom() const {return fBottom; }
-   Double_t GetIC0() const {return fIC0; }
-   Double_t GetICSum() const {return fICEnergy; }
    Short_t GetTdcNumber() const { return fTdcNumber; }
 
    Short_t GetFailedFill() const { return fFail; }
@@ -69,9 +65,13 @@ private:
    Double_t fBottom{0};           // Bottom Cathode
    Double_t fAnodeTrigger{0};     // Trigger Anode
    Short_t fTdcNumber{0};         // Used in BuildHits
-   Double_t fIC0{0}; 		  // 1st IC
-   Double_t fICEnergy{0};         // IC sum
+   Double_t fICSum{0};		  // IC Sum
    Short_t fFail{0};              // Check BuildHits is working
+   Double_t fSiE{0};              // Si at focal plane
+   static double fLdelay;
+   static double fRdelay;
+   static double fTdelay;
+   static double fBdelay;
 
    /// \cond CLASSIMP
    ClassDefOverride(TEmmaHit, 3);
