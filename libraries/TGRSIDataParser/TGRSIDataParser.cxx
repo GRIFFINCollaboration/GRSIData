@@ -1866,7 +1866,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 				{
 					if((dword & 0x00800000) != 0) {
 						adchightimestamp=dword&0x0000ffff;
-						eventFrag->AppendTimeStamp((static_cast<Long64_t>(adchightimestamp))*static_cast<Long64_t>(0x0000000140000000) ); // 14 gives you the *5 you need
+						eventFrag->AppendTimeStamp((static_cast<Long64_t>(adchightimestamp))*static_cast<Long64_t>(0x0000000040000000)); // This should shift the time stamp 30 bits
 						xferhfts = eventFrag->GetTimeStamp();
 					} else if ((dword & 0x04000000) != 0) { // GH verify that this is a good ADC reading
 						adcchannel = (dword>>16)&0x1F; // ADC Channel Number
@@ -1895,7 +1895,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 			case 0xd:
 			case 0xc: // Last 30 bits of timestamp
 				adctimestamp =(dword&0x3FFFFFFF);
-				eventFrag->AppendTimeStamp( static_cast<Long64_t>(adctimestamp)*static_cast<Long64_t>(5) ) ;
+				eventFrag->AppendTimeStamp( static_cast<Long64_t>(adctimestamp) ) ;
 				break;
 			default: break;
 		} // end swich
