@@ -99,8 +99,8 @@ public:
    void ClearTransients() override
    {
       fS3Bits = 0;
-      for(const auto& hit : fHits) {
-         hit->ClearTransients();
+      for(const auto& hit : fS3PixelHits) {
+         hit.ClearTransients();
       }
       for(const auto& hit : fS3RingHits) {
          hit.ClearTransients();
@@ -116,7 +116,7 @@ public:
    void Print(Option_t* opt = "") const override; //!<!
 
 private:
-   std::vector<TS3Hit> fS3RingHits, fS3SectorHits;
+   std::vector<TS3Hit> fS3RingHits, fS3SectorHits, fS3PixelHits;
 
    TTransientBits<UChar_t> fS3Bits; // flags for transient members
    void                    ClearStatus() { fS3Bits = 0; }
