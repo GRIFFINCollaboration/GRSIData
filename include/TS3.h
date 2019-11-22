@@ -64,6 +64,7 @@ public:
    TS3Hit* GetS3Hit(const int& i) const { return static_cast<TS3Hit*>(GetHit(i)); }
    TS3Hit* GetRingHit(const int& i);
    TS3Hit* GetSectorHit(const int& i);
+   TS3Hit* GetPixelHit(const int& i);
 
    static bool PreferenceSector(bool set = true)
    {
