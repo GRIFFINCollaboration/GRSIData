@@ -26,9 +26,9 @@ public:
    };
 
    enum class ES3GlobalBits {
-      kPreSector  = BIT(0), // Preference sector energy when building pixels
-      kMultHit    = BIT(1), // Attempt to reconstruct multi strip-hit events
-      kKeepShared = BIT(2), // When kMultHit, reconstruct rather than discard charge sharing
+      kPreSector  = BIT(0), ///< Preference sector energy when building pixels
+      kMultHit    = BIT(1), ///< Attempt to reconstruct multi strip-hit events
+      kKeepShared = BIT(2), ///< When kMultHit, reconstruct rather than discard charge sharing
       kGBit3      = BIT(3)
    };
 
@@ -39,7 +39,7 @@ public:
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
-	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
+	void BuildHits() override {} ///< no need to build any hits, everything already done in AddFragment
 
    Short_t GetRingMultiplicity() const { return fS3RingHits.size(); }
    Short_t GetSectorMultiplicity() const { return fS3SectorHits.size(); }
@@ -49,17 +49,17 @@ public:
    {
       fFrontBackEnergy = de;
       SetPixels(false);
-   } // Set fractional allowed energy difference
+   } ///< Set fractional allowed energy difference
    void SetFrontBackEOffset(double de)
    {
       fFrontBackOffset = de;
       SetPixels(false);
-   } // Set fractional allowed energy difference
+   } ///< Set fractional allowed energy difference
    void SetFrontBackTime(int time)
    {
       fFrontBackTime = time;
       SetPixels(false);
-   } // Set absolute allow time difference
+   } ///< Set absolute allow time difference
 
    TS3Hit* GetS3Hit(const int& i) const { return static_cast<TS3Hit*>(GetHit(i)); }
    TS3Hit* GetRingHit(const int& i);
@@ -116,14 +116,16 @@ public:
    void Print(Option_t* opt = "") const override; //!<!
 
 private:
-   std::vector<TS3Hit> fS3RingHits, fS3SectorHits, fS3PixelHits;
+   std::vector<TS3Hit> fS3RingHits;   ///< vector to store hits of the ring side
+   std::vector<TS3Hit> fS3SectorHits; ///< vector to store hits of the sector side
+   std::vector<TS3Hit> fS3PixelHits;  //!<! transient vector to hold the on-the-fly calculated pixel hits
 
-   TTransientBits<UChar_t> fS3Bits; // flags for transient members
+   TTransientBits<UChar_t> fS3Bits; ///< flags for transient members
    void                    ClearStatus() { fS3Bits = 0; }
    void SetBitNumber(ES3Bits bit, Bool_t set = true);
    Bool_t TestBitNumber(ES3Bits bit) const { return (fS3Bits.TestBit(bit)); }
 
-   static TTransientBits<UShort_t> fgS3Bits; // Global Bit
+   static TTransientBits<UShort_t> fgS3Bits; ///< Global Bit
    static void SetGlobalBit(ES3GlobalBits bit, Bool_t set = true) { fgS3Bits.SetBit(bit, set); }
    static Bool_t TestGlobalBit(ES3GlobalBits bit) { return (fgS3Bits.TestBit(bit)); }
 
