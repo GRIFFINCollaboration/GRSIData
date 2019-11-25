@@ -149,7 +149,7 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h
+$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
@@ -158,10 +158,10 @@ lib: include/GRSIDataVersion.h
 include/GRSIDataVersion.h:
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-lib/lib%.so: $(LIBRARY_OUTPUT) .build/histos/%.o | include/GRSIDataVersion.h lib lib/libGRSIData.so
+lib/lib%.so: $(LIBRARY_OUTPUT) .build/histos/%.o | include/GRSIDataVersion.h lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -Llib $(addprefix -l,$(LIBRARY_NAMES)) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
-lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | include/GRSIDataVersion.h lib lib/libGRSIData.so
+lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | include/GRSIDataVersion.h lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) | include/GRSIDataVersion.h
