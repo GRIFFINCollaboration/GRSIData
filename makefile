@@ -90,7 +90,7 @@ CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
 LINKFLAGS += $(shell grsi-config --all-libs)
-LINKFLAGS += -Llib -lGRSIData -Wl,-rpath,\$$ORIGIN/../lib
+LINKFLAGS += $(shell grsi-config --GRSIData-libs)
 
 # RCFLAGS are being used for rootcint
 ifeq ($(MATHMORE_INSTALLED),yes)
@@ -200,6 +200,7 @@ html: all
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build lib
+	@-$(RM) -f $(EXECUTABLES)
 	@-$(RM) -rf libraries/*.so libraries/*.pcm #this is here for cleaning up libraries from pre GRSI 3.0
 
 cleaner: clean
