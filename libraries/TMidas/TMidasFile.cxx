@@ -1049,7 +1049,7 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
          tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
-         tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+         if(x < quads.size()) tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
       }
       printf("\t%i TChannels created.\n", TChannel::GetNumberOfChannels());
    } else {

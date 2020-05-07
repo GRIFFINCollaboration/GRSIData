@@ -84,7 +84,7 @@ FIN_STRING="Finished Building"
 LIBRARY_NAMES  := $(notdir $(LIBRARY_DIRS))
 LIBRARY_OUTPUT := $(patsubst %,lib/lib%.so,$(LIBRARY_NAMES))
 
-INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES)) -I$(shell grsi-config --incdir)
+INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdir)
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
@@ -171,7 +171,7 @@ lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) | include/GRSIDataVersion.
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell $(HEAD) $(1) -n 1 2> /dev/null)))
+dict_header_files = $(addprefix $(CURDIR)/include/,$(subst //,,$(shell $(HEAD) $(1) -n 1 2> /dev/null)))
 find_linkdef = $(shell $(FIND) $(1) -name "*LinkDef.h")
 
 # In order for all function names to be unique, rootcint requires unique output names.
