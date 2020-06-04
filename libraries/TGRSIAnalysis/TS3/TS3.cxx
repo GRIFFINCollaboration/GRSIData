@@ -50,6 +50,7 @@ void TS3::Copy(TObject& rhs) const
    TDetector::Copy(rhs);
    static_cast<TS3&>(rhs).fS3RingHits   = fS3RingHits;
    static_cast<TS3&>(rhs).fS3SectorHits = fS3SectorHits;
+   static_cast<TS3&>(rhs).fS3PixelHits = fS3PixelHits;
 }
 
 void TS3::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
@@ -390,6 +391,16 @@ TS3Hit* TS3::GetSectorHit(const int& i)
       return &fS3SectorHits.at(i);
    }
    std::cerr<<"S3 sector hits are out of range"<<std::endl;
+   throw grsi::exit_exception(1);
+   return nullptr;
+}
+
+TS3Hit* TS3::GetPixelHit(const int& i)
+{
+   if(i < GetPixelMultiplicity()) {
+      return &fS3PixelHits.at(i);
+   }
+   std::cerr<<"S3 Pixel hits are out of range"<<std::endl;
    throw grsi::exit_exception(1);
    return nullptr;
 }
