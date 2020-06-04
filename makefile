@@ -84,13 +84,13 @@ FIN_STRING="Finished Building"
 LIBRARY_NAMES  := $(notdir $(LIBRARY_DIRS))
 LIBRARY_OUTPUT := $(patsubst %,lib/lib%.so,$(LIBRARY_NAMES))
 
-INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES)) -I$(shell grsi-config --incdir)
+INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdir)
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
 LINKFLAGS += $(shell grsi-config --all-libs)
-LINKFLAGS += -Llib -lGRSIData -Wl,-rpath,\$$ORIGIN/../lib
+LINKFLAGS += $(shell grsi-config --GRSIData-libs)
 
 # RCFLAGS are being used for rootcint
 ifeq ($(MATHMORE_INSTALLED),yes)
@@ -138,15 +138,19 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(HISTOGRAM_SO) 
+all: include/GRSIDataVersion.h $(LIBRARY_OUTPUT) lib/libGRSIData.so $(HISTOGRAM_SO) $(EXECUTABLES)
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
+	@grep "^GRSI.ParserLibrary" ../.grsirc 2>&1 > /dev/null || printf "$(ERROR_COLOR)You need to set GRSI.ParserLibrary in your .grsirc to enable the use of this library!$(NO_COLOR)\n"
 
 docs: doxygen
 
 doxygen:
 	$(MAKE) -C $@
+
+$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
 	@mkdir -p $@
@@ -167,7 +171,7 @@ lib/libGRSIData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) | include/GRSIDataVersion.
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell $(HEAD) $(1) -n 1 2> /dev/null)))
+dict_header_files = $(addprefix $(CURDIR)/include/,$(subst //,,$(shell $(HEAD) $(1) -n 1 2> /dev/null)))
 find_linkdef = $(shell $(FIND) $(1) -name "*LinkDef.h")
 
 # In order for all function names to be unique, rootcint requires unique output names.
@@ -196,6 +200,7 @@ html: all
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build lib
+	@-$(RM) -f $(EXECUTABLES)
 	@-$(RM) -rf libraries/*.so libraries/*.pcm #this is here for cleaning up libraries from pre GRSI 3.0
 
 cleaner: clean

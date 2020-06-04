@@ -698,6 +698,8 @@ void TMidasFile::SetFileOdb()
    } else if(expt.compare("griffin") == 0) {
       //		fIamGriffin = true;
       SetGRIFFOdb();
+   } else if(expt.compare("tigdaq") == 0) { //New TIGRESS DAQ
+      SetTIGDAQOdb();
    }
 #endif
 }
@@ -780,6 +782,12 @@ void TMidasFile::SetGRIFFOdb()
    node                        = fOdb->FindPath(temp.c_str());
    std::vector<double> offsets = fOdb->ReadDoubleArray(node);
 
+   // DAQ has quadratic terms in ODB from November 2019
+   temp = path;
+   temp.append("/quadratic");
+   node                        = fOdb->FindPath(temp.c_str());
+   std::vector<double> quads   = fOdb->ReadDoubleArray(node);
+
    temp = path;
    temp.append("/digitizer");
    node                          = fOdb->FindPath(temp.c_str());
@@ -788,6 +796,7 @@ void TMidasFile::SetGRIFFOdb()
    if((address.size() == names.size()) && (names.size() == gains.size()) && (gains.size() == offsets.size()) &&
       (offsets.size() == type.size())) {
       // all good. We ignore the digitizer size as this information is not present for all data
+      // Also ignoring quad terms as this will only be present in future data - S. Gillespie 
       for(size_t x = 0; x < address.size(); x++) {
          TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
          if(tempChan == nullptr) {
@@ -801,6 +810,9 @@ void TMidasFile::SetGRIFFOdb()
          tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
+			if(x < quads.size()) {
+				tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+			}
 			if(x < digitizer.size()) {
 				tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
 			}
@@ -967,6 +979,84 @@ void TMidasFile::SetTIGOdb()
       TChannel::AddChannel(tempChan, "overwrite");
    }
    printf("\t%i TChannels created.\n", TChannel::GetNumberOfChannels());
+#endif
+}
+
+void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without the PPG (as we don't have one) and digitizer MSC key which is not in TIGDAQ 
+{
+#ifdef HAS_XML
+   // get calibrations
+   std::string path = "/DAQ/MSC";
+   printf("using TIGDAQ path to analyzer info: %s...\n", path.c_str());
+
+   std::string temp = path;
+   temp.append("/MSC");
+   TXMLNode*        node    = fOdb->FindPath(temp.c_str());
+   std::vector<int> address = fOdb->ReadIntArray(node);
+
+   temp = path;
+   temp.append("/chan");
+   node                           = fOdb->FindPath(temp.c_str());
+   std::vector<std::string> names = fOdb->ReadStringArray(node);
+
+   temp = path;
+   temp.append("/datatype");
+   node                  = fOdb->FindPath(temp.c_str());
+   std::vector<int> type = fOdb->ReadIntArray(node);
+	if(type.empty()) {
+		// failed to read array from /DAQ/MSC/datatype, so try to read /DAQ/MSC/DetType
+		temp = path;
+		temp.append("/DetType");
+		node = fOdb->FindPath(temp.c_str());
+		type = fOdb->ReadIntArray(node);
+		std::cout<<"failed to find ODB path /DAQ/MSC/datatype, using "<<type.size()<<" entries from /DAQ/MSC/DetType instead"<<std::endl;
+	}
+
+   temp = path;
+   temp.append("/gain");
+   node                      = fOdb->FindPath(temp.c_str());
+   std::vector<double> gains = fOdb->ReadDoubleArray(node);
+
+   temp = path;
+   temp.append("/offset");
+   node                        = fOdb->FindPath(temp.c_str());
+   std::vector<double> offsets = fOdb->ReadDoubleArray(node);
+
+   // DAQ has quadratic terms in ODB from November 2019
+   temp = path;
+   temp.append("/quadratic");
+   node                        = fOdb->FindPath(temp.c_str());
+   std::vector<double> quads   = fOdb->ReadDoubleArray(node);
+
+   temp = path;
+   temp.append("/digitizer");
+   node                          = fOdb->FindPath(temp.c_str());
+   std::vector<std::string> digitizer = fOdb->ReadStringArray(node);
+
+   if((address.size() == names.size()) && (names.size() == gains.size()) && (gains.size() == offsets.size()) && (gains.size() == offsets.size()) &&
+      (offsets.size() == type.size())) {
+      // Only data without quad terms is mine so they will always be present - S. Gillespie 
+      for(size_t x = 0; x < address.size(); x++) {
+         TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
+         if(tempChan == nullptr) {
+            tempChan = new TChannel();
+         }
+         tempChan->SetName(names.at(x).c_str());
+         tempChan->SetAddress(address.at(x));
+         tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
+         // printf("temp chan(%s) number set to: %i\n",tempChan->GetChannelName(),tempChan->GetNumber());
+
+         tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
+         tempChan->AddENGCoefficient(offsets.at(x));
+         tempChan->AddENGCoefficient(gains.at(x));
+         if(x < quads.size()) tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+      }
+      printf("\t%i TChannels created.\n", TChannel::GetNumberOfChannels());
+   } else {
+      printf(BG_WHITE DRED "problem parsing odb data, arrays are different sizes, channels not set." RESET_COLOR "\n");
+   }
+
+
 #endif
 }
 

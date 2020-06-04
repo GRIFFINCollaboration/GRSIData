@@ -82,10 +82,13 @@ void TGRSIMnemonic::EnumerateSystem()
       fSystem = ESystem::kTip;
    } else if(fSystemString.compare("BG") == 0) {
       fSystem = ESystem::kBgo;
-   } else if(fSystemString.compare("EM") == 0) {
-      fSystem = ESystem::kEmma;
-   } else if(fSystemString.compare("ET") == 0) {
-      fSystem = ESystem::kEmma;
+   } else if((fSystemString.compare("EM") == 0) || (fSystemString.compare("ET") == 0)) {
+      if(SubSystem() == EMnemonic::kE) {
+        fSystem = ESystem::kEmmaS3;
+      }
+      else {
+        fSystem = ESystem::kEmma;
+      }
    } else {
       fSystem = ESystem::kClear;
    }
@@ -114,10 +117,10 @@ void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerNam
 		tmpUnit = 2;
    } else if(name.compare("MADC") == 0) {
 		tmpType = EDigitizer::kMadc;
-		tmpUnit = 10;
+		tmpUnit = 50;
    } else if(name.compare("V1190") == 0) {
 		tmpType = EDigitizer::kV1190;
-		tmpUnit = 10;
+		tmpUnit = 50;
    } else {
 		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', 'CAEN', 'MADC!' && 'V1190'!"<<std::endl;
 	}
@@ -187,6 +190,7 @@ TClass* TGRSIMnemonic::GetClassType() const
 		case ESystem::kLaBrBgo:       fClassType = TLaBrBgo::Class(); break;
 		case ESystem::kGeneric:       fClassType = TGenericDetector::Class(); break;
 		case ESystem::kEmma:          fClassType = TEmma::Class(); break;
+		case ESystem::kEmmaS3:        fClassType = TS3::Class(); break;
 		default:                      fClassType = nullptr;
    };
    return fClassType;

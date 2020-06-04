@@ -6,6 +6,11 @@
 ClassImp(TEmmaHit)
 /// \endcond
 
+double TEmmaHit::fLdelay = 40;
+double TEmmaHit::fRdelay = 20;
+double TEmmaHit::fTdelay = 10;
+double TEmmaHit::fBdelay = 20;
+
 TEmmaHit::TEmmaHit()
    : TGRSIDetectorHit()
 {
@@ -37,8 +42,7 @@ void TEmmaHit::Copy(TObject& rhs) const
    static_cast<TEmmaHit&>(rhs).fBottom = fBottom;
    static_cast<TEmmaHit&>(rhs).fAnodeTrigger = fAnodeTrigger;
    static_cast<TEmmaHit&>(rhs).fFail = fFail;
-   static_cast<TEmmaHit&>(rhs).fIC0 = fIC0;
-   static_cast<TEmmaHit&>(rhs).fICEnergy = fICEnergy;
+   static_cast<TEmmaHit&>(rhs).fICSum = fICSum;
 }
 
 bool TEmmaHit::InFilter(Int_t)
@@ -63,6 +67,10 @@ void TEmmaHit::Print(Option_t*) const
 
 TVector3 TEmmaHit::GetPosition() const
 {
-   return TEmma::GetPosition(GetLeft(),GetRight(),GetTop(),GetBottom());
+   return TEmma::GetPosition(GetLeft(),GetRight(),GetTop(),GetBottom(),fLdelay,fRdelay,fTdelay,fBdelay);
 }
 
+TVector3 TEmmaHit::GetPosition(double delayL, double delayR, double delayT, double delayB) const
+{
+   return TEmma::GetPosition(GetLeft(),GetRight(),GetTop(),GetBottom(),delayL,delayR,delayT,delayB);
+}

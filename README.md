@@ -12,3 +12,5 @@ Other implemented classes are:
  - the TGRSIDetectorInformation which provides functions and members to tell which detectors are present in the data,
  - the TGRSIDetectorHit which overrides the GetTime function of TDetectorHit to properly handle the different timestamp and CFD data from the different digitizers used, and
  - the TAngularCorrelation class which can be used to look at angular correlations of GRIFFIN detectors.
+ 
+ To compile simply call ```make``` inside the GRSIData directory.

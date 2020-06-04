@@ -47,7 +47,8 @@ public:
 		kTdrSiLi,
 		kTdrPlastic,
 		kEmma,
-		kClear            //29
+	        kEmmaS3,
+		kClear            //30
    };
 
    ESystem   System() const { return fSystem; }
