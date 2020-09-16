@@ -275,7 +275,7 @@ void TGriffin::SetDefaultGainType(const EGainBits& gain_type)
    if((gain_type == EGainBits::kLowGain) || (gain_type == EGainBits::kHighGain)) {
       fDefaultGainType = gain_type;
    } else {
-      std::cout<<static_cast<std::underlying_type<EGainBits>::type>(gain_type)<<" is not a known gain type. Please use kLowGain or kHighGain"<<std::endl;
+      std::cerr<<static_cast<std::underlying_type<EGainBits>::type>(gain_type)<<" is not a known gain type. Please use kLowGain or kHighGain"<<std::endl;
    }
 }
 
@@ -585,7 +585,7 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 		Bool_t time_constraint)
 {
 	if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
-		printf("One of the hits is invalid in TGriffin::CTCorrectedEnergy\n");
+		std::cerr<<"One of the hits is invalid in TGriffin::CTCorrectedEnergy"<<std::endl;
 		return 0;
 	}
 
@@ -607,20 +607,16 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 			fixed_energy -= hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
 		}
 	} catch(const std::out_of_range& oor) {
-		if(!been_warned[16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() +
-				other_hit->GetCrystal()]) {
-			been_warned[16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal()] =
-				true;
-			std::cout<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
-				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<std::endl;
+		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
+		if(!been_warned[id]) {
+			been_warned[id] = true;
+			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
 		}
 		return hit_to_correct->GetEnergy();
 	}
 
 	return fixed_energy;
-
-	// return hit_to_correct->GetEnergy() - (gCrossTalkPar[0][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] +
-	// gCrossTalkPar[1][hit_to_correct->GetCrystal()][other_hit->GetCrystal()]*other_hit->GetNoCTEnergy());
 }
 
 void TGriffin::FixLowGainCrossTalk()
@@ -644,6 +640,7 @@ void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 		static_cast<TGriffinHit*>(hit)->ClearEnergy();
 	}
 
+	// why is this check done here? Shouldn't this be the first thing to check?
 	if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
 		for(auto& one : hit_vec) {
 			for(auto& two : hit_vec) {
