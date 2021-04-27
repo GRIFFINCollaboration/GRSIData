@@ -197,7 +197,7 @@ void GetTimeDiff(TTree *tree, int64_t *correction){
    const int range = 1000; //   +/- the amount of events to diff over
 
    printf(DBLUE "Looking for time differences...\n" RESET_COLOR);
-   printf(DYELLOW "Tree Index not found, building index on %s/%s..." RESET_COLOR,"Master Filter Id","TimeStampLow");  fflush(stdout);//I'm not sure this even has to happen
+   printf(DYELLOW "Tree Index not found, building index on %s/%s..." RESET_COLOR,"Primary Filter Id","TimeStampLow");  fflush(stdout);//I'm not sure this even has to happen
    tree->BuildIndex("TriggerId","TimeStampLow");
    printf(" done!\n");
    TList* bestvs = new TList;
