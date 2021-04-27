@@ -358,7 +358,7 @@ void TGriffin::SetCrossTalk(const EGainBits& gain_type, const Bool_t flag) const
    };
 }
 
-TDetectorHit* TGriffin::GetHit(const Int_t& idx)
+TDetectorHit* TGriffin::GetHit(const int& idx)
 {
    return GetGriffinHit(idx);
 }
@@ -652,7 +652,7 @@ void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 	SetCrossTalk(gain_type, true);
 }
 
-const char* TGriffin::GetColorFromNumber(Int_t number)
+const char* TGriffin::GetColorFromNumber(int number)
 {
 	switch(number) {
 		case(0): return "B";

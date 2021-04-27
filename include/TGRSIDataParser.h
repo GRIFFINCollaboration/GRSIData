@@ -109,8 +109,8 @@ private:
    bool SetTIGTimeStamp(uint32_t*, const std::shared_ptr<TFragment>&);
 
    bool SetGRIFHeader(uint32_t, const std::shared_ptr<TFragment>&, EBank);
-   bool SetGRIFMasterFilterPattern(uint32_t, const std::shared_ptr<TFragment>&, EBank);
-   bool SetGRIFMasterFilterId(uint32_t, const std::shared_ptr<TFragment>&);
+   bool SetGRIFPrimaryFilterPattern(uint32_t, const std::shared_ptr<TFragment>&, EBank);
+   bool SetGRIFPrimaryFilterId(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFChannelTriggerId(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFTimeStampLow(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFNetworkPacket(uint32_t, const std::shared_ptr<TFragment>&);

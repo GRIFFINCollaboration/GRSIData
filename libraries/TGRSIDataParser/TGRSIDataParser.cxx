@@ -557,15 +557,15 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 		++x;
 	}
 
-	// The master Filter Pattern is in an unstable state right now and is not
+	// The Primary Filter Pattern is in an unstable state right now and is not
 	// always written to the midas file
-	if(SetGRIFMasterFilterPattern(data[x], eventFrag, bank)) {
+	if(SetGRIFPrimaryFilterPattern(data[x], eventFrag, bank)) {
 		++x;
 	}
 
 	// We can get multiple filter ids (one fragment can pass multiple filter conditions)
 	// so we have to loop until we don't find one
-	while(SetGRIFMasterFilterId(data[x], eventFrag)) {
+	while(SetGRIFPrimaryFilterId(data[x], eventFrag)) {
 		++x;
 	}
 
@@ -619,7 +619,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 		switch(packet) {
 			case 0x8: // The 8 packet type is for event headers
 				// if this happens, we have "accidentally" found another event.
-				// currently the GRIF-C only sets the master/slave port of the address for the first header (of the corrupt
+				// currently the GRIF-C only sets the primary/secondary port of the address for the first header (of the corrupt
 				// event)
 				// so we want to ignore this corrupt event and the next event which has a wrong address
 				TParsingDiagnostics::Get()->BadFragment(eventFrag->GetDetectorType());
@@ -943,7 +943,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 									}
 								} else {
 									// these types of corrupt events quite often end without a trailer which leads to the header of the
-									// next event missing the master/slave part of the address
+									// next event missing the primary/secondary part of the address
 									// so we look for the next trailer and stop there
 									while(x < size && (data[x] & 0xf0000000) != 0xe0000000) {
 										++x;
@@ -1099,9 +1099,9 @@ bool TGRSIDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFragm
 	return true;
 }
 
-bool TGRSIDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
+bool TGRSIDataParser::SetGRIFPrimaryFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
 {
-	/// Sets the Griffin Master Filter Pattern
+	/// Sets the Griffin Primary Filter Pattern
 	if((value & 0xc0000000) != 0x00000000) {
 		return false;
 	}
@@ -1122,9 +1122,9 @@ bool TGRSIDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shar
 	return true;
 }
 
-bool TGRSIDataParser::SetGRIFMasterFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFPrimaryFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
-	/// Sets the Griffin master filter ID and PPG
+	/// Sets the Griffin Primary filter ID and PPG
 	if((value & 0x80000000) != 0x00000000) {
 		return false;
 	}

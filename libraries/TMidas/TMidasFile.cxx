@@ -323,7 +323,7 @@ static int readpipe(int fd, char* buf, int length)
    return count;
 }
 
-/// \param [in] midasEvent Pointer to an empty TMidasEvent
+/// \param [in] event shared Pointer to an empty TMidasEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
 ///
 ///  EDITED FROM THE ORIGINAL TO RETURN TOTAL SUCESSFULLY BYTES READ INSTEAD OF TRUE/FALSE,  PCB

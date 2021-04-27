@@ -41,7 +41,7 @@ public:
 public:
    TGriffinHit* GetGriffinLowGainHit(const int& i);                                              //!<!
    TGriffinHit* GetGriffinHighGainHit(const int& i);                                             //!<!
-   TGriffinHit* GetGriffinHit(const Int_t& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
+   TGriffinHit* GetGriffinHit(const int& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
    using TDetector::GetHit;
    TDetectorHit* GetHit(const int& idx);
    Short_t GetLowGainMultiplicity() const { return fGriffinLowGainHits.size(); }
@@ -50,7 +50,7 @@ public:
 
    static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 110.0); //!<!
    static TVector3 GetDetectorPosition(int DetNbr); //!<!
-   static const char* GetColorFromNumber(Int_t number);
+   static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
@@ -104,7 +104,7 @@ public:
 
    TGriffinHit* GetSuppressedLowGainHit(const int& i);                                              //!<!
    TGriffinHit* GetSuppressedHighGainHit(const int& i);                                             //!<!
-   TGriffinHit* GetSuppressedHit(const Int_t& i) { return GetSuppressedHit(i, GetDefaultGainType()); } //!<!
+   TGriffinHit* GetSuppressedHit(const int& i) { return GetSuppressedHit(i, GetDefaultGainType()); } //!<!
    Short_t GetSuppressedLowGainMultiplicity(const TBgo* bgo);
    Short_t GetSuppressedHighGainMultiplicity(const TBgo* bgo);
    Short_t GetSuppressedMultiplicity(const TBgo* bgo) { return GetSuppressedMultiplicity(bgo, GetDefaultGainType()); }
@@ -185,7 +185,7 @@ private:
    const std::vector<TDetectorHit*>& GetHitVector(const EGainBits& gain_type) const;      //!<!
    std::vector<TDetectorHit*>& GetAddbackVector(const EGainBits& gain_type);  //!<!
    std::vector<UShort_t>& GetAddbackFragVector(const EGainBits& gain_type); //!<!
-   TGriffinHit* GetGriffinHit(const Int_t& i, const EGainBits& gain_type);  //!<!
+   TGriffinHit* GetGriffinHit(const int& i, const EGainBits& gain_type);  //!<!
    Short_t GetMultiplicity(const EGainBits& gain_type) const;
    TGriffinHit* GetAddbackHit(const int& i, const EGainBits& gain_type);
    Short_t GetAddbackMultiplicity(const EGainBits& gain_type);
@@ -196,7 +196,7 @@ private:
    std::vector<TDetectorHit*>& GetSuppressedVector(const EGainBits& gain_type);      //!<!
    std::vector<TDetectorHit*>& GetSuppressedAddbackVector(const EGainBits& gain_type);  //!<!
    std::vector<UShort_t>& GetSuppressedAddbackFragVector(const EGainBits& gain_type); //!<!
-   TGriffinHit* GetSuppressedHit(const Int_t& i, const EGainBits& gain_type);  //!<!
+   TGriffinHit* GetSuppressedHit(const int& i, const EGainBits& gain_type);  //!<!
    Short_t GetSuppressedMultiplicity(const TBgo* bgo, const EGainBits& gain_type);
    void SetSuppressed(const EGainBits& gain_type, bool flag = true) const;
    void ResetSuppressed(const EGainBits& gain_type); //!<!
