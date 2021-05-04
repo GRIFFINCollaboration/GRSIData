@@ -7,10 +7,10 @@ PLATFORM:=$(shell uname)
 # EDIT THIS SECTION
 
 INCLUDES   = include 
-CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unknown-pragmas -Wno-unused-function -Wshadow
+CFLAGS     = -g -O3 -Wall -Wextra -pedantic -Wno-unknown-pragmas -Wno-unused-function -Wshadow
 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
@@ -85,8 +85,8 @@ LIBRARY_NAMES  := $(notdir $(LIBRARY_DIRS))
 LIBRARY_OUTPUT := $(patsubst %,lib/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdir)
-CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += $(shell grsi-config --cflags)
+CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
 LINKFLAGS += $(shell grsi-config --all-libs)
