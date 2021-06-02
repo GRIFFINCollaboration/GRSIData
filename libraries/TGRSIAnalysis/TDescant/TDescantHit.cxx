@@ -297,7 +297,6 @@ std::vector<Short_t> TDescantHit::CalculateSmoothedWaveform(unsigned int halfSmo
 std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsigned int delay,
                                                       unsigned int halfSmoothingWindow)
 {
-
    if(fWaveform.empty()) {
       return std::vector<Short_t>(); // Error!
    }
@@ -320,7 +319,6 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
 
 std::vector<Int_t> TDescantHit::CalculatePartialSum()
 {
-
    if(fWaveform.empty()) {
       return std::vector<Int_t>(); // Error!
    }
@@ -351,7 +349,6 @@ Int_t TDescantHit::CalculatePsd(double fraction, unsigned int interpolationSteps
 Int_t TDescantHit::CalculatePsdAndPartialSums(double fraction, unsigned int interpolationSteps,
                                               std::vector<Int_t>& partialSums)
 {
-
    Int_t psd = 0;
 
    partialSums = CalculatePartialSum();
@@ -372,3 +369,4 @@ Int_t TDescantHit::CalculatePsdAndPartialSums(double fraction, unsigned int inte
 
    return psd;
 }
+
