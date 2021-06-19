@@ -342,7 +342,7 @@ bool TGriffin::IsCrossTalkSet(const EGainBits& gain_type) const
    return false;
 }
 
-void TGriffin::SetAddback(const EGainBits& gain_type, const Bool_t flag) const
+void TGriffin::SetAddback(const EGainBits& gain_type, const bool flag) const
 {
    switch(gain_type) {
 		case EGainBits::kLowGain:  return SetBitNumber(EGriffinBits::kIsLowGainAddbackSet, flag);
@@ -350,7 +350,7 @@ void TGriffin::SetAddback(const EGainBits& gain_type, const Bool_t flag) const
    };
 }
 
-void TGriffin::SetCrossTalk(const EGainBits& gain_type, const Bool_t flag) const
+void TGriffin::SetCrossTalk(const EGainBits& gain_type, const bool flag) const
 {
    switch(gain_type) {
 		case EGainBits::kLowGain: return SetBitNumber(EGriffinBits::kIsLowGainCrossTalkSet, flag);
@@ -821,7 +821,7 @@ Short_t TGriffin::GetSuppressedMultiplicity(const TBgo* bgo, const EGainBits& ga
 	return sup_vec.size();
 }
 
-void TGriffin::SetSuppressed(const EGainBits& gain_type, const Bool_t flag) const
+void TGriffin::SetSuppressed(const EGainBits& gain_type, const bool flag) const
 {
 	switch(gain_type) {
 		case EGainBits::kLowGain:  return SetBitNumber(EGriffinBits::kIsLowGainSuppressed, flag);
@@ -885,7 +885,7 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo, const EGainB
 	return ab_vec.size();
 }
 
-void TGriffin::SetSuppressedAddback(const EGainBits& gain_type, const Bool_t flag) const
+void TGriffin::SetSuppressedAddback(const EGainBits& gain_type, const bool flag) const
 {
 	switch(gain_type) {
 		case EGainBits::kLowGain: return SetBitNumber(EGriffinBits::kIsLowGainSuppressedAddbackSet, flag);

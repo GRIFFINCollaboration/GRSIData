@@ -109,7 +109,6 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
             fitGraph->SetPoint(fitGraph->GetN(), cmat->GetYaxis()->GetBinCenter(i), cmat->GetMean(2));
             fitGraph->SetPointError(fitGraph->GetN() - 1, cmat->GetXaxis()->GetBinWidth(i), cmat->GetMeanError(2));
          }
-         cmat->GetXaxis()->UnZoom();
       }
       cmat->Write();
 

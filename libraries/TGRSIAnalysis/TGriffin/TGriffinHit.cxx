@@ -1,4 +1,3 @@
-
 #include "TGriffin.h"
 #include "TGriffinHit.h"
 #include "Globals.h"
