@@ -5,14 +5,14 @@
  *  @{
  */
 
-// Access ODB info from an XML ODB dump at either the begining of a run
-// or from a seperate file.
-//
-// Name: TXMLOdb.h
-// Author: P.C. Bender
-//
-//
-//
+/////////////////////////////////////////////////////////////////
+///
+/// \class TXMLOdb
+///
+/// Class to access ODB info from an XML ODB dump at either the begining of a run
+/// or from a seperate file.
+///
+/////////////////////////////////////////////////////////////////
 
 #include <cstdlib>
 #include <cstdio>
