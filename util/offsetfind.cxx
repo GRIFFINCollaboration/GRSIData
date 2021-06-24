@@ -3,7 +3,6 @@
 
 #include "TMidasFile.h"
 #include "TMidasEvent.h"
-#include "GFile.h"
 #include "TFragment.h"
 #include "TTree.h"
 #include "TChannel.h"
