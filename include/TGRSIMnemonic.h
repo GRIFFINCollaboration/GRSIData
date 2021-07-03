@@ -48,6 +48,7 @@ public:
 		kTdrPlastic,
 		kEmma,
 	        kEmmaS3,
+	    kTrific,
 		kClear            //30
    };
 

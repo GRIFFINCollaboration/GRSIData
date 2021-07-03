@@ -23,6 +23,7 @@
 #include "TGriffinBgo.h"
 #include "TLaBrBgo.h"
 #include "TEmma.h"
+#include "TTrific.h"
 
 ClassImp(TGRSIMnemonic)
 
@@ -89,6 +90,8 @@ void TGRSIMnemonic::EnumerateSystem()
       else {
         fSystem = ESystem::kEmma;
       }
+   } else if(fSystemString.compare("TF") == 0) {
+      fSystem = ESystem::kTrific;
    } else {
       fSystem = ESystem::kClear;
    }
@@ -191,6 +194,7 @@ TClass* TGRSIMnemonic::GetClassType() const
 		case ESystem::kGeneric:       fClassType = TGenericDetector::Class(); break;
 		case ESystem::kEmma:          fClassType = TEmma::Class(); break;
 		case ESystem::kEmmaS3:        fClassType = TS3::Class(); break;
+		case ESystem::kTrific:        fClassType = TTrific::Class(); break;
 		default:                      fClassType = nullptr;
    };
    return fClassType;
