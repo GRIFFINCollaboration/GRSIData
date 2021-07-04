@@ -43,9 +43,6 @@ public:
    //TVector3 GetPosition(Double_t dist) const override; //!<!
    TVector3 GetPosition() const override;              //!<!
 
-
-
-
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
