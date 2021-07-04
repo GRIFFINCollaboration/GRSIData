@@ -9,54 +9,47 @@ ClassImp(TTrificHit)
 TTrificHit::TTrificHit() : TGRSIDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
-   Class()->IgnoreTObjectStreamer(kTRUE);
+	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-   Clear();
+	Clear();
 }
 
 TTrificHit::TTrificHit(const TTrificHit& rhs) : TGRSIDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
-   Class()->IgnoreTObjectStreamer(kTRUE);
+	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-   Clear();
-   rhs.Copy(*this);
+	Clear();
+	rhs.Copy(*this);
 }
 
 TTrificHit::~TTrificHit() = default;
 
 void TTrificHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
-   static_cast<TTrificHit&>(rhs).fFilter = fFilter;
+	TGRSIDetectorHit::Copy(rhs);
+	static_cast<TTrificHit&>(rhs).fFilter = fFilter;
 }
-
 
 void TTrificHit::Clear(Option_t* opt)
 {
-   TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+	TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
 }
 
 void TTrificHit::Print(Option_t*) const
 {
-   printf("TRIFIC Detector: %i\n", GetDetector());
-   printf("TRIFIC Segment:    %i\n", GetSegment());
-   printf("TRIFIC Energy:   %lf\n", GetEnergy());
-   printf("TRIFIC Hit Time:   %f\n", GetTime());
-   
+	printf("TRIFIC Detector: %i\n", GetDetector());
+	printf("TRIFIC Segment:    %i\n", GetSegment());
+	printf("TRIFIC Energy:   %lf\n", GetEnergy());
+	printf("TRIFIC Hit Time:   %f\n", GetTime());
 }
-
-
 
 TVector3 TTrificHit::GetPosition() const
 {
 	//calling GetPosition() on a TRIFIC hit should return the x,y,z location of the hit at that grid number
-	
+
 	//TVector3 particle = TTrific::GetPosition()
-	
-   return TTrific::GetPosition(GetDetector());
+
+	return TTrific::GetPosition(GetDetector());
 }
-
-
-
 
