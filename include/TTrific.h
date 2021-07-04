@@ -15,6 +15,15 @@
 #include "TDetector.h"
 #include "TTrificHit.h"
 
+////////////////////////////////////////////////////////////
+///
+/// \class TTrific
+///
+/// The TTrific class defines the observables and algorithms used
+/// when analyzing TIGRESS data.
+///
+////////////////////////////////////////////////////////////
+
 class TTrific : public TDetector {
 
 public:
