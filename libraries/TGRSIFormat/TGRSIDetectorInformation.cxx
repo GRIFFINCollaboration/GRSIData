@@ -58,6 +58,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       printf("\t\tDANTE:              %s\n", Dante() ? "true" : "false");
       printf("\t\tBGO:                %s\n", Bgo() ? "true" : "false");
       printf("\t\tEMMA:                %s\n", Emma() ? "true" : "false");
+      printf("\t\tTRIFIC:                %s\n", Trific() ? "true" : "false");
       printf("\n");
    }
 }
@@ -79,7 +80,8 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fS3      = false;
    fGeneric = false;
    fBambino = false;
-   fEmma        = false;
+   fEmma    = false;
+   fTrific  = false;
 
    fGriffin    = false;
    fSceptar    = false;
@@ -147,6 +149,9 @@ void TGRSIDetectorInformation::Set()
 				break;
 			case TGRSIMnemonic::ESystem::kEmma:
 				SetEmma();
+				break;
+			case TGRSIMnemonic::ESystem::kTrific:
+				SetTrific();
 				break;
 			case TGRSIMnemonic::ESystem::kGeneric:
 				SetGeneric();
