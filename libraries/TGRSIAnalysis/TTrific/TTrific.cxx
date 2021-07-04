@@ -3,15 +3,6 @@
 #include "TRandom.h"
 #include "TMath.h"
 
-////////////////////////////////////////////////////////////
-//
-// TTrific
-//
-// The TTrific class defines the observables and algorithms used
-// when analyzing TIGRESS data.
-//
-////////////////////////////////////////////////////////////
-
 /// \cond CLASSIMP
 ClassImp(TTrific)
 /// \endcond
@@ -64,10 +55,6 @@ void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 	fHits.push_back(std::move(hit));
 }
 
-
-
-
-
 Int_t TTrific::GetXYGrid(char grid, const TTrific& event)
 {
 	//used to determine which grid number are x or y grids
@@ -75,22 +62,22 @@ Int_t TTrific::GetXYGrid(char grid, const TTrific& event)
 	//the only thing that will need to be modified is the ODB
 
 	Int_t gridNumber = 0; //GetDetector indexes at 1, so if we return a grid number of 0, we weren't able to find the position grid in this event
-	if ('y' == grid || 'Y' == grid){
-		//for (auto i = 0; i < GetMultiplicity(); i++){
-		for (auto i = 0; i < event.GetMultiplicity(); i++){
+	if('y' == grid || 'Y' == grid){
+		//for(auto i = 0; i < GetMultiplicity(); i++){
+		for(auto i = 0; i < event.GetMultiplicity(); i++){
 			//y grids are [16,27], so need greater than 15 and less than 28
-			//if (static_cast<TTrificHit*>(GetHit(i))->GetSegment() > 15 && static_cast<TTrificHit*>(GetHit(i))->GetSegment() < 28){
-			if (GetTrificHit(i)->GetSegment() > 15 && GetTrificHit(i)->GetSegment() < 28){
+			//if(static_cast<TTrificHit*>(GetHit(i))->GetSegment() > 15 && static_cast<TTrificHit*>(GetHit(i))->GetSegment() < 28){
+			if(GetTrificHit(i)->GetSegment() > 15 && GetTrificHit(i)->GetSegment() < 28){
 				gridNumber = GetTrificHit(i)->GetDetector();
 				break;
 			}
 		}
 	} 
-	else if ('x' == grid || 'X' == grid){
-		for (auto i = 0; i < event.GetMultiplicity(); i++){
-		//for (auto i = 0; i < GetMultiplicity(); i++){
+	else if('x' == grid || 'X' == grid){
+		for(auto i = 0; i < event.GetMultiplicity(); i++){
+		//for(auto i = 0; i < GetMultiplicity(); i++){
 			//x grids are [1,12], so need greater than 0 and less than 13
-			if (GetTrificHit(i)->GetSegment() > 0 && GetTrificHit(i)->GetSegment() < 13){
+			if(GetTrificHit(i)->GetSegment() > 0 && GetTrificHit(i)->GetSegment() < 13){
 				gridNumber = GetTrificHit(i)->GetDetector();
 				break;
 			}
@@ -156,7 +143,7 @@ TVector3 TTrific::GetPosition()
 
 	//std::cout << "\nX and Y grids are " << gridX << " " << gridY << "\n"; fflush(stdout);
 
-	if (!gridY || !gridX){
+	if(!gridY || !gridX){
 		//if we don't have both an x and y grid hit in this event, position reconstruction won't be possible.
 		//std::cout << "\nUnable to find both X and Y grids for this event.\n";
 		return TVector3(-1,-1,-1);
@@ -170,31 +157,30 @@ TVector3 TTrific::GetPosition()
 	Int_t yMulti = 0; //if we only have multiplicity 1, we won't need to do a weighted average later
 
 
-	for (auto i = 0; i < GetMultiplicity(); i++){
+	for(auto i = 0; i < GetMultiplicity(); i++){
 		Int_t det = GetTrificHit(i)->GetDetector();
 	
 		//immediately discard any hits that aren't on the x or y grid
-		if (det != gridX && det != gridY) continue;
+		if(det != gridX && det != gridY) continue;
 
 		UInt_t seg = GetTrificHit(i)->GetSegment();
 		Double_t eng = GetTrificHit(i)->GetEnergy();
 
 		//set a lower threshold on the energy of the hit
-		if (3 > eng) continue; //arbitrary threshold at the moment
+		if(3 > eng) continue; //arbitrary threshold at the moment
 
 		//if we have a segment of 0, something went weird, so we discard this hit
-		if (0 == seg) continue;
+		if(0 == seg) continue;
 
 		//std::cout << "\nDetector and segment are " << det << " " << seg; fflush(stdout);
 
-		if (det == gridX){
+		if(det == gridX){
 			//this will eventually create a vector with as many entries as the highest segment number
 			//and fill every non-zero entry with the energy from that segment
 			while(xGridEnergy.size() < seg) xGridEnergy.push_back(0); 
 			xGridEnergy[seg-1]= eng; //minus 1 because vector indexes at 0 and x segments start at 1
 			xMulti++; //increase the multiplicity of the x-hit
-		} 
-		else if (det == gridY){
+		} else if(det == gridY){
 			//same thing, create the vector for the y-grids
 			//std::cout << "\nSeg is " << seg << " and seg mod is " << seg % 16 << " and size of the grid is " << yGridEnergy.size(); fflush(stdout);
 			while(yGridEnergy.size() < (seg%15)) yGridEnergy.push_back(0); //have to mod this by 15 so that if there is a hit seg 16,
@@ -209,27 +195,25 @@ TVector3 TTrific::GetPosition()
 	Double_t xMean = 0.0; //keeping track of the weighted mean
 	Double_t xEnergyTotal = 0.0; //keeping track of the total energy
 
-	if (xMulti > 1){ //we only have to loop through the x-hits if we have more than 1. 
+	if(xMulti > 1){ //we only have to loop through the x-hits if we have more than 1. 
 					 //it's possible that this will get caught if we had a single x-hit, but it was on segment 0 somehow. Have to think about this more
 
 		bool bStarted = false; //this will be used to see if we have started counting the hit
 
 		//go through the two grids and do a weighted average of the non-zero points in them
-		for (unsigned int i = 0; i < xGridEnergy.size(); i++){
+		for(unsigned int i = 0; i < xGridEnergy.size(); i++){
 			xEnergyTotal += xGridEnergy[i]; //add the energy of the hit to the total.
 
-			if (!bStarted){//if we haven't hit a non-zero point yet, check to see if the current one is non-zer
-				if (xGridEnergy[i]){ //if it is, we've hit the first segment with an energy from the hit. 
+			if(!bStarted){//if we haven't hit a non-zero point yet, check to see if the current one is non-zer
+				if(xGridEnergy[i]){ //if it is, we've hit the first segment with an energy from the hit. 
 					xMean += xmm[i]*xGridEnergy[i]; //add the weighted mean
 					bStarted = true; //signal that we have started averaging
 				}
-			} 
-			else if (xGridEnergy[i]){//since we've started averaging, now we need to check for continuity. If adjacent segments that aren't on the end don't both have energy, then 
+			} else if(xGridEnergy[i]){//since we've started averaging, now we need to check for continuity. If adjacent segments that aren't on the end don't both have energy, then 
 				//this is a discontinuous hit. Ex: we want vectors that look like [0,0,4,6,8,7,5,0,0], not [0,0,4,6,0,4,2,0,0]
-				if (xGridEnergy[i-1]){
+				if(xGridEnergy[i-1]){
 					xMean += xmm[i]*xGridEnergy[i]; //add the weighted mean		
-				}
-				else {
+				} else {
 					//if we have a discontinuous hit, don't bother to try to reconstruct the position
 					//std::cout << "\nProblem here on entry " << i;	
 					return TVector3(-1,-1,-2);				
@@ -238,37 +222,34 @@ TVector3 TTrific::GetPosition()
 			}
 		}
 		xMean /= xEnergyTotal; //divide the weighted sum by the total energy of the hits in that grid
-	}
-	else { //if we have multiplicity 1 event, the mean will just be the value of the segment that was the multiplicity 1 event.
-		for (unsigned int i = 0; i<xGridEnergy.size(); i++){
-			if (!xGridEnergy[i]) xMean = xmm[i]; //
+	} else { //if we have multiplicity 1 event, the mean will just be the value of the segment that was the multiplicity 1 event.
+		for(unsigned int i = 0; i<xGridEnergy.size(); i++){
+			if(!xGridEnergy[i]) xMean = xmm[i]; //
 		}
 	}
 
 	Double_t yMean = 0.0; //keeping track of the weighted mean
 	Double_t yEnergyTotal = 0.0; //keeping track of the total energy
 
-	if (yMulti > 1){ //we only have to loop through the x-hits if we have more than 1. 
+	if(yMulti > 1){ //we only have to loop through the x-hits if we have more than 1. 
 					 //it's possible that this will get caught if we had a single x-hit, but it was on segment 0 somehow. Have to think about this more
 
 		bool bStarted = false; //this will be used to see if we have started counting the hit
 
 		//go through the two grids and do a weighted average of the non-zero points in them
-		for (unsigned int i = 0; i < yGridEnergy.size(); i++){
+		for(unsigned int i = 0; i < yGridEnergy.size(); i++){
 			yEnergyTotal += yGridEnergy[i]; //add the energy of the hit to the total.
 
-			if (!bStarted){//if we haven't hit a non-zero point yet, check to see if the current one is non-zer
-				if (yGridEnergy[i]){ //if it is, we've hit the first segment with an energy from the hit. 
+			if(!bStarted){//if we haven't hit a non-zero point yet, check to see if the current one is non-zer
+				if(yGridEnergy[i]){ //if it is, we've hit the first segment with an energy from the hit. 
 					yMean += ymm[i]*yGridEnergy[i]; //add the weighted mean
 					bStarted = true; //signal that we have started averaging
 				}
-			} 
-			else if (yGridEnergy[i]){//since we've started averaging, now we need to check for continuity. If adjacent segments that aren't on the end don't both have energy, then 
+			} else if(yGridEnergy[i]){//since we've started averaging, now we need to check for continuity. If adjacent segments that aren't on the end don't both have energy, then 
 				//this is a discontinuous hit. Ex: we want vectors that look like [0,0,4,6,8,7,5,0,0], not [0,0,4,6,0,4,2,0,0]
 				if (yGridEnergy[i-1]){
 					yMean += ymm[i]*yGridEnergy[i]; //add the weighted mean		
-				}
-				else {
+				} else {
 					//if we have a discontinuous hit, don't bother to try to reconstruct the position
 					//std::cout << "\nProblem here on entry " << i;	
 					return TVector3(-1,-1,-2);				
@@ -277,22 +258,17 @@ TVector3 TTrific::GetPosition()
 			}
 		}
 		yMean /= yEnergyTotal;
-	} 
-	else { //if we have multiplicity 1 event, the mean will just be the value of the segment that was the multiplicity 1 event.
-		for (unsigned int i = 0; i<yGridEnergy.size(); i++){
-			if (!yGridEnergy[i]) yMean = ymm[i]; //
+	} else { //if we have multiplicity 1 event, the mean will just be the value of the segment that was the multiplicity 1 event.
+		for(unsigned int i = 0; i<yGridEnergy.size(); i++){
+			if(!yGridEnergy[i]) yMean = ymm[i]; //
 		}
 	}
-	
-	
-
 
 	/*
 	std::cout << "\nTest print here\n";
 	for (int i = 0; i < xGrid.size(); i++){
 		std::cout << "\nI is " << i << " and value is " << xGrid[i];
 	}*/
-
 
 	//convert them into cartesion coordinates 
 	double yCart = yMean*TMath::Sin(angle); //shifts from grid coordinates to XYZ coordinates
@@ -305,7 +281,6 @@ TVector3 TTrific::GetPosition()
 
 	//double ratioZX = 1./normalGridVec.Dot(particle.Unit()); //the Z->R corretion factor
 	
-
 	fflush(stdout);
 
 	return particle;
@@ -319,12 +294,11 @@ Int_t TTrific::GetRange()
 	//can't just use the size of fHits because there is no guarantee that every
 	//grid gets an event, plus the XY position grids may have multiplicity>1
 	Int_t range = 0;
-	for (unsigned i = 0; i < fHits.size(); i++){
+	for(unsigned i = 0; i < fHits.size(); i++){
 	//for (auto i = 0; i < GetMultiplicity(); i++){
 		//if (static_cast<TTrificHit*>(GetHit(i))->GetDetector() > range) range = static_cast<TTrificHit*>(GetHit(i))->GetDetector();
-		if (GetTrificHit(i)->GetDetector() > range) range = GetTrificHit(i)->GetDetector();			
+		if(GetTrificHit(i)->GetDetector() > range) range = GetTrificHit(i)->GetDetector();			
 	}
 	
 	return range;
-
 }
