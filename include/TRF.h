@@ -61,7 +61,7 @@ public:
 private:
    time_t fMidasTime;
    Long_t fTimeStamp;
-   double fTime;
+   double fTime; //RF time offset from timestamp, like a CFD value
 
    static Double_t fPeriod;
 

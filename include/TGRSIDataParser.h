@@ -91,6 +91,8 @@ public:
    int GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToScalerEvent(uint32_t* data, int address);
 
+   int RFScalerToFragment(uint32_t* data, const int size, const std::shared_ptr<TFragment>& frag);
+
    int EPIXToScalar(float* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int SCLRToScalar(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0,
