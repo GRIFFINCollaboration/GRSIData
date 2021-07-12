@@ -1276,7 +1276,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 					tsSet=true;
 				}else{
 					TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
-					fState     = EDataParserState::kBadHighTS;
+					fState     = EDataParserState::kBadRFScalerWord;
 					failedWord = x;
 					Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 					//std::cout << "Invalid RF high time stamp!" << std::endl;
@@ -1313,7 +1313,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 	if(!(x<size-3)){
 		//std::cout << "RF fragment does not contain all parameters." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
-		fState     = EDataParserState::kWrongNofWords;
+		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
@@ -1321,7 +1321,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 	if((data[x]==data[x+1])&&(data[x]==data[x+2])&&(data[x]==data[x+3])){
 		//std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
-		fState     = EDataParserState::kUndefined;
+		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
@@ -1345,7 +1345,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 			if((i!=2)&&(dword == 0)){
 				//std::cout << "Failed RF fit: non-offset parameter is zero." << std::endl;
 				TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
-				fState     = EDataParserState::kUndefined;
+				fState     = EDataParserState::kBadRFScalerWord;
 				failedWord = x;
 				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 				return -1;
@@ -1364,10 +1364,8 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 					dword ^= 1 << j;
 				}
 				rfPar[i] = static_cast<double>(-1.0*(dword & 0x03ffffff)); //RF fit parameters (30-bit numbers)
-				//printf("par %i: %f\n",i,-1.0*(dword & 0x03ffffff));
 			}else{
 				rfPar[i] = static_cast<double>(dword & 0x03ffffff); //RF fit parameters (30-bit numbers)
-				//printf("par %i: %f\n",i,1.0*(dword & 0x03ffffff));
 			}
 			
 			x++;
@@ -1395,7 +1393,6 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 
 	frag->SetCharge(static_cast<float>(T)); //period stored as charge (where else would I put it?)
 	frag->SetCfd(static_cast<float>(rfPhaseShift) * 1.6f); //phase shift in cfd units (this one seems reasonable)
-	//std::cout << "RF period: " << T << " ns, phase shift: " << rfPhaseShift << " ns." << std::endl;
 
 	Push(fGoodOutputQueues, std::make_shared<TFragment>(*frag));
 	return 1;

@@ -72,6 +72,7 @@ public:
       kBadBank,
       kBadModuleType,
       kEndOfData,
+      kBadRFScalerWord,
       kUndefined
    };
 

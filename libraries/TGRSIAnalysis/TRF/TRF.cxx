@@ -4,8 +4,6 @@
 ClassImp(TRF)
 /// \endcond
 
-Double_t TRF::fPeriod;
-
 TRF::TRF()
 {
    Clear();
@@ -17,6 +15,7 @@ void TRF::Copy(TObject& rhs) const
    static_cast<TRF&>(rhs).fMidasTime = fMidasTime;
    static_cast<TRF&>(rhs).fTimeStamp = fTimeStamp;
    static_cast<TRF&>(rhs).fTime      = fTime;
+   static_cast<TRF&>(rhs).fPeriod    = fPeriod;
 }
 
 TRF::TRF(const TRF& rhs) : TDetector()
@@ -39,8 +38,8 @@ void TRF::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
       //special RF scaler format
       //no waveform, only fit parameters
 
-      //the phase shift (in cfd units) is stored as the cfd
-      //the period (in ns) is stored as the charge
+      //the phase shift (in cfd units) is stored in the fragment as the cfd
+      //the period (in ns) is stored in the fragment as the charge
 
       fTime = frag->GetCfd() / 1.6; //convert from cfd units to ns
       fPeriod = frag->GetCharge();
