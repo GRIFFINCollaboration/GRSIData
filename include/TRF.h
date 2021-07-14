@@ -21,8 +21,16 @@ public:
    TRF(const TRF&);
    ~TRF() override;
 
-   Double_t Phase() const { return (fTime / fPeriod) * TMath::TwoPi(); }
-   Double_t Time() const { return fTime; }//in ns, not tstamp 10ns
+   Double_t Phase() const 
+   {
+      if(fPeriod > 0.0f) {
+         return (fTime / fPeriod) * TMath::TwoPi(); 
+      } else {
+         return -10.0; //negative value indicates failed RF fit
+      }
+   }
+   Double_t Time() const { return fTime; } //in ns, not tstamp 10ns
+   Double_t Period() const { return fPeriod; } //in ns
    Long_t   TimeStamp() const { return fTimeStamp; }
    time_t   MidasTime() const { return fMidasTime; }
 
@@ -61,9 +69,8 @@ public:
 private:
    time_t fMidasTime;
    Long_t fTimeStamp;
-   double fTime;
-
-   static Double_t fPeriod;
+   double fTime; //RF time offset from timestamp, like a CFD value
+   double fPeriod;
 
    /// \cond CLASSIMP
    ClassDefOverride(TRF, 4)
