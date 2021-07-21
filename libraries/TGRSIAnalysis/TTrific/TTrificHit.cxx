@@ -45,11 +45,13 @@ void TTrificHit::Print(Option_t*) const
 }
 
 TVector3 TTrificHit::GetPosition() const
+//TVector3 TTrificHit::GetPosition()
 {
 	//calling GetPosition() on a TRIFIC hit should return the x,y,z location of the hit at that grid number
 
 	//TVector3 particle = TTrific::GetPosition()
 
-	return TTrific::GetPosition(GetDetector());
+	//return TTrific::GetPosition(GetDetector());
+	return TVector3(1,1,1);
 }
 

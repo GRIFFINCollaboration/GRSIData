@@ -41,7 +41,8 @@ public:
    void Print(Option_t* opt = "") const override;      //!<!
    void     Copy(TObject&) const override;             //!<!
    //TVector3 GetPosition(Double_t dist) const override; //!<!
-   TVector3 GetPosition() const override;              //!<!
+   TVector3 GetPosition() const override;  //!<!             
+   //TVector3 GetPosition() const; //!<!
 
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
