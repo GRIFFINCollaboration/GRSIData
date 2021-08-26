@@ -72,6 +72,7 @@ public:
       kBadBank,
       kBadModuleType,
       kEndOfData,
+      kBadRFScalerWord,
       kUndefined
    };
 
@@ -91,6 +92,8 @@ public:
    int GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToScalerEvent(uint32_t* data, int address);
 
+   int RFScalerToFragment(uint32_t* data, const int size, const std::shared_ptr<TFragment>& frag);
+
    int EPIXToScalar(float* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int SCLRToScalar(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0,
@@ -109,8 +112,8 @@ private:
    bool SetTIGTimeStamp(uint32_t*, const std::shared_ptr<TFragment>&);
 
    bool SetGRIFHeader(uint32_t, const std::shared_ptr<TFragment>&, EBank);
-   bool SetGRIFMasterFilterPattern(uint32_t, const std::shared_ptr<TFragment>&, EBank);
-   bool SetGRIFMasterFilterId(uint32_t, const std::shared_ptr<TFragment>&);
+   bool SetGRIFPrimaryFilterPattern(uint32_t, const std::shared_ptr<TFragment>&, EBank);
+   bool SetGRIFPrimaryFilterId(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFChannelTriggerId(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFTimeStampLow(uint32_t, const std::shared_ptr<TFragment>&);
    bool SetGRIFNetworkPacket(uint32_t, const std::shared_ptr<TFragment>&);

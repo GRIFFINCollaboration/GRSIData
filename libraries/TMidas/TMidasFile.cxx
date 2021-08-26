@@ -323,7 +323,7 @@ static int readpipe(int fd, char* buf, int length)
    return count;
 }
 
-/// \param [in] midasEvent Pointer to an empty TMidasEvent
+/// \param [in] event shared Pointer to an empty TMidasEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
 ///
 ///  EDITED FROM THE ORIGINAL TO RETURN TOTAL SUCESSFULLY BYTES READ INSTEAD OF TRUE/FALSE,  PCB
@@ -746,11 +746,21 @@ void TMidasFile::SetGRIFFOdb()
 {
 #ifdef HAS_XML
    // get calibrations
-   std::string path = "/DAQ/MSC";
-   printf("using GRIFFIN path to analyzer info: %s...\n", path.c_str());
+	// check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
+   std::string path = "/DAQ/PSC";
+   std::string temp;
+	if(fOdb->FindPath(path.c_str()) != nullptr) {
+		printf("using GRIFFIN path to analyzer info: %s...\n", path.c_str());
 
-   std::string temp = path;
-   temp.append("/MSC");
+		temp = path;
+		temp.append("/PSC");
+	} else {
+		path = "/DAQ/MSC";
+		printf("using GRIFFIN path to analyzer info: %s...\n", path.c_str());
+
+		temp = path;
+		temp.append("/MSC");
+	}
    TXMLNode*        node    = fOdb->FindPath(temp.c_str());
    std::vector<int> address = fOdb->ReadIntArray(node);
 
@@ -764,12 +774,12 @@ void TMidasFile::SetGRIFFOdb()
    node                  = fOdb->FindPath(temp.c_str());
    std::vector<int> type = fOdb->ReadIntArray(node);
 	if(type.empty()) {
-		// failed to read array from /DAQ/MSC/datatype, so try to read /DAQ/MSC/DetType
+		// failed to read array from /DAQ/<P/M>SC/datatype, so try to read /DAQ/<P/M>SC/DetType
 		temp = path;
 		temp.append("/DetType");
 		node = fOdb->FindPath(temp.c_str());
 		type = fOdb->ReadIntArray(node);
-		std::cout<<"failed to find ODB path /DAQ/MSC/datatype, using "<<type.size()<<" entries from /DAQ/MSC/DetType instead"<<std::endl;
+		std::cout<<"failed to find ODB path "<<path<<"/datatype, using "<<type.size()<<" entries from "<<path<<"/DetType instead"<<std::endl;
 	}
 
    temp = path;
@@ -982,15 +992,25 @@ void TMidasFile::SetTIGOdb()
 #endif
 }
 
-void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without the PPG (as we don't have one) and digitizer MSC key which is not in TIGDAQ 
+void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without the PPG (as we don't have one) and digitizer <P/M>SC key which is not in TIGDAQ 
 {
 #ifdef HAS_XML
    // get calibrations
-   std::string path = "/DAQ/MSC";
-   printf("using TIGDAQ path to analyzer info: %s...\n", path.c_str());
+	// check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
+   std::string path = "/DAQ/PSC";
+   std::string temp;
+	if(fOdb->FindPath(path.c_str()) != nullptr) {
+		printf("using GRIFFIN path to analyzer info: %s...\n", path.c_str());
 
-   std::string temp = path;
-   temp.append("/MSC");
+		temp = path;
+		temp.append("/PSC");
+	} else {
+		path = "/DAQ/MSC";
+		printf("using GRIFFIN path to analyzer info: %s...\n", path.c_str());
+
+		temp = path;
+		temp.append("/MSC");
+	}
    TXMLNode*        node    = fOdb->FindPath(temp.c_str());
    std::vector<int> address = fOdb->ReadIntArray(node);
 
@@ -1004,12 +1024,12 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
    node                  = fOdb->FindPath(temp.c_str());
    std::vector<int> type = fOdb->ReadIntArray(node);
 	if(type.empty()) {
-		// failed to read array from /DAQ/MSC/datatype, so try to read /DAQ/MSC/DetType
+		// failed to read array from <path>/datatype, so try to read <path>/DetType
 		temp = path;
 		temp.append("/DetType");
 		node = fOdb->FindPath(temp.c_str());
 		type = fOdb->ReadIntArray(node);
-		std::cout<<"failed to find ODB path /DAQ/MSC/datatype, using "<<type.size()<<" entries from /DAQ/MSC/DetType instead"<<std::endl;
+		std::cout<<"failed to find ODB path "<<path<<"/datatype, using "<<type.size()<<" entries from "<<path<<"/DetType instead"<<std::endl;
 	}
 
    temp = path;

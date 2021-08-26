@@ -58,6 +58,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       printf("\t\tDANTE:              %s\n", Dante() ? "true" : "false");
       printf("\t\tBGO:                %s\n", Bgo() ? "true" : "false");
       printf("\t\tEMMA:                %s\n", Emma() ? "true" : "false");
+      printf("\t\tTRIFIC:                %s\n", Trific() ? "true" : "false");
       printf("\n");
    }
 }
@@ -79,7 +80,8 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fS3      = false;
    fGeneric = false;
    fBambino = false;
-   fEmma        = false;
+   fEmma    = false;
+   fTrific  = false;
 
    fGriffin    = false;
    fSceptar    = false;
@@ -95,8 +97,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
 void TGRSIDetectorInformation::Set()
 {
    /// Sets the run info. This figures out what systems are available.
-   std::unordered_map<unsigned int, TChannel*>::iterator iter;
-   for(iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
+   for(auto iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
       std::string channelname = iter->second->GetName();
 
 		// check if we have an old TIG digitizer, in that case sort by trigger ID (instead of time stamp)
@@ -148,6 +149,9 @@ void TGRSIDetectorInformation::Set()
 				break;
 			case TGRSIMnemonic::ESystem::kEmma:
 				SetEmma();
+				break;
+			case TGRSIMnemonic::ESystem::kTrific:
+				SetTrific();
 				break;
 			case TGRSIMnemonic::ESystem::kGeneric:
 				SetGeneric();

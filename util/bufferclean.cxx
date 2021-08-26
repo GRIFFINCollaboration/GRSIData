@@ -4,7 +4,6 @@
 // -lXMLParser  -ooffsetfind
 #include "TMidasFile.h"
 #include "TMidasEvent.h"
-#include "GFile.h"
 #include "TStopwatch.h"
 #include "TSystem.h"
 #include <map>

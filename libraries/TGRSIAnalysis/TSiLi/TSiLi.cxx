@@ -105,7 +105,7 @@ double TSiLi::GetSegmentArea(Int_t seg)
    return (TMath::Pi() * (r2 * r2 - r1 * r1)) / fSectorNumber;
 }
 
-TSiLiHit* TSiLi::GetAddbackHit(const int& i)
+TSiLiHit* TSiLi::GetAddbackHit(const Int_t& i)
 {
    /// Get the ith addback hit. This function calls GetAddbackMultiplicity to check the range of the index.
    /// This automatically calculates all addback hits if they haven't been calculated before.
@@ -117,7 +117,7 @@ TSiLiHit* TSiLi::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-TSiLiHit* TSiLi::GetRejectHit(const int& i)
+TSiLiHit* TSiLi::GetRejectHit(const Int_t& i)
 {
    if(i < GetRejectMultiplicity()) {
       return GetSiLiHit(fRejectHits[i]);

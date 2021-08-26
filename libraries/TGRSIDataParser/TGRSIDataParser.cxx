@@ -542,6 +542,15 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 	if(eventFrag->GetDetectorType() == 0xf) {
 		// a scaler event (trigger or deadtime) has 8 words (including header and trailer), make sure we have at least
 		// that much left
+		TChannel* chan = TChannel::GetChannel(eventFrag->GetAddress());
+		if((chan != nullptr) && strncmp("RF", chan->GetName(), 2) == 0){
+			//JW: RF event, stored as a scaler containing fit paramters 
+			//in recent (2019 and later) GRIF-16 firmware revisions.
+			//These should be still be treated as RF event fragments, but 
+			//need to be parsed differently.
+			//std::cout << "RF scaler event" << std::endl;
+			return RFScalerToFragment(data, size, eventFrag);
+		}
 		if(size < 8) {
 			if(fState == EDataParserState::kGood) {
 				fState     = EDataParserState::kMissingWords;
@@ -552,6 +561,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 			throw TGRSIDataParserException(fState, failedWord, multipleErrors);
 		}
 		return GriffinDataToScalerEvent(data, eventFrag->GetAddress());
+		
 	}
 
 	// The Network packet number is for debugging and is not always written to the midas file.
@@ -559,15 +569,15 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 		++x;
 	}
 
-	// The master Filter Pattern is in an unstable state right now and is not
+	// The Primary Filter Pattern is in an unstable state right now and is not
 	// always written to the midas file
-	if(SetGRIFMasterFilterPattern(data[x], eventFrag, bank)) {
+	if(SetGRIFPrimaryFilterPattern(data[x], eventFrag, bank)) {
 		++x;
 	}
 
 	// We can get multiple filter ids (one fragment can pass multiple filter conditions)
 	// so we have to loop until we don't find one
-	while(SetGRIFMasterFilterId(data[x], eventFrag)) {
+	while(SetGRIFPrimaryFilterId(data[x], eventFrag)) {
 		++x;
 	}
 
@@ -624,7 +634,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 		switch(packet) {
 			case 0x8: // The 8 packet type is for event headers
 				// if this happens, we have "accidentally" found another event.
-				// currently the GRIF-C only sets the master/slave port of the address for the first header (of the corrupt
+				// currently the GRIF-C only sets the primary/secondary port of the address for the first header (of the corrupt
 				// event)
 				// so we want to ignore this corrupt event and the next event which has a wrong address
 				TParsingDiagnostics::Get()->BadFragment(eventFrag->GetDetectorType());
@@ -948,7 +958,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 									}
 								} else {
 									// these types of corrupt events quite often end without a trailer which leads to the header of the
-									// next event missing the master/slave part of the address
+									// next event missing the primary/secondary part of the address
 									// so we look for the next trailer and stop there
 									while(x < size && (data[x] & 0xf0000000) != 0xe0000000) {
 										++x;
@@ -1104,9 +1114,9 @@ bool TGRSIDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFragm
 	return true;
 }
 
-bool TGRSIDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
+bool TGRSIDataParser::SetGRIFPrimaryFilterPattern(uint32_t value, const std::shared_ptr<TFragment>& frag, EBank bank)
 {
-	/// Sets the Griffin Master Filter Pattern
+	/// Sets the Griffin Primary Filter Pattern
 	if((value & 0xc0000000) != 0x00000000) {
 		return false;
 	}
@@ -1127,9 +1137,9 @@ bool TGRSIDataParser::SetGRIFMasterFilterPattern(uint32_t value, const std::shar
 	return true;
 }
 
-bool TGRSIDataParser::SetGRIFMasterFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
+bool TGRSIDataParser::SetGRIFPrimaryFilterId(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
-	/// Sets the Griffin master filter ID and PPG
+	/// Sets the Griffin Primary filter ID and PPG
 	if((value & 0x80000000) != 0x00000000) {
 		return false;
 	}
@@ -1181,7 +1191,7 @@ bool TGRSIDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TFra
 {
 	/// Sets the Griffin waveform if record_waveform is set to true
 	if(frag->GetWaveform()->size() > (100000)) {
-		printf("number of wave samples found is to great\n");
+		printf("number of wave samples found is too great\n");
 		return false;
 	}
 
@@ -1240,6 +1250,169 @@ bool TGRSIDataParser::SetGRIFPsd(uint32_t value, const std::shared_ptr<TFragment
 	frag->SetZc(value & 0x003fffff);
 	frag->SetCcLong(frag->GetCcLong() | ((value & 0x7fe00000) >> 12)); // 21 bits from zero crossing minus 9 lower bits
 	return true;
+}
+
+int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const std::shared_ptr<TFragment>& frag)
+{
+	// Parses special RF scaler events which contain only timestamps and fit paramteters
+
+	ULong64_t        ts = 0;
+	ULong64_t        tshigh;
+	double           rfFreq = -1.0;
+	double           rfPar[4];
+	bool             freqSet=false;
+	bool             tsSet=false;
+	int              failedWord = -1;
+
+	int x=0;
+	for(int i = 0; i < size; i++) {
+		
+		if(x >= size){
+			//std::cout << "RF fragment missing frequency and/or timestamp info!" << std::endl;
+			return -1;
+		}
+
+		uint32_t dword  = data[x];
+		uint32_t packet = dword >> 28;
+		uint32_t value  = dword & 0x0fffffff;
+
+		switch(packet) {
+			case 0x9:
+				//RF frequency word
+				rfFreq = static_cast<double>(value); //RF frequency (27-bit number) in cycles per 2^27 clock ticks or 1.34s
+				freqSet=true;
+				break;
+			case 0xa:
+				//timestamp words (low 0xa followed by high 0xb)
+				ts = 0;
+				ts |= value;
+				x++;
+				if((data[x] >> 28) == 0xb) {
+					tshigh = data[x]; //need to convert the high timestamp data to a long int prior to shifting
+					ts |= ((tshigh & 0x00003fff)<<28); //timestamp, in samples
+					tsSet=true;
+				}else{
+					TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+					fState     = EDataParserState::kBadRFScalerWord;
+					failedWord = x;
+					Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+					//std::cout << "Invalid RF high time stamp!" << std::endl;
+					return -1;
+				}
+				break;
+			case 0xe:
+				//std::cout << "Early end to RF fragment." << std::endl;
+				TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+				fState     = EDataParserState::kEndOfData;
+				failedWord = x;
+				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+				return -1;
+				break;
+			default:
+				break;
+		}
+		x++;
+		if(freqSet&&tsSet)
+			break;
+	}
+
+	if(rfFreq < 0.0){
+		//std::cout << "Bad RF frequency." << std::endl;
+		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+		fState     = EDataParserState::kUndefined;
+		failedWord = x;
+		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+		return -1;
+	}
+
+	frag->SetTimeStamp(ts);
+
+	if(!(x<size-3)){
+		//std::cout << "RF fragment does not contain all parameters." << std::endl;
+		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+		fState     = EDataParserState::kBadRFScalerWord;
+		failedWord = x;
+		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+		return -1;
+	}
+	if((data[x]==data[x+1])&&(data[x]==data[x+2])&&(data[x]==data[x+3])){
+		//std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
+		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+		fState     = EDataParserState::kBadRFScalerWord;
+		failedWord = x;
+		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+		return -1;
+	}
+
+	int pos=0;
+	for(int i = 0; i < 4; i++) {
+
+		uint32_t dword  = data[x];
+		uint32_t packet = dword >> 28;
+
+		if(x<size){
+			if((packet) == 0xe){
+				//std::cout << "RF fragment unexpectedly ended early!" << std::endl;
+				TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+				fState     = EDataParserState::kEndOfData;
+				failedWord = x;
+				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+				return -1;
+			}
+			if((i!=2)&&(dword == 0)){
+				//std::cout << "Failed RF fit: non-offset parameter is zero." << std::endl;
+				TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
+				fState     = EDataParserState::kBadRFScalerWord;
+				failedWord = x;
+				Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
+				return -1;
+			}
+			
+			if(dword & (1<<29)){ 
+				//parameter value is negative
+				//take two's complement
+				for(int j=0;j<30;j++){
+					if(dword & (1<<j)){
+						pos=j;
+						break;
+					}
+				}
+				for(int j=pos+1;j<30;j++){
+					dword ^= 1 << j;
+				}
+				rfPar[i] = static_cast<double>(-1.0*(dword & 0x03ffffff)); //RF fit parameters (30-bit numbers)
+			}else{
+				rfPar[i] = static_cast<double>(dword & 0x03ffffff); //RF fit parameters (30-bit numbers)
+			}
+			
+			x++;
+		}
+	}
+
+	//RF frequency and all 4 fit parameters were parsed without issue
+	//convert these into the RF period and phase
+	
+	rfPar[0] = rfPar[0] / rfPar[3];
+	rfPar[1] = rfPar[1] / rfPar[3];
+	rfPar[2] = rfPar[2] / rfPar[3];
+	double T = 1.34217728E9 / rfFreq; // period in ns
+	double A = sqrt(rfPar[1] * rfPar[1] + rfPar[0] * rfPar[0]);
+	double s = -rfPar[0] / A;
+	double c = rfPar[1] / A;
+	double rfPhaseShift; //the phase shift, in ns
+	if(s >= 0) {
+		rfPhaseShift = acos(c) * T / (2 * TMath::Pi());
+	} else {
+		rfPhaseShift = (1 - acos(c) / (2 * TMath::Pi())) * T;
+	}
+
+	//put the important info (phase shift, period) into the fragment
+
+	frag->SetCharge(static_cast<float>(T)); //period stored as charge (where else would I put it?)
+	frag->SetCfd(static_cast<float>(rfPhaseShift) * 1.6f); //phase shift in cfd units (this one seems reasonable)
+
+	Push(fGoodOutputQueues, std::make_shared<TFragment>(*frag));
+	return 1;
 }
 
 int TGRSIDataParser::GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int, time_t)
