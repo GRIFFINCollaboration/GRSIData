@@ -27,8 +27,6 @@ TGRSIDataParser::~TGRSIDataParser()
 {
 }
 
-static Long64_t firstTimeStamp = 0;
-
 int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 {
 	std::shared_ptr<TMidasEvent> event = std::static_pointer_cast<TMidasEvent>(rawEvent);
@@ -616,9 +614,6 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 			failedWord = x - 1; // -1 compensates the incrementation in the if-statement
 		} else {
 			multipleErrors = true;
-		}
-		if(firstTimeStamp == 0) {
-			throw TGRSIDataParserException(fState, failedWord, multipleErrors);
 		}
 	}
 
@@ -1208,7 +1203,6 @@ bool TGRSIDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TFra
 
 bool TGRSIDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
-	static short entry = 0;
 	/// Sets the Griffin deadtime and the upper 14 bits of the timestamp
 	if((value & 0xf0000000) != 0xb0000000) {
 		return false;
@@ -1216,17 +1210,6 @@ bool TGRSIDataParser::SetGRIFDeadTime(uint32_t value, const std::shared_ptr<TFra
 	frag->SetDeadTime((value & 0x0fffc000) >> 14);
 	// AppendTimeStamp simply adds the new value (not bitwise operation), so we just add the high bits
 	frag->AppendTimeStamp(static_cast<Long64_t>(value & 0x00003fff)<<28);
-	if(firstTimeStamp == 0) {
-	  //	  std::cout << "Time Stamp of First Fragment (s) = " << frag->GetTimeStamp()/1e8 << std::endl;
-		if(entry < 250) {
-			++entry;
-			return false;
-		} else {
-		  std::cout << "Time Stamp Correction is (s) = " << frag->GetTimeStamp()/1e8 << std::endl;
-			firstTimeStamp = frag->GetTimeStamp();
-		}
-	}
-	frag->SetTimeStamp(frag->GetTimeStamp() - firstTimeStamp);
 	return true;
 }
 
@@ -1805,8 +1788,6 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
 
 int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
 {
-	static std::unordered_map<UInt_t, Long64_t> oldTimeStamp;
-	static std::unordered_map<UInt_t, Long64_t> nofWrapArounds;
 	/// Converts a Caen flavoured MIDAS events into TFragments and returns the number of events processed
 	std::shared_ptr<TFragment> eventFrag = std::make_shared<TFragment>();
 	int w = 0;
@@ -1967,29 +1948,6 @@ int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr
 						default:
 							break;
 					}
-					if(extraFormat == 4 || extraFormat == 5) {
-						//bool first = false;
-						if(oldTimeStamp.find(eventFrag->GetAddress()) == oldTimeStamp.end()) {
-							nofWrapArounds[eventFrag->GetAddress()] = 0;
-						} else {
-							if(eventFrag->GetTimeStamp() < oldTimeStamp[eventFrag->GetAddress()]) {
-								//std::cout<<std::hex<<"0x"<<eventFrag->GetAddress()<<": New time stamp 0x"<<eventFrag->GetTimeStamp()<<" less than old timestamp 0x"<<oldTimeStamp[eventFrag->GetAddress()]<<std::dec<<" => wrap around from "<<nofWrapArounds[eventFrag->GetAddress()];
-								++nofWrapArounds[eventFrag->GetAddress()];
-								//std::cout<<" to "<<nofWrapArounds[eventFrag->GetAddress()]<<std::endl;
-								//first = true;
-							}
-						}
-						oldTimeStamp[eventFrag->GetAddress()] = eventFrag->GetTimeStamp();
-						// add each wrap around of the 31 bit timestamp
-						//if(first) {
-						//	std::cout<<"Changing time stamp from 0x"<<std::hex<<eventFrag->GetTimeStamp();
-						//}
-						eventFrag->SetTimeStamp(eventFrag->GetTimeStamp() + (nofWrapArounds[eventFrag->GetAddress()] * 0x80000000));
-						//if(first) {
-						//	std::cout<<" to 0x"<<std::hex<<eventFrag->GetTimeStamp()<<std::dec<<std::endl;
-						//}
-						eventFrag->SetTriggerBitPattern(nofWrapArounds[eventFrag->GetAddress()]);
-					}
 					++w;
 				}
 				// highest bit is actually the pile-up or roll-over bit!
@@ -2081,7 +2039,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 				{
 					if((dword & 0x00800000) != 0) {
 						adchightimestamp=dword&0x0000ffff;
-						eventFrag->AppendTimeStamp((static_cast<Long64_t>(adchightimestamp))*static_cast<Long64_t>(0x0000000140000000) ); // 14 gives you the *5 you need
+						eventFrag->AppendTimeStamp((static_cast<Long64_t>(adchightimestamp))*static_cast<Long64_t>(0x0000000040000000)); // This should shift the time stamp 30 bits
 						xferhfts = eventFrag->GetTimeStamp();
 					} else if ((dword & 0x04000000) != 0) { // GH verify that this is a good ADC reading
 						adcchannel = (dword>>16)&0x1F; // ADC Channel Number
@@ -2110,7 +2068,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 			case 0xd:
 			case 0xc: // Last 30 bits of timestamp
 				adctimestamp =(dword&0x3FFFFFFF);
-				eventFrag->AppendTimeStamp( static_cast<Long64_t>(adctimestamp)*static_cast<Long64_t>(5) ) ;
+				eventFrag->AppendTimeStamp(static_cast<Long64_t>(adctimestamp));
 				break;
 			default: break;
 		} // end swich
