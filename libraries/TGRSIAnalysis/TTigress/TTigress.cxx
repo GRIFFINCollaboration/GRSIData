@@ -90,20 +90,12 @@ TTigress::TTigress(const TTigress& rhs) : TDetector()
    rhs.Copy(*this);
 }
 
-TTigress::~TTigress()
-{
-	for(auto hit : fAddbackHits) {
-		delete hit;
-	}
-}
+TTigress::~TTigress() = default;
 
 void TTigress::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
-	static_cast<TTigress&>(rhs).fAddbackHits.resize(fAddbackHits.size());
-	for(size_t i = 0; i < fAddbackHits.size(); ++i) {
-		static_cast<TTigress&>(rhs).fAddbackHits[i] = new TTigressHit(*static_cast<TTigressHit*>(fAddbackHits[i]));
-	}
+	 static_cast<TTigress&>(rhs).fAddbackHits  = fAddbackHits;
    static_cast<TTigress&>(rhs).fAddbackFrags = fAddbackFrags;
    static_cast<TTigress&>(rhs).fBgos = fBgos;
    static_cast<TTigress&>(rhs).fTigressBits  = 0;
@@ -113,9 +105,6 @@ void TTigress::Clear(Option_t* opt)
 {
    // Clears the mother, and all of the hits
    TDetector::Clear(opt);
-	for(auto hit : fAddbackHits) {
-		delete hit;
-	}
    fAddbackHits.clear();
    fAddbackFrags.clear();
    fBgos.clear();
@@ -145,9 +134,6 @@ Int_t TTigress::GetAddbackMultiplicity()
    }
    // if the addback has been reset, clear the addback hits
    if(!fTigressBits.TestBit(ETigressBits::kAddbackSet)) {
-		for(auto hit : fAddbackHits) {
-			delete hit;
-		}
 		fAddbackHits.clear();
 	} else {
 		return fAddbackHits.size();
@@ -312,9 +298,6 @@ void TTigress::ResetAddback()
 	/// the old addback hits will be stored instead.
 	/// This should have changed now, we're using the stored tigress bits to reset the addback
 	fTigressBits.SetBit(ETigressBits::kAddbackSet, false);
-	for(auto hit : fAddbackHits) {
-		delete hit;
-	}
 	fAddbackHits.clear();
 	fAddbackFrags.clear();
 }
