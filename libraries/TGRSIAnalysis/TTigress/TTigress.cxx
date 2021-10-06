@@ -76,8 +76,8 @@ std::function<bool(TDetectorHit*, TBgoHit&)> TTigress::fSuppressionCriterion = D
 
 std::underlying_type<TTigress::ETigressGlobalBits>::type operator |(TTigress::ETigressGlobalBits lhs, TTigress::ETigressGlobalBits rhs)  
 {
-	return static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(lhs) |
-		    static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(rhs);
+   return static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(lhs) |
+   static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(rhs);
 }
 
 TTigress::TTigress() : TDetector()
@@ -95,7 +95,10 @@ TTigress::~TTigress() = default;
 void TTigress::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
-	 static_cast<TTigress&>(rhs).fAddbackHits  = fAddbackHits;
+   static_cast<TTigress&>(rhs).fAddbackHits.resize(fAddbackHits.size());
+   for(size_t i = 0; i < fAddbackHits.size(); ++i) {
+      static_cast<TTigress&>(rhs).fAddbackHits[i] = new TTigressHit(*static_cast<TTigressHit*>(fAddbackHits[i]));
+   }
    static_cast<TTigress&>(rhs).fAddbackFrags = fAddbackFrags;
    static_cast<TTigress&>(rhs).fBgos = fBgos;
    static_cast<TTigress&>(rhs).fTigressBits  = 0;
