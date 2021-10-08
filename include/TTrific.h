@@ -47,7 +47,7 @@ class TTrific : public TDetector {
 
 
 	public:
-		//TTrificHit* GetTrificHit(const int& i) const { return static_cast<TTrificHit*>(GetHit(i)); } //current does nothing because we have moved all fragments into an X, Y, or Sing fragment
+		TTrificHit* GetTrificHit(const int& i) const {return static_cast<TTrificHit*>(GetHit(i));}
 		TTrificHit* GetTrificXHit(const int& i) const {return fXFragments.at(i);}
 		TTrificHit* GetTrificYHit(const int& i) const {return fYFragments.at(i);}
 		TTrificHit* GetTrificSingHit(const int& i) const {return fSingFragments.at(i);}
@@ -61,19 +61,24 @@ class TTrific : public TDetector {
    		{
       		fTrificBits = 0;
 			TDetector::ClearTransients();
-			particle.SetXYZ(0,0,0);
-			range = 0;
+			fParticle.SetXYZ(0,0,0);
+			fRange = 0;
    		}
 
-		//since we've eliminated fHits from TTrific, we need to redefine GetMultiplicity()
-		virtual Short_t GetMultiplicity() const override {return fXFragments.size()+fYFragments.size()+fSingFragments.size();} //Note: you cannot iterate over just the multiplicity, since there is no one vector will all hits in it
+		virtual Short_t GetMultiplicity() const override {return fHits.size();}
 		virtual Short_t GetXMultiplicity() const {return fXFragments.size();}
 		virtual Short_t GetYMultiplicity() const {return fYFragments.size();}
 		virtual Short_t GetSingMultiplicity() const {return fSingFragments.size();}
 
-		static TVector3 particle; //!<!
+		//used to set the target to window distance depending on which experiment is running
+		static void SetSharc(Double_t distance = 650.57) {fTargetToWindowCart = distance;} //mm. 640.2mm from ideal target location to start of window housing, then 20.74mm window housing thickness
+		static void SetTip(Double_t distance = 600.) {fTargetToWindowCart = distance;} //mm. THIS IS ONLY A *ROUGH* APPROXIMATION
+		static void SetCustomTargetChamber(Double_t distance){fTargetToWindowCart = distance;}
 
-		static Int_t range; //!<!
+
+		TVector3 fParticle = TVector3(0,0,0); //!<!
+
+		Int_t fRange = 0; //!<!
 
 		//TVector3 GetPosition(const TTrificHit& hit,Int_t detectorNumber); //!<!
 		TVector3 GetPosition(Int_t detectorNumber); //!<!
@@ -104,23 +109,23 @@ class TTrific : public TDetector {
 		void Print(Option_t* opt = "") const override; //!<!
 		void Clear(Option_t* = "") override; //!<!
 		
-		static const double spacingCart; //!
-		static const double initialSpacingCart; //!
-		static double targetToWindowCart; //!
+		static const double fSpacingCart; //!
+		static const double fInitialSpacingCart; //!
+		static double fTargetToWindowCart; //!
 
 	private:
 		//physical information on the grids
 
-		static const double xmm[12]; //!
+		static const double fXmm[12]; //!
 		//static double xW[12]; //!
-		static const double ymm[12]; //!
+		static const double fYmm[12]; //!
 		//static double yW[12]; //!
 		
 		//for use in determining the XY grids
-		static Int_t gridX; //!
-		static Int_t gridY; //!
-		static const double angle; //!
-		static const TVector3 normalGridVec; //!
+		static Int_t fGridX; //!
+		static Int_t fGridY; //!
+		static const double fAngle; //!
+		static const TVector3 fNormalGridVec; //!
 
 		/// \cond CLASSIMP
 		ClassDefOverride(TTrific, 4) // TRIFIC Physics structure
