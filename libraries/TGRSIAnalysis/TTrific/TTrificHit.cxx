@@ -50,6 +50,6 @@ TVector3 TTrificHit::GetPosition() const
 	//calling GetPosition() on a TRIFIC hit will return the position vector to the centre of the grid
 	//calling TTrific::GetPosition(det) will give the vector to the position itself.
 
-	return TVector3(0,0,TTrific::targetToWindowCart+TTrific::initialSpacingCart+TTrific::spacingCart*GetDetector());
+	return TVector3(0,0,TTrific::fTargetToWindowCart+TTrific::fInitialSpacingCart+TTrific::fSpacingCart*GetDetector());
 }
 
