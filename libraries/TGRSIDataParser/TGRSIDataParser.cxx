@@ -559,7 +559,6 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 			throw TGRSIDataParserException(fState, failedWord, multipleErrors);
 		}
 		return GriffinDataToScalerEvent(data, eventFrag->GetAddress());
-		
 	}
 
 	// The Network packet number is for debugging and is not always written to the midas file.

@@ -69,7 +69,7 @@ void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
    }
 
    TSiLiHit* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
-   fHits.push_back(std::move(hit));
+   fHits.push_back(hit);
 }
 
 // For mapping you may want to us -position.X() to account for looking upstream

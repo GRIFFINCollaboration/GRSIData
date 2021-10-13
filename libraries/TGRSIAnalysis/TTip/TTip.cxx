@@ -39,9 +39,9 @@ void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
       return;
    }
 
-   TTipHit* dethit = new TTipHit(*frag);
-   dethit->SetUpNumbering(chan);          // Think about moving this to ctor
-   fHits.push_back(std::move(dethit)); // Once we are done with it we can move the memory
+   TTipHit* hit = new TTipHit(*frag);
+   hit->SetUpNumbering(chan);          // Think about moving this to ctor
+   fHits.push_back(hit);
 }
 
 void TTip::Print(Option_t*) const

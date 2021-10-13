@@ -145,6 +145,6 @@ TLaBrHit* TLaBr::GetSuppressedHit(const int& i)
 
 void TLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TLaBrHit* laHit = new TLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
-	fHits.push_back(std::move(laHit)); // use std::move for efficienciy since laHit loses scope here anyway
+	TLaBrHit* hit = new TLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
+	fHits.push_back(hit);
 }

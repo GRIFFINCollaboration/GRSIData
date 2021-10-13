@@ -47,8 +47,8 @@ public:
 		kTdrSiLi,
 		kTdrPlastic,
 		kEmma,
-	        kEmmaS3,
-	    	kTrific,
+		kEmmaS3,
+		kTrific,
 		kClear            //30
    };
 

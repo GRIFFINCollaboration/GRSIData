@@ -466,13 +466,13 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    switch(mnemonic->SubSystem()) {
 		case TMnemonic::EMnemonic::kG:
 			{
-				TGriffinHit* geHit = new TGriffinHit(*frag);
+				TGriffinHit* hit = new TGriffinHit(*frag);
 				switch(mnemonic->OutputSensor()) {
 					case TMnemonic::EMnemonic::kA:
-						GetHitVector(EGainBits::kLowGain).push_back(std::move(geHit));
+						GetHitVector(EGainBits::kLowGain).push_back(hit);
 						break;
 					case TMnemonic::EMnemonic::kB:
-						GetHitVector(EGainBits::kHighGain).push_back(std::move(geHit));
+						GetHitVector(EGainBits::kHighGain).push_back(hit);
 						break;
 					default:
 						break;
@@ -611,7 +611,7 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 		if(!been_warned[id]) {
 			been_warned[id] = true;
 			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
-				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<RESET_COLOR<<std::endl;
 		}
 		return hit_to_correct->GetEnergy();
 	}
