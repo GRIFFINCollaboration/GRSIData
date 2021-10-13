@@ -143,7 +143,7 @@ void TSharc::BuildHits()
 			TSharcHit* hit = new TSharcHit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
-			fHits.push_back(std::move(hit));
+			fHits.push_back(hit);
 			front = fFrontFragments.erase(front);
 			back  = fBackFragments.erase(back);
 		} else {

@@ -61,7 +61,7 @@ TPaces& TPaces::operator=(const TPaces& rhs)
 void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TPacesHit* hit = new TPacesHit(*frag);
-	fHits.push_back(std::move(hit));
+	fHits.push_back(hit);
 }
 
 TVector3 TPaces::GetPosition(int)

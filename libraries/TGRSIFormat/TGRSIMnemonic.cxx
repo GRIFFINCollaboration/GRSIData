@@ -135,7 +135,7 @@ void TGRSIMnemonic::Parse(std::string* name)
 {
    if((name == nullptr) || name->length() < 9) {
       if((name->length() < 1) && (name->compare(0, 2, "RF") == 0)) {
-         SetRFMNEMONIC(name);
+         SetRFMnemonic(name);
       }
       return;
    }

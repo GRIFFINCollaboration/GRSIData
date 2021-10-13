@@ -76,7 +76,7 @@ void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
 	if(frag == nullptr || chan == nullptr) {
 		return;
 	}
-	TEmmaHit dethit( * frag);
+	TEmmaHit dethit(*frag);
 	if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kI) { // IC ADC Data 
 		fEmmaICHits.push_back(std::move(dethit));
 	} else if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kS) { // Si at focal plane
@@ -228,7 +228,7 @@ void TEmma::BuildHits()
 				hit->SetTop((hit->GetTop() - fAnodeTrigger));
 				hit->SetBottom((hit->GetBottom() - fAnodeTrigger));
 				hit->SetAnodeTrigger(fAnodeTrigger);
-				fHits.push_back(std::move(hit));
+				fHits.push_back(hit);
 			} else {
 				//std::cout<<"TDC Array Failed"<<std::endl;
 				fFail = 0;
@@ -237,7 +237,7 @@ void TEmma::BuildHits()
 				if(hit->GetTop() == 0) fFail++;
 				if(hit->GetBottom() == 0) fFail++;
 				hit->SetFailedFill(fFail);
-				fHits.push_back(std::move(hit));
+				fHits.push_back(hit);
 			}
 		} else {
 			return;

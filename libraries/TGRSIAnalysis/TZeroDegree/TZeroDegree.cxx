@@ -56,5 +56,5 @@ void TZeroDegree::AddFragment(const std::shared_ptr<const TFragment>& frag, TCha
    }
 
    TZeroDegreeHit* hit = new TZeroDegreeHit(*frag);
-   fHits.push_back(std::move(hit));
+   fHits.push_back(hit);
 }
