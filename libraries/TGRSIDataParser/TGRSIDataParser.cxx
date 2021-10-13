@@ -2067,7 +2067,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 			case 0xd:
 			case 0xc: // Last 30 bits of timestamp
 				adctimestamp =(dword&0x3FFFFFFF);
-				eventFrag->AppendTimeStamp( static_cast<Long64_t>(adctimestamp) ) ;
+				eventFrag->AppendTimeStamp(static_cast<Long64_t>(adctimestamp));
 				break;
 			default: break;
 		} // end swich

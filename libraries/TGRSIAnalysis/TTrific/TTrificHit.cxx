@@ -47,11 +47,9 @@ void TTrificHit::Print(Option_t*) const
 TVector3 TTrificHit::GetPosition() const
 //TVector3 TTrificHit::GetPosition()
 {
-	//calling GetPosition() on a TRIFIC hit should return the x,y,z location of the hit at that grid number
+	//calling GetPosition() on a TRIFIC hit will return the position vector to the centre of the grid
+	//calling TTrific::GetPosition(det) will give the vector to the position itself.
 
-	//TVector3 particle = TTrific::GetPosition()
-
-	//return TTrific::GetPosition(GetDetector());
-	return TVector3(1,1,1);
+	return TVector3(0,0,TTrific::fTargetToWindowCart+TTrific::fInitialSpacingCart+TTrific::fSpacingCart*GetDetector());
 }
 
