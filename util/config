@@ -43,7 +43,12 @@ incdir=$GRSISYS/GRSIData/include
 
 libs="-lTAngularCorrelation -lTCSM -lTDescant -lTGRSIDataParser -lTGRSIFormat -lTGenericDetector -lTGriffin -lTLaBr -lTMidas -lTPaces -lTRF -lTS3 -lTSceptar -lTSharc -lTSiLi -lTTAC -lTTigress -lTTip -lTTriFoil -lTZeroDegree -lTEmma -lTTrific -lTGRSIDetector"
 
-cflags="-std=c++14 -I$incdir"
+if [[ $(root-config --cflags) == *"-std="* ]]
+then
+	cflags="-I$incdir"
+else
+	cflags="-std=c++11 -I$incdir"
+fi
 
 usage="\
 Usage: grsi-config [--version] [--incdir] [--cflags] [--libs] [--help]"
