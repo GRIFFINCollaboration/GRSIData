@@ -380,15 +380,18 @@ void TMidasFile::Skip(size_t nofEvents)
 {
 	TMidasEvent ev;
 	for(size_t i = 0; i < nofEvents; ++i) {
+		// if we don't have enough data left for a header, we try and read more
 		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
 			ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - fReadBuffer.size());
 		}
 
+		// if we don't have enough data to read the header we are done
 		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
 			return;
 		}
 
 		ev.Clear();
+		// copy the header
 		memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), fReadBuffer.data(), sizeof(TMidas_EVENT_HEADER));
 		if(fDoByteSwap) {
 			printf("Swapping bytes\n");
@@ -400,17 +403,26 @@ void TMidasFile::Skip(size_t nofEvents)
 			return;
 		}
 
+		// check if this event is the end-of-run event
+		if((ev.GetEventHeader()->fEventId & 0xffff) == 0x8001) {
+			// we simply return here so that the next event read is the end-of-run event
+			return;
+		}
+
 		size_t event_size = ev.GetDataSize();
 		size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
 
+		// try and read the total event if we don't already have it in the buffer
 		if(fReadBuffer.size() < total_size) {
 			ReadMoreBytes(total_size - fReadBuffer.size());
 		}
 
+		// if we don't have enough data to read the whole event we are done
 		if(fReadBuffer.size() < total_size) {
 			return;
 		}
 
+		//increment our counters and clear the buffer
 		size_t bytes_read = fReadBuffer.size();
 		fBytesRead += bytes_read;
 		fCurrentEventNumber++;
