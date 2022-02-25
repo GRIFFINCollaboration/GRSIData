@@ -631,6 +631,8 @@ void TGriffin::FixHighGainCrossTalk()
 
 void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 {
+	if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
+
 	auto& hit_vec = GetHitVector(gain_type);
 	if(hit_vec.size() < 2) {
 		SetCrossTalk(gain_type, true);
@@ -640,13 +642,10 @@ void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 		static_cast<TGriffinHit*>(hit)->ClearEnergy();
 	}
 
-	// why is this check done here? Shouldn't this be the first thing to check?
-	if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
-		for(auto& one : hit_vec) {
-			for(auto& two : hit_vec) {
-				one->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(one), static_cast<TGriffinHit*>(two)));
-				two->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(two), static_cast<TGriffinHit*>(one)));
-			}
+	for(auto& one : hit_vec) {
+		for(auto& two : hit_vec) {
+			one->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(one), static_cast<TGriffinHit*>(two)));
+			//two->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(two), static_cast<TGriffinHit*>(one)));
 		}
 	}
 	SetCrossTalk(gain_type, true);
