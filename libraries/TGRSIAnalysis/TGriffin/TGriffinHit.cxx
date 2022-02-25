@@ -70,12 +70,11 @@ void TGriffinHit::Clear(Option_t* opt)
 void TGriffinHit::Print(Option_t*) const
 {
    // Prints the Detector Number, Crystal Number, Energy, Time and Angle.
-   printf("Griffin Detector: %i\n", GetDetector());
-   printf("Griffin Crystal:  %i\n", GetCrystal());
-   printf("Griffin Energy:   %lf\n", GetEnergy());
-   printf("Griffin hit time:   %lf\n", GetTime());
-   printf("Griffin hit TV3 theta: %.2f\tphi%.2f\n", GetPosition().Theta() * 180 / (3.141597),
-          GetPosition().Phi() * 180 / (3.141597));
+	std::cout<<"Griffin Detector: "<<GetDetector()<<std::endl
+		      <<"Griffin Crystal:  "<<GetCrystal()<<std::endl
+            <<"Griffin Energy:   "<<GetEnergy()<<std::endl
+            <<"Griffin hit time:   "<<GetTime()<<", TS (in ns) "<<GetTimeStampNs()<<", TS "<<fTimeStamp<<std::endl
+            <<"Griffin hit TV3 theta: "<<GetPosition().Theta() * 180 / (3.141597)<<" \tphi: "<<GetPosition().Phi() * 180 / (3.141597)<<std::endl;
 }
 
 TVector3 TGriffinHit::GetPosition(double dist) const
