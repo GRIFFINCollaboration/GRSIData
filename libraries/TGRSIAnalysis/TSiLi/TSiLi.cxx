@@ -334,7 +334,7 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 		uint s = fAddbackHits.size();
 		// We have to add it and THEN do the SumHit because the push_back copies the charge but not the energy,
 		// which is the bit we sum
-		// This is desired behaviour of TGRSIDetectorHit for speed of sorts, but messy for the addback, which should
+		// This is desired behaviour of TDetectorHit for speed of sorts, but messy for the addback, which should
 		// only be done "on the fly" not stored to TSiLi on disk
 		fAddbackHits.emplace_back();
 		for(unsigned int j : cluster) {

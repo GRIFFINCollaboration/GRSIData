@@ -23,7 +23,7 @@ TTipHit::TTipHit()
    Clear();
 }
 
-TTipHit::TTipHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TTipHit::TTipHit(const TFragment& frag) : TDetectorHit(frag)
 {
    // SetVariables(frag);
    if(TGRSIOptions::AnalysisOptions()->IsWaveformFitting() && !IsCsI()) {
@@ -35,7 +35,7 @@ TTipHit::TTipHit(const TFragment& frag) : TGRSIDetectorHit(frag)
 
 TTipHit::~TTipHit() = default;
 
-TTipHit::TTipHit(const TTipHit& rhs) : TGRSIDetectorHit()
+TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -46,7 +46,7 @@ TTipHit::TTipHit(const TTipHit& rhs) : TGRSIDetectorHit()
 
 void TTipHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    static_cast<TTipHit&>(rhs).fFilter     = fFilter;
    static_cast<TTipHit&>(rhs).fPID        = fPID;
    static_cast<TTipHit&>(rhs).fTipChannel = fTipChannel;

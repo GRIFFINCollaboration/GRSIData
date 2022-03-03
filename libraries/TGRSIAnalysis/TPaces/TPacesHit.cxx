@@ -6,8 +6,7 @@
 ClassImp(TPacesHit)
 /// \endcond
 
-TPacesHit::TPacesHit()
-   : TGRSIDetectorHit()
+TPacesHit::TPacesHit() : TDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -15,7 +14,7 @@ TPacesHit::TPacesHit()
    Clear();
 }
 
-TPacesHit::TPacesHit(const TPacesHit& rhs) : TGRSIDetectorHit()
+TPacesHit::TPacesHit(const TPacesHit& rhs) : TDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -28,7 +27,7 @@ TPacesHit::~TPacesHit() = default;
 
 void TPacesHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    static_cast<TPacesHit&>(rhs).fFilter = fFilter;
 }
 
@@ -41,7 +40,7 @@ bool TPacesHit::InFilter(Int_t)
 
 void TPacesHit::Clear(Option_t* opt)
 {
-   TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+   TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
    fFilter = 0;
 }
 

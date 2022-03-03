@@ -11,10 +11,10 @@
 
 #include "TFragment.h"
 #include "TChannel.h"
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 #include "TPulseAnalyzer.h"
 
-class TSiLiHit : public TGRSIDetectorHit {
+class TSiLiHit : public TDetectorHit {
 public:
    enum class ESiLiHitBits { kUseFitCharge = BIT(0), kSiLiHitBit1 = BIT(1) };
 

@@ -23,9 +23,9 @@
 
 #include "TVector3.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TSceptarHit : public TGRSIDetectorHit {
+class TSceptarHit : public TDetectorHit {
 public:
    TSceptarHit();
    ~TSceptarHit() override;

@@ -13,9 +13,9 @@
 #include "TFragment.h"
 #include "TChannel.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TGriffinHit : public TGRSIDetectorHit {
+class TGriffinHit : public TDetectorHit {
 public:
    enum class EGriffinHitBits {
       kTotalPU1    = 1<<0,

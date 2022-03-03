@@ -9,7 +9,7 @@
 
 #include "TDetector.h"
 #include "TChannel.h"
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
 class TGenericDetector : public TDetector {
 public:
@@ -23,7 +23,7 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   TGRSIDetectorHit* GetGenericDetectorHit(const int& i) const { return static_cast<TGRSIDetectorHit*>(GetHit(i)); }
+   TDetectorHit* GetGenericDetectorHit(const int& i) const { return GetHit(i); }
 
    TGenericDetector& operator=(const TGenericDetector&);                    //
    void Print(Option_t* opt = "") const override; //!<!

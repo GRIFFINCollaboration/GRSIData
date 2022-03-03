@@ -11,8 +11,7 @@ double TEmmaHit::fRdelay = 20;
 double TEmmaHit::fTdelay = 10;
 double TEmmaHit::fBdelay = 20;
 
-TEmmaHit::TEmmaHit()
-   : TGRSIDetectorHit()
+TEmmaHit::TEmmaHit() : TDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -20,7 +19,7 @@ TEmmaHit::TEmmaHit()
    Clear();
 }
 
-TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TGRSIDetectorHit()
+TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TDetectorHit()
 {
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -33,7 +32,7 @@ TEmmaHit::~TEmmaHit() = default;
 
 void TEmmaHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    static_cast<TEmmaHit&>(rhs).fFilter = fFilter;
    static_cast<TEmmaHit&>(rhs).fTdcNumber = fTdcNumber;
    static_cast<TEmmaHit&>(rhs).fLeft = fLeft;
@@ -54,7 +53,7 @@ bool TEmmaHit::InFilter(Int_t)
 
 void TEmmaHit::Clear(Option_t* opt)
 {
-   TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+   TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
    fFilter = 0;
 }
 

@@ -22,13 +22,13 @@ TDescantHit::TDescantHit()
    Clear();
 }
 
-TDescantHit::TDescantHit(const TDescantHit& rhs) : TGRSIDetectorHit()
+TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit()
 {
    Clear();
    rhs.Copy(*this);
 }
 
-TDescantHit::TDescantHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
 {
    SetZc(frag.GetZc());
    SetCcShort(frag.GetCcShort());
@@ -83,9 +83,9 @@ TDescantHit::~TDescantHit() = default;
 
 void TDescantHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    if(TGRSIOptions::Get()->ExtractWaves()) {
-      TGRSIDetectorHit::CopyWave(rhs);
+      TDetectorHit::CopyWave(rhs);
    }
 #if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -109,7 +109,7 @@ void TDescantHit::Copy(TObject& obj, bool waveform) const
 
 TVector3 TDescantHit::GetPosition(Double_t dist) const
 {
-   /// TGRSIDetectorHit::GetPosition
+   /// TDetectorHit::GetPosition
    return TDescant::GetPosition(GetDetector(), dist);
 }
 
@@ -147,7 +147,7 @@ void TDescantHit::Clear(Option_t*)
    fCcLong  = 0;
    fCfdMonitor.clear();
    fPartialSum.clear();
-   TGRSIDetectorHit::Clear();
+   TDetectorHit::Clear();
 }
 
 void TDescantHit::Print(Option_t*) const

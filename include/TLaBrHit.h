@@ -22,14 +22,14 @@
 
 #include "TVector3.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TLaBrHit : public TGRSIDetectorHit {
+class TLaBrHit : public TDetectorHit {
 public:
    TLaBrHit();
    ~TLaBrHit() override;
    TLaBrHit(const TLaBrHit&);
-   TLaBrHit(const TFragment& frag) : TGRSIDetectorHit(frag) {}
+   TLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
 
 private:
    Int_t fFilter{0};

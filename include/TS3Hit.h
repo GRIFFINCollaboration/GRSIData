@@ -7,9 +7,9 @@
 
 #include <cstdio>
 #include "TFragment.h"
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TS3Hit : public TGRSIDetectorHit {
+class TS3Hit : public TDetectorHit {
 public:
    TS3Hit();
    TS3Hit(const TFragment&);

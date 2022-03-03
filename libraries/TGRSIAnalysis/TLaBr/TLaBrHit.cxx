@@ -22,7 +22,7 @@ TLaBrHit::TLaBrHit()
 
 TLaBrHit::~TLaBrHit() = default;
 
-TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TGRSIDetectorHit()
+TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
 #if MAJOR_ROOT_VERSION < 6
@@ -35,7 +35,7 @@ TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TGRSIDetectorHit()
 void TLaBrHit::Copy(TObject& rhs) const
 {
    // Copies a TLaBrHit
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    static_cast<TLaBrHit&>(rhs).fFilter = fFilter;
 }
 
@@ -63,7 +63,7 @@ void TLaBrHit::Clear(Option_t*)
 {
    // Clears the LaBrHit
    fFilter = 0;
-   TGRSIDetectorHit::Clear();
+   TDetectorHit::Clear();
 }
 
 void TLaBrHit::Print(Option_t*) const

@@ -15,7 +15,7 @@ TS3Hit::TS3Hit()
    Clear();
 }
 
-TS3Hit::TS3Hit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TS3Hit::TS3Hit(const TFragment& frag) : TDetectorHit(frag)
 {
 	if(static_cast<const TGRSIMnemonic*>(GetChannel()->GetMnemonic())->System() == TGRSIMnemonic::ESystem::kSiLiS3) {
 		SetIsDownstream(false);   
@@ -28,7 +28,7 @@ TS3Hit::TS3Hit(const TFragment& frag) : TGRSIDetectorHit(frag)
 
 TS3Hit::~TS3Hit() = default;
 
-TS3Hit::TS3Hit(const TS3Hit& rhs) : TGRSIDetectorHit(rhs)
+TS3Hit::TS3Hit(const TS3Hit& rhs) : TDetectorHit(rhs)
 {
 	Clear();
 	rhs.Copy(*this);
@@ -36,7 +36,7 @@ TS3Hit::TS3Hit(const TS3Hit& rhs) : TGRSIDetectorHit(rhs)
 
 void TS3Hit::Copy(TObject& rhs) const
 {
-	TGRSIDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 
 	// static_cast<TS3Hit&>(rhs).fLed          = fLed;
 	static_cast<TS3Hit&>(rhs).fRing         = fRing;
@@ -48,7 +48,7 @@ void TS3Hit::Copy(TObject& rhs) const
 
 void TS3Hit::Clear(Option_t* opt)
 {
-	TGRSIDetectorHit::Clear(opt);
+	TDetectorHit::Clear(opt);
 	fRing         = -1;
 	fSector       = -1;
 	fIsDownstream = false;
