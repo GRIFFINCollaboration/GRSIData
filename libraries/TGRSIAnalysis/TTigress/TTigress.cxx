@@ -263,7 +263,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 		return;
 	}
 	if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kG) { // its ge but its not a core...
-		TGRSIDetectorHit temp(*frag);
+		TDetectorHit temp(*frag);
 		for(size_t i = 0; i < fHits.size(); ++i) {
 			TTigressHit* hit = GetTigressHit(i);
 			if((hit->GetDetector() == chan->GetDetectorNumber()) &&

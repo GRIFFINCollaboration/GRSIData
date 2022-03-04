@@ -77,7 +77,7 @@ TSharc::fPdim / 24.0; // TSharc::backstripslist[1] ; // 81.6/24 = 3.4 degrees (a
 
 TSharc::TSharc()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();

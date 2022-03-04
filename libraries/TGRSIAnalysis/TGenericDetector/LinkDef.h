@@ -6,8 +6,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-// #pragma link C++ class TGRSIDetectorHit+;
-// #pragma link C++ class std::vector<TGRSIDetectorHit>+;
 #pragma link C++ class TGenericDetector+;
 
 #endif

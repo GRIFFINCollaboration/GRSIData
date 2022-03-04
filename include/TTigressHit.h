@@ -18,9 +18,9 @@
 #include "TChannel.h"
 #include "TPulseAnalyzer.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TTigressHit : public TGRSIDetectorHit {
+class TTigressHit : public TDetectorHit {
 public:
    TTigressHit();
    TTigressHit(const TTigressHit&);
@@ -32,7 +32,7 @@ private:
    // UShort_t fFirstSegment;
    // Float_t  fFirstSegmentCharge; //!<!
 
-   std::vector<TGRSIDetectorHit> fSegments;
+   std::vector<TDetectorHit> fSegments;
 
 	bool    fCoreSet{false};
    bool    fBgoFired{false};
@@ -46,8 +46,8 @@ public:
    void SetHit() {}
    /////////////////////////    /////////////////////////////////////
    void SetCore(const TTigressHit& core) { core.Copy(*this); fCoreSet = true; }                //!<!
-   void AddSegment(const TGRSIDetectorHit& seg) { fSegments.push_back(seg); } //!<!
-   //    void AddBGO(const TGRSIDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
+   void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); } //!<!
+   //    void AddBGO(const TDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
    // void SetInitalHit(const int &i)     { fFirstSegment = i; }        //!<!
 
    /////////////////////////    /////////////////////////////////////
@@ -84,12 +84,12 @@ public:
    /* int GetBGOMultiplicity()            const { return fBgos.size();     }  //!<! */
    /* int GetNBGOs()                      const { return fBgos.size();     }  //!<! */
 
-   const TGRSIDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); } //!<!
-   /* const TGRSIDetectorHit& GetBGO(int i)     const { return fBgos.at(i);      }  //!<! */
-   const TGRSIDetectorHit& GetCore() const { return *this; } //!<!
+   const TDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); } //!<!
+   /* const TDetectorHit& GetBGO(int i)     const { return fBgos.at(i);      }  //!<! */
+   const TDetectorHit& GetCore() const { return *this; } //!<!
 
-   const std::vector<TGRSIDetectorHit>& GetSegmentVec() const { return fSegments; }
-   /* const std::vector<TGRSIDetectorHit>& GetBGOVec()     const { return fBgos; } */
+   const std::vector<TDetectorHit>& GetSegmentVec() const { return fSegments; }
+   /* const std::vector<TDetectorHit>& GetBGOVec()     const { return fBgos; } */
 
    /* modified by Momiyama and Niikura on Aug. 23, 2016 */
    /* int GetFirstSeg() const { if(fSegments.size()>0) return fSegments.front().GetSegment(); return -1; } */

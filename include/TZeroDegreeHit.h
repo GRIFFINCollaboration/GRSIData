@@ -22,9 +22,9 @@
 
 #include "TVector3.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TZeroDegreeHit : public TGRSIDetectorHit {
+class TZeroDegreeHit : public TDetectorHit {
 public:
    TZeroDegreeHit();
    ~TZeroDegreeHit() override;

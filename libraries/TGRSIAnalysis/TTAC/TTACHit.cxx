@@ -14,7 +14,7 @@ ClassImp(TTACHit)
 TTACHit::TTACHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -22,10 +22,10 @@ TTACHit::TTACHit()
 
 TTACHit::~TTACHit() = default;
 
-TTACHit::TTACHit(const TTACHit& rhs) : TGRSIDetectorHit()
+TTACHit::TTACHit(const TTACHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -35,7 +35,7 @@ TTACHit::TTACHit(const TTACHit& rhs) : TGRSIDetectorHit()
 void TTACHit::Copy(TObject& rhs) const
 {
 	// Copies a TTACHit
-	TGRSIDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 	static_cast<TTACHit&>(rhs).fFilter = fFilter;
 }
 
@@ -87,7 +87,7 @@ void TTACHit::Clear(Option_t*)
 {
 	// Clears the TACHit
 	fFilter = 0;
-	TGRSIDetectorHit::Clear();
+	TDetectorHit::Clear();
 }
 
 void TTACHit::Print(Option_t*) const

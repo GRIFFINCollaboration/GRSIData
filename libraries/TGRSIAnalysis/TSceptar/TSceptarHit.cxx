@@ -12,10 +12,10 @@
 ClassImp(TSceptarHit)
 /// \endcond
 
-TSceptarHit::TSceptarHit()
+TSceptarHit::TSceptarHit() : TDetectorHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -23,17 +23,17 @@ TSceptarHit::TSceptarHit()
 
 TSceptarHit::~TSceptarHit() = default;
 
-TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TGRSIDetectorHit()
+TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
 	rhs.Copy(*this);
 }
 
-TSceptarHit::TSceptarHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TSceptarHit::TSceptarHit(const TFragment& frag) : TDetectorHit(frag)
 {
 	if(TSceptar::SetWave()) {
 		if(frag.GetWaveform()->empty()) {
@@ -81,7 +81,7 @@ TSceptarHit::TSceptarHit(const TFragment& frag) : TGRSIDetectorHit(frag)
 void TSceptarHit::Copy(TObject& rhs) const
 {
 	// Copies a TSceptarHit
-	TGRSIDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 	static_cast<TSceptarHit&>(rhs).fFilter = fFilter;
 }
 
@@ -116,7 +116,7 @@ void TSceptarHit::Clear(Option_t*)
 {
 	// Clears the SceptarHit
 	fFilter = 0;
-	TGRSIDetectorHit::Clear();
+	TDetectorHit::Clear();
 }
 
 void TSceptarHit::Print(Option_t*) const

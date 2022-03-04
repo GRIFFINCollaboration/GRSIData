@@ -14,9 +14,9 @@
 #include "TFragment.h"
 #include "TChannel.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TDescantHit : public TGRSIDetectorHit {
+class TDescantHit : public TDetectorHit {
 public:
    TDescantHit();
    ~TDescantHit() override;

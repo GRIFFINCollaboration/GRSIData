@@ -36,7 +36,7 @@ TVector3 TSceptar::gPaddlePosition[21] = {
 TSceptar::TSceptar()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	// Class()->AddRule("TSceptar sceptar_hits attributes=NotOwner");
@@ -52,7 +52,7 @@ TSceptar::~TSceptar()
 TSceptar::TSceptar(const TSceptar& rhs) : TDetector()
 {
 	// Copy Contructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);

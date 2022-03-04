@@ -15,7 +15,7 @@ bool TZeroDegree::fSetWave = false;
 TZeroDegree::TZeroDegree()
 {
 // Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -29,7 +29,7 @@ TZeroDegree::~TZeroDegree()
 TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector()
 {
 // Copy Contructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);

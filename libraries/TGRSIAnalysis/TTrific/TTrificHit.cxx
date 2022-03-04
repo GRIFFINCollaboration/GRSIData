@@ -6,17 +6,17 @@
 ClassImp(TTrificHit)
 /// \endcond
 
-TTrificHit::TTrificHit() : TGRSIDetectorHit()
+TTrificHit::TTrificHit() : TDetectorHit()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
 }
 
-TTrificHit::TTrificHit(const TTrificHit& rhs) : TGRSIDetectorHit()
+TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -27,13 +27,13 @@ TTrificHit::~TTrificHit() = default;
 
 void TTrificHit::Copy(TObject& rhs) const
 {
-	TGRSIDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 	static_cast<TTrificHit&>(rhs).fFilter = fFilter;
 }
 
 void TTrificHit::Clear(Option_t* opt)
 {
-	TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+	TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
 }
 
 void TTrificHit::Print(Option_t*) const

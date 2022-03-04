@@ -23,14 +23,14 @@
 
 #include "TVector3.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TTACHit : public TGRSIDetectorHit {
+class TTACHit : public TDetectorHit {
 public:
    TTACHit();
    ~TTACHit() override;
    TTACHit(const TTACHit&);
-   TTACHit(const TFragment& frag) : TGRSIDetectorHit(frag) {}
+   TTACHit(const TFragment& frag) : TDetectorHit(frag) {}
 
 private:
    Int_t fFilter{0};

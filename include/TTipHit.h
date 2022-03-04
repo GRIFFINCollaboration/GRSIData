@@ -14,9 +14,9 @@
 #include "TChannel.h"
 #include "TPulseAnalyzer.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TTipHit : public TGRSIDetectorHit {
+class TTipHit : public TDetectorHit {
 public:
    TTipHit();
    TTipHit(const TFragment&);

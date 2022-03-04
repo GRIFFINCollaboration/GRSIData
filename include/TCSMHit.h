@@ -20,9 +20,9 @@
 
 #include "Globals.h"
 
-#include "TGRSIDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TCSMHit : public TGRSIDetectorHit {
+class TCSMHit : public TDetectorHit {
 public:
    TCSMHit();
    ~TCSMHit() override;

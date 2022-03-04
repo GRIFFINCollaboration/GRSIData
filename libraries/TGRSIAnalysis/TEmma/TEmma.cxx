@@ -29,7 +29,7 @@ short TEmma::fFail = 0;
 
 TEmma::TEmma() : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -37,7 +37,7 @@ TEmma::TEmma() : TDetector()
 
 TEmma::TEmma(const TEmma& rhs) : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);

@@ -8,24 +8,23 @@
 ClassImp(TGriffinHit)
 /// \endcond
 
-TGriffinHit::TGriffinHit()
-   : TGRSIDetectorHit()
+TGriffinHit::TGriffinHit() : TDetectorHit()
 {
 // Default Ctor. Ignores TObject Streamer in ROOT < 6.
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TGRSIDetectorHit()
+TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit()
 {
    // Copy Ctor. Ignores TObject Streamer in ROOT < 6.
    Clear();
    rhs.Copy(*this);
 }
 
-TGriffinHit::TGriffinHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TGriffinHit::TGriffinHit(const TFragment& frag) : TDetectorHit(frag)
 {
    SetNPileUps(frag.GetNumberOfPileups());
 }
@@ -34,7 +33,7 @@ TGriffinHit::~TGriffinHit() = default;
 
 void TGriffinHit::Copy(TObject& rhs) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    static_cast<TGriffinHit&>(rhs).fFilter = fFilter;
    // We should copy over a 0 and let the hit recalculate, this is safest
    static_cast<TGriffinHit&>(rhs).fGriffinHitBits      = 0;
@@ -60,7 +59,7 @@ bool TGriffinHit::InFilter(Int_t)
 void TGriffinHit::Clear(Option_t* opt)
 {
    // Clears the information stored in the TGriffinHit.
-   TGRSIDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+   TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
    fFilter              = 0;
    fGriffinHitBits      = 0;
    fPPG                 = nullptr;

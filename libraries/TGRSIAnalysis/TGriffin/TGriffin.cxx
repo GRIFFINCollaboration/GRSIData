@@ -117,7 +117,7 @@ TVector3 TGriffin::gCloverPosition[17] = {
 TGriffin::TGriffin() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -126,7 +126,7 @@ TGriffin::TGriffin() : TSuppressed()
 TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed()
 {
 // Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);
@@ -645,7 +645,6 @@ void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 	for(auto& one : hit_vec) {
 		for(auto& two : hit_vec) {
 			one->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(one), static_cast<TGriffinHit*>(two)));
-			//two->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(two), static_cast<TGriffinHit*>(one)));
 		}
 	}
 	SetCrossTalk(gain_type, true);

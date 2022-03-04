@@ -59,6 +59,9 @@ public:
    void EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType, TPriorityValue<int>& timeStampUnit) override;
 
 	TClass* GetClassType() const override;
+
+	double GetTime(Long64_t timestamp, Float_t cfd, double energy, const TChannel* channel) const override;
+
    void Print(Option_t* opt = "") const override;
    void Clear(Option_t* opt = "") override;
 

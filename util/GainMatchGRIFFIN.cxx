@@ -1,4 +1,4 @@
-//g++ GainMatchGRIFFIN.C -std=c++0x -I$GRSISYS/include -L$GRSISYS/libraries -lGRSIFormat -lAnalysisTreeBuilder -lGriffin -lSceptar -lDescant -lPaces -lGRSIDetector -lTigress -lSharc -lCSM -lTriFoil -lTGRSIint -lTGRSIFit -lGRSILoop -lMidasFormat -lGRSIRootIO -lDataParser -lMidasFormat -lXMLParser -lXMLIO -lProof -lGuiHtml `root-config --cflags --libs` -Wl,--no-as-needed -lTreePlayer -lSpectrum -lX11 -lXtst -lXpm -lGROOT -lTGRSIFit -o GainMatchGRIFFIN
+//g++ GainMatchGRIFFIN.C -std=c++0x -I$GRSISYS/include -L$GRSISYS/libraries -lGRSIFormat -lAnalysisTreeBuilder -lGriffin -lSceptar -lDescant -lPaces -lTigress -lSharc -lCSM -lTriFoil -lTGRSIint -lTGRSIFit -lGRSILoop -lMidasFormat -lGRSIRootIO -lDataParser -lMidasFormat -lXMLParser -lXMLIO -lProof -lGuiHtml `root-config --cflags --libs` -Wl,--no-as-needed -lTreePlayer -lSpectrum -lX11 -lXtst -lXpm -lGROOT -lTGRSIFit -o GainMatchGRIFFIN
 #include<algorithm>
 #include<vector>
 #include<string>

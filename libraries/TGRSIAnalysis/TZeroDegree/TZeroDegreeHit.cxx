@@ -17,7 +17,7 @@ ClassImp(TZeroDegreeHit)
 TZeroDegreeHit::TZeroDegreeHit()
 {
 // Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -25,7 +25,7 @@ TZeroDegreeHit::TZeroDegreeHit()
 
 TZeroDegreeHit::~TZeroDegreeHit() = default;
 
-TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TDetectorHit(frag)
 {
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
@@ -39,10 +39,10 @@ TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TGRSIDetectorHit(frag)
    }
 }
 
-TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TGRSIDetectorHit()
+TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -52,9 +52,9 @@ TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TGRSIDetectorHit()
 void TZeroDegreeHit::Copy(TObject& rhs) const
 {
    /// Copies a TZeroDegreeHit
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
    if(TGRSIOptions::Get()->ExtractWaves()) {
-      TGRSIDetectorHit::CopyWave(rhs);
+      TDetectorHit::CopyWave(rhs);
    }
    static_cast<TZeroDegreeHit&>(rhs).fFilter     = fFilter;
    static_cast<TZeroDegreeHit&>(rhs).fCfdMonitor = fCfdMonitor;
@@ -93,7 +93,7 @@ void TZeroDegreeHit::Clear(Option_t*)
 {
    /// Clears the ZeroDegreeHit
    fFilter = 0;
-   TGRSIDetectorHit::Clear();
+   TDetectorHit::Clear();
    fCfdMonitor.clear();
    fPartialSum.clear();
 }

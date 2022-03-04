@@ -10,7 +10,7 @@ TSiLiHit::TSiLiHit()
    Clear();
 }
 
-TSiLiHit::TSiLiHit(const TFragment& frag) : TGRSIDetectorHit(frag)
+TSiLiHit::TSiLiHit(const TFragment& frag) : TDetectorHit(frag)
 {
 
    fFitCharge = frag.GetCharge();
@@ -19,7 +19,7 @@ TSiLiHit::TSiLiHit(const TFragment& frag) : TGRSIDetectorHit(frag)
 
 TSiLiHit::~TSiLiHit() = default;
 
-TSiLiHit::TSiLiHit(const TSiLiHit& rhs) : TGRSIDetectorHit(rhs)
+TSiLiHit::TSiLiHit(const TSiLiHit& rhs) : TDetectorHit(rhs)
 {
    Clear();
    (const_cast<TSiLiHit&>(rhs)).Copy(*this);
@@ -27,7 +27,7 @@ TSiLiHit::TSiLiHit(const TSiLiHit& rhs) : TGRSIDetectorHit(rhs)
 
 void TSiLiHit::Copy(TObject& rhs, bool suppress) const
 {
-   TGRSIDetectorHit::Copy(rhs);
+   TDetectorHit::Copy(rhs);
 
    static_cast<TSiLiHit&>(rhs).fTimeFit     = fTimeFit;
    static_cast<TSiLiHit&>(rhs).fSig2Noise   = fSig2Noise;
@@ -45,7 +45,7 @@ void TSiLiHit::Copy(TObject& rhs, bool suppress) const
 
 void TSiLiHit::Clear(Option_t* opt)
 {
-   TGRSIDetectorHit::Clear(opt);
+   TDetectorHit::Clear(opt);
    // fSegment   = -1;
    fTimeFit   = -1;
    fFitCharge = -1;
@@ -191,7 +191,7 @@ bool TSiLiHit::MagnetShadow() const
 double TSiLiHit::GetFitEnergy() const
 {
    if(fSiLiHitBits.TestBit(ESiLiHitBits::kUseFitCharge)) {
-      return TGRSIDetectorHit::GetEnergy();
+      return TDetectorHit::GetEnergy();
    }
    TChannel* chan = GetChannel();
    if(chan == nullptr) {
@@ -203,7 +203,7 @@ double TSiLiHit::GetFitEnergy() const
 double TSiLiHit::GetEnergy(Option_t*) const
 {
    if(TestHitBit(EBitFlag::kIsEnergySet) || !fSiLiHitBits.TestBit(ESiLiHitBits::kUseFitCharge)) {
-      return TGRSIDetectorHit::GetEnergy(); // If not fitting waveforms, be normal.
+      return TDetectorHit::GetEnergy(); // If not fitting waveforms, be normal.
    }
    TChannel* chan = GetChannel();
    if(chan == nullptr) {

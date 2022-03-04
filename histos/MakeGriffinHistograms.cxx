@@ -46,14 +46,6 @@ bool PromptCoincidence(TZeroDegreeHit* sc_hit, TGriffinHit* grif_hit){
    return (((grif_hit->GetTime()*ns - sc_hit->GetTime()*ns) >= gzTLow) && ((grif_hit->GetTime()*ns - sc_hit->GetTime()*ns) <= gzTHigh) && (sc_hit->GetEnergy() > zELow) && (sc_hit->GetDetector() == 1)); 
 }
 
-/*
-bool GriffinCloverSuppression(const TGRSIDetectorHit& hit, const TBgoHit& bgoHit){
-	return ((hit.GetDetector() == bgoHit.GetDetector() &&
-	(std::fabs(hit.GetTime() - bgoHit.GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
-	(bgoHit.GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
-}
-*/
-//std::function<bool(const TGRSIDetectorHit&, const TBgoHit&)> TGriffin::fSuppressionCriterion = DefaultGriffinSuppression;
 extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
 {
    auto grif      = obj.GetDetector<TGriffin>();
