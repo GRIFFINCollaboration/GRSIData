@@ -21,7 +21,7 @@ TTip::~TTip()
 
 TTip::TTip(const TTip& rhs) : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);

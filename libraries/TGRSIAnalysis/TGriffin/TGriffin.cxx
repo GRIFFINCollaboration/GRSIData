@@ -117,7 +117,7 @@ TVector3 TGriffin::gCloverPosition[17] = {
 TGriffin::TGriffin() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -126,7 +126,7 @@ TGriffin::TGriffin() : TSuppressed()
 TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed()
 {
 // Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);

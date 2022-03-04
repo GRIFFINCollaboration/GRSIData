@@ -17,7 +17,7 @@ ClassImp(TZeroDegreeHit)
 TZeroDegreeHit::TZeroDegreeHit()
 {
 // Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -42,7 +42,7 @@ TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TDetectorHit(frag)
 TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();

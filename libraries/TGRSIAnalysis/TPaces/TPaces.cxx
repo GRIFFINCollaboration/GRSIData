@@ -20,7 +20,7 @@ bool TPaces::fSetCoreWave = false;
 
 TPaces::TPaces() : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -28,7 +28,7 @@ TPaces::TPaces() : TDetector()
 
 TPaces::TPaces(const TPaces& rhs) : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);

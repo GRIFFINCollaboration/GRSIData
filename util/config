@@ -41,7 +41,7 @@ fi
 libdir=$GRSISYS/GRSIData/lib
 incdir=$GRSISYS/GRSIData/include
 
-libs="-lTAngularCorrelation -lTCSM -lTDescant -lTGRSIDataParser -lTGRSIFormat -lTGenericDetector -lTGriffin -lTLaBr -lTMidas -lTPaces -lTRF -lTS3 -lTSceptar -lTSharc -lTSiLi -lTTAC -lTTigress -lTTip -lTTriFoil -lTZeroDegree -lTEmma -lTTrific -lTGRSIDetector"
+libs="-lTAngularCorrelation -lTCSM -lTDescant -lTGRSIDataParser -lTGRSIFormat -lTGenericDetector -lTGriffin -lTLaBr -lTMidas -lTPaces -lTRF -lTS3 -lTSceptar -lTSharc -lTSiLi -lTTAC -lTTigress -lTTip -lTTriFoil -lTZeroDegree -lTEmma -lTTrific"
 
 if [[ $(root-config --cflags) == *"-std="* ]]
 then

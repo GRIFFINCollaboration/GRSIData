@@ -15,7 +15,7 @@ ClassImp(TSceptarHit)
 TSceptarHit::TSceptarHit() : TDetectorHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -26,7 +26,7 @@ TSceptarHit::~TSceptarHit() = default;
 TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();

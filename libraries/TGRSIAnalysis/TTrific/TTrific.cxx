@@ -40,7 +40,7 @@ bool TTrific::fSetCoreWave = false;
 
 TTrific::TTrific() : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -48,7 +48,7 @@ TTrific::TTrific() : TDetector()
 
 TTrific::TTrific(const TTrific& rhs) : TDetector()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);

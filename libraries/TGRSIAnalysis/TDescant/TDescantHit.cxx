@@ -16,7 +16,7 @@ ClassImp(TDescantHit)
 
 TDescantHit::TDescantHit()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -87,7 +87,7 @@ void TDescantHit::Copy(TObject& rhs) const
    if(TGRSIOptions::Get()->ExtractWaves()) {
       TDetectorHit::CopyWave(rhs);
    }
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    static_cast<TDescantHit&>(rhs).fFilter     = fFilter;

@@ -14,7 +14,7 @@ ClassImp(TLaBrHit)
 TLaBrHit::TLaBrHit()
 {
 // Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -25,7 +25,7 @@ TLaBrHit::~TLaBrHit() = default;
 TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();

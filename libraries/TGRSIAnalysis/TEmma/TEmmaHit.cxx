@@ -13,7 +13,7 @@ double TEmmaHit::fBdelay = 20;
 
 TEmmaHit::TEmmaHit() : TDetectorHit()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -21,7 +21,7 @@ TEmmaHit::TEmmaHit() : TDetectorHit()
 
 TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TDetectorHit()
 {
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
