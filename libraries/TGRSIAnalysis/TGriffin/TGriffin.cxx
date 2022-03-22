@@ -644,7 +644,7 @@ void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 
 	for(auto& one : hit_vec) {
 		for(auto& two : hit_vec) {
-			one->SetEnergy(TGriffin::CTCorrectedEnergy(static_cast<TGriffinHit*>(one), static_cast<TGriffinHit*>(two)));
+			one->SetEnergy(CTCorrectedEnergy(static_cast<TGriffinHit*>(one), static_cast<TGriffinHit*>(two)));
 		}
 	}
 	SetCrossTalk(gain_type, true);
