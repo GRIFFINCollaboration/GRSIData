@@ -47,7 +47,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TPacesHit, 3);
+   ClassDefOverride(TPacesHit, 4);
    /// \endcond
 };
 /*! @} */

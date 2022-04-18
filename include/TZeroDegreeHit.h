@@ -69,7 +69,7 @@ public:
    // Position Not written for ZeroDegree Yet
 
    /// \cond CLASSIMP
-   ClassDefOverride(TZeroDegreeHit, 3) // Stores the information for a ZeroDegreeHit
+   ClassDefOverride(TZeroDegreeHit, 4) // Stores the information for a ZeroDegreeHit
    /// \endcond
 };
 /*! @} */
