@@ -65,7 +65,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSceptarHit, 2) // Stores the information for a SceptarHit
+   ClassDefOverride(TSceptarHit, 4) // Stores the information for a SceptarHit
    /// \endcond
 };
 /*! @} */

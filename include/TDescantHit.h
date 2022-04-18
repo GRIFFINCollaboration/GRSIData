@@ -84,7 +84,7 @@ private:
    Double_t GetDefaultDistance() const { return 222.; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TDescantHit, 5)
+   ClassDefOverride(TDescantHit, 6)
    /// \endcond
 };
 /*! @} */
