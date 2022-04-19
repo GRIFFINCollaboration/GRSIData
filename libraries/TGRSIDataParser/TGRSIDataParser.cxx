@@ -157,7 +157,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 		switch(type) {
 			case 0x0: // raw wave forms.
 				{
-					TChannel* chan = TChannel::GetChannel(eventFrag->GetAddress());
+					TChannel* chan = TChannel::GetChannel(eventFrag->GetAddress(), false);
 					if(!fNoWaveforms) {
 						SetTIGWave(value, eventFrag);
 					}
@@ -540,7 +540,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 	if(eventFrag->GetDetectorType() == 0xf) {
 		// a scaler event (trigger or deadtime) has 8 words (including header and trailer), make sure we have at least
 		// that much left
-		TChannel* chan = TChannel::GetChannel(eventFrag->GetAddress());
+		TChannel* chan = TChannel::GetChannel(eventFrag->GetAddress(), false);
 		if((chan != nullptr) && strncmp("RF", chan->GetName(), 2) == 0){
 			//JW: RF event, stored as a scaler containing fit paramters 
 			//in recent (2019 and later) GRIF-16 firmware revisions.
@@ -710,7 +710,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 						}
 						eventFrag->SetCfd(tmpCfd[0]);
 						if(fRecordDiag) {
-							TParsingDiagnostics::Get()->GoodFragment(eventFrag);
+							TParsingDiagnostics::Get()->GoodFragment(eventFrag->GetDetectorType());
 						}
 						fFragmentMap.Add(eventFrag, tmpCharge, tmpIntLength);
 						return x;
@@ -733,7 +733,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 						eventFrag->SetKValue(tmpIntLength[h]);
 						eventFrag->SetCfd(tmpCfd[h]);
 						if(fRecordDiag) {
-							TParsingDiagnostics::Get()->GoodFragment(eventFrag);
+							TParsingDiagnostics::Get()->GoodFragment(eventFrag->GetDetectorType());
 						}
 						if(fState == EDataParserState::kGood) {
 							if(fOptions->ReconstructTimeStamp()) {
@@ -2046,7 +2046,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 						std::shared_ptr<TFragment> transferfrag = std::make_shared<TFragment>(*eventFrag);
 						transferfrag->SetCharge(static_cast<Int_t>(adcdata));
 						transferfrag->SetAddress(0x800000 + adcchannel);
-						TChannel* chan = TChannel::GetChannel(transferfrag->GetAddress());
+						TChannel* chan = TChannel::GetChannel(transferfrag->GetAddress(), false);
 						if(chan == nullptr) {
 							chan = fChannel;
 						}

@@ -974,7 +974,7 @@ void TMidasFile::SetTIGOdb()
    }
 
    for(size_t x = 0; x < address.size(); x++) {
-      TChannel* tempChan = TChannel::GetChannel(address.at(x)); // names.at(x).c_str());
+      TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
       if(tempChan == nullptr) {
          tempChan = new TChannel();
       }
