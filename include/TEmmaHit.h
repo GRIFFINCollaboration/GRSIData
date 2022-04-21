@@ -41,6 +41,7 @@ public:
    inline Int_t GetFilterPattern() const { return fFilter; } //!<!
 
    TVector3 GetPosition() const override;              //!<!
+	TVector3 GetPosition(Double_t) const override { return GetPosition(); } //!<!
    TVector3 GetPosition(double delayL, double delayR, double delayT, double delayB) const;              //!<!
    Double_t GetLeft() const {return fLeft; }
    Double_t GetRight() const {return fRight; }
