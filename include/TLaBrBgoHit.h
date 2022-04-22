@@ -32,7 +32,7 @@ public:
    UShort_t GetArrayNumber() const override { return (3 * (GetDetector() - 1) + GetSegment()); } //!<! the BGO of each detector has three segments
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLaBrBgoHit, 1)
+   ClassDefOverride(TLaBrBgoHit, 2)
    /// \endcond
 };
 /*! @} */

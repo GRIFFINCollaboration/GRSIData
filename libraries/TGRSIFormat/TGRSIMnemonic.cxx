@@ -206,7 +206,7 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 {
    if(channel == nullptr) {
       Error("GetTime", "No TChannel provided");
-		return static_cast<Double_t>(((timestamp) + gRandom->Uniform()) * channel->GetTimeStampUnit());
+		return static_cast<Double_t>((timestamp) + gRandom->Uniform());
    }
 	
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {

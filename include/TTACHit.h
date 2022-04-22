@@ -55,7 +55,7 @@ public:
    void Copy(TObject&) const override;            //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTACHit, 1) // Stores the information for a TACrHit
+   ClassDefOverride(TTACHit, 2) // Stores the information for a TACrHit
    /// \endcond
 };
 /*! @} */

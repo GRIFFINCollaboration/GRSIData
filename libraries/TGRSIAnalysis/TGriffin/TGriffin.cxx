@@ -468,26 +468,27 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 		return;
 	}
 
-   switch(mnemonic->SubSystem()) {
-		case TMnemonic::EMnemonic::kG:
+	if(mnemonic->SubSystem() != TMnemonic::EMnemonic::kG) {
+		std::cerr<<__PRETTY_FUNCTION__<<": not a GRIFFIN detector: "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem())<<std::endl;
+		return;
+	}
+
+	// only create the hit if we have a HPGe signal (A or B), not a suppressor (S)
+	switch(mnemonic->OutputSensor()) {
+		case TMnemonic::EMnemonic::kA:
 			{
 				TGriffinHit* hit = new TGriffinHit(*frag);
-				switch(mnemonic->OutputSensor()) {
-					case TMnemonic::EMnemonic::kA:
-						GetHitVector(EGainBits::kLowGain).push_back(hit);
-						break;
-					case TMnemonic::EMnemonic::kB:
-						GetHitVector(EGainBits::kHighGain).push_back(hit);
-						break;
-					default:
-						break;
-				};
+				GetHitVector(EGainBits::kLowGain).push_back(hit);
 			}
 			break;
-			//     case TMnemonic::EMnemonic::kS :
-			// do supressor stuff in the future
-			//      break;
+		case TMnemonic::EMnemonic::kB:
+			{
+				TGriffinHit* hit = new TGriffinHit(*frag);
+				GetHitVector(EGainBits::kHighGain).push_back(hit);
+			}
+			break;
 		default:
+			std::cout<<"output sensor "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->OutputSensor())<<", skipping it"<<std::endl;
 			break;
 	};
 }

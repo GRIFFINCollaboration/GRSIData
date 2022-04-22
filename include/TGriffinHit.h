@@ -84,7 +84,7 @@ private:
    Double_t GetDefaultDistance() const { return 110.; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffinHit, 7); // Information about a GRIFFIN Hit
+   ClassDefOverride(TGriffinHit, 8); // Information about a GRIFFIN Hit
    /// \endcond
 };
 /*! @} */

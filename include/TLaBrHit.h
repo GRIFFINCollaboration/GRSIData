@@ -55,7 +55,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.; } // This needs to be updated
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLaBrHit, 2) // Stores the information for a LaBrrHit
+   ClassDefOverride(TLaBrHit, 3) // Stores the information for a LaBrrHit
    /// \endcond
 };
 /*! @} */
