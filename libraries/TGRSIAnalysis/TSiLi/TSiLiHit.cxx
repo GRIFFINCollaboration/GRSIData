@@ -142,9 +142,16 @@ TVector3 TSiLiHit::GetPosition(bool smear) const
 
 void TSiLiHit::Print(Option_t*) const
 {
-   printf("===============\n");
-   printf("not yet written\n");
-   printf("===============\n");
+	Print(std::cout);
+}
+
+void TSiLiHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"==============="<<std::endl;
+   str<<"not yet written"<<std::endl;
+   str<<"==============="<<std::endl;
+	out<<str.str();
 }
 
 void TSiLiHit::SumHit(TSiLiHit* hit)

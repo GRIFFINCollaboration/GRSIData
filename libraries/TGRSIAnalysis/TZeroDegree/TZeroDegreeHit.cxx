@@ -100,13 +100,20 @@ void TZeroDegreeHit::Clear(Option_t*)
 
 void TZeroDegreeHit::Print(Option_t*) const
 {
-   ////Prints the ZeroDegreeHit. Returns:
-   ////Detector
-   ////Energy
-   ////Time
-   printf("ZeroDegree Detector: %i\n", GetDetector());
-   printf("ZeroDegree hit energy: %.2f\n", GetEnergy());
-   printf("ZeroDegree hit time:   %.lf\n", GetTime());
+   ///Prints the ZeroDegreeHit. Returns:
+   ///Detector
+   ///Energy
+   ///Time
+	Print(std::cout);
+}
+
+void TZeroDegreeHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"ZeroDegree Detector:   "<<GetDetector()<<std::endl;
+   str<<"ZeroDegree hit energy: "<<GetEnergy()<<std::endl;
+   str<<"ZeroDegree hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 bool TZeroDegreeHit::AnalyzeWaveform()

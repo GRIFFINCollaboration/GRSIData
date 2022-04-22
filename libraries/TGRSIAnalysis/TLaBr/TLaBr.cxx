@@ -88,8 +88,15 @@ TLaBr& TLaBr::operator=(const TLaBr& rhs)
 
 void TLaBr::Print(Option_t*) const
 {
-	// Prints out TLaBr Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	/// Prints out TLaBr Multiplicity, currently does little.
+	Print(std::cout);
+}
+
+void TLaBr::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 bool TLaBr::IsSuppressed() const

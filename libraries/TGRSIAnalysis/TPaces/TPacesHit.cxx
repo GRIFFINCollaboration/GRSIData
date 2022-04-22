@@ -46,9 +46,16 @@ void TPacesHit::Clear(Option_t* opt)
 
 void TPacesHit::Print(Option_t*) const
 {
-   printf("Paces Detector: %i\n", GetDetector());
-   printf("Paces Energy:   %lf\n", GetEnergy());
-   printf("Paces hit time:   %f\n", GetTime());
+	Print(std::cout);
+}
+
+void TPacesHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Paces Detector: "<<GetDetector()<<std::endl;
+   str<<"Paces Energy:   "<<GetEnergy()<<std::endl;
+   str<<"Paces hit time: "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TPacesHit::GetPosition(Double_t) const

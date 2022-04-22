@@ -47,5 +47,12 @@ void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
 void TTip::Print(Option_t*) const
 {
    /// Prints out TTip members, currently only prints the multiplicity.
-   printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TTip::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }

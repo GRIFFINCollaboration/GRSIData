@@ -92,11 +92,18 @@ void TTACHit::Clear(Option_t*)
 
 void TTACHit::Print(Option_t*) const
 {
-	// Prints the TACHit. Returns:
-	// Detector
-	// Energy
-	// Time
-	printf("TAC Detector: %i\n", GetDetector());
-	printf("TAC hit energy: %.2f\n", GetEnergy());
-	printf("TAC hit time:   %.lf\n", GetTime());
+	/// Prints the TACHit. Returns:
+	/// Detector
+	/// Energy
+	/// Time
+	Print(std::cout);
+}
+
+void TTACHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"TAC Detector:   "<<GetDetector()<<std::endl;
+	str<<"TAC hit energy: "<<GetEnergy()<<std::endl;
+	str<<"TAC hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }

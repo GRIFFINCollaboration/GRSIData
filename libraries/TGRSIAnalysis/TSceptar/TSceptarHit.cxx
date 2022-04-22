@@ -121,13 +121,20 @@ void TSceptarHit::Clear(Option_t*)
 
 void TSceptarHit::Print(Option_t*) const
 {
-	// Prints the SceptarHit. Returns:
-	// Detector
-	// Energy
-	// Time
-	printf("Sceptar Detector: %i\n", GetDetector());
-	printf("Sceptar hit energy: %.2f\n", GetEnergy());
-	printf("Sceptar hit time:   %.lf\n", GetTime());
+	/// Prints the SceptarHit. Returns:
+	/// Detector
+	/// Energy
+	/// Time
+	Print(std::cout);
+}
+
+void TSceptarHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"Sceptar Detector:   "<<GetDetector()<<std::endl;
+	str<<"Sceptar hit energy: "<<GetEnergy()<<std::endl;
+	str<<"Sceptar hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 bool TSceptarHit::AnalyzeWaveform()

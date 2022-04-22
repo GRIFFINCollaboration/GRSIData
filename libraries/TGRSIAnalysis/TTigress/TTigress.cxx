@@ -114,12 +114,19 @@ void TTigress::Clear(Option_t* opt)
    fTigressBits = 0;
 }
 
-void TTigress::Print(Option_t* opt) const
+void TTigress::Print(Option_t*) const
 {
-   printf("%lu tigress hits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TTigress::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<fHits.size()<<" tigress hits"<<std::endl;
    for(Short_t i = 0; i < GetMultiplicity(); i++) {
-      fHits.at(i)->Print(opt);
+      fHits.at(i)->Print(str);
    }
+	out<<str.str();
 }
 
 TTigress& TTigress::operator=(const TTigress& rhs)

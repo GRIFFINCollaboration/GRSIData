@@ -43,5 +43,12 @@ void TGenericDetector::AddFragment(const std::shared_ptr<const TFragment>& frag,
 
 void TGenericDetector::Print(Option_t*) const
 {
-   printf("%s\tnot yet written.\n", __PRETTY_FUNCTION__);
+	Print(std::cout);
+}
+
+void TGenericDetector::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+	out<<str.str();
 }

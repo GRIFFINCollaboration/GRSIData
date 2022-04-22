@@ -68,11 +68,18 @@ void TLaBrHit::Clear(Option_t*)
 
 void TLaBrHit::Print(Option_t*) const
 {
-   // Prints the LaBrHit. Returns:
-   // Detector
-   // Energy
-   // Time
-   printf("LaBr Detector: %i\n", GetDetector());
-   printf("LaBr hit energy: %.2f\n", GetEnergy());
-   printf("LaBr hit time:   %.lf\n", GetTime());
+   /// Prints the LaBrHit. Returns:
+   /// Detector
+   /// Energy
+   /// Time
+	Print(std::cout);
+}
+
+void TLaBrHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"LaBr Detector:   "<<GetDetector()<<std::endl;
+   str<<"LaBr hit energy: "<<GetEnergy()<<std::endl;
+   str<<"LaBr hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }

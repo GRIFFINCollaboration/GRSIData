@@ -48,8 +48,15 @@ TPaces::~TPaces()
 
 void TPaces::Print(Option_t*) const
 {
-	// Prints out TPaces members, currently does nothing.
-	printf("%lu fHits\n", fHits.size());
+	/// Prints out TPaces members, currently shows only multiplicity.
+	Print(std::cout);
+}
+
+void TPaces::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 TPaces& TPaces::operator=(const TPaces& rhs)

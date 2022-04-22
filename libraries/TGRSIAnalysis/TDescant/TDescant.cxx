@@ -119,7 +119,14 @@ TDescant& TDescant::operator=(const TDescant& rhs)
 void TDescant::Print(Option_t*) const
 {
    /// Prints out TDescant members, currently does little.
-   printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TDescant::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 void TDescant::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)

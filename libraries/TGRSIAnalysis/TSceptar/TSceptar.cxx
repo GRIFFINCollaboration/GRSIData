@@ -72,6 +72,13 @@ void TSceptar::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 
 void TSceptar::Print(Option_t*) const
 {
-	// Prints out TSceptar Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	/// Prints out TSceptar Multiplicity, currently does little.
+	Print(std::cout);
+}
+
+void TSceptar::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }

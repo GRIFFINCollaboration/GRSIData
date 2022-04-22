@@ -152,9 +152,16 @@ void TDescantHit::Clear(Option_t*)
 
 void TDescantHit::Print(Option_t*) const
 {
-   printf("Descant Detector: %i\n", GetDetector());
-   printf("Descant hit energy: %.2f\n", GetEnergy());
-   printf("Descant hit time:   %.f\n", GetTime());
+	Print(std::cout);
+}
+
+void TDescantHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Descant Detector:   "<<GetDetector()<<std::endl;
+   str<<"Descant hit energy: "<<GetEnergy()<<std::endl;
+   str<<"Descant hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 bool TDescantHit::AnalyzeWaveform()

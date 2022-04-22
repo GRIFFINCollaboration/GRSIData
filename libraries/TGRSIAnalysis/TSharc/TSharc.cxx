@@ -191,7 +191,14 @@ void TSharc::Clear(Option_t* option)
 
 void TSharc::Print(Option_t*) const
 {
-	printf("not yet written...\n");
+	Print(std::cout);
+}
+
+void TSharc::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"not yet written..."<<std::endl;
+	out<<str.str();
 }
 
 void TSharc::Copy(TObject& rhs) const

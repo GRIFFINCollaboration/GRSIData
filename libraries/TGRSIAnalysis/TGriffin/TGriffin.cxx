@@ -228,40 +228,45 @@ void TGriffin::Clear(Option_t* opt)
    fCycleStart = 0;
 }
 
-void TGriffin::Print(Option_t* opt) const
+void TGriffin::Print(Option_t*) const
 {
-   std::cout<<"Griffin Contains: "<<std::endl;
-   std::cout<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
-	if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
+	Print(std::cout);
+}
+
+void TGriffin::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Griffin Contains: "<<std::endl;
+   str<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
+	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
 		for(auto hit : fGriffinLowGainHits) {
-			static_cast<TGriffinHit*>(hit)->Print();
+			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
-	}
-   std::cout<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
-	if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
+	//}
+   str<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
+	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
 		for(auto hit : fGriffinHighGainHits) {
-			static_cast<TGriffinHit*>(hit)->Print();
+			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
-	}
+	//}
 
    if(IsAddbackSet(EGainBits::kLowGain)) {
-      std::cout<<std::setw(6)<<fAddbackLowGainHits.size()<<" Low gain addback hits"<<std::endl;
+      str<<std::setw(6)<<fAddbackLowGainHits.size()<<" Low gain addback hits"<<std::endl;
    } else {
-      std::cout<<std::setw(6)<<" "
-               <<" Low Gain Addback not set"<<std::endl;
+      str<<std::setw(6)<<" "<<" Low Gain Addback not set"<<std::endl;
    }
 
    if(IsAddbackSet(EGainBits::kHighGain)) {
-      std::cout<<std::setw(6)<<fAddbackHighGainHits.size()<<" High gain addback hits"<<std::endl;
+      str<<std::setw(6)<<fAddbackHighGainHits.size()<<" High gain addback hits"<<std::endl;
    } else {
-      std::cout<<std::setw(6)<<" "
-               <<" High Gain Addback not set"<<std::endl;
+      str<<std::setw(6)<<" "<<" High Gain Addback not set"<<std::endl;
    }
 
-   std::cout<<std::setw(6)<<" "
+   str<<std::setw(6)<<" "
             <<" Cross-talk Set?  Low gain: "<<IsCrossTalkSet(EGainBits::kLowGain)
             <<"   High gain: "<<IsCrossTalkSet(EGainBits::kHighGain)<<std::endl;
-   std::cout<<std::setw(6)<<fCycleStart<<" cycle start"<<std::endl;
+   str<<std::setw(6)<<fCycleStart<<" cycle start"<<std::endl;
+	out<<str.str();
 }
 
 TGriffin& TGriffin::operator=(const TGriffin& rhs)

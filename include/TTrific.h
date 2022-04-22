@@ -107,6 +107,7 @@ class TTrific : public TDetector {
 
 		void Copy(TObject&) const override;            //!<!
 		void Print(Option_t* opt = "") const override; //!<!
+		void Print(std::ostream& out) const override; //!<!
 		void Clear(Option_t* = "") override; //!<!
 		
 		static const double fSpacingCart; //!

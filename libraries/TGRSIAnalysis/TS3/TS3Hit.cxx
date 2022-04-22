@@ -91,9 +91,16 @@ TVector3 TS3Hit::GetPosition(bool smear) const
 
 void TS3Hit::Print(Option_t*) const
 {
-	printf("================\n");
-	printf("not yet written.\n");
-	printf("================\n");
+	Print(std::cout);
+}
+
+void TS3Hit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"================"<<std::endl;
+	str<<"not yet written."<<std::endl;
+	str<<"================"<<std::endl;
+	out<<str.str();
 }
 
 Double_t TS3Hit::GetDefaultPhiOffset() const

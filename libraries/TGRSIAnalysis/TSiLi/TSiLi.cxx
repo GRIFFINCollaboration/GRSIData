@@ -58,8 +58,15 @@ TSiLi& TSiLi::operator=(const TSiLi& rhs)
 
 void TSiLi::Print(Option_t*) const
 {
-   printf("%lu sili_hits\n", fHits.size());
-   printf("%lu sili_addback_hits\n", fAddbackHits.size());
+	Print(std::cout);
+}
+
+void TSiLi::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<fHits.size()<<" sili_hits"<<std::endl;
+   str<<fAddbackHits.size()<<" sili_addback_hits"<<std::endl;
+	out<<str.str();
 }
 
 void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)

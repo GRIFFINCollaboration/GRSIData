@@ -61,8 +61,15 @@ TEmma::~TEmma()
 
 void TEmma::Print(Option_t*) const
 {
-	// Prints out TEmma members, currently does nothing.
-	std::cout<<fHits.size()<<" fHits"<<std::endl;
+	/// Prints out TEmma members, currently only prints multiplicity.
+	Print(std::cout);
+}
+
+void TEmma::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 TEmma& TEmma::operator=(const TEmma& rhs)

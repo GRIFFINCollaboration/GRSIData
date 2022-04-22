@@ -64,6 +64,7 @@ public:
 
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    // static bool Compare(TCSMHit *lhs,TCSMHit *rhs); //!<!
 

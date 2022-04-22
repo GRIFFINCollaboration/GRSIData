@@ -39,6 +39,7 @@ public:
 public:
    void Copy(TObject&) const override; //!
    void Print(Option_t* opt = "") const override;
+	void Print(std::ostream& out) const override; //!<!
    void Clear(Option_t* opt = "") override;
 
    inline Double_t GetFitTime() { return fTimeFit; }         //!<!

@@ -50,6 +50,7 @@ public:
 
 public:
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TZeroDegree, 2) // ZeroDegree Physics structure
