@@ -61,7 +61,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 				frags = EmmaTdcDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
 			}
 			else if(!TGRSIOptions::Get()->SuppressErrors()) {
-				printf(DRED "\nUnknown bank in midas event #%d" RESET_COLOR "\n", event->GetSerialNumber());
+				std::cout<<DRED<<std::endl<<"Unknown bank in midas event #"<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
 			}
 			break;
 		case 2:
@@ -136,8 +136,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 	uint32_t value;
 
 	if(!SetTIGTriggerID(dword, eventFrag)) {
-		printf(RED "Setting TriggerId (0x%08x) failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", dword,
-				event->GetSerialNumber());
+		std::cout<<RED<<"Setting TriggerId ("<<hex(dword, 8)<<") failed on midas event: "<<DYELLOW<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
 		return -x;
 	}
 	x += 1;
@@ -145,7 +144,7 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 	// There can be a tigger bit pattern between the header and the time !   pcb.
 
 	if(!SetTIGTimeStamp((data + x), eventFrag)) {
-		printf(RED "%i Setting TimeStamp failed on midas event: " DYELLOW "%i" RESET_COLOR "\n", x, event->GetSerialNumber());
+		std::cout<<RED<<x<<" Setting TimeStamp failed on midas event: "<<DYELLOW<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
 		return -x;
 	}
 	// int temp_charge =  0;
@@ -185,11 +184,6 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 					Push(fGoodOutputQueues, transferfrag);
 					NumFragsFound++;
 					event->IncrementGoodFrags();
-
-					// printf("transferfrag = 0x%08x\n",transferfrag); fflush(stdout);
-					// printf("transferfrag->GetTimeStamp() = %lu\n",transferfrag->GetTimeStamp()); fflush(stdout);
-					// printf("eventFrag: = 0x%08x\n",eventFrag); fflush(stdout);
-					// printf("eventFrag->GetTimeStamp() = %lu\n",eventFrag->GetTimeStamp()); fflush(stdout);
 				} else {
 					std::shared_ptr<TFragment> transferfrag = std::make_shared<TFragment>(*eventFrag);
 					Push(fGoodOutputQueues, transferfrag);
@@ -210,7 +204,6 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 			case 0xc: SetTIGAddress(value, eventFrag); break;
 			case 0xe: // this ends the bank!
 						 if(eventFrag) {
-							 // printf("this is never called\n"); fflush(stdout);
 							 return -x;
 						 }
 						 break;
@@ -232,7 +225,7 @@ void TGRSIDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragment
 	/// Sets the waveform for a Tigress event.
 
 	if(currentFrag->GetWaveform()->size() > (100000)) {
-		printf("number of wave samples found is to great\n");
+		std::cout<<"number of wave samples found is to great"<<std::endl;
 		return;
 	}
 
@@ -315,9 +308,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	if(value < fMaxTriggerId / 10) {                                // the trigger id has wrapped around
 		if(LastTriggerIdLoBits > fMaxTriggerId * 9 / 10) {
 			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value + fMaxTriggerId));
-			printf(DBLUE "We are looping new trigger id = %lu, last trigger hi bits = %d,"
-					" last trigger lo bits = %d, value = %d,             midas = %d" RESET_COLOR "\n",
-					currentFrag->GetTriggerId(), LastTriggerIdHiBits, LastTriggerIdLoBits, value, 0); // midasSerialNumber);
+			std::cout<<DBLUE<<"We are looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
 		}
@@ -326,9 +317,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	} else {
 		if(LastTriggerIdLoBits < fMaxTriggerId / 10) {
 			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value - fMaxTriggerId));
-			printf(DRED "We are backwards looping new trigger id = %lu, last trigger hi bits = %d,"
-					" last trigger lo bits = %d, value = %d, midas = %d" RESET_COLOR "\n",
-					currentFrag->GetTriggerId(), LastTriggerIdHiBits, LastTriggerIdLoBits, value, 0); // midasSerialNumber);
+			std::cout<<DRED<<"We are backwards looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
 		}
@@ -351,13 +340,11 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
 	long timestamplow  = -1;
 	long timestamphigh = -1;
 
-	// printf("\n\n\ndata = 0x%08x\n\n\n",*data);  fflush(stdout);
 
 	if(!((*data & 0xf0000000) == 0xa0000000)) {
-		printf("here 0?\t0x%08x\n", *data);
+		std::cout<<"here 0?\t"<<hex(*data,8)<<std::endl;
 		return false;
 	}
-	// printf("data = 0x%08x\n",*data);
 
 	unsigned int time[5] = {0}; // tigress can report up to 5 valid timestamp words
 	int          x       = 0;
@@ -467,10 +454,10 @@ int TGRSIDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank
 
 				if(!TGRSIOptions::Get()->SuppressErrors()) {
 					if(!TGRSIOptions::Get()->LogErrors()) {
-						printf(DRED "\n//**********************************************//" RESET_COLOR "\n");
-						printf(DRED "\nBad things are happening. Failed on datum %i" RESET_COLOR "\n", index);
+						std::cout<<DRED<<"//**********************************************//"<<RESET_COLOR<<std::endl;
+						std::cout<<DRED<<"Bad things are happening. Failed on datum "<<index<<RESET_COLOR<<std::endl;
 						event->Print(Form("a%i", index));
-						printf(DRED "\n//**********************************************//" RESET_COLOR "\n");
+						std::cout<<DRED<<"//**********************************************//"<<RESET_COLOR<<std::endl;
 					} else {
 						std::string errfilename = "error.log";
 						// if(mFile) {
@@ -484,9 +471,9 @@ int TGRSIDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank
 						// }
 						FILE* originalstdout = stdout;
 						FILE* errfileptr     = freopen(errfilename.c_str(), "a", stdout);
-						printf("\n//**********************************************//\n");
+						std::cout<<"//**********************************************//"<<std::endl;
 						event->Print("a");
-						printf("\n//**********************************************//\n");
+						std::cout<<"//**********************************************//"<<std::endl;
 						fclose(errfileptr);
 						stdout = originalstdout;
 					}
@@ -520,7 +507,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 
 	int           x   = 0;
 	if(!SetGRIFHeader(data[x++], eventFrag, bank)) {
-		printf(DYELLOW "data[0] = 0x%08x" RESET_COLOR "\n", data[0]);
+		std::cout<<DYELLOW<<"data[0] = "<<hex(data,8)<<RESET_COLOR<<std::endl;
 		// we failed to get a good header, so we don't know which detector type this fragment would've belonged to
 		TParsingDiagnostics::Get()->BadFragment(-1); 
 		// this is the first word, so no need to check is the state/failed word has been set before
@@ -657,8 +644,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 						// check whether the nios finished and if so whether it finished with an error
 						if(((value >> 14) & 0x1) == 0x1) {
 							if(((value >> 16) & 0xff) != 0) {
-								printf(BLUE "0x%04x: NIOS code finished with error 0x%02x" RESET_COLOR "\n",
-										eventFrag->GetAddress(), (value >> 16) & 0xff);
+								std::cout<<BLUE<<hex(eventFrag->GetAddress(),4)<<": NIOS code finished with error "<<hex((value >> 16) & 0xff,2)<<RESET_COLOR<<std::endl;
 							}
 						}
 					}
@@ -821,7 +807,9 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 						Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, size, failedWord, multipleErrors));
 						throw TGRSIDataParserException(fState, failedWord, multipleErrors);
 						break;
-					default: printf("This bank not yet defined.\n"); break;
+					default: 
+						std::cout<<"This bank not yet defined."<<std::endl;
+						break;
 				}
 				break;
 
@@ -970,7 +958,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 								break;
 							default:
 								if(!fOptions->SuppressErrors()) {
-									printf(DRED "Error, bank type %d not implemented yet" RESET_COLOR "\n", static_cast<std::underlying_type<EBank>::type>(bank));
+									std::cout<<DRED<<"Error, bank type "<<static_cast<std::underlying_type<EBank>::type>(bank)<<" not implemented yet"<<RESET_COLOR<<std::endl;
 								}
 								TParsingDiagnostics::Get()->BadFragment(eventFrag->GetDetectorType());
 								if(fState == EDataParserState::kGood) {
@@ -1030,7 +1018,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 						break;
 					default:
 						if(!fOptions->SuppressErrors()) {
-							printf(DRED "Error, module type %d not implemented yet" RESET_COLOR "\n", eventFrag->GetModuleType());
+							std::cout<<DRED<<"Error, module type "<<eventFrag->GetModuleType()<<" not implemented yet"<<RESET_COLOR<<std::endl;
 						}
 						TParsingDiagnostics::Get()->BadFragment(eventFrag->GetDetectorType());
 						if(fState == EDataParserState::kGood) {
@@ -1102,7 +1090,9 @@ bool TGRSIDataParser::SetGRIFHeader(uint32_t value, const std::shared_ptr<TFragm
 			frag->SetDetectorType((value & 0x0000000f));
 
 			break;
-		default: printf("This bank is not yet defined.\n"); return false;
+		default: 
+			std::cout<<"This bank is not yet defined."<<std::endl;
+			return false;
 	}
 
 	return true;
@@ -1184,13 +1174,12 @@ bool TGRSIDataParser::SetGRIFTimeStampLow(uint32_t value, const std::shared_ptr<
 bool TGRSIDataParser::SetGRIFWaveForm(uint32_t value, const std::shared_ptr<TFragment>& frag)
 {
 	/// Sets the Griffin waveform if record_waveform is set to true
-	if(frag->GetWaveform()->size() > (100000)) {
-		printf("number of wave samples found is too great\n");
+	if(frag->GetWaveform()->size() > 100000) {
+		std::cout<<"number of wave samples found is too great"<<std::endl;
 		return false;
 	}
 
-	// to go from a 14-bit signed number to a 16-bit signed number, we simply set the two highest bits if the sign bit is
-	// set
+	// to go from a 14-bit signed number to a 16-bit signed number, we simply set the two highest bits if the sign bit is set
 	frag->AddWaveformSample((value & 0x2000) != 0u ? static_cast<Short_t>((value & 0x3fff) | 0xc000)
 			: static_cast<Short_t>(value & 0x3fff));
 	value = value >> 14;
@@ -1464,12 +1453,10 @@ bool TGRSIDataParser::SetOldPPGPattern(uint32_t value, TPPGData* ppgevent)
 bool TGRSIDataParser::SetPPGNetworkPacket(uint32_t value, TPPGData* ppgevent)
 {
 	// Ignores the network packet number (for now)
-	//   printf("value = 0x%08x    |   frag->NetworkPacketNumber = %i   \n",value,frag->NetworkPacketNumber);
 	if((value & 0xf0000000) != 0xd0000000) {
 		return false;
 	}
 	ppgevent->SetNetworkPacketId(value & 0x00ffffff);
-	//   printf("value = 0x%08x    |   frag->NetworkPacketNumber = %i   \n",value,frag->NetworkPacketNumber);
 
 	return true;
 }
@@ -2161,8 +2148,6 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 				if (tmpTimestamp < lasttimestamp) { // Assume this means you wrapped around
 					wraparoundcounter++; // How many times it wrapped around
 					countsbetweenwraps=0; // Reset wraparound counter
-					//printf("Timestamp wraparound:  countsbetween, current, last, newcounter = ");
-					//printf("%08x, %08x, %08x, %08x\n", countsbetweenwraps, tmpTimestamp, lasttimestamp, wraparoundcounter);
 				}
 				lasttimestamp=tmpTimestamp; // so far so good
 				ts = static_cast<Long64_t>(lasttimestamp); // start with 32 bits
@@ -2173,13 +2158,9 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 				// Check if there's a somewhat valid timestamp from an ADC
 				// the && 0 at the end suppresses the xfer
 				if ( (event->GetSerialNumber()==xfermidsn) && (event->GetTimeStamp()==xfermidts)) { // Valid data from prior MADC bank
-					// printf("Matching midas ts & id: hf ts MADC/EMMT %llu / %llu \n",
-					// 	xferhfts,ts);
 					eventFrag->SetTimeStamp(xferhfts);
 				} else {
 					eventFrag->SetTimeStamp(ts);
-					//					printf("Failed xfer: MADC/EMMT midts, midsn, ts %llu / %llu, %llu / %llu, %llu / %llu \n",
-					//						xfermidts,midasTime,xfermidsn,midasSerialNumber,xferhfts,ts);
 				}
 				// got all the data, so now we can loop over the hits and write them
 				if(addresses.size() != charges.size()) {
@@ -2202,9 +2183,6 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 						Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
 						++numFragsFound;
 					} 
-					// else {
-					// 	printf("Address %x hit %d times, keep only 1st\n",addresses[i],duped+1);
-					// }
 				}
 
 				// clear the old data

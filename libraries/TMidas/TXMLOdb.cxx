@@ -26,7 +26,6 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
    if(input.is_open()) {
       fParser->ParseFile(buffer);
    } else {
-      // printf("0x%08x\t%i\n",buffer,size);
       fParser->ParseBuffer(buffer, size);
    }
    fDoc = fParser->GetXMLDocument();
@@ -199,19 +198,14 @@ std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
          size = atoi(attr->GetValue());
       }
    }
-   //   printf("size = %i\n",size);
    temp.assign(size, "");
    TXMLNode* child   = node->GetChildren();
    int       counter = 0;
    while(true) {
-      //     printf("here\n");
       if(TList* index = child->GetAttributes()) {
-         // printf("index = %i\n",atoi(((TXMLAttr*)(index->At(0)))->GetValue()));
-         // printf("value = %s\t%i\n",child->GetText(),atoi(child->GetText()));
          int         indexnum = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
          const char* value;
          value = child->GetText();
-         // printf("indexnum %i : value 0x%08x\n",indexnum,value.c_str());
 
          // Make sure we actually read a word
          std::string value_str;
@@ -223,7 +217,6 @@ std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
          temp.at(indexnum) = value_str;
       } else if(child->GetText() != nullptr) {
          int indexnum = counter++;
-         // printf("%i/%i\n",counter,size);
          temp.at(indexnum).assign(child->GetText());
       }
       child = child->GetNextNode();
@@ -256,18 +249,13 @@ std::vector<double> TXMLOdb::ReadDoubleArray(TXMLNode* node)
          size = atoi(attr->GetValue());
       }
    }
-   //   printf("size = %i\n",size);
    temp.assign(size, 0.0);
    TXMLNode* child   = node->GetChildren();
    int       counter = 0;
    while(true) {
-      //      printf("here\n");
       if(TList* index = child->GetAttributes()) {
-         // printf("index = %i\n",atoi(((TXMLAttr*)(index->At(0)))->GetValue()));
-         // printf("value = %s\t%i\n",child->GetText(),atoi(child->GetText()));
          int    indexnum = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
          double value    = atof(child->GetText());
-         //         printf("indexnum %i : value 0x%08x\n",indexnum,value);
          temp.at(indexnum) = value;
       } else if(child->GetText() != nullptr) {
          int indexnum      = counter++;

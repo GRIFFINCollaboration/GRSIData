@@ -117,7 +117,7 @@ TVector3 TCSM::GetPosition(int detector, char pos, int horizontalstrip, int vert
       x             = -EX + (50. / 32.) * cos(detTheta) * (2 * verticalstrip + 1);
       z             = EZ + (50. / 32.) * sin(detTheta) * (2 * verticalstrip + 1);
    } else {
-      printf("***Error, unrecognized detector and position combo!***\n");
+		std::cout<<"***Error, unrecognized detector and position combo!***"<<std::endl;
    }
 
    y = (50. / 32.) * (2 * horizontalstrip + 1) - (50 / 16.) * 8;

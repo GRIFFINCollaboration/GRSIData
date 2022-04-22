@@ -297,7 +297,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 		return;
 	}
 	// if not suprress errors;
-	printf(ALERTTEXT "failed to build!" RESET_COLOR "\n");
+	std::cout<<ALERTTEXT<<"failed to build!"<<RESET_COLOR<<std::endl;
 	frag->Print();
 }
 

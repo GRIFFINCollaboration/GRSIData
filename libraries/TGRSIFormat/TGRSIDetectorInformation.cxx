@@ -37,29 +37,30 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
    // Prints the TGRSIDetectorInformation. Options:
    // a: Print out more details.
    if(strchr(opt, 'a') != nullptr) {
-      printf(DBLUE "\t\tDESCANT in ancillary positions = " DRED "%s" RESET_COLOR "\n",
-             DescantAncillary() ? "TRUE" : "FALSE");
-      printf("\n");
-      printf("\t\tTIGRESS:            %s\n", Tigress() ? "true" : "false");
-      printf("\t\tSHARC:              %s\n", Sharc() ? "true" : "false");
-      printf("\t\tTRIFOIL:            %s\n", TriFoil() ? "true" : "false");
-      printf("\t\tTIP:                %s\n", Tip() ? "true" : "false");
-      printf("\t\tCSM:                %s\n", CSM() ? "true" : "false");
-      printf("\t\tSPICE:              %s\n", Spice() ? "true" : "false");
-      printf("\t\tGENERIC:            %s\n", Generic() ? "true" : "false");
-      printf("\t\tS3:                 %s\n", S3() ? "true" : "false");
-      printf("\t\tBAMBINO:            %s\n", Bambino() ? "true" : "false");
-      printf("\t\tRF:                 %s\n", RF() ? "true" : "false");
-      printf("\t\tGRIFFIN:            %s\n", Griffin() ? "true" : "false");
-      printf("\t\tSCEPTAR:            %s\n", Sceptar() ? "true" : "false");
-      printf("\t\tPACES:              %s\n", Paces() ? "true" : "false");
-      printf("\t\tDESCANT:            %s\n", Descant() ? "true" : "false");
-      printf("\t\tZDS:                %s\n", ZeroDegree() ? "true" : "false");
-      printf("\t\tDANTE:              %s\n", Dante() ? "true" : "false");
-      printf("\t\tBGO:                %s\n", Bgo() ? "true" : "false");
-      printf("\t\tEMMA:                %s\n", Emma() ? "true" : "false");
-      printf("\t\tTRIFIC:                %s\n", Trific() ? "true" : "false");
-      printf("\n");
+		std::ostringstream str;
+      str<<DBLUE<<"\t\tDESCANT in ancillary positions = "<<DRED<<(DescantAncillary() ? "TRUE" : "FALSE")<<RESET_COLOR<<std::endl;
+      str<<std::endl;
+      str<<"\t\tTIGRESS:            "<<(Tigress() ? "true" : "false")<<std::endl;
+      str<<"\t\tSHARC:              "<<(Sharc() ? "true" : "false")<<std::endl;
+      str<<"\t\tTRIFOIL:            "<<(TriFoil() ? "true" : "false")<<std::endl;
+      str<<"\t\tTIP:                "<<(Tip() ? "true" : "false")<<std::endl;
+      str<<"\t\tCSM:                "<<(CSM() ? "true" : "false")<<std::endl;
+      str<<"\t\tSPICE:              "<<(Spice() ? "true" : "false")<<std::endl;
+      str<<"\t\tGENERIC:            "<<(Generic() ? "true" : "false")<<std::endl;
+      str<<"\t\tS3:                 "<<(S3() ? "true" : "false")<<std::endl;
+      str<<"\t\tBAMBINO:            "<<(Bambino() ? "true" : "false")<<std::endl;
+      str<<"\t\tRF:                 "<<(RF() ? "true" : "false")<<std::endl;
+      str<<"\t\tGRIFFIN:            "<<(Griffin() ? "true" : "false")<<std::endl;
+      str<<"\t\tSCEPTAR:            "<<(Sceptar() ? "true" : "false")<<std::endl;
+      str<<"\t\tPACES:              "<<(Paces() ? "true" : "false")<<std::endl;
+      str<<"\t\tDESCANT:            "<<(Descant() ? "true" : "false")<<std::endl;
+      str<<"\t\tZDS:                "<<(ZeroDegree() ? "true" : "false")<<std::endl;
+      str<<"\t\tDANTE:              "<<(Dante() ? "true" : "false")<<std::endl;
+      str<<"\t\tBGO:                "<<(Bgo() ? "true" : "false")<<std::endl;
+      str<<"\t\tEMMA:               "<<(Emma() ? "true" : "false")<<std::endl;
+      str<<"\t\tTRIFIC:             "<<(Trific() ? "true" : "false")<<std::endl;
+      str<<std::endl;
+		std::cout<<str.str();
    }
 }
 

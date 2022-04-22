@@ -29,7 +29,7 @@ TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TDetectorHit(frag)
 {
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
-         printf("Warning, TZeroDegree::SetWave() set, but data waveform size is zero!\n");
+			std::cout<<"Warning, TZeroDegree::SetWave() set, but data waveform size is zero!"<<std::endl;
       } else {
          frag.CopyWave(*this);
       }

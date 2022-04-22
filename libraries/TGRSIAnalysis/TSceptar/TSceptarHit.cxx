@@ -37,7 +37,7 @@ TSceptarHit::TSceptarHit(const TFragment& frag) : TDetectorHit(frag)
 {
 	if(TSceptar::SetWave()) {
 		if(frag.GetWaveform()->empty()) {
-			printf("Warning, TSceptar::SetWave() set, but data waveform size is zero!\n");
+			std::cout<<"Warning, TSceptar::SetWave() set, but data waveform size is zero!"<<std::endl;
 		}
 		if(false) {
 			std::vector<Short_t> x;
@@ -70,10 +70,7 @@ TSceptarHit::TSceptarHit(const TFragment& frag) : TDetectorHit(frag)
 			frag.CopyWave(*this);
 		}
 		if(!GetWaveform()->empty()) {
-			//            printf("Analyzing waveform, current cfd = %d\n",dethit.GetCfd());
 			AnalyzeWaveform();
-			//            printf("%s analyzed waveform, cfd = %d\n",analyzed ?
-			//            "successfully":"unsuccessfully",dethit.GetCfd());
 		}
 	}
 }

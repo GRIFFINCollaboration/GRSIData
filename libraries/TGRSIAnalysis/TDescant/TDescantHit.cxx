@@ -37,7 +37,6 @@ TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
    // if(TDescant::SetWave()) {
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
-         // printf("Warning, TDescant::SetWave() set, but data waveform size is zero!\n");
       }
       if(false) {
          std::vector<Short_t> x;
@@ -70,11 +69,7 @@ TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
          frag.CopyWave(*this);
       }
       if(!GetWaveform()->empty()) {
-         // printf("Analyzing waveform, current cfd = %d, psd = %d\n",hit.GetCfd(),hit.GetPsd());
          AnalyzeWaveform();
-         //          bool analyzed = hit.AnalyzeWaveform();
-         //          printf("%s analyzed waveform, cfd = %d, psd = %d\n",analyzed ?
-         //          "successfully":"unsuccessfully",hit.GetCfd(),hit.GetPsd());
       }
    }
 }

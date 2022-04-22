@@ -97,10 +97,6 @@ void TSharc::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
 	if(frag == nullptr || chan == nullptr) {
 		return;
 	}
-	/*  if(GetMidasTimestamp() == -1) {
-		 SetMidasTimestamp(frag->GetMidasTimeStamp());
-		 }
-		 */
 	switch(chan->GetMnemonic()->ArraySubPosition()) {
 		case TMnemonic::EMnemonic::kD:
 			if(chan->GetMnemonic()->CollectedCharge() == TMnemonic::EMnemonic::kP) {
@@ -115,10 +111,6 @@ void TSharc::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
 		default:
 			break;
 	};
-
-	// if(frag->GetDetector()==11 && frag->GetSegment()==16)
-	//   return;
-	// printf("FRONT:  %s\n",frag->GetName());
 }
 
 void TSharc::BuildHits()
@@ -126,8 +118,6 @@ void TSharc::BuildHits()
 	std::vector<TFragment>::iterator front;
 	std::vector<TFragment>::iterator back;
 	std::vector<TFragment>::iterator pad;
-	// static int total;
-	// printf("\t%i:  front = %i; back = %i\n",total++,fFrontFragments.size(),fBackFragments.size()); fflush(stdout);
 
 	for(front = fFrontFragments.begin(); front != fFrontFragments.end();) {
 		bool front_used = false;
