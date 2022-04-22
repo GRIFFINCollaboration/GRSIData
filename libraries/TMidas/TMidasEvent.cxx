@@ -272,11 +272,11 @@ void TMidasEvent::Print(const char* option) const
    time_t t = static_cast<time_t>(fEventHeader.fTimeStamp);
 
 	std::cout<<"Event start:"<<std::endl;
-   d::cout<<"  event id:       "<<hex(fEventHeader.fEventId,4)<<std::endl;
-   d::cout<<"  trigger mask:   "<<hex(fEventHeader.fTriggerMask,4)<<std::endl;
-   d::cout<<"  serial number:  "<<fEventHeader.fSerialNumber<<std::endl;
-   d::cout<<"  time stamp:     "<<fEventHeader.fTimeStamp<<", "<<ctime(&t)<<std::endl;
-   d::cout<<"  data size:      "<<std::setw(8)<<fEventHeader.fDataSize<<std::endl;
+   std::cout<<"  event id:       "<<hex(fEventHeader.fEventId,4)<<std::endl;
+   std::cout<<"  trigger mask:   "<<hex(fEventHeader.fTriggerMask,4)<<std::endl;
+   std::cout<<"  serial number:  "<<fEventHeader.fSerialNumber<<std::endl;
+   std::cout<<"  time stamp:     "<<fEventHeader.fTimeStamp<<", "<<ctime(&t)<<std::endl;
+   std::cout<<"  data size:      "<<std::setw(8)<<fEventHeader.fDataSize<<std::endl;
    // const_cast<TMidasEvent*>(this)->SetBankList(); // moved here to get event information in case SetBankList crashes
    if((fEventHeader.fEventId & 0xffff) == 0x8000) {
 		std::cout<<"Begin of run "<<fEventHeader.fSerialNumber<<std::endl;
@@ -285,7 +285,7 @@ void TMidasEvent::Print(const char* option) const
    } else if((fEventHeader.fEventId & 0xffff) == 0x8002) {
 		std::cout<<"Message event \""<<fData<<"\""<<std::endl;
    } else if(fBanksN <= 0) {
-		std::cout<<"TMidasEvent::Print: Use SetBankList() before Print() to print bank data\n");
+		std::cout<<"TMidasEvent::Print: Use SetBankList() before Print() to print bank data"<<std::endl;
    } else {
 		std::cout<<"Banks: "<<fBankList<<std::endl;
 
@@ -307,9 +307,9 @@ void TMidasEvent::Print(const char* option) const
             case 4: // TID_WORD
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<RESET_COLOR<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<((j % 10 == 9) ? '\n' : ' ');
                   }
                }
 					std::cout<<std::endl;
@@ -317,9 +317,9 @@ void TMidasEvent::Print(const char* option) const
             case 6: // TID_DWORD
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<((j % 10 == 9) ? '\n' : ' ');
                   }
                }
 					std::cout<<std::endl;
@@ -327,9 +327,9 @@ void TMidasEvent::Print(const char* option) const
             case 7: // TID_nd280 (like a DWORD?)
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<((j % 10 == 9) ? '\n' : ' ');
                   }
                }
 					std::cout<<std::endl;
@@ -337,9 +337,9 @@ void TMidasEvent::Print(const char* option) const
             case 9: // TID_FLOAT
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<(reinterpret_cast<float*>(pdata))[j]<<RESET_COLOR<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<ALERTTEXT<<(reinterpret_cast<float*>(pdata))[j]<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<(reinterpret_cast<float*>(pdata))[j]<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<(reinterpret_cast<float*>(pdata))[j]<<((j % 10 == 9) ? '\n' : ' ');
                   }
                }
 					std::cout<<std::endl;
@@ -347,9 +347,9 @@ void TMidasEvent::Print(const char* option) const
             case 10: // TID_DOUBLE
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<(reinterpret_cast<double*>(pdata))[j]<<RESET_COLOR<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<ALERTTEXT<<(reinterpret_cast<double*>(pdata))[j]<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<(reinterpret_cast<double*>(pdata))[j]<<(j % 10 == 9) ? std::endl : ' ');
+							std::cout<<(reinterpret_cast<double*>(pdata))[j]<<((j % 10 == 9) ? '\n' : ' ');
                   }
                }
 					std::cout<<std::endl;

@@ -959,11 +959,11 @@ void TMidasFile::SetTIGOdb()
       // all good.
    } else {
 		std::cout<<BG_WHITE DRED<<"problem parsing odb data, arrays are different sizes, channels not set."<<RESET_COLOR<<std::endl;
-      :cout<<DRED<<"\taddress.size() = "<<address.size()<<RESET_COLOR<<std::endl;
-      :cout<<DRED<<"\tnames.size()   = "<<names.size()<<RESET_COLOR<<std::endl;
-      :cout<<DRED<<"\tgains.size()   = "<<gains.size()<<RESET_COLOR<<std::endl;
-      :cout<<DRED<<"\toffsets.size() = "<<offsets.size()<<RESET_COLOR<<std::endl;
-      :cout<<DRED<<"\ttype.size()    = "<<type.size()<<RESET_COLOR<<std::endl;
+      std::cout<<DRED<<"\taddress.size() = "<<address.size()<<RESET_COLOR<<std::endl;
+      std::cout<<DRED<<"\tnames.size()   = "<<names.size()<<RESET_COLOR<<std::endl;
+      std::cout<<DRED<<"\tgains.size()   = "<<gains.size()<<RESET_COLOR<<std::endl;
+      std::cout<<DRED<<"\toffsets.size() = "<<offsets.size()<<RESET_COLOR<<std::endl;
+      std::cout<<DRED<<"\ttype.size()    = "<<type.size()<<RESET_COLOR<<std::endl;
       return;
    }
 
