@@ -27,6 +27,7 @@ public:
 
    TGenericDetector& operator=(const TGenericDetector&);                    //
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
 private:
    void  ClearStatus() {  }

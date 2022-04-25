@@ -78,4 +78,9 @@ void TTriFoil::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 
 void TTriFoil::Print(Option_t*) const
 {
+	Print(std::cout);
+}
+
+void TTriFoil::Print(std::ostream&) const
+{
 }

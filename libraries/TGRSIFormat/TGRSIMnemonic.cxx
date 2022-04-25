@@ -155,15 +155,17 @@ void TGRSIMnemonic::Parse(std::string* name)
 
 void TGRSIMnemonic::Print(Option_t*) const
 {
-   printf("====== GRSIMNEMONIC ======\n");
-   printf("fArrayPosition           = %i\n", fArrayPosition);
-   printf("fSegment                 = %i\n", fSegment);
-   printf("fSystemString            = %s\n", fSystemString.c_str());
-   printf("fSubSystemString         = %s\n", fSubSystemString.c_str());
-   printf("fArraySubPositionString  = %s\n", fArraySubPositionString.c_str());
-   printf("fCollectedChargeString   = %s\n", fCollectedChargeString.c_str());
-   printf("fOutputSensorString      = %s\n", fOutputSensorString.c_str());
-   printf("===============================\n");
+	std::ostringstream str;
+   str<<"======== GRSIMNEMONIC ========"<<std::endl;
+   str<<"fArrayPosition           = "<<fArrayPosition<<std::endl;
+   str<<"fSegment                 = "<<fSegment<<std::endl;
+   str<<"fSystemString            = "<<fSystemString<<std::endl;
+   str<<"fSubSystemString         = "<<fSubSystemString<<std::endl;
+   str<<"fArraySubPositionString  = "<<fArraySubPositionString<<std::endl;
+   str<<"fCollectedChargeString   = "<<fCollectedChargeString<<std::endl;
+   str<<"fOutputSensorString      = "<<fOutputSensorString<<std::endl;
+   str<<"=============================="<<std::endl;
+	std::cout<<str.str();
 }
 
 TClass* TGRSIMnemonic::GetClassType() const

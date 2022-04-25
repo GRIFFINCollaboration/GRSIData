@@ -44,7 +44,14 @@ TZeroDegree& TZeroDegree::operator=(const TZeroDegree& rhs)
 void TZeroDegree::Print(Option_t*) const
 {
    /// Prints out TZeroDegree multiplicity, currently does little.
-   printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TZeroDegree::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 void TZeroDegree::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)

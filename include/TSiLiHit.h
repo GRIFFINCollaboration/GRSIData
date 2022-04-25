@@ -26,6 +26,7 @@ public:
    void Copy(TObject&, bool = false) const override; //!
    void Clear(Option_t* opt = "") override;
    void Print(Option_t* opt = "") const override;
+	void Print(std::ostream& out) const override; //!<!
 
    Int_t    GetRing() const;
    Int_t    GetSector() const;

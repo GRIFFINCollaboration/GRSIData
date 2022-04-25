@@ -121,6 +121,7 @@ public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Copy(TObject&) const override;            //!<!
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); } //!<!
 

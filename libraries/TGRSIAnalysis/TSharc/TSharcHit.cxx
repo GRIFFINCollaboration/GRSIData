@@ -44,7 +44,14 @@ void TSharcHit::Clear(Option_t* options)
 
 void TSharcHit::Print(Option_t*) const
 {
-	printf(DGREEN "[D/F/B] = %02i\t/%02i\t/%02i " RESET_COLOR "\n", GetDetector(), GetFrontStrip(), GetBackStrip());
+	Print(std::cout);
+}
+
+void TSharcHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<DGREEN<<"[D/F/B] = "<<std::setw(2)<<GetDetector()<<"\t/"<<std::setw(2)<<GetFrontStrip()<<"\t/"<<std::setw(2)<<GetBackStrip()<<RESET_COLOR<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TSharcHit::GetPosition(Double_t) const

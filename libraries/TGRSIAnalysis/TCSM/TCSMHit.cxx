@@ -207,34 +207,30 @@ Double_t TCSMHit::GetEEnergy() const
 
 void TCSMHit::Print(Option_t*) const
 {
-   std::cout<<"Printing TCSMHit:  Horizontal    Vertical"<<std::endl;
-   std::cout<<"Detector number: "<<GetDetectorNumber()<<std::endl;
-   // std::cout<<"Detector position: "<<GetDetectorPosition()<<std::endl;
-   std::cout<<"D"<<std::endl;
-   std::cout<<"Strip: "<<GetDHorizontalStrip()<<" "<<GetDVerticalStrip()<<std::endl;
+	Print(std::cout);
+}
 
-   std::cout<<"Charge: "<<GetDHorizontalCharge()<<" "<<GetDVerticalCharge()<<std::endl;
-
-   std::cout<<"CFD: "<<GetDHorizontalCFD()<<" "<<GetDVerticalCFD()<<std::endl;
-
-   std::cout<<"Energy: "<<GetDHorizontalEnergy()<<" "<<GetDVerticalEnergy()<<std::endl;
-
-   std::cout<<"Theta: "<<GetDPosition().Theta() * 180. / 3.14159
-            <<" Phi: "<<GetDPosition().Phi() * 180. / 3.14159<<std::endl;
-
-   std::cout<<"E"<<std::endl;
-   std::cout<<"Strip: "<<GetEHorizontalStrip()<<" "<<GetEVerticalStrip()<<std::endl;
-
-   std::cout<<"Charge: "<<GetEHorizontalCharge()<<" "<<GetEVerticalCharge()<<std::endl;
-
-   std::cout<<"CFD: "<<GetEHorizontalCFD()<<" "<<GetEVerticalCFD()<<std::endl;
-
-   std::cout<<"Energy: "<<GetEHorizontalEnergy()<<" "<<GetEVerticalEnergy()<<std::endl;
-
-   std::cout<<"Theta: "<<GetEPosition().Theta() * 180. / 3.14159
-            <<" Phi: "<<GetEPosition().Phi() * 180. / 3.14159<<std::endl;
-
-   std::cout<<std::endl;
+void TCSMHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Printing TCSMHit:  Horizontal    Vertical"<<std::endl;
+   str<<"Detector number: "<<GetDetectorNumber()<<std::endl;
+   str<<"D"<<std::endl;
+   str<<"Strip: "<<GetDHorizontalStrip()<<" "<<GetDVerticalStrip()<<std::endl;
+   str<<"Charge: "<<GetDHorizontalCharge()<<" "<<GetDVerticalCharge()<<std::endl;
+   str<<"CFD: "<<GetDHorizontalCFD()<<" "<<GetDVerticalCFD()<<std::endl;
+   str<<"Energy: "<<GetDHorizontalEnergy()<<" "<<GetDVerticalEnergy()<<std::endl;
+   str<<"Theta: "<<GetDPosition().Theta() * 180. / 3.14159
+      <<" Phi: "<<GetDPosition().Phi() * 180. / 3.14159<<std::endl;
+   str<<"E"<<std::endl;
+   str<<"Strip: "<<GetEHorizontalStrip()<<" "<<GetEVerticalStrip()<<std::endl;
+   str<<"Charge: "<<GetEHorizontalCharge()<<" "<<GetEVerticalCharge()<<std::endl;
+   str<<"CFD: "<<GetEHorizontalCFD()<<" "<<GetEVerticalCFD()<<std::endl;
+   str<<"Energy: "<<GetEHorizontalEnergy()<<" "<<GetEVerticalEnergy()<<std::endl;
+   str<<"Theta: "<<GetEPosition().Theta() * 180. / 3.14159
+      <<" Phi: "<<GetEPosition().Phi() * 180. / 3.14159<<std::endl;
+   str<<std::endl;
+	out<<str.str();
 }
 
 bool TCSMHit::IsEmpty()

@@ -58,7 +58,14 @@ void TRF::Clear(Option_t*)
 
 void TRF::Print(Option_t*) const
 {
-   printf("time = %f\n", fTime);
-   printf("timestamp = %ld\n", fTimeStamp);
-   printf("midastime = %ld\n", fMidasTime);
+	Print(std::cout);
+}
+
+void TRF::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"time =      "<<fTime<<std::endl;
+   str<<"timestamp = "<<fTimeStamp<<std::endl;
+   str<<"midastime = "<<fMidasTime<<std::endl;
+	out<<str.str();
 }

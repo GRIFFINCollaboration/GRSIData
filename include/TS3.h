@@ -115,6 +115,7 @@ public:
    TS3& operator=(const TS3&);                    //
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
 private:
    std::vector<TS3Hit> fS3RingHits;   ///< vector to store hits of the ring side

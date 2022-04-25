@@ -41,6 +41,7 @@ public:
    inline Int_t GetFilterPattern() const { return fFilter; } //!<!
 
    TVector3 GetPosition() const override;              //!<!
+	TVector3 GetPosition(Double_t) const override { return GetPosition(); } //!<!
    TVector3 GetPosition(double delayL, double delayR, double delayT, double delayB) const;              //!<!
    Double_t GetLeft() const {return fLeft; }
    Double_t GetRight() const {return fRight; }
@@ -56,6 +57,7 @@ public:
 public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
+	void Print(std::ostream& out) const override; //!<!
    void     Copy(TObject&) const override;             //!<!
 
 private:

@@ -66,26 +66,34 @@ TVector3 TTigressHit::GetLastPosition(Double_t dist) const
    return TTigress::GetPosition(seg->GetDetector(), seg->GetCrystal(), seg->GetSegment(), dist);
 }
 
-void TTigressHit::Print(Option_t* opt) const
+void TTigressHit::Print(Option_t*) const
 {
-   TString sopt(opt);
-   printf("==== TigressHit @ 0x%p\n ====", (void*)this);
-   printf("\t%s\n", GetName());
-   printf("\tCharge: %f\n", GetCharge());
-   printf("\tEnergy: %.2f\n", GetEnergy());
-   printf("\tTime:   %.2f\n", GetTime());
-   printf("\tCore set: %s\n", CoreSet() ? "true" : "false");
-   printf("\tBGO Fired: %s\n", BGOFired() ? "true" : "false");
-   std::cout<<"\tTime:   "<<GetTimeStamp()<<"\n";
-   printf("\thit contains %i segments.\n", GetNSegments());
-   if(sopt.Contains("all")) {
-      printf("Name           Charge\n");
+	Print(std::cout);
+}
+
+void TTigressHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   //TString sopt(opt);
+   str<<"==== TigressHit @ "<<this<<" ===="<<std::endl;
+   str<<"\t"<<GetName()<<std::endl;
+   str<<"\tCharge:    "<<GetCharge()<<std::endl;
+   str<<"\tEnergy:    "<<GetEnergy()<<std::endl;
+   str<<"\tTime:      "<<GetTime()<<std::endl;
+   str<<"\tCore set:  "<<(CoreSet() ? "true" : "false")<<std::endl;
+   str<<"\tBGO Fired: "<<(BGOFired() ? "true" : "false")<<std::endl;
+   str<<"\tTime:      "<<GetTimeStamp()<<std::endl;
+   str<<"\thit contains "<<GetNSegments()<<" segments."<<std::endl;
+   //if(sopt.Contains("all")) {
+      str<<"Name           Charge"<<std::endl;
       for(int x = 0; x < GetNSegments(); x++) {
-         printf("\t\t%s  |   %f\n", GetSegmentHit(x).GetName(), GetSegmentHit(x).GetCharge());
+         str<<"\t\t"<<GetSegmentHit(x).GetName()<<"  |   "<<GetSegmentHit(x).GetCharge()<<std::endl;
       }
-      GetPosition().Print();
-   }
-   printf("============================\n");
+		auto p = GetPosition();
+		str<<p.GetName()<<" "<<p.GetTitle()<<" (x,y,z)=("<<p.X()<<","<<p.Y()<<","<<p.Z()<<") (rho,theta,phi)=("<<p.Mag()<<","<<p.Theta()<<","<<p.Phi()<<")"<<std::endl;
+   //}
+   str<<"============================"<<std::endl;
+	out<<str.str();
 }
 
 bool TTigressHit::Compare(const TTigressHit& lhs, const TTigressHit& rhs)

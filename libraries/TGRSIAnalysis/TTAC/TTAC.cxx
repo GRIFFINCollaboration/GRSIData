@@ -39,7 +39,14 @@ TTAC& TTAC::operator=(const TTAC& rhs)
 void TTAC::Print(Option_t*) const
 {
 	// Prints out TTAC Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TTAC::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 void TTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)

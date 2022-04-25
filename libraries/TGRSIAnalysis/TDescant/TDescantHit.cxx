@@ -37,7 +37,6 @@ TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
    // if(TDescant::SetWave()) {
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
-         // printf("Warning, TDescant::SetWave() set, but data waveform size is zero!\n");
       }
       if(false) {
          std::vector<Short_t> x;
@@ -70,11 +69,7 @@ TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
          frag.CopyWave(*this);
       }
       if(!GetWaveform()->empty()) {
-         // printf("Analyzing waveform, current cfd = %d, psd = %d\n",hit.GetCfd(),hit.GetPsd());
          AnalyzeWaveform();
-         //          bool analyzed = hit.AnalyzeWaveform();
-         //          printf("%s analyzed waveform, cfd = %d, psd = %d\n",analyzed ?
-         //          "successfully":"unsuccessfully",hit.GetCfd(),hit.GetPsd());
       }
    }
 }
@@ -152,9 +147,16 @@ void TDescantHit::Clear(Option_t*)
 
 void TDescantHit::Print(Option_t*) const
 {
-   printf("Descant Detector: %i\n", GetDetector());
-   printf("Descant hit energy: %.2f\n", GetEnergy());
-   printf("Descant hit time:   %.f\n", GetTime());
+	Print(std::cout);
+}
+
+void TDescantHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Descant Detector:   "<<GetDetector()<<std::endl;
+   str<<"Descant hit energy: "<<GetEnergy()<<std::endl;
+   str<<"Descant hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 bool TDescantHit::AnalyzeWaveform()

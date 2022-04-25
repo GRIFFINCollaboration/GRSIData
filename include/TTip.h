@@ -35,6 +35,7 @@ public:
    TTip& operator=(const TTip&); //!<!
 
    void Print(Option_t* opt = "") const override;
+	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TTip, 2);

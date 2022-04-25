@@ -72,9 +72,16 @@ void TTipHit::Clear(Option_t*)
 
 void TTipHit::Print(Option_t*) const
 {
-   printf("Tip Detector: %i\n", GetDetector());
-   printf("Tip hit energy: %.2f\n", GetEnergy());
-   printf("Tip hit time:   %.f\n", GetTime());
+	Print(std::cout);
+}
+
+void TTipHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Tip Detector: "<<GetDetector()<<std::endl;
+   str<<"Tip hit energy: "<<GetEnergy()<<std::endl;
+   str<<"Tip hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 void TTipHit::SetWavefit(const TFragment& frag)

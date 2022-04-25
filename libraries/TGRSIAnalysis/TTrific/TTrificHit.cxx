@@ -38,14 +38,20 @@ void TTrificHit::Clear(Option_t* opt)
 
 void TTrificHit::Print(Option_t*) const
 {
-	printf("TRIFIC Detector: %i\n", GetDetector());
-	printf("TRIFIC Segment:    %i\n", GetSegment());
-	printf("TRIFIC Energy:   %lf\n", GetEnergy());
-	printf("TRIFIC Hit Time:   %f\n", GetTime());
+	Print(std::cout);
+}
+
+void TTrificHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"TRIFIC Detector: "<<GetDetector()<<std::endl;
+	str<<"TRIFIC Segment:    "<<GetSegment()<<std::endl;
+	str<<"TRIFIC Energy:   "<<GetEnergy()<<std::endl;
+	str<<"TRIFIC Hit Time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TTrificHit::GetPosition() const
-//TVector3 TTrificHit::GetPosition()
 {
 	//calling GetPosition() on a TRIFIC hit will return the position vector to the centre of the grid
 	//calling TTrific::GetPosition(det) will give the vector to the position itself.

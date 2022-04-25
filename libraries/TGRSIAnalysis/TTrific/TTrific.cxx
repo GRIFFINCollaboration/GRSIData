@@ -75,11 +75,18 @@ TTrific::~TTrific()
 
 void TTrific::Print(Option_t*) const
 {
-	// Prints out TTrific members, currently does nothing.
-	printf("%lu fHits\n", fHits.size());
-	printf("%lu xHits\n",fXFragments.size());
-	printf("%lu yHits\n",fYFragments.size());
-	printf("%lu singHits\n",fSingFragments.size());
+	// Prints out TTrific members.
+	Print(std::cout);
+}
+
+void TTrific::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<fXFragments.size()<<" xHits"<<std::endl;
+	str<<fYFragments.size()<<" yHits"<<std::endl;
+	str<<fSingFragments.size()<<" singHits"<<std::endl;
+	out<<str.str();
 }
 
 TTrific& TTrific::operator=(const TTrific& rhs)

@@ -42,6 +42,7 @@ public:
 
 public:
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TTAC, 1) // TAC Physics structure

@@ -52,6 +52,7 @@ private:
 
 public:
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TSceptar, 2) // Sceptar Physics structure

@@ -42,6 +42,7 @@ public:
 
    void Copy(TObject&) const override;            //!<!
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TPaces, 4) // Paces Physics structure

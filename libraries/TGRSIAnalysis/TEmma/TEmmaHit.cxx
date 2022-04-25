@@ -59,9 +59,16 @@ void TEmmaHit::Clear(Option_t* opt)
 
 void TEmmaHit::Print(Option_t*) const
 {
-	printf("================\n");
-	printf("not yet written.\n");
-	printf("================\n");
+	Print(std::cout);
+}
+
+void TEmmaHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"================"<<std::endl;
+	str<<"not yet written."<<std::endl;
+	str<<"================"<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TEmmaHit::GetPosition() const

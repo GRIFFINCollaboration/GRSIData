@@ -407,7 +407,14 @@ TS3Hit* TS3::GetPixelHit(const int& i)
 
 void TS3::Print(Option_t*) const
 {
-   printf("%s\tnot yet written.\n", __PRETTY_FUNCTION__);
+	Print(std::cout);
+}
+
+void TS3::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+	out<<str.str();
 }
 
 void TS3::Clear(Option_t* opt)
