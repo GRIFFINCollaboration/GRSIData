@@ -700,14 +700,15 @@ void TMidasFile::SetFileOdb()
       node = node->GetNextNode();
    }
    if(expt.compare("tigress") == 0) {
-      //		fIamTigress = true;
       SetTIGOdb();
-   } else if(expt.compare("griffin") == 0) {
-      //		fIamGriffin = true;
+   } else if(expt.find("grif") != std::string::npos) {
+		// for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
    } else if(expt.compare("tigdaq") == 0) { //New TIGRESS DAQ
       SetTIGDAQOdb();
-   }
+   } else {
+		std::cerr<<RED<<"Unknown experiment name \""<<expt<<"\", ODB won't be read!"<<RESET_COLOR<<std::endl;
+	}
 #endif
 }
 
@@ -882,6 +883,11 @@ void TMidasFile::SetGRIFFOdb()
       return;
    }
    std::vector<int> durations = fOdb->ReadIntArray(node);
+
+	if(durations.size() != ppgCodes.size()) {
+      std::cerr<<"Mismatching sizes of ppg codes ("<<ppgCodes.size()<<") and duration ("<<durations.size()<<")"<<std::endl;
+      return;
+	}
 
    TPPG::Get()->SetOdbCycle(ppgCodes, durations);
 #endif
