@@ -98,6 +98,10 @@ void TGRSIDetectorInformation::Clear(Option_t*)
 void TGRSIDetectorInformation::Set()
 {
    /// Sets the run info. This figures out what systems are available.
+	if(TChannel::GetChannelMap() == nullptr) {
+		std::cerr<<RED<<"TGRSIDetectorInformation::Set(): Failed to get channel map!"<<RESET_COLOR<<std::endl;
+		return;
+	}
    for(auto iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
       std::string channelname = iter->second->GetName();
 
