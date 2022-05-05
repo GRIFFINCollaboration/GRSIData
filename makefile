@@ -108,8 +108,9 @@ ROOT_LIBFLAGS := $(shell root-config --cflags --glibs)
 GRSI_LIBFLAGS := $(shell grsi-config --cflags --libs)
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
+ANALYSIS_O_FILES := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard myAnalysis/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
-EXE_O_FILES     := $(UTIL_O_FILES)
+EXE_O_FILES     := $(UTIL_O_FILES) $(ANALYSIS_O_FILES)
 EXECUTABLES     := $(patsubst %.o,$(GRSISYS)/bin/%,$(notdir $(EXE_O_FILES)))
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
@@ -146,6 +147,9 @@ docs: doxygen
 
 doxygen:
 	$(MAKE) -C $@
+
+$(GRSISYS)/bin/%: .build/myAnalysis/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 $(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
