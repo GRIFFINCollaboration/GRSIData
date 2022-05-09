@@ -62,6 +62,8 @@ public:
 
 	double GetTime(Long64_t timestamp, Float_t cfd, double energy, const TChannel* channel) const override;
 
+	int NumericArraySubPosition() const override;
+
    void Print(Option_t* opt = "") const override;
    void Clear(Option_t* opt = "") override;
 

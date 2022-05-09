@@ -7,12 +7,15 @@
 
 #include "Globals.h"
 #include "TBgo.h"
+#include "TLaBrBgoHit.h"
 
 class TLaBrBgo : public TBgo {
 public:
    TLaBrBgo();
    TLaBrBgo(const TLaBrBgo&);
    virtual ~TLaBrBgo();
+
+   TLaBrBgoHit* GetLaBrBgoHit(const int& i) const { return static_cast<TLaBrBgoHit*>(GetHit(i)); }
 
    TLaBrBgo& operator=(const TLaBrBgo&); //!<!
 
