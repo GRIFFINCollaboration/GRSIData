@@ -234,3 +234,41 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
    return 0.;
 }
 
+int TGRSIMnemonic::NumericArraySubPosition() const
+{
+	/// This function translates the crystal color to an index
+	/// B - Blue - 0, G - Green - 1, R - Red - 2, W - White - 3, default - 5
+	/// Except for the LaBr BGOs which use A - 0, B - 1, C - 2
+	/// and a default of 5
+	if(System() == ESystem::kLaBrBgo) {
+		switch(fArraySubPosition) {
+			case TMnemonic::EMnemonic::kA:
+				return 0;
+			case TMnemonic::EMnemonic::kB:
+				return 1;
+			case TMnemonic::EMnemonic::kC:
+				return 2;
+			default:
+				return 5;
+		};
+	}
+
+	switch(fArraySubPosition) {
+		case TMnemonic::EMnemonic::kB:
+			return 0;
+		case TMnemonic::EMnemonic::kG:
+			return 1;
+		case TMnemonic::EMnemonic::kR:
+			return 2;
+		case TMnemonic::EMnemonic::kW:
+			return 3;
+		default:
+			return 5;
+	};
+
+	// return statement here instead of default case
+	// to make sure compiler doesn't warn us about missing return
+	return 5;
+}
+
+
