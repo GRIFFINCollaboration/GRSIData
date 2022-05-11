@@ -50,7 +50,7 @@ public:
    inline Int_t    GetFitChiSq() { return fChiSq; }          //!<!
    inline Double_t GetFitTime() { return fTimeFit; }         //!<!
    inline Double_t GetSignalToNoise() { return fSig2Noise; } //!<!
-   inline Int_t    GetTipChannel() { return fTipChannel; }   //!<!
+   inline Int_t    GetTipChannel() const { return fTipChannel; }   //!<!
 
    inline bool IsCsI() { return csi_flag; }                    //!<!
    inline void SetCsI(bool flag = "true") { csi_flag = flag; } //!<!
@@ -80,6 +80,8 @@ public:
    void SetWavefit(const TFragment&);
 
    void SetPID(const TFragment&);
+
+   TVector3 GetPosition() const override;
 
 public:
    void Clear(Option_t* opt = "") override;       //!<!
