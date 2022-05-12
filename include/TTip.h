@@ -22,10 +22,6 @@
 class TTip : public TDetector {
 public:
 
-   enum class ETipGlobalBits {
-      kVectorsBuilt   = BIT(0)
-   };
-
    ~TTip() override;
    TTip();
    TTip(const TTip& rhs);
@@ -44,22 +40,13 @@ public:
 
 private:
 
-   static TTransientBits<UShort_t> fgTipBits; //!
-
    // Position vectors for individual TIP detectors
    static TVector3 fPositionVectors[128];     //!<!
-
-   static void SetGlobalBit(ETipGlobalBits bit, Bool_t set = true) { fgTipBits.SetBit(bit, set); }
-   static Bool_t TestGlobalBit(ETipGlobalBits bit) { return (fgTipBits.TestBit(bit)); }
-
-   static void BuildVectors();  //!<!
 
 public:
 
    void Print(Option_t* opt = "") const override;
 	void Print(std::ostream& out) const override; //!<!
-
-   static bool GetVectorsBuilt() { return TestGlobalBit(ETipGlobalBits::kVectorsBuilt); } //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TTip, 2);
