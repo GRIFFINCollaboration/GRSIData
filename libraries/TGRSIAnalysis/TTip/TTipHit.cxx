@@ -55,6 +55,11 @@ void TTipHit::Copy(TObject& rhs) const
    static_cast<TTipHit&>(rhs).fChiSq      = fChiSq;
 }
 
+TVector3 TTipHit::GetPosition() const
+{
+   return TTip::GetPosition(*this);
+}
+
 bool TTipHit::InFilter(Int_t)
 {
    // check if the desired filter is in wanted filter;
