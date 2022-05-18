@@ -46,7 +46,8 @@ TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit()
 
 void TTipHit::Copy(TObject& rhs) const
 {
-   TDetectorHit::Copy(rhs,true);
+   TDetectorHit::Copy(rhs);
+   TDetectorHit::CopyWave(rhs); //waveforms are basically always needed (for TIP PID)
    static_cast<TTipHit&>(rhs).fFilter     = fFilter;
    static_cast<TTipHit&>(rhs).fPID        = fPID;
    static_cast<TTipHit&>(rhs).fTipChannel = fTipChannel;
