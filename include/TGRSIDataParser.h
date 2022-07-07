@@ -101,6 +101,7 @@ public:
 
 private:
 	EDataParserState fState;
+	bool fIgnoreMissingChannel; ///< flag that's set to TGRSIOptions::IgnoreMissingChannel
 #ifndef __CINT__
    void SetTIGWave(uint32_t, const std::shared_ptr<TFragment>&);
    void SetTIGAddress(uint32_t, const std::shared_ptr<TFragment>&);
