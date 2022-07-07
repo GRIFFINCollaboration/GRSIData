@@ -52,6 +52,7 @@ void TTipHit::Copy(TObject& rhs) const
    static_cast<TTipHit&>(rhs).fPID        = fPID;
    static_cast<TTipHit&>(rhs).fTipChannel = fTipChannel;
    static_cast<TTipHit&>(rhs).fTimeFit    = fTimeFit;
+   static_cast<TTipHit&>(rhs).fFitType    = fFitType;
    static_cast<TTipHit&>(rhs).fSig2Noise  = fSig2Noise;
    static_cast<TTipHit&>(rhs).fChiSq      = fChiSq;
 }
@@ -106,5 +107,6 @@ void TTipHit::SetPID(const TFragment& frag)
       fPID     = pulse.CsIPID();
       fTimeFit = pulse.CsIt0();
       fChiSq   = pulse.GetCsIChiSq();
+      fFitType = pulse.GetCsIFitType();
    }
 }

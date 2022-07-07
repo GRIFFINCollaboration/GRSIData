@@ -27,12 +27,13 @@ private:
    Int_t    fFilter{0}; //
    Double_t fPID{0.};    //
    Int_t    fChiSq{0};
+   Int_t    fFitType{0};
 
    // Double_t fFastAmplitude;
    // Double_t fSlowAmplitude;
    // Double_t fGammaAmplitude;
 
-   bool csi_flag{false};
+   bool csi_flag{true};
 
    Int_t fTipChannel{0};
 
@@ -45,10 +46,11 @@ public:
    inline void SetPID(Double_t x) { fPID = x; }                //!<!
    inline void SetTipChannel(const int x) { fTipChannel = x; } //!<!
 
-   inline Int_t    GetFiterPatter() { return fFilter; }      //!<!
+   inline Int_t    GetFilterPattern() { return fFilter; }      //!<!
    inline Double_t GetPID() { return fPID; }                 //!<!
    inline Int_t    GetFitChiSq() { return fChiSq; }          //!<!
    inline Double_t GetFitTime() { return fTimeFit; }         //!<!
+   inline Int_t    GetFitType() { return fFitType; }         //!<!
    inline Double_t GetSignalToNoise() { return fSig2Noise; } //!<!
    inline Int_t    GetTipChannel() const { return fTipChannel; }   //!<!
 
