@@ -39,6 +39,14 @@ void TLaBrHit::Copy(TObject& rhs) const
    static_cast<TLaBrHit&>(rhs).fFilter = fFilter;
 }
 
+void TLaBrHit::Copy(TObject& obj, bool waveform) const
+{
+   Copy(obj);
+   if(waveform) {
+      CopyWave(obj);
+   }
+}
+
 TVector3 TLaBrHit::GetPosition(Double_t) const
 {
    // Gets the position of the current TLaBrHit
