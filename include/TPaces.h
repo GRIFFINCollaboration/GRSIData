@@ -30,12 +30,13 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr); //!<!
+   static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return gDetectorPosition[DetNbr]; } //!<!
 
    TPaces& operator=(const TPaces&); //!<!
 
 private:
    static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
+   static ROOT::Math::Polar3DVector gDetectorPosition[6]; //!<!  Position of each detector (plus one default position)
 
 public:
    static bool SetCoreWave() { return fSetCoreWave; } //!<!

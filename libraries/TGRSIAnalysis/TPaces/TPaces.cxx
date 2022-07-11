@@ -18,6 +18,14 @@ ClassImp(TPaces)
 
 bool TPaces::fSetCoreWave = false;
 
+ROOT::Math::Polar3DVector TPaces::gDetectorPosition[6] = {
+	ROOT::Math::Polar3DVector(1., 0., 0.),
+	ROOT::Math::Polar3DVector(1., 120.178/180.*TMath::Pi(),  21./180.*TMath::Pi()),
+	ROOT::Math::Polar3DVector(1., 120.827/180.*TMath::Pi(),  94./180.*TMath::Pi()),
+	ROOT::Math::Polar3DVector(1., 119.742/180.*TMath::Pi(), 166./180.*TMath::Pi()),
+	ROOT::Math::Polar3DVector(1., 120.299/180.*TMath::Pi(), 237./180.*TMath::Pi()),
+	ROOT::Math::Polar3DVector(1., 120.193/180.*TMath::Pi(), 313./180.*TMath::Pi())};
+
 TPaces::TPaces() : TDetector()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -71,9 +79,3 @@ void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
 	fHits.push_back(hit);
 }
 
-TVector3 TPaces::GetPosition(int)
-{
-	// Gets the position vector for a crystal specified by DetNbr
-	// Does not currently contain any positons.
-	return TVector3(0, 0, 1);
-}
