@@ -48,6 +48,7 @@ private:
 
 public:
    void Copy(TObject&) const override;        //!<!
+   void Copy(TObject&, bool) const override;           //!<!
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!

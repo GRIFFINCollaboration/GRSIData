@@ -44,6 +44,14 @@ void TEmmaHit::Copy(TObject& rhs) const
    static_cast<TEmmaHit&>(rhs).fICSum = fICSum;
 }
 
+void TEmmaHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 bool TEmmaHit::InFilter(Int_t)
 {
    // check if the desired filter is in wanted filter;

@@ -31,6 +31,14 @@ void TTrificHit::Copy(TObject& rhs) const
 	static_cast<TTrificHit&>(rhs).fFilter = fFilter;
 }
 
+void TTrificHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 void TTrificHit::Clear(Option_t* opt)
 {
 	TDetectorHit::Clear(opt); // clears the base (address, position and waveform)

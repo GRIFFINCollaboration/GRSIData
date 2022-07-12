@@ -31,6 +31,14 @@ void TPacesHit::Copy(TObject& rhs) const
    static_cast<TPacesHit&>(rhs).fFilter = fFilter;
 }
 
+void TPacesHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 bool TPacesHit::InFilter(Int_t)
 {
    // check if the desired filter is in wanted filter;
@@ -60,7 +68,8 @@ void TPacesHit::Print(std::ostream& out) const
 
 TVector3 TPacesHit::GetPosition(Double_t) const
 {
-   return TPaces::GetPosition(GetDetector());
+   auto vec = TPaces::GetPosition(GetDetector());
+   return TVector3(vec.X(), vec.Y(), vec.Z());
 }
 
 TVector3 TPacesHit::GetPosition() const

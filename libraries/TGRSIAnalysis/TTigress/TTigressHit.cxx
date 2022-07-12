@@ -49,6 +49,14 @@ void TTigressHit::Copy(TObject& rhs) const
    static_cast<TTigressHit&>(rhs).fBgoFired = fBgoFired;
 }
 
+void TTigressHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 TVector3 TTigressHit::GetPosition(Double_t dist) const
 {
    return TTigress::GetPosition(*this, dist);
