@@ -46,6 +46,14 @@ void TS3Hit::Copy(TObject& rhs) const
 	static_cast<TS3Hit&>(rhs).fSig2Noise    = fSig2Noise;
 }
 
+void TS3Hit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 void TS3Hit::Clear(Option_t* opt)
 {
 	TDetectorHit::Clear(opt);

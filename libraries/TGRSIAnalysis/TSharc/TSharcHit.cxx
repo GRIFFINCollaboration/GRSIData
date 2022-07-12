@@ -35,6 +35,14 @@ void TSharcHit::Copy(TObject& rhs) const
 	static_cast<const TDetectorHit&>(fPadHit).Copy(static_cast<TObject&>(static_cast<TSharcHit&>(rhs).fPadHit));
 }
 
+void TSharcHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 void TSharcHit::Clear(Option_t* options)
 {
 	TDetectorHit::Clear(options); //

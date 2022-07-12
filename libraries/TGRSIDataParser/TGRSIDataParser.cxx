@@ -21,6 +21,7 @@ TGRSIDataParser::TGRSIDataParser()
    : TDataParser()
 {
 	fState = EDataParserState::kGood;
+	fIgnoreMissingChannel = TGRSIOptions::Get()->IgnoreMissingChannel();
 }
 
 TGRSIDataParser::~TGRSIDataParser()
@@ -546,6 +547,14 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 			throw TGRSIDataParserException(fState, failedWord, multipleErrors);
 		}
 		return GriffinDataToScalerEvent(data, eventFrag->GetAddress());
+	}
+
+	// If the flag is set, skip any fragment without a channel
+	if(fIgnoreMissingChannel && eventFrag->GetChannel() != nullptr) {
+		// find end of this event
+		for(; x < size; x++) {
+			if((data[x] >> 28) == 0xe) return x;
+		}
 	}
 
 	// The Network packet number is for debugging and is not always written to the midas file.

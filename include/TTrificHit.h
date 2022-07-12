@@ -40,7 +40,8 @@ public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
 	void Print(std::ostream& out) const override; //!<!
-   void     Copy(TObject&) const override;             //!<!
+   void Copy(TObject&) const override;             //!<!
+   void Copy(TObject&, bool) const override;      //!<!
    //TVector3 GetPosition(Double_t dist) const override; //!<!
    TVector3 GetPosition() const override;  //!<!             
    //TVector3 GetPosition() const; //!<!

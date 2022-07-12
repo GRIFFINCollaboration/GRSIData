@@ -57,6 +57,14 @@ void TTipHit::Copy(TObject& rhs) const
    static_cast<TTipHit&>(rhs).fChiSq      = fChiSq;
 }
 
+void TTipHit::Copy(TObject& rhs, bool waveform) const
+{
+	Copy(rhs);
+	if(waveform) {
+		CopyWave(rhs);
+	}
+}
+
 TVector3 TTipHit::GetPosition() const
 {
    return TTip::GetPosition(*this);

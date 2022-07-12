@@ -39,6 +39,14 @@ void TTACHit::Copy(TObject& rhs) const
 	static_cast<TTACHit&>(rhs).fFilter = fFilter;
 }
 
+void TTACHit::Copy(TObject& obj, bool waveform) const
+{
+   Copy(obj);
+   if(waveform) {
+      CopyWave(obj);
+   }
+}
+
 Double_t TTACHit::GetTempCorrectedCharge(TGraph* correction_graph) const {
 	//Applies the kValue ot the charge
 	if(!correction_graph){
