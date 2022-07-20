@@ -68,7 +68,7 @@ void TPacesHit::Print(std::ostream& out) const
 
 TVector3 TPacesHit::GetPosition(Double_t) const
 {
-   auto vec = TPaces::GetPosition(GetDetector());
+	auto vec = TPaces::GetPosition(GetDetector());
    return TVector3(vec.X(), vec.Y(), vec.Z());
 }
 

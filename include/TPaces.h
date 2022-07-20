@@ -9,7 +9,6 @@
 #include <cstdio>
 
 #include "TBits.h"
-#include "TVector3.h"
 #include "Math/Vector3D.h"
 
 #include "Globals.h"
