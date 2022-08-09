@@ -50,7 +50,7 @@ void TZeroDegree::Print(Option_t*) const
 void TZeroDegree::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<fHits.size()<<" fHits"<<std::endl;
+	str<<"TZeroDegree contains "<<fHits.size()<<" fHits"<<std::endl;
 	out<<str.str();
 }
 
