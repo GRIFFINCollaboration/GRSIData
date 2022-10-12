@@ -60,19 +60,37 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 				}
 			} else if((banksize = event->LocateBank(nullptr, "EMMT", &ptr)) > 0) {
 				frags = EmmaTdcDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
-			}
-			else if(!TGRSIOptions::Get()->SuppressErrors()) {
-				std::cout<<DRED<<std::endl<<"Unknown bank in midas event #"<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
+			} else {
+				std::cout<<DRED<<std::endl<<"Unknown bank in midas event #"<<event->GetSerialNumber()<<", event ID 1, bank list "<<event->GetBankList()<<RESET_COLOR<<std::endl;
 			}
 			break;
 		case 2:
 			event->SetBankList();
+         if((banksize = event->LocateBank(nullptr, "SRAW", &ptr)) > 0) {
+				if(!TGRSIOptions::Get()->SuppressErrors()) {
+					std::cout<<"Found bank \"SRAW\" of size "<<banksize<<std::endl;
+				}
+            frags = EmmaRawDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+			}
+			if((banksize = event->LocateBank(nullptr, "SSUM", &ptr)) > 0) {
+				if(!TGRSIOptions::Get()->SuppressErrors()) {
+					std::cout<<"Found bank \"SSUM\" of size "<<banksize<<std::endl;
+				}
+            frags = EmmaSumDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+			} 
+			if((banksize = event->LocateBank(nullptr, "SCLR", &ptr)) > 0) {
+				if(!TGRSIOptions::Get()->SuppressErrors()) {
+					std::cout<<"Found bank \"SCLR\" of size "<<banksize<<std::endl;
+				}
+			}
 			break;
 		case 3:
 			if((banksize = event->LocateBank(nullptr, "CAEN", &ptr)) > 0) {
 				frags = CaenPsdToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
 			} else if((banksize = event->LocateBank(nullptr, "CPHA", &ptr)) > 0) {
 				frags = CaenPhaToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
+			} else {
+				std::cout<<DRED<<std::endl<<"Unknown bank in midas event #"<<event->GetSerialNumber()<<", event ID 3, bank list "<<event->GetBankList()<<RESET_COLOR<<std::endl;
 			}
 			break;
 		case 4:
@@ -2216,3 +2234,28 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 	return numFragsFound;
 }
 
+int TGRSIDataParser::EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
+{
+	/// Extract SRAW data, i.e. the instantaneous rates
+	auto scaler = new TScalerData;
+	scaler->SetAddress(0xfffe); // magic address for raw scaler
+	// counter used to set time
+	static UInt_t nofRawScalers = 0;
+	scaler->SetLowTimeStamp(nofRawScalers++);
+	scaler->SetScaler(data, size);
+	TRateScalerQueue::Get()->Add(scaler);
+	return 0;
+}
+
+int TGRSIDataParser::EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
+{
+	/// Extract SSUM data, i.e. the cumulative counts
+	auto scaler = new TScalerData;
+	scaler->SetAddress(0xffff); // magic address for sum scaler
+	// counter used to set time
+	static UInt_t nofSumScalers = 0;
+	scaler->SetLowTimeStamp(nofSumScalers++);
+	scaler->SetScaler(data, size);
+	TRateScalerQueue::Get()->Add(scaler);
+	return 0;
+}
