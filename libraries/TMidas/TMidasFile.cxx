@@ -62,10 +62,12 @@ TMidasFile::TMidasFile()
 
 TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TMidasFile()
 {
+	bool status = false;
    switch(open_type) {
-		case TRawFile::EOpenType::kRead: Open(filename); break;
-		case TRawFile::EOpenType::kWrite: OutOpen(filename); break;
+		case TRawFile::EOpenType::kRead: status = Open(filename); break;
+		case TRawFile::EOpenType::kWrite: status = OutOpen(filename); break;
    }
+	if(!status) std::cerr<<"Failed to create midas file \""<<filename<<"\": "<<fLastError<<std::endl;
 }
 
 TMidasFile::~TMidasFile()
