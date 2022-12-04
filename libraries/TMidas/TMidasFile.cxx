@@ -67,7 +67,11 @@ TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TM
 		case TRawFile::EOpenType::kRead: status = Open(filename); break;
 		case TRawFile::EOpenType::kWrite: status = OutOpen(filename); break;
    }
-	if(!status) std::cerr<<"Failed to create midas file \""<<filename<<"\": "<<fLastError<<std::endl;
+	if(!status) {
+		std::stringstream str;
+		str<<RED<<"Failed to create midas file \""<<filename<<"\": "<<fLastError<<RESET_COLOR<<std::endl;
+		throw std::runtime_error(str.str());
+	}
 }
 
 TMidasFile::~TMidasFile()
