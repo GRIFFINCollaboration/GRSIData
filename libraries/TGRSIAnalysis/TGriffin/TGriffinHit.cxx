@@ -37,7 +37,6 @@ void TGriffinHit::Copy(TObject& rhs) const
    static_cast<TGriffinHit&>(rhs).fFilter = fFilter;
    // We should copy over a 0 and let the hit recalculate, this is safest
    static_cast<TGriffinHit&>(rhs).fGriffinHitBits      = 0;
-   static_cast<TGriffinHit&>(rhs).fPPG                 = fPPG;
    static_cast<TGriffinHit&>(rhs).fBremSuppressed_flag = fBremSuppressed_flag;
 }
 
@@ -62,7 +61,6 @@ void TGriffinHit::Clear(Option_t* opt)
    TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
    fFilter              = 0;
    fGriffinHitBits      = 0;
-   fPPG                 = nullptr;
    fBremSuppressed_flag = false;
 }
 
