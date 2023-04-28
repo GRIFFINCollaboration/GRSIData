@@ -108,6 +108,7 @@ void TTigress::Clear(Option_t* opt)
 {
    // Clears the mother, and all of the hits
    TDetector::Clear(opt);
+	for(auto& hit : fAddbackHits) delete hit;
    fAddbackHits.clear();
    fAddbackFrags.clear();
    fBgos.clear();
@@ -144,6 +145,7 @@ Int_t TTigress::GetAddbackMultiplicity()
    }
    // if the addback has been reset, clear the addback hits
    if(!fTigressBits.TestBit(ETigressBits::kAddbackSet)) {
+		for(auto& hit : fAddbackHits) delete hit;
 		fAddbackHits.clear();
 	} else {
 		return fAddbackHits.size();
@@ -198,7 +200,7 @@ void TTigress::BuildHits()
 	// using remove_if the elements to be removed are left in an undefined state so we can only log how many we are removing!
 	TSortingDiagnostics::Get()->RemovedHits(IsA(), std::distance(remove, fHits.end()), fHits.size());
 	fHits.erase(remove, fHits.end());
-	for(auto hit : fHits) {
+	for(auto& hit : fHits) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
 		if(tigressHit->GetNSegments() > 1) {
 			tigressHit->SortSegments();
@@ -213,7 +215,7 @@ void TTigress::BuildHits()
 	}
 
 	// Label all hits as being suppressed or not
-	for(auto fTigressHit : fHits) {
+	for(auto& fTigressHit : fHits) {
 		bool suppressed = false;
 		for(auto& fBgo : fBgos) {
 			if(fSuppressionCriterion(fTigressHit, fBgo)) {
@@ -308,6 +310,7 @@ void TTigress::ResetAddback()
 	/// the old addback hits will be stored instead.
 	/// This should have changed now, we're using the stored tigress bits to reset the addback
 	fTigressBits.SetBit(ETigressBits::kAddbackSet, false);
+	for(auto& hit : fAddbackHits) delete hit;
 	fAddbackHits.clear();
 	fAddbackFrags.clear();
 }

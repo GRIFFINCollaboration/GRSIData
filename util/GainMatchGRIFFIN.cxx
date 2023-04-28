@@ -185,7 +185,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -199,7 +199,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 		int chan = currentFrag->GetChannelNumber();
 		int dettype = currentFrag->GetDetectorType();
 		bool skipChannel=kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -215,7 +215,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -268,7 +268,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 	for(int i=minchannel;i<=maxchannel;i++) {
 		std::cout <<"\t" <<i <<std::endl;
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -285,7 +285,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 
 		// calculate rough positions of peaks
 		std::vector<double> peakguesses;
-		for(auto peak : peaks) {
+		for(auto& peak : peaks) {
 			peakguesses.push_back(gain*peak);
 		}
 
@@ -368,7 +368,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	TGraph** g = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) { // channel number
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -396,7 +396,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	for(int i=minchannel;i<=maxchannel;i++) {
 		// check for skipped channel
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -442,7 +442,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::cout <<"Channel\tSlope\t\tOffset\t\tChi^2" <<std::endl;
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -484,7 +484,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	outFile.open(outFileName);
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -561,7 +561,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel=kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -574,7 +574,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 		tree->GetEntry(i);
 		int chan = currentFrag->GetChannelNumber();
 		bool skipChannel=kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -589,7 +589,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
@@ -653,7 +653,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	// create hstall
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) {
 				skipChannel = kTRUE;
 				break;
@@ -672,7 +672,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 
 	// get peak values from summed spectrum for residual calculation
 	std::vector<double> summedpeaks;
-	for(auto peak : peaks) {
+	for(auto& peak : peaks) {
 		double centroid = GetCentroid(type,hstall,peak-width,peak+width);
 		summedpeaks.push_back(centroid);
 	}	
@@ -681,7 +681,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	TGraph** residuals = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
-		for(auto skip : channelsToSkip) {
+		for(auto& skip : channelsToSkip) {
 			if(i == skip) {
 				skipChannel = kTRUE;
 				break;
@@ -715,7 +715,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	hstall->Write();
 
 	// fill 2D histograms for summed spectrum
-	for(auto peak : peaks) {
+	for(auto& peak : peaks) {
 		double myfwhm = FWHM(hstall,peak-width,peak+width);
 		if(myfwhm!=0.0) fwhm_all->Fill(peak,myfwhm);
 		double myfwtm = FWTM(hstall,peak-width,peak+width);
