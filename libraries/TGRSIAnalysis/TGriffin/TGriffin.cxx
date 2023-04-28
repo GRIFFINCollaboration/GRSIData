@@ -143,6 +143,24 @@ void TGriffin::Copy(TObject& rhs) const
 		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinHighGainHits[i]));
 	}
 	// not copying addback or suppressed vectors
+	for(auto& hit : fAddbackLowGainHits) {
+		delete hit;
+	}
+	for(auto& hit : fAddbackHighGainHits) {
+		delete hit;
+	}
+	for(auto& hit : fSuppressedLowGainHits) {
+		delete hit;
+	}
+	for(auto& hit : fSuppressedHighGainHits) {
+		delete hit;
+	}
+	for(auto& hit : fSuppressedAddbackLowGainHits) {
+		delete hit;
+	}
+	for(auto& hit : fSuppressedAddbackHighGainHits) {
+		delete hit;
+	}
    static_cast<TGriffin&>(rhs).fGriffinBits          = 0;
    static_cast<TGriffin&>(rhs).fAddbackLowGainHits.clear();
    static_cast<TGriffin&>(rhs).fAddbackHighGainHits.clear();
@@ -163,25 +181,25 @@ TGriffin::~TGriffin()
 {
    // Default Destructor
 	// no need to delete low gain hits, this is taken care of by the destructor of TDetector
-	for(auto hit : fGriffinHighGainHits) {
+	for(auto& hit : fGriffinHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fAddbackLowGainHits) {
+	for(auto& hit : fAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fAddbackHighGainHits) {
+	for(auto& hit : fAddbackHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedLowGainHits) {
+	for(auto& hit : fSuppressedLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedHighGainHits) {
+	for(auto& hit : fSuppressedHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedAddbackLowGainHits) {
+	for(auto& hit : fSuppressedAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedAddbackHighGainHits) {
+	for(auto& hit : fSuppressedAddbackHighGainHits) {
 		delete hit;
 	}
 }
@@ -192,25 +210,25 @@ void TGriffin::Clear(Option_t* opt)
    ClearStatus();
    TSuppressed::Clear(opt);
    // low gain hits cleared by TDetector::Clear
-	for(auto hit : fGriffinHighGainHits) {
+	for(auto& hit : fGriffinHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fAddbackLowGainHits) {
+	for(auto& hit : fAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fAddbackHighGainHits) {
+	for(auto& hit : fAddbackHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedLowGainHits) {
+	for(auto& hit : fSuppressedLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedHighGainHits) {
+	for(auto& hit : fSuppressedHighGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedAddbackLowGainHits) {
+	for(auto& hit : fSuppressedAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto hit : fSuppressedAddbackHighGainHits) {
+	for(auto& hit : fSuppressedAddbackHighGainHits) {
 		delete hit;
 	}
    fGriffinHighGainHits.clear();
@@ -239,13 +257,13 @@ void TGriffin::Print(std::ostream& out) const
    str<<"Griffin Contains: "<<std::endl;
    str<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto hit : fGriffinLowGainHits) {
+		for(auto& hit : fGriffinLowGainHits) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
    str<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto hit : fGriffinHighGainHits) {
+		for(auto& hit : fGriffinHighGainHits) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
@@ -420,7 +438,7 @@ Short_t TGriffin::GetAddbackMultiplicity(const EGainBits& gain_type)
    }
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet(gain_type)) {
-		for(auto hit : ab_vec) {
+		for(auto& hit : ab_vec) {
 			delete hit;
 		}
       ab_vec.clear();
@@ -554,7 +572,7 @@ void TGriffin::ResetAddback(const EGainBits& gain_type)
 {
    SetAddback(gain_type, false);
    SetCrossTalk(gain_type, false);
-	for(auto hit : GetAddbackVector(gain_type)) {
+	for(auto& hit : GetAddbackVector(gain_type)) {
 		delete hit;
 	}
 	GetAddbackVector(gain_type).clear();
@@ -812,7 +830,7 @@ Short_t TGriffin::GetSuppressedMultiplicity(const TBgo* bgo, const EGainBits& ga
 	}
 	// if the suppressed has been reset, clear the suppressed hits
 	if(!IsSuppressed(gain_type)) {
-		for(auto hit : sup_vec) {
+		for(auto& hit : sup_vec) {
 			delete hit;
 		}
 		sup_vec.clear();
@@ -837,7 +855,7 @@ void TGriffin::ResetSuppressed(const EGainBits& gain_type)
 {
 	SetSuppressed(gain_type, false);
 	//SetCrossTalk(gain_type, false);
-	for(auto hit : GetSuppressedVector(gain_type)) {
+	for(auto& hit : GetSuppressedVector(gain_type)) {
 		delete hit;
 	}
 	GetSuppressedVector(gain_type).clear();
@@ -875,7 +893,7 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo, const EGainB
 	}
 	// if the addback has been reset, clear the addback hits
 	if(!IsSuppressedAddbackSet(gain_type)) {
-		for(auto hit : ab_vec) {
+		for(auto& hit : ab_vec) {
 			delete hit;
 		}
 		ab_vec.clear();
@@ -901,7 +919,7 @@ void TGriffin::ResetSuppressedAddback(const EGainBits& gain_type)
 {
 	SetSuppressedAddback(gain_type, false);
 	//SetCrossTalk(gain_type, false);
-	for(auto hit : GetSuppressedAddbackVector(gain_type)) {
+	for(auto& hit : GetSuppressedAddbackVector(gain_type)) {
 		delete hit;
 	}
 	GetSuppressedAddbackVector(gain_type).clear();

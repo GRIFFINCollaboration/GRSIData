@@ -43,7 +43,7 @@ TLaBr::TLaBr()
 TLaBr::~TLaBr()
 {
 	// Default Destructor
-	for(auto hit : fSuppressedHits) {
+	for(auto& hit : fSuppressedHits) {
 		delete hit;
 	}
 }
@@ -61,7 +61,7 @@ void TLaBr::Clear(Option_t* opt)
 {
 	// Clears all of the hits
 	TSuppressed::Clear(opt);
-	for(auto hit : fSuppressedHits) {
+	for(auto& hit : fSuppressedHits) {
 		delete hit;
 	}
 	fSuppressedHits.clear();
@@ -112,7 +112,7 @@ void TLaBr::SetSuppressed(const bool flag)
 void TLaBr::ResetSuppressed()
 {
 	SetSuppressed(false);
-	for(auto hit : fSuppressedHits) {
+	for(auto& hit : fSuppressedHits) {
 		delete hit;
 	}
 	fSuppressedHits.clear();
@@ -126,7 +126,7 @@ Short_t TLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
 	}
 	// if the suppressed has been reset, clear the suppressed hits
 	if(!IsSuppressed()) {
-		for(auto hit : fSuppressedHits) {
+		for(auto& hit : fSuppressedHits) {
 			delete hit;
 		}
 		fSuppressedHits.clear();
