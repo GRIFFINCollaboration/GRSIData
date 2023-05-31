@@ -108,7 +108,7 @@ void TTigress::Clear(Option_t* opt)
 {
    // Clears the mother, and all of the hits
    TDetector::Clear(opt);
-	for(auto& hit : fAddbackHits) delete hit;
+   // deleting the hits causes sef-faults for some reason
    fAddbackHits.clear();
    fAddbackFrags.clear();
    fBgos.clear();
@@ -145,7 +145,7 @@ Int_t TTigress::GetAddbackMultiplicity()
    }
    // if the addback has been reset, clear the addback hits
    if(!fTigressBits.TestBit(ETigressBits::kAddbackSet)) {
-		for(auto& hit : fAddbackHits) delete hit;
+      // deleting the hits causes sef-faults for some reason
 		fAddbackHits.clear();
 	} else {
 		return fAddbackHits.size();
@@ -310,7 +310,7 @@ void TTigress::ResetAddback()
 	/// the old addback hits will be stored instead.
 	/// This should have changed now, we're using the stored tigress bits to reset the addback
 	fTigressBits.SetBit(ETigressBits::kAddbackSet, false);
-	for(auto& hit : fAddbackHits) delete hit;
+   // deleting the hits causes sef-faults for some reason
 	fAddbackHits.clear();
 	fAddbackFrags.clear();
 }
