@@ -143,22 +143,22 @@ void TGriffin::Copy(TObject& rhs) const
 		static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinHighGainHits[i]));
 	}
 	// not copying addback or suppressed vectors
-	for(auto& hit : fAddbackLowGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto& hit : fAddbackHighGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fAddbackHighGainHits) {
 		delete hit;
 	}
-	for(auto& hit : fSuppressedLowGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fSuppressedLowGainHits) {
 		delete hit;
 	}
-	for(auto& hit : fSuppressedHighGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fSuppressedHighGainHits) {
 		delete hit;
 	}
-	for(auto& hit : fSuppressedAddbackLowGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fSuppressedAddbackLowGainHits) {
 		delete hit;
 	}
-	for(auto& hit : fSuppressedAddbackHighGainHits) {
+	for(auto& hit : static_cast<TGriffin&>(rhs).fSuppressedAddbackHighGainHits) {
 		delete hit;
 	}
    static_cast<TGriffin&>(rhs).fGriffinBits          = 0;
