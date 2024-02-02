@@ -14,8 +14,8 @@
 //
 // TGriffinBgo
 //
-// The TGriffinBgo class is just a differently name TBgo.
-// This allows us to distinguish between the BGOs for diiferent
+// The TGriffinBgo class is just a differently named TBgo.
+// This allows us to distinguish between the BGOs for different
 // detector classes.
 //
 ////////////////////////////////////////////////////////////
