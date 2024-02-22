@@ -37,6 +37,10 @@ double GetYError(TGraphErrors* graph, const double& x)
 /// and to create chi-square plots
 int main(int argc, char** argv)
 {
+	// --------------------------------------------------------------------------------
+	// Reading and verifying inputs and settings.
+	// --------------------------------------------------------------------------------
+	
 	// input parameters
 	bool help = false;
 	double projGateLow = -1.;
@@ -123,8 +127,8 @@ int main(int argc, char** argv)
 	if(projBgLow == -1. || projBgHigh == -1. || projBgLow >= projBgHigh) {
 		for(int i = 1;; ++i) {
 			try {
-				auto low = settings->GetDouble(Form("Background.%d.Low",i));
-				auto high = settings->GetDouble(Form("Background.%d.High",i));
+				auto low = settings->GetDouble(Form("Background.%d.Low",i), true);
+				auto high = settings->GetDouble(Form("Background.%d.High",i), true);
 				if(low >= high) {
 					std::cout<<i<<". background gate, low edge not lower than the high edge: "<<low<<" >= "<<high<<std::endl;
 					break;
@@ -139,11 +143,11 @@ int main(int argc, char** argv)
 		bgLow.push_back(projBgLow);
 		bgHigh.push_back(projBgHigh);
 	}
-	// background-peak positions can only be set via settings file right now
+	// background-peak positions can only be set via settings file
 	// we loop until we fail to find an entry
 	for(int i = 1;; ++i) {
 		try {
-			auto pos = settings->GetDouble(Form("Peak.Position.%d",i));
+			auto pos = settings->GetDouble(Form("BackgroundPeak.Position.%d",i), true);
 			if(pos <= peakLow || pos >= peakHigh) {
 				std::cout<<i<<". background peak outside of fit range: "<<pos<<" <= "<<peakLow<<" or "<<pos<<" >= "<<peakHigh<<std::endl;
 				break;
@@ -153,6 +157,71 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
+	// the spins of the low, middle, and high levels, to be used for the mixing method
+	// two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
+	std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
+	std::vector<int> twoJMiddle = settings->GetIntVector("TwoJ.Middle");
+	std::vector<int> twoJHigh   = settings->GetIntVector("TwoJ.High");
+
+	// parameter limits and fixed parameters for the peak and the background peaks
+	// if the limits are the same, the parameter is fixed to that value, if the high limit is lower than the low limit there is no limit
+	// right now we are hard coded to use TRWPeaks which have 6 parameters
+	std::vector<double> peakParameter(6, -2.);
+	std::vector<double> peakParameterLow(6, 0.);
+	std::vector<double> peakParameterHigh(6, -1.);
+	std::vector<double> bgPeakParameter(6, -2.);
+	std::vector<double> bgPeakParameterLow(6, 0.);
+	std::vector<double> bgPeakParameterHigh(6, -1.);
+	for(size_t i = 0; i < peakParameterLow.size(); ++i) {
+		peakParameter[i]     = settings->GetDouble(Form("Peak.Parameter.%d",      static_cast<int>(i)), -2.);
+		peakParameterLow[i]  = settings->GetDouble(Form("Peak.Parameter.%d.Low",  static_cast<int>(i)),  0.);
+		peakParameterHigh[i] = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
+		bgPeakParameter[i]     = settings->GetDouble(Form("BackgroundPeak.Parameter.%d",      static_cast<int>(i)), -2.);
+		bgPeakParameterLow[i]  = settings->GetDouble(Form("BackgroundPeak.Parameter.%d.Low",  static_cast<int>(i)),  0.);
+		bgPeakParameterHigh[i] = settings->GetDouble(Form("BackgroundPeak.Parameter.%d.High", static_cast<int>(i)), -1.);
+		// check that the result makes sense, i.e. if the limits are in the righ order that the parameter itself is within the limits
+		// only output a warning that the parameter is changed if it's not the default value
+		if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
+			bool output = peakParameter[i] != -2.;
+			if(output) std::cout<<"Warning, "<<i<<". peak parameter ("<<peakParameter[i]<<") is out of range "<<peakParameterLow[i]<<" - "<<peakParameterHigh[i]<<", resetting it to ";
+			peakParameter[i] = (peakParameterHigh[i] + peakParameterLow[i])/2.;
+			if(output) std::cout<<peakParameter[i]<<std::endl;
+		}
+		if(bgPeakParameterLow[i] <= bgPeakParameterHigh[i] && (bgPeakParameter[i] < bgPeakParameterLow[i] || bgPeakParameterHigh[i] < bgPeakParameter[i])) {
+			bool output = bgPeakParameter[i] != -2.;
+			if(output) std::cout<<"Warning, "<<i<<". background peak parameter ("<<bgPeakParameter[i]<<") is out of range "<<bgPeakParameterLow[i]<<" - "<<bgPeakParameterHigh[i]<<", resetting it to ";
+			bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i])/2.;
+			if(output) std::cout<<bgPeakParameter[i]<<std::endl;
+		}
+	}
+	// parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
+	// same idea as above, lower limit = higher limit means fixed parameter, higher limit < lower limit means parameter not set
+	std::vector<double> backgroundParameter(4, -2.);
+	std::vector<double> backgroundParameterLow(4, 0.);
+	std::vector<double> backgroundParameterHigh(4, -1.);
+	backgroundParameter[0]     = settings->GetDouble("Background.Offset",         -2.);
+	backgroundParameterLow[0]  = settings->GetDouble("Background.Offset.Low",      0.);
+	backgroundParameterHigh[0] = settings->GetDouble("Background.Offset.High",    -1.);
+	backgroundParameter[1]     = settings->GetDouble("Background.Linear",         -2.);
+	backgroundParameterLow[1]  = settings->GetDouble("Background.Linear.Low",      0.);
+	backgroundParameterHigh[1] = settings->GetDouble("Background.Linear.High",    -1.);
+	backgroundParameter[2]     = settings->GetDouble("Background.Quadratic",      -2.);
+	backgroundParameterLow[2]  = settings->GetDouble("Background.Quadratic.Low",   0.);
+	backgroundParameterHigh[2] = settings->GetDouble("Background.Quadratic.High", -1.);
+	backgroundParameter[3]     = settings->GetDouble("Background.Xoffset",        -2.);
+	backgroundParameterLow[3]  = settings->GetDouble("Background.Xoffset.Low",     0.);
+	backgroundParameterHigh[3] = settings->GetDouble("Background.Xoffset.High",   -1.);
+	for(size_t i = 0; i < backgroundParameter.size(); ++i) {
+		if(backgroundParameterLow[i] <= backgroundParameterHigh[i] && (backgroundParameter[i] < backgroundParameterLow[i] || backgroundParameterHigh[i] < backgroundParameter[i])) {
+			bool output = backgroundParameter[i] != -2.;
+			if(output) std::cout<<"Warning, "<<i<<". background parameter ("<<backgroundParameter[i]<<") is out of range "<<backgroundParameterLow[i]<<" - "<<backgroundParameterHigh[i]<<", resetting it to ";
+			backgroundParameter[i] = (backgroundParameterHigh[i] + backgroundParameterLow[i])/2.;
+			if(output) std::cout<<backgroundParameter[i]<<std::endl;
+		}
+	}
+
+	// confidence level (this value is used to draw a line at the confidence level for the mixing method)
+	double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535); // 1.535 is 99% confidence level for 48 degrees of freedom
 
 	// check if all necessary settings have been provided
 	if(projGateLow >= projGateHigh) {
@@ -190,6 +259,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	// --------------------------------------------------------------------------------
+	// Create the angular distribution.
+	// --------------------------------------------------------------------------------
+
 	// open output file and create graphs
 	TFile output(outputFile.c_str(), "recreate");
 
@@ -203,6 +276,9 @@ int main(int argc, char** argv)
 	rawChiSquares->SetName("RawChiSquares");
 	auto mixedChiSquares = new TGraph(angles->NumberOfAngles());
 	mixedChiSquares->SetName("MixedChiSquares");
+
+	// write the user settings to the output file
+	settings->Write();
 
 	auto fitDir = output.mkdir("fits", "Projections with fits", true);
 
@@ -252,9 +328,34 @@ int main(int argc, char** argv)
 		// fit the projections, we create separate peak fitters and peaks for the prompt and mixed histograms
 		TPeakFitter pf(peakLow, peakHigh);
 		TRWPeak peak(peakPos);
+		for(size_t p = 0; p < peakParameterLow.size(); ++p) {
+			if(peakParameterLow[p] == peakParameterHigh[p]) {
+				peak.GetFitFunction()->FixParameter(p, peakParameter[p]);
+			} else if(peakParameterLow[p] < peakParameterHigh[p]) {
+				peak.GetFitFunction()->SetParameter(p, peakParameter[p]);
+				peak.GetFitFunction()->SetParLimits(p, peakParameterLow[p], peakParameterHigh[p]);
+			}
+		}
 		pf.AddPeak(&peak);
 		for(auto bgPeak : bgPeakPos) {
-			pf.AddPeak(new TRWPeak(bgPeak));
+			auto bgP = new TRWPeak(bgPeak);
+			for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
+				if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
+					bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
+				} else if(bgPeakParameterLow[p] < bgPeakParameterHigh[p]) {
+					bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
+					bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
+				}
+			}
+			pf.AddPeak(bgP);
+		}
+		for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
+			if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
+				pf.GetBackground()->FixParameter(p, backgroundParameter[p]);
+			} else if(backgroundParameterLow[p] < backgroundParameterHigh[p]) {
+				pf.GetBackground()->SetParameter(p, backgroundParameter[p]);
+				pf.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
+			}
 		}
 		pf.Fit(proj, "qretryfit");
 
@@ -262,7 +363,24 @@ int main(int argc, char** argv)
 		TRWPeak peakMixed(peakPos);
 		pfMixed.AddPeak(&peakMixed);
 		for(auto bgPeak : bgPeakPos) {
-			pfMixed.AddPeak(new TRWPeak(bgPeak));
+			auto bgP = new TRWPeak(bgPeak);
+			for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
+				if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
+					bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
+				} else if(bgPeakParameterLow[p] < bgPeakParameterHigh[p]) {
+					bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
+					bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
+				}
+			}
+			pfMixed.AddPeak(bgP);
+		}
+		for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
+			if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
+				pfMixed.GetBackground()->FixParameter(p, backgroundParameter[p]);
+			} else if(backgroundParameterLow[p] < backgroundParameterHigh[p]) {
+				pfMixed.GetBackground()->SetParameter(p, backgroundParameter[p]);
+				pfMixed.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
+			}
 		}
 		pfMixed.Fit(projMixed, "qretryfit");
 
@@ -286,6 +404,11 @@ int main(int argc, char** argv)
 	}
 	std::cout<<"Fitting of projections done."<<std::endl;
 
+	// --------------------------------------------------------------------------------
+	// If a theory/simulation file has been provided, we use the a2/a4 and mixing
+	// methods to fit the angular distribution.
+	// --------------------------------------------------------------------------------
+
 	// check if we have a theory file
 	if(!theoryFile.empty()) {
 		TFile theory(theoryFile.c_str());
@@ -296,116 +419,132 @@ int main(int argc, char** argv)
 			auto z2 = static_cast<TGraphErrors*>(theory.Get("graph010"));
 			auto z4 = static_cast<TGraphErrors*>(theory.Get("graph100"));
 
-			if(z0 != nullptr && z2 != nullptr && z4 != nullptr) {
-				// calculate chi2 vs mixing graphs
-				std::vector<double> parametersSpin0;
-				auto spin0 = MixingMethod(angularDistribution, z0, z2, z4, 0, 2, 0, parametersSpin0);
-				std::vector<double> parametersSpin1;
-				auto spin1 = MixingMethod(angularDistribution, z0, z2, z4, 2, 2, 0, parametersSpin1);
-				std::vector<double> parametersSpin2;
-				auto spin2 = MixingMethod(angularDistribution, z0, z2, z4, 4, 2, 0, parametersSpin2);
-				std::vector<double> parametersSpin3;
-				auto spin3 = MixingMethod(angularDistribution, z0, z2, z4, 6, 2, 0, parametersSpin3);
-				std::vector<double> parametersSpin4;
-				auto spin4 = MixingMethod(angularDistribution, z0, z2, z4, 8, 2, 0, parametersSpin4);
+			if(z0 != nullptr && z2 != nullptr && z4 != nullptr && z0->GetN() == z2->GetN() && z0->GetN() == z4->GetN()) {
+				// check if the sizes of the provided graphs match what we expect:
+				// if we have folding and grouping enabled we either need the graphs to match the angular distribution or have a size of either 51 (singles) or 49 (addback)
+				// otherwise the size needs to match the angular distribution
+				if(z0->GetN() == angularDistribution->GetN() || ((angles->Grouping() || angles->Folding()) && z0->GetN() == (angles->Addback() ? 49:51))) {
+					// if the theory needs to be folded and/or grouped, do so now
+					if(z0->GetN() != angularDistribution->GetN()) {
+						angles->FoldOrGroup(z0, z2, z4);
+					}
+					// calculate chi2 vs mixing graphs
+					std::vector<TGraph*> spin;
+					std::vector<double> spinLabel;
+					std::vector<std::vector<double>> parameters;
+					// first check which of the vectors we iterate over
+					if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
+						for(auto twoJ : twoJLow) {
+							parameters.push_back(std::vector<double>());
+							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back()));
+							spinLabel.push_back(twoJ/2.);
+						}
+					} else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
+						for(auto twoJ : twoJMiddle) {
+							parameters.push_back(std::vector<double>());
+							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back()));
+							spinLabel.push_back(twoJ/2.);
+						}
+					} else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
+						for(auto twoJ : twoJHigh) {
+							parameters.push_back(std::vector<double>());
+							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
+							spinLabel.push_back(twoJ/2.);
+						}
+					} else {
+						parameters.push_back(std::vector<double>());
+						spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
+						spinLabel.push_back(twoJHigh.at(0)/2.);
+					}
 
-				// create canvas and plot graphs on it
-				auto canvas = new TCanvas;
+					// create canvas and plot graphs on it
+					auto canvas = new TCanvas;
 
-				// determine maximum y-value
-				double max = TMath::Max(TMath::MaxElement(spin0->GetN(), spin0->GetY()), TMath::MaxElement(spin1->GetN(), spin1->GetY()));
-				max = TMath::Max(max, TMath::MaxElement(spin2->GetN(), spin2->GetY()));
-				max = TMath::Max(max, TMath::MaxElement(spin3->GetN(), spin3->GetY()));
-				max = TMath::Max(max, TMath::MaxElement(spin4->GetN(), spin4->GetY()));
+					// determine minimum and maximum y-value
+					double min = TMath::MinElement(spin.at(0)->GetN(), spin.at(0)->GetY());
+					double max = TMath::MaxElement(spin.at(0)->GetN(), spin.at(0)->GetY());
+					for(size_t i = 1; i < spin.size(); ++i) {
+						min = TMath::Min(min, TMath::MinElement(spin.at(i)->GetN(), spin.at(i)->GetY()));
+						max = TMath::Max(max, TMath::MaxElement(spin.at(i)->GetN(), spin.at(i)->GetY()));
+					}
+					min = TMath::Min(min, confidenceLevel);
 
-				spin1->SetTitle("");
-				spin1->SetMinimum(0.);
-				spin1->SetMaximum(1.1*max);
+					// find first graph with more than one data point
+					size_t first = 0;
+					for(first = 0; first < spin.size(); ++first) {
+						if(spin[first]->GetN() > 1) break;
+					}
 
-				spin1->SetLineColor(2); spin1->SetMarkerColor(2); spin1->SetLineWidth(2);
-				spin2->SetLineColor(3); spin2->SetMarkerColor(3); spin2->SetLineWidth(2);
-				spin3->SetLineColor(4); spin3->SetMarkerColor(4); spin3->SetLineWidth(2);
-				spin4->SetLineColor(6); spin4->SetMarkerColor(6); spin4->SetLineWidth(2);
+					spin[first]->SetTitle("");
+					spin[first]->SetMinimum(0.9*min);
+					spin[first]->SetMaximum(1.1*max);
 
-				spin1->Draw("ac");
-				spin2->Draw("c");
-				spin3->Draw("c");
-				spin4->Draw("c");
-				spin0->Draw("*");
+					for(size_t i = 0; i < spin.size(); ++i) {
+						spin[i]->SetLineColor(i+1); spin[i]->SetMarkerColor(i+1); spin[i]->SetLineWidth(2);
+					}
 
-				auto confidenceLevel = new TLine(-1.5, 1.535, 1.5, 1.535);
+					spin[first]->Draw("ac");
+					for(size_t i = 0; i < spin.size(); ++i) {
+						if(i == first) continue;
+						if(spin[i]->GetN() > 1) spin[i]->Draw("c");
+						else                    spin[i]->Draw("*");
+					}
 
-				confidenceLevel->Draw();
+					auto confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
 
-				auto legend = new TLegend(0.1, 0.3);
-				legend->AddEntry(spin0, "J = 0", "p");
-				legend->AddEntry(spin1, "J = 1", "l");
-				legend->AddEntry(spin2, "J = 2", "l");
-				legend->AddEntry(spin3, "J = 3", "l");
-				legend->AddEntry(spin4, "J = 4", "l");
+					confidenceLevelLine->Draw();
 
-				legend->Draw();
+					auto legend = new TLegend(0.1, 0.3);
+					for(size_t i = 0; i < spin.size(); ++i) {
+						if(spin[i]->GetN() == 1) {
+							legend->AddEntry(spin[i], Form("J = %.1f", spinLabel[i]), "p");
+						} else {
+							legend->AddEntry(spin[i], Form("J = %.1f", spinLabel[i]), "l");
+						}
+					}
 
-				canvas->SetLogy();
+					legend->Draw();
 
-				spin1->GetHistogram()->GetXaxis()->SetRangeUser(-1.5, 1.5);
-				spin1->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
-				spin1->GetHistogram()->GetXaxis()->CenterTitle();
-				spin1->GetHistogram()->GetYaxis()->SetTitle("red. #chi^2");
-				spin1->GetHistogram()->GetYaxis()->CenterTitle();
+					canvas->SetLogy();
 
-				// write graphs and canvas to output file
-				output.cd();
-				z0->Write("graph000");
-				z2->Write("graph010");
-				z4->Write("graph100");
-				spin0->Write("spin0");
-				spin1->Write("spin1");
-				spin2->Write("spin2");
-				spin3->Write("spin3");
-				spin4->Write("spin4");
-				canvas->Write("MixingCanvas");
+					spin[first]->GetHistogram()->GetXaxis()->SetRangeUser(-1.5, 1.5);
+					spin[first]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
+					spin[first]->GetHistogram()->GetXaxis()->CenterTitle();
+					spin[first]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
+					spin[first]->GetHistogram()->GetYaxis()->CenterTitle();
 
-				// create theory graphs with best fit for each spin, and write them to file
-				auto spin0Fit = new TGraphErrors(angularDistribution->GetN());
-				auto spin1Fit = new TGraphErrors(angularDistribution->GetN());
-				auto spin2Fit = new TGraphErrors(angularDistribution->GetN());
-				auto spin3Fit = new TGraphErrors(angularDistribution->GetN());
-				auto spin4Fit = new TGraphErrors(angularDistribution->GetN());
-				auto x = angularDistribution->GetX();
-				for(int p = 0; p < angularDistribution->GetN(); ++p) {
-					spin0Fit->SetPoint(p, x[p], parametersSpin0[0]*((1.-parametersSpin0[1]-parametersSpin0[2])*z0->Eval(x[p]) + parametersSpin0[1]*z2->Eval(x[p]) + parametersSpin0[2]*z4->Eval(x[p])));
-					spin0Fit->SetPointError(p, 0., TMath::Sqrt(parametersSpin0[0]*(TMath::Power((1.-parametersSpin0[1]-parametersSpin0[2])*GetYError(z0, x[p]), 2) + TMath::Power(parametersSpin0[1]*GetYError(z2, x[p]), 2) + TMath::Power(parametersSpin0[2]*GetYError(z4, x[p]), 2))));
-					spin1Fit->SetPoint(p, x[p], parametersSpin1[0]*((1.-parametersSpin1[1]-parametersSpin1[2])*z0->Eval(x[p]) + parametersSpin1[1]*z2->Eval(x[p]) + parametersSpin1[2]*z4->Eval(x[p])));
-					spin1Fit->SetPointError(p, 0., TMath::Sqrt(parametersSpin1[0]*(TMath::Power((1.-parametersSpin1[1]-parametersSpin1[2])*GetYError(z0, x[p]), 2) + TMath::Power(parametersSpin1[1]*GetYError(z2, x[p]), 2) + TMath::Power(parametersSpin1[2]*GetYError(z4, x[p]), 2))));
-					spin2Fit->SetPoint(p, x[p], parametersSpin2[0]*((1.-parametersSpin2[1]-parametersSpin2[2])*z0->Eval(x[p]) + parametersSpin2[1]*z2->Eval(x[p]) + parametersSpin2[2]*z4->Eval(x[p])));
-					spin2Fit->SetPointError(p, 0., TMath::Sqrt(parametersSpin2[0]*(TMath::Power((1.-parametersSpin2[1]-parametersSpin2[2])*GetYError(z0, x[p]), 2) + TMath::Power(parametersSpin2[1]*GetYError(z2, x[p]), 2) + TMath::Power(parametersSpin2[2]*GetYError(z4, x[p]), 2))));
-					spin3Fit->SetPoint(p, x[p], parametersSpin3[0]*((1.-parametersSpin3[1]-parametersSpin3[2])*z0->Eval(x[p]) + parametersSpin3[1]*z2->Eval(x[p]) + parametersSpin3[2]*z4->Eval(x[p])));
-					spin3Fit->SetPointError(p, 0., TMath::Sqrt(parametersSpin3[0]*(TMath::Power((1.-parametersSpin3[1]-parametersSpin3[2])*GetYError(z0, x[p]), 2) + TMath::Power(parametersSpin3[1]*GetYError(z2, x[p]), 2) + TMath::Power(parametersSpin3[2]*GetYError(z4, x[p]), 2))));
-					spin4Fit->SetPoint(p, x[p], parametersSpin4[0]*((1.-parametersSpin4[1]-parametersSpin4[2])*z0->Eval(x[p]) + parametersSpin4[1]*z2->Eval(x[p]) + parametersSpin4[2]*z4->Eval(x[p])));
-					spin4Fit->SetPointError(p, 0., TMath::Sqrt(parametersSpin4[0]*(TMath::Power((1.-parametersSpin4[1]-parametersSpin4[2])*GetYError(z0, x[p]), 2) + TMath::Power(parametersSpin4[1]*GetYError(z2, x[p]), 2) + TMath::Power(parametersSpin4[2]*GetYError(z4, x[p]), 2))));
+					// write graphs and canvas to output file
+					output.cd();
+					z0->Write("graph000");
+					z2->Write("graph010");
+					z4->Write("graph100");
+					for(size_t i = 0; i < spin.size(); ++i) {
+						spin[i]->Write(Form("spin%d", static_cast<int>(i)));
+					}
+					canvas->Write("MixingCanvas");
+
+					// create theory graphs with best fit for each spin, and write them to file
+					std::vector<TGraphErrors*> spinFit(spin.size(), new TGraphErrors(angularDistribution->GetN()));
+					auto x = angularDistribution->GetX();
+					for(int p = 0; p < angularDistribution->GetN(); ++p) {
+						for(size_t i = 0; i < spinFit.size(); ++i) {
+							spinFit[i]->SetPoint(p, x[p], parameters[i][0]*((1.-parameters[i][1]-parameters[i][2])*z0->Eval(x[p]) + parameters[i][1]*z2->Eval(x[p]) + parameters[i][2]*z4->Eval(x[p])));
+							spinFit[i]->SetPointError(p, 0., TMath::Sqrt(parameters[i][0]*(TMath::Power((1.-parameters[i][1]-parameters[i][2])*GetYError(z0, x[p]), 2) + TMath::Power(parameters[i][1]*GetYError(z2, x[p]), 2) + TMath::Power(parameters[i][2]*GetYError(z4, x[p]), 2))));
+						}
+					}
+					for(size_t i = 0; i < spin.size(); ++i) {
+						spinFit[i]->SetLineColor(i+1); spinFit[i]->SetMarkerColor(i+1); spinFit[i]->SetLineWidth(2);
+						spinFit[i]->Write(Form("SpinFit%d", static_cast<int>(i)));
+						output.WriteObject(&parameters[i], Form("Parameters%d", static_cast<int>(i)));
+					}
+
+					auto a2a4Parameters = A2a4Method(angularDistribution, z0, z2, z4);
+					output.WriteObject(&a2a4Parameters, "ParametersA2a4Fit");
+				} else { // if(z0->GetN() == angularDistribution->GetN() || ((angles->Grouping() || angles->Folding) && z0->GetN() == (angles->Addback() ? 49:51)))
+					std::cerr<<"Mismatch between theory and data ("<<z0->GetN()<<" != "<<angularDistribution->GetN()<<"?) or neither grouping and folding are enabled ("<<std::boolalpha<<angles->Grouping()<<", "<<angles->Folding()<<") or the ungrouped/folded theory doesn't match the required size for "<<(angles->Addback() ? "addback":"singles")<<" data ("<<(angles->Addback() ? 49:51)<<")"<<std::endl;
 				}
-				spin1Fit->SetLineColor(2); spin1Fit->SetMarkerColor(2); spin1Fit->SetLineWidth(2);
-				spin2Fit->SetLineColor(3); spin2Fit->SetMarkerColor(3); spin2Fit->SetLineWidth(2);
-				spin3Fit->SetLineColor(4); spin3Fit->SetMarkerColor(4); spin3Fit->SetLineWidth(2);
-				spin4Fit->SetLineColor(6); spin4Fit->SetMarkerColor(6); spin4Fit->SetLineWidth(2);
-
-				spin0Fit->Write("Spin0Fit");
-				spin1Fit->Write("Spin1Fit");
-				spin2Fit->Write("Spin2Fit");
-				spin3Fit->Write("Spin3Fit");
-				spin4Fit->Write("Spin4Fit");
-
-				output.WriteObject(&parametersSpin0, "ParametersSpin0");
-				output.WriteObject(&parametersSpin1, "ParametersSpin1");
-				output.WriteObject(&parametersSpin2, "ParametersSpin2");
-				output.WriteObject(&parametersSpin3, "ParametersSpin3");
-				output.WriteObject(&parametersSpin4, "ParametersSpin4");
-
-				auto a2a4Parameters = A2a4Method(angularDistribution, z0, z2, z4);
-				output.WriteObject(&a2a4Parameters, "ParametersA2a4Fit");
-			} else { // if(z0 != nullptr && z2 != nullptr && z4 != nullptr)
-				std::cerr<<"Failed to find z0 ("<<z0<<", \"graph000\"), z2 ("<<z2<<", \"graph010\"), or z4 ("<<z4<<", \"graph100\") in "<<theoryFile<<std::endl; 
+			} else { // if(z0 != nullptr && z2 != nullptr && z4 != nullptr && z0->GetN() == z2->GetN() && z0->GetN() == z4->GetN())
+				std::cerr<<"Failed to find z0 ("<<z0<<", \"graph000\"), z2 ("<<z2<<", \"graph010\"), or z4 ("<<z4<<", \"graph100\") in "<<theoryFile<<", or they had mismatched sizes"<<std::endl; 
 			}
 		} else { // if(theory.IsOpen())
 			std::cerr<<"Failed to open "<<theoryFile<<std::endl;

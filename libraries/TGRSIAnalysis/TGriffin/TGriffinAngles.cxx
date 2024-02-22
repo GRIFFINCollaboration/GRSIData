@@ -11,8 +11,8 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	if(TGRSIOptions::Get() != nullptr) {
 		auto settings = TGRSIOptions::Get()->UserSettings();
 		if(settings != nullptr) {
-			fExcludedCrystals = settings->GetIntVector("ExcludedCrystals");
-			fExcludedDetectors = settings->GetIntVector("ExcludedDetectors");
+			fExcludedCrystals = settings->GetIntVector("ExcludedCrystal");
+			fExcludedDetectors = settings->GetIntVector("ExcludedDetector");
 		} else {
 			std::cout<<"Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals"<<std::endl;
 		}
