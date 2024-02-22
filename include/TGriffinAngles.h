@@ -20,6 +20,7 @@
 #include <functional>
 
 #include "TNamed.h"
+#include "TGraphErrors.h"
 
 class TGriffinAngles : public TNamed {
 public:
@@ -27,17 +28,21 @@ public:
 	~TGriffinAngles() {}
 
 	double Distance() { return fDistance; }
-	double Folding() { return fFolding; }
-	double Grouping() { return fGrouping; }
-	double Addback() { return fAddback; }
+	bool Folding() { return fFolding; }
+	bool Grouping() { return fGrouping; }
+	bool Addback() { return fAddback; }
 
 	int Index(double angle);
 	int NumberOfAngles() const { return fAngles.size(); }
 	double Angle(int index) const { auto it = fAngles.begin(); std::advance(it, index); return *it; }
 	double AverageAngle(int index) const;
 
+	void FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose = false) const;
 	std::set<double>::iterator begin() const { return fAngles.begin(); }
 	std::set<double>::iterator end() const { return fAngles.end(); }
+
+	bool ExcludeDetector(int detector) const;
+	bool ExcludeCrystal(int detector, int crystal) const;
 
 	void Print(Option_t* = "") const override;
 
@@ -47,11 +52,13 @@ private:
 	bool fGrouping{false}; ///< flag indicating whether we group close angles together
 	bool fAddback{true}; ///< flag indicating whether we use addback
 	double fRounding{0.01}; ///< we consider any angles whose difference is less than this to be equal
+	std::vector<int> fExcludedDetectors; ///< list of detectors that are excluded in calculating the angles
+	std::vector<int> fExcludedCrystals; ///< list of crystals that are excluded in calculating the angles, the crystals are numbered as 4*(det-1)+cry, so start at 0 and go up to 63
 	std::set<double> fAngles; ///< set of unique angles, when grouping is used, the largest angle of the group is used!
 	std::map<double, int> fAngleMap; ///< Maps angles to indices. This is fairly straight forward without grouping, but if grouping is used multiple angles can be mapped to the same index.
 
 	/// \cond CLASSIMP
-	ClassDefOverride(TGriffinAngles, 2)
+	ClassDefOverride(TGriffinAngles, 3)
 	/// \endcond
 };
 /*! @} */
