@@ -1,5 +1,6 @@
 #include "TGriffinAngles.h"
 #include "TGriffin.h"
+#include "TGRSIOptions.h"
 
 ClassImp(TGriffinAngles)
 
@@ -283,7 +284,7 @@ bool TGriffinAngles::ExcludeDetector(int detector) const
 bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 {
 	for(auto exclude : fExcludedCrystals) {
-		if(4*(detector-1)+crystal == exclude) return true;
+		if(4*(detector-1)+crystal+1 == exclude) return true;
 	}
 	return false;
 }
