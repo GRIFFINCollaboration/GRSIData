@@ -31,6 +31,7 @@ public:
 	bool Folding() { return fFolding; }
 	bool Grouping() { return fGrouping; }
 	bool Addback() { return fAddback; }
+	double Rounding() { return fRounding; }
 
 	int Index(double angle);
 	int NumberOfAngles() const { return fAngles.size(); }
