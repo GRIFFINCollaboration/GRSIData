@@ -157,11 +157,6 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
-	// the spins of the low, middle, and high levels, to be used for the mixing method
-	// two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
-	std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
-	std::vector<int> twoJMiddle = settings->GetIntVector("TwoJ.Middle");
-	std::vector<int> twoJHigh   = settings->GetIntVector("TwoJ.High");
 
 	// parameter limits and fixed parameters for the peak and the background peaks
 	// if the limits are the same, the parameter is fixed to that value, if the high limit is lower than the low limit there is no limit
@@ -219,6 +214,12 @@ int main(int argc, char** argv)
 			if(output) std::cout<<backgroundParameter[i]<<std::endl;
 		}
 	}
+
+	// the spins of the low, middle, and high levels, to be used for the mixing method
+	// two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
+	std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
+	std::vector<int> twoJMiddle = settings->GetIntVector("TwoJ.Middle");
+	std::vector<int> twoJHigh   = settings->GetIntVector("TwoJ.High");
 
 	// confidence level (this value is used to draw a line at the confidence level for the mixing method)
 	double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535); // 1.535 is 99% confidence level for 48 degrees of freedom
