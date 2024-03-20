@@ -174,11 +174,6 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
 
    // MidasTimeStamp is the only time we can trust at this level.
 
-   // int fEntries = eventQ->size();
-
-   int FragsIn = 0;
-
-   FragsIn++;
    int* lowest_hightime;
    lowest_hightime = new int[TEventTime::NDigitizers()];
    // Clear lowest hightime
