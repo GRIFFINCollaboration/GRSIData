@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 		if(settings == nullptr) {
 			settings = new TUserSettings(settingsFile);
 		} else {
-			settings->Read(settingsFile);
+			settings->ReadSettings(settingsFile);
 		}
 	}
 
