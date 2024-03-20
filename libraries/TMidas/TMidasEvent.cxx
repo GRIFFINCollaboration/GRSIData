@@ -295,7 +295,7 @@ void TMidasEvent::Print(const char* option) const
          void* pdata      = nullptr;
          int   found      = FindBank(&fBankList[i], &bankLength, &bankType, &pdata);
 
-			std::cout<<"Bank "<<fBankList[i]<<fBankList[i+1]<<fBankList[i+2]<<", length "<<std::setw(6)<<bankLength<<", type "<<bankType<<std::endl;
+			std::cout<<"Bank "<<fBankList[i]<<fBankList[i+1]<<fBankList[i+2]<<fBankList[i+3]<<", length "<<std::setw(6)<<bankLength<<", type "<<bankType<<std::endl;
 
          int highlight = -1;
          if(strlen(option) > 1) {

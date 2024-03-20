@@ -46,7 +46,7 @@ LIBRARY_DIRS   := $(shell $(FIND) libraries/* -type d)
 else
 export __LINUX__:= 1
 CPP        = g++
-CFLAGS     += -Wl,--no-as-needed
+CFLAGS     += -DHAVE_ZLIB -Wl,--no-as-needed
 LINKFLAGS_PREFIX += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 HEAD=head
