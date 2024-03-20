@@ -792,7 +792,6 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int i = 0; i < wsize; ++i) {
          wspec[i] = new double[3];
       }
-      int flagc   = 0;
       int binsize = 3;
 
       // Check the "randomness" of the random number generator **RCHECK**
@@ -826,7 +825,6 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                //~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~'good'
                //events
                if(var3 >= l1 && var3 <= l2) {
-                  flagc++;
                   // calculate deadtime using var3(rcmin-rrand), var2(rrand)
                   rtau = ((1.0 / var2) * (1.0 - sqrt(var3 / (*rate)))) * 1.0e6;
                   // build wspec matrix
@@ -842,7 +840,6 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                }
             }
             i += binsize;
-            flagc = 0;
          } else {
             i += 1;
             continue;
