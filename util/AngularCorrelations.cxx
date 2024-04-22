@@ -362,6 +362,14 @@ int main(int argc, char** argv)
 
 		TPeakFitter pfMixed(peakLow, peakHigh);
 		TRWPeak peakMixed(peakPos);
+		for(size_t p = 0; p < peakParameterLow.size(); ++p) {
+			if(peakParameterLow[p] == peakParameterHigh[p]) {
+				peakMixed.GetFitFunction()->FixParameter(p, peakParameter[p]);
+			} else if(peakParameterLow[p] < peakParameterHigh[p]) {
+				peakMixed.GetFitFunction()->SetParameter(p, peakParameter[p]);
+				peakMixed.GetFitFunction()->SetParLimits(p, peakParameterLow[p], peakParameterHigh[p]);
+			}
+		}
 		pfMixed.AddPeak(&peakMixed);
 		for(auto bgPeak : bgPeakPos) {
 			auto bgP = new TRWPeak(bgPeak);
@@ -404,6 +412,26 @@ int main(int argc, char** argv)
 		std::cout<<std::setw(3)<<i<<" of "<<angles->NumberOfAngles()<<" done\r"<<std::flush;
 	}
 	std::cout<<"Fitting of projections done."<<std::endl;
+
+	// correct the raw and mixed graphs for the number of combinations that contribute to each angle
+	auto rawAngularDistributionCorr = static_cast<TGraphErrors*>(rawAngularDistribution->Clone("RawAngularDistributionCorrected"));
+	for(int i = 0; i < rawAngularDistributionCorr->GetN(); ++i) {
+		if(angles->Count(rawAngularDistributionCorr->GetPointX(i)) != 0) {
+			rawAngularDistributionCorr->SetPointY(i, rawAngularDistributionCorr->GetPointY(i)/angles->Count(rawAngularDistributionCorr->GetPointX(i)));
+			rawAngularDistributionCorr->SetPointError(i, rawAngularDistributionCorr->GetErrorX(i), rawAngularDistributionCorr->GetErrorY(i)/angles->Count(rawAngularDistributionCorr->GetPointX(i)));
+		} else {
+			rawAngularDistributionCorr->SetPointY(i, 0);
+		}
+	}
+	auto mixedAngularDistributionCorr = static_cast<TGraphErrors*>(mixedAngularDistribution->Clone("MixedAngularDistributionCorrected"));
+	for(int i = 0; i < mixedAngularDistributionCorr->GetN(); ++i) {
+		if(angles->Count(mixedAngularDistributionCorr->GetPointX(i)) != 0) {
+			mixedAngularDistributionCorr->SetPointY(i, mixedAngularDistributionCorr->GetPointY(i)/angles->Count(mixedAngularDistributionCorr->GetPointX(i)));
+			mixedAngularDistributionCorr->SetPointError(i, mixedAngularDistributionCorr->GetErrorX(i), mixedAngularDistributionCorr->GetErrorY(i)/angles->Count(mixedAngularDistributionCorr->GetPointX(i)));
+		} else {
+			mixedAngularDistributionCorr->SetPointY(i, 0);
+		}
+	}
 
 	// --------------------------------------------------------------------------------
 	// If a theory/simulation file has been provided, we use the a2/a4 and mixing
@@ -560,6 +588,10 @@ int main(int argc, char** argv)
 	mixedAngularDistribution->Write();
 	rawChiSquares->Write();
 	mixedChiSquares->Write();
+	rawAngularDistributionCorr->Write();
+	mixedAngularDistributionCorr->Write();
+
+	angles->Write();
 
 	output.Close();
 	input.Close();
