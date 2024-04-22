@@ -12,8 +12,13 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	if(TGRSIOptions::Get() != nullptr) {
 		auto settings = TGRSIOptions::Get()->UserSettings();
 		if(settings != nullptr) {
-			fExcludedCrystals = settings->GetIntVector("ExcludedCrystal");
-			fExcludedDetectors = settings->GetIntVector("ExcludedDetector");
+			// try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
+			try {
+				fExcludedCrystals = settings->GetIntVector("ExcludedCrystal", true);
+			} catch(std::out_of_range&) {}
+			try {
+				fExcludedDetectors = settings->GetIntVector("ExcludedDetector", true);
+			} catch(std::out_of_range&) {}
 		} else {
 			std::cout<<"Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals"<<std::endl;
 		}
@@ -37,13 +42,19 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
                if(fFolding && angle > 90.) {
                   angle = 180. - angle;
                }
+					// if the lower bound and the upper bound are the same we have a new angle 
                if(fAngles.lower_bound(angle-fRounding) == fAngles.upper_bound(angle+fRounding)) {
 						fAngles.insert(angle);
 					}
-            }
-         }
-      }
-   }
+					// this should always work, either this is a new angle, in which case it gets initialized to zero and then incremented to one,
+					// or we increment the existing counter
+					// the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
+					// factor 2 to include that the "normal" rounding is +- fRounding
+					fAngleCount[std::round(angle/fRounding)]++;
+            } // second crystal loop
+         } //second detector loop
+      } // first crystal loop
+   } // first detector loop
 
 	// create map of indices before we group so that we have an index for each (folded) angle
 	for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
@@ -291,14 +302,29 @@ bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 
 void TGriffinAngles::Print(Option_t*) const
 {
-	std::cout<<"List of unique angles:"<<std::endl;
-	for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
-		std::cout<<std::distance(fAngles.begin(), it)<<": "<<*it<<std::endl;//<<" - index "<<Index(*it)<<std::endl;
-	}
-	std::cout<<"Map from angles to indices:"<<std::endl;
-	int i = 0;
-	for(auto const& it : fAngleMap) {
-		std::cout<<i<<": angle "<<it.first<<", index "<<it.second<<" - average angle "<<AverageAngle(it.second)<<std::endl;
-		++i;
+	std::cout<<"List of unique angles "<<std::setw(2)<<fAngles.size()<<" Map from angles to indices "<<std::setw(2)<<fAngleMap.size()<<"   # of combinations "<<std::setw(2)<<fAngleCount.size()<<std::endl;
+	          //List of unique angles aa Map from angles to indices mm   # of combinations cc"<<std::endl;
+	std::cout<<"index   angle            angle   index  average angle    angle   counts"<<std::endl;
+	          //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+	auto it = fAngles.begin();
+	auto it2 = fAngleMap.begin();
+	auto it3 = fAngleCount.begin();
+	for(it = fAngles.begin(), it2 = fAngleMap.begin(), it3 = fAngleCount.begin(); it != fAngles.end() || it2 != fAngleMap.end() || it3 != fAngleCount.end(); ++it, ++it2, ++it3) {
+		if(it != fAngles.end()) {
+			std::cout<<std::setw(2)<<std::distance(fAngles.begin(), it)<<":     "<<std::setw(7)<<*it<<"          ";
+		} else {
+	                //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+			std::cout<<"                         ";
+		}
+		if(it2 != fAngleMap.end()) {
+			std::cout<<std::setw(7)<<it2->first<<" "<<std::setw(2)<<it2->second<<"     "<<std::setw(7)<<AverageAngle(it2->second)<<"          ";
+		} else {
+	                //aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+			std::cout<<"                                ";
+		}
+		if(it3 != fAngleCount.end()) {
+			std::cout<<std::setw(7)<<it3->first*fRounding<<" "<<std::setw(3)<<it3->second;
+		}
+		std::cout<<std::endl;
 	}
 }
