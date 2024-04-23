@@ -209,6 +209,6 @@ foreach(UTIL IN LISTS UTIL_NAMES)
 	target_link_libraries(${UTIL} ${GRSI_LIBRARIES} ${ROOT_LIBRARIES} X11 Xpm)
 endforeach()
 
-configure_file(${PROJECT_SOURCE_DIR}/util/grsi-config    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/grsi-config COPYONLY)
-configure_file(${PROJECT_SOURCE_DIR}/util/ErrorReport.sh ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ErrorReport.sh COPYONLY)
+#configure_file(${PROJECT_SOURCE_DIR}/util/grsi-config    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/grsi-config COPYONLY)
+#configure_file(${PROJECT_SOURCE_DIR}/util/ErrorReport.sh ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ErrorReport.sh COPYONLY)
 
