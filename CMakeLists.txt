@@ -203,7 +203,7 @@ target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegr
 
 ##----------------------------------------------------------------------------
 ## add all executable in util
-set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GrifinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
+set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
 	target_link_libraries(${UTIL} ${GRSI_LIBRARIES} ${ROOT_LIBRARIES} X11 Xpm)
