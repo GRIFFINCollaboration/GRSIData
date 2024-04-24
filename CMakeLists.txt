@@ -36,6 +36,7 @@ find_package(ROOT REQUIRED XMLParser)
 
 if(${ROOT_xml_FOUND})
 	add_compile_options(-DHAS_XML)
+	set(CLING_OPTIONS "-DHAS_XML")
 else()
 	message("${Red}XML feature for ROOT not found (ROOT_xml_FOUND = ${ROOT_xml_FOUND})!${ColourReset}")
 endif()
@@ -69,7 +70,7 @@ add_library(TMidas SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TMidas/TMidasFile.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TMidas/TXMLOdb.cxx
 	)
-root_generate_dictionary(G__TMidas TXMLOdb.h TMidasEvent.h TMidasFile.h MODULE TMidas LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TMidas/LinkDef.h)
+root_generate_dictionary(G__TMidas TXMLOdb.h TMidasEvent.h TMidasFile.h MODULE TMidas LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TMidas/LinkDef.h ${CLING_OPTIONS})
 target_link_libraries(TMidas TGRSIFormat ${ROOT_LIBRARIES})
 add_dependencies(TMidas GRSIDataVersion)
 
