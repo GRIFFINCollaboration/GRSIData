@@ -42,7 +42,7 @@ endif()
 
 #----------------------------------------------------------------------------
 # find the GRSISort package
-find_package(GRSISort REQUIRED)
+#find_package(GRSISort REQUIRED)
 
 #----------------------------------------------------------------------------
 # set c++ standard to the one used for root
