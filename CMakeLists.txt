@@ -123,6 +123,7 @@ add_library(TGriffin SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TGriffin/TGriffinBgoHit.cxx
 	)
 root_generate_dictionary(G__TGriffin TGriffinAngles.h TGriffin.h TGriffinHit.h TGriffinBgo.h TGriffinBgoHit.h MODULE TGriffin LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TGriffin/LinkDef.h)
+target_link_libraries(TGriffin ${GRSI_LIBRARIES})
 
 add_library(TLaBr SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TLaBr/TLaBr.cxx
