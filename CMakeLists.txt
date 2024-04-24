@@ -207,11 +207,9 @@ add_library(MakeGriffinHistograms SHARED
 	)
 target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegree)
 
-# GRSIDataVersion.h is created by running util/gen_version.sh
-# might need to copy util/config to $GRSISYS/<parser-lib>/util/config ?
-
 ##----------------------------------------------------------------------------
 ## add all executable in util
+set(GRSIDATA_LIBRARIES TAngularCorrelation TCSM TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
 set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
