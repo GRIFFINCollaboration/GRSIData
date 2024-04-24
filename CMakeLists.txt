@@ -219,9 +219,10 @@ endforeach()
 
 ##----------------------------------------------------------------------------
 # custom target to generate the version header
+# CMAKE_SOURCE_DIR is the GRSISort directory
 add_custom_target(GRSIDataVersion
-	${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/include/GRSIDataVersion.h.in
-						  -D DST=${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
+	                 -D DST=${PROJECT_BINARY_DIR}/include/GRSIDataVersion.h
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
   )
