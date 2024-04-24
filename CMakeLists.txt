@@ -26,6 +26,10 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(GRSIData)
 
 #----------------------------------------------------------------------------
+# find the git package (needed to determine the version of the code)
+find_package(Git REQUIRED)
+
+#----------------------------------------------------------------------------
 # find the root package (and add COMPONENTS)
 #find_package(ROOT REQUIRED COMPONENTS Gui GuiHtml Minuit Spectrum)
 find_package(ROOT REQUIRED)
@@ -35,6 +39,10 @@ if(${ROOT_xml_FOUND})
 else()
 	message("${Red}XML feature for ROOT not found (ROOT_xml_FOUND = ${ROOT_xml_FOUND})!${ColourReset}")
 endif()
+
+#----------------------------------------------------------------------------
+# find the GRSISort package
+find_package(GRSISort REQUIRED)
 
 #----------------------------------------------------------------------------
 # set c++ standard to the one used for root
@@ -209,6 +217,12 @@ foreach(UTIL IN LISTS UTIL_NAMES)
 	target_link_libraries(${UTIL} ${GRSI_LIBRARIES} ${ROOT_LIBRARIES} X11 Xpm)
 endforeach()
 
-#configure_file(${PROJECT_SOURCE_DIR}/util/grsi-config    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/grsi-config COPYONLY)
-#configure_file(${PROJECT_SOURCE_DIR}/util/ErrorReport.sh ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ErrorReport.sh COPYONLY)
+##----------------------------------------------------------------------------
+# custom target to generate the version header
+add_custom_target(GRSIDataVersion
+	${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/include/GRSIDataVersion.h.in
+						  -D DST=${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+                    -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                    -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+  )
 
