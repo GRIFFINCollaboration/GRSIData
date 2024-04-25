@@ -219,6 +219,13 @@ foreach(UTIL IN LISTS UTIL_NAMES)
 endforeach()
 
 ##----------------------------------------------------------------------------
+# add the global library with the functions to create files and parsers
+add_library(GRSIData SHARED
+	${PROJECT_SOURCE_DIR}/src/GRSIDataLibrary.cxx
+	)
+target_link_libraries(GRSIData ${GRSIDATA_LIBRARIES})
+
+##----------------------------------------------------------------------------
 # custom target to generate the version header
 # CMAKE_SOURCE_DIR is the GRSISort directory
 # PROJECT_SOURCE_DIR is the _deps/grsidata-src directory
