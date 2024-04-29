@@ -110,12 +110,12 @@ int main(int argc, char **argv)
 				      <<"Trying to accomodate filenames"<<std::endl;
 			for(int pop = 0; pop < 5; pop++) inputname.pop_back();
 			while(inputname.size() > 9) inputname.erase(inputname.begin());
-			outputname = Form("/tig/aquila_data1/dsouthall/RawWorkingFiles/ComptonPolarimetry/AnalysisScripts/Output/test/test_%s.root", inputname.c_str());
+			outputname = Form("test_%s.root", inputname.c_str());
 		} else {
 			int runnumber = runInfo->RunNumber();
 			int subrunnumber = runInfo->SubRunNumber();
 			printf("Run number = %d and subrun number = %d\n", runnumber, subrunnumber);
-			outputname = Form("/data1/grifuser/CompHists_%05d_%03d.root", runnumber, subrunnumber);
+			outputname = Form("CompHists_%05d_%03d.root", runnumber, subrunnumber);
 		}
 		
 		outfile = new TFile(outputname.c_str(), "recreate");
@@ -183,7 +183,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 	int gEnergyIndex1; //The index for gEnergy of gamma 1.  Set within the code. 
 							 //These parameters could potentially be automated but right now my attempts were unsuccesful  
 	std::vector<int> MissingClovers = {}; // = {1,2,3,4};//13 //Put Missing Detectors in vector below.  Any detector combinations including these detectors will be ignored.  Detectors are 1 through 16. 
-	double DetectorHeight = 110.0;   //This should be found from runinfo->HPGeArrayPosition();, however this may not have been actively set for the experiment. For 
+	double DetectorHeight = 145.0;   //This should be found from runinfo->HPGeArrayPosition();, however this may not have been actively set for the experiment. For 
 												//for run02397 it seems that this returned the default of 110mm, but the calculated crystal position magnitudes were 58.112mm, 
 												// lists in which to store the array numbers, energies, and entry numbers of earlier events used for
 												// event mixing. 
@@ -257,6 +257,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 				Xi = n1.Angle(n2)*TMath::RadToDeg();
 				CoTheta = v3.Angle(v1)*TMath::RadToDeg();
 
+				std::cout<<one<<", "<<two<<", "<<three<<": "<<Xi<<", "<<d1.Angle(d2)*TMath::RadToDeg()<<", "<<CoTheta<<std::endl;
 				XiHist2DGeo_DetDet->Fill( Xi, TMath::RadToDeg()*d1.Angle(d2) ); 
 				XiHist2DGeo_CryCry->Fill( Xi, CoTheta );
 				XiCrystalGeo->Fill( Xi, one );

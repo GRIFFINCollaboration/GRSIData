@@ -12,8 +12,13 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	if(TGRSIOptions::Get() != nullptr) {
 		auto settings = TGRSIOptions::Get()->UserSettings();
 		if(settings != nullptr) {
-			fExcludedCrystals = settings->GetIntVector("ExcludedCrystal");
-			fExcludedDetectors = settings->GetIntVector("ExcludedDetector");
+			// try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
+			try {
+				fExcludedCrystals = settings->GetIntVector("ExcludedCrystal", true);
+			} catch(std::out_of_range&) {}
+			try {
+				fExcludedDetectors = settings->GetIntVector("ExcludedDetector", true);
+			} catch(std::out_of_range&) {}
 		} else {
 			std::cout<<"Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals"<<std::endl;
 		}
@@ -37,13 +42,19 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
                if(fFolding && angle > 90.) {
                   angle = 180. - angle;
                }
+					// if the lower bound and the upper bound are the same we have a new angle 
                if(fAngles.lower_bound(angle-fRounding) == fAngles.upper_bound(angle+fRounding)) {
 						fAngles.insert(angle);
 					}
-            }
-         }
-      }
-   }
+					// this should always work, either this is a new angle, in which case it gets initialized to zero and then incremented to one,
+					// or we increment the existing counter
+					// the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
+					// factor 2 to include that the "normal" rounding is +- fRounding
+					fAngleCount[std::round(angle/fRounding)]++;
+            } // second crystal loop
+         } //second detector loop
+      } // first crystal loop
+   } // first detector loop
 
 	// create map of indices before we group so that we have an index for each (folded) angle
 	for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
@@ -129,6 +140,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 	/// This assumes that the theory graphs all have the exact same length of 49 or 51 for singles or addback, respectively.
 
 	// these are simulated data, so if we add points together we take their average as the new value and change the uncertainties accordingly
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 	if(verbose) {
 		std::cout<<"-------------------- original --------------------"<<std::endl;
 		for(int i = 0; i < z0->GetN(); ++i) {
@@ -136,6 +148,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 		}
 		std::cout<<"--------------------------------------------------"<<std::endl;
 	}
+#endif
 
 	// folding first
 	if(fFolding) {
@@ -145,20 +158,25 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 		auto angle4 = z4->GetX();
 		for(int i = 0; i < z0->GetN(); ++i) {
 			if(angle0[i] > 90.) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 				if(verbose) {
 					std::cout<<i<<": Folding from "<<std::setw(8)<<z0->GetPointX(i)<<" "<<std::setw(8)<<z2->GetPointX(i)<<" "<<std::setw(8)<<z4->GetPointX(i);
 				}
+#endif
 				angle0[i] = 180. - angle0[i];
 				angle2[i] = angle0[i];
 				angle4[i] = angle0[i];
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 				if(verbose) {
 					std::cout<<" to "<<std::setw(8)<<z0->GetPointX(i)<<" "<<std::setw(8)<<z2->GetPointX(i)<<" "<<std::setw(8)<<z4->GetPointX(i)<<std::endl;
 				}
+#endif
 			}
 		}
 		z0->Sort();
 		z2->Sort();
 		z4->Sort();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		if(verbose) {
 			std::cout<<"-------------------- sorted --------------------"<<std::endl;
 			for(int i = 0; i < z0->GetN(); ++i) {
@@ -166,6 +184,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 			}
 			std::cout<<"------------------------------------------------"<<std::endl;
 		}
+#endif
 		angle0 = z0->GetX();
 		auto counts0 = z0->GetY(); auto errors0 = z0->GetEY();
 		auto counts2 = z2->GetY(); auto errors2 = z2->GetEY();
@@ -194,6 +213,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 			}
 		}
 	}
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 	if(verbose) {
 		std::cout<<"-------------------- after folding --------------------"<<std::endl;
 		for(int i = 0; i < z0->GetN(); ++i) {
@@ -201,6 +221,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 		}
 		std::cout<<"-------------------------------------------------------"<<std::endl;
 	}
+#endif
 
 	// grouping
 	if(fGrouping) {
@@ -213,18 +234,22 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 			switch(i) {
 				case 0:
 				case 1: // first and second angle are not grouped
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					if(verbose) {
 						std::cout<<i<<": Leaving as is "<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
 					}
+#endif
 					break;
 				case 2:
 				case 3:
 				case 4:
 					// three groups of two angles each, so we add the this point to the next one, delete it, and update the pointers
 					// because we delete the point, we don't skip cases here like when we create the angles above
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					if(verbose) {
 						std::cout<<i<<": Grouping "<<z0->GetPointX(i)<<" and "<<z0->GetPointX(i+1)<<" from "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i);
 					}
+#endif
 					counts0[i+1] += counts0[i]; counts0[i+1] /= 2.; errors0[i+1] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i+1], 2))/2.;
 					counts2[i+1] += counts2[i]; counts2[i+1] /= 2.; errors2[i+1] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i+1], 2))/2.;
 					counts4[i+1] += counts4[i]; counts4[i+1] /= 2.; errors4[i+1] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i+1], 2))/2.;
@@ -234,16 +259,20 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 					counts0 = z0->GetY(); errors0 = z0->GetEY();
 					counts2 = z2->GetY(); errors2 = z2->GetEY();
 					counts4 = z4->GetY(); errors4 = z4->GetEY();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					if(verbose) {
 						std::cout<<" to "<<z0->GetPointX(i)<<" with "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
 					}
+#endif
 					// no need to decrement the index, by removing one point the old i+1 became i and we don't want to process that one (we just added to it)
 					break;
 				default:
 					// all others are groups of three, so we add this point and the next one to the one two ahead, delete them, and update the pointers
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					if(verbose) {
 						std::cout<<i<<": Grouping "<<z0->GetPointX(i)<<", "<<z0->GetPointX(i+1)<<", and "<<z0->GetPointX(i+2)<<" from "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i);
 					}
+#endif
 					counts0[i+2] += counts0[i] + counts0[i+1]; counts0[i+2] /= 3.; errors0[i+2] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
 					counts2[i+2] += counts2[i] + counts2[i+1]; counts2[i+2] /= 3.; errors2[i+2] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
 					counts4[i+2] += counts4[i] + counts4[i+1]; counts4[i+2] /= 3.; errors4[i+2] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
@@ -256,14 +285,17 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 					counts0 = z0->GetY(); errors0 = z0->GetEY();
 					counts2 = z2->GetY(); errors2 = z2->GetEY();
 					counts4 = z4->GetY(); errors4 = z4->GetEY();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					if(verbose) {
 						std::cout<<" to "<<z0->GetPointX(i)<<" with "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
 					}
+#endif
 					// no need to decrement the index, by removing two points the old i+2 became i and we don't want to processs that one since we just added to it
 					break;
 			}
 		}
 	}
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 	if(verbose) {
 		std::cout<<"-------------------- after folding and grouping --------------------"<<std::endl;
 		for(int i = 0; i < z0->GetN(); ++i) {
@@ -271,6 +303,7 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 		}
 		std::cout<<"--------------------------------------------------------------------"<<std::endl;
 	}
+#endif
 }
 
 bool TGriffinAngles::ExcludeDetector(int detector) const
@@ -291,14 +324,29 @@ bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 
 void TGriffinAngles::Print(Option_t*) const
 {
-	std::cout<<"List of unique angles:"<<std::endl;
-	for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
-		std::cout<<std::distance(fAngles.begin(), it)<<": "<<*it<<std::endl;//<<" - index "<<Index(*it)<<std::endl;
-	}
-	std::cout<<"Map from angles to indices:"<<std::endl;
-	int i = 0;
-	for(auto const& it : fAngleMap) {
-		std::cout<<i<<": angle "<<it.first<<", index "<<it.second<<" - average angle "<<AverageAngle(it.second)<<std::endl;
-		++i;
+	std::cout<<"List of unique angles "<<std::setw(2)<<fAngles.size()<<" Map from angles to indices "<<std::setw(2)<<fAngleMap.size()<<"   # of combinations "<<std::setw(2)<<fAngleCount.size()<<std::endl;
+	          //List of unique angles aa Map from angles to indices mm   # of combinations cc"<<std::endl;
+	std::cout<<"index   angle            angle   index  average angle    angle   counts"<<std::endl;
+	          //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+	auto it = fAngles.begin();
+	auto it2 = fAngleMap.begin();
+	auto it3 = fAngleCount.begin();
+	for(it = fAngles.begin(), it2 = fAngleMap.begin(), it3 = fAngleCount.begin(); it != fAngles.end() || it2 != fAngleMap.end() || it3 != fAngleCount.end(); ++it, ++it2, ++it3) {
+		if(it != fAngles.end()) {
+			std::cout<<std::setw(2)<<std::distance(fAngles.begin(), it)<<":     "<<std::setw(7)<<*it<<"          ";
+		} else {
+	                //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+			std::cout<<"                         ";
+		}
+		if(it2 != fAngleMap.end()) {
+			std::cout<<std::setw(7)<<it2->first<<" "<<std::setw(2)<<it2->second<<"     "<<std::setw(7)<<AverageAngle(it2->second)<<"          ";
+		} else {
+	                //aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+			std::cout<<"                                ";
+		}
+		if(it3 != fAngleCount.end()) {
+			std::cout<<std::setw(7)<<it3->first*fRounding<<" "<<std::setw(3)<<it3->second;
+		}
+		std::cout<<std::endl;
 	}
 }

@@ -1,3 +1,9 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <string>
+#include <cassert>
+
 #include "TFile.h"
 #include "TH2.h"
 #include "TH1.h"
@@ -23,11 +29,21 @@ double GetYError(TGraphErrors* graph, const double& x)
 {
 	/// general function to get the error of a graph at point x (takes the maximum of the errors of the bracketing points)
 	for(int i = 0; i < graph->GetN(); ++i) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		// exact match: return the error at this point
 		if(graph->GetPointX(i) == x) return graph->GetErrorY(i);
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
 		else if(graph->GetPointX(i) > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+#else
+		double px, py;
+		graph->GetPoint(i, px, py);
+		// exact match: return the error at this point
+		if(px == x) return graph->GetErrorY(i);
+		// first point with larger x: take maximum of this point and previous point
+		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
+		else if(px > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+#endif
 	}
 	return 0.;
 }
@@ -281,7 +297,11 @@ int main(int argc, char** argv)
 	// write the user settings to the output file
 	settings->Write();
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 	auto fitDir = output.mkdir("fits", "Projections with fits", true);
+#else
+	auto fitDir = output.mkdir("fits", "Projections with fits");
+#endif
 
 	// loop over all matrices
 	for(int i = 0; i < angles->NumberOfAngles(); ++i) {
@@ -362,6 +382,14 @@ int main(int argc, char** argv)
 
 		TPeakFitter pfMixed(peakLow, peakHigh);
 		TRWPeak peakMixed(peakPos);
+		for(size_t p = 0; p < peakParameterLow.size(); ++p) {
+			if(peakParameterLow[p] == peakParameterHigh[p]) {
+				peakMixed.GetFitFunction()->FixParameter(p, peakParameter[p]);
+			} else if(peakParameterLow[p] < peakParameterHigh[p]) {
+				peakMixed.GetFitFunction()->SetParameter(p, peakParameter[p]);
+				peakMixed.GetFitFunction()->SetParLimits(p, peakParameterLow[p], peakParameterHigh[p]);
+			}
+		}
 		pfMixed.AddPeak(&peakMixed);
 		for(auto bgPeak : bgPeakPos) {
 			auto bgP = new TRWPeak(bgPeak);
@@ -404,6 +432,48 @@ int main(int argc, char** argv)
 		std::cout<<std::setw(3)<<i<<" of "<<angles->NumberOfAngles()<<" done\r"<<std::flush;
 	}
 	std::cout<<"Fitting of projections done."<<std::endl;
+
+	// correct the raw and mixed graphs for the number of combinations that contribute to each angle
+	auto rawAngularDistributionCorr = static_cast<TGraphErrors*>(rawAngularDistribution->Clone("RawAngularDistributionCorrected"));
+	for(int i = 0; i < rawAngularDistributionCorr->GetN(); ++i) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
+		if(angles->Count(rawAngularDistributionCorr->GetPointX(i)) != 0) {
+			rawAngularDistributionCorr->SetPointY(i, rawAngularDistributionCorr->GetPointY(i)/angles->Count(rawAngularDistributionCorr->GetPointX(i)));
+			rawAngularDistributionCorr->SetPointError(i, rawAngularDistributionCorr->GetErrorX(i), rawAngularDistributionCorr->GetErrorY(i)/angles->Count(rawAngularDistributionCorr->GetPointX(i)));
+		} else {
+			rawAngularDistributionCorr->SetPointY(i, 0);
+		}
+#else
+		double px, py;
+		rawAngularDistributionCorr->GetPoint(i, px, py);
+		if(angles->Count(px) != 0) {
+			rawAngularDistributionCorr->SetPoint(i, px, py/angles->Count(px));
+			rawAngularDistributionCorr->SetPointError(i, rawAngularDistributionCorr->GetErrorX(i), rawAngularDistributionCorr->GetErrorY(i)/angles->Count(px));
+		} else {
+			rawAngularDistributionCorr->SetPoint(i, px, 0);
+		}
+#endif
+	}
+	auto mixedAngularDistributionCorr = static_cast<TGraphErrors*>(mixedAngularDistribution->Clone("MixedAngularDistributionCorrected"));
+	for(int i = 0; i < mixedAngularDistributionCorr->GetN(); ++i) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
+		if(angles->Count(mixedAngularDistributionCorr->GetPointX(i)) != 0) {
+			mixedAngularDistributionCorr->SetPointY(i, mixedAngularDistributionCorr->GetPointY(i)/angles->Count(mixedAngularDistributionCorr->GetPointX(i)));
+			mixedAngularDistributionCorr->SetPointError(i, mixedAngularDistributionCorr->GetErrorX(i), mixedAngularDistributionCorr->GetErrorY(i)/angles->Count(mixedAngularDistributionCorr->GetPointX(i)));
+		} else {
+			mixedAngularDistributionCorr->SetPointY(i, 0);
+		}
+#else
+		double px, py;
+		mixedAngularDistributionCorr->GetPoint(i, px, py);
+		if(angles->Count(px) != 0) {
+			mixedAngularDistributionCorr->SetPoint(i, px, py/angles->Count(px));
+			mixedAngularDistributionCorr->SetPointError(i, mixedAngularDistributionCorr->GetErrorX(i), mixedAngularDistributionCorr->GetErrorY(i)/angles->Count(px));
+		} else {
+			mixedAngularDistributionCorr->SetPoint(i, px, 0);
+		}
+#endif
+	}
 
 	// --------------------------------------------------------------------------------
 	// If a theory/simulation file has been provided, we use the a2/a4 and mixing
@@ -495,7 +565,11 @@ int main(int argc, char** argv)
 
 					confidenceLevelLine->Draw();
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 					auto legend = new TLegend(0.1, 0.3);
+#else
+					auto legend = new TLegend(0.7, 0.6, 0.8, 0.9);
+#endif
 					for(size_t i = 0; i < spin.size(); ++i) {
 						if(spin[i]->GetN() == 1) {
 							legend->AddEntry(spin[i], Form("J = %.1f", spinLabel[i]), "p");
@@ -560,6 +634,10 @@ int main(int argc, char** argv)
 	mixedAngularDistribution->Write();
 	rawChiSquares->Write();
 	mixedChiSquares->Write();
+	rawAngularDistributionCorr->Write();
+	mixedAngularDistributionCorr->Write();
+
+	angles->Write();
 
 	output.Close();
 	input.Close();
@@ -584,8 +662,9 @@ public:
 		double chi2 = 0;
 		for(int point = 0; point < fData->GetN(); ++point) {
 			// get data values
-			double x = fData->GetPointX(point);
-			double y = fData->GetPointY(point);
+			double x;
+			double y;
+			fData->GetPoint(point, x, y);
 			double yError = fData->GetErrorY(point);
 
 			// get simulation values
@@ -726,6 +805,9 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
 
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4)
 {
+	assert(data->GetN() == z0->GetN());
+	assert(data->GetN() == z2->GetN());
+	assert(data->GetN() == z4->GetN());
 	// create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
 	// this is to get initial conditions for our fit
 	auto cosTheta = new TGraphErrors(*data);
@@ -771,13 +853,21 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	// create fit and residual graphs
 	auto fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
 	for(int i = 0; i < fit->GetN(); ++i) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		fit->SetPointY(i, parameters[0]*((1. - parameters[1] - parameters[2])*z0->GetPointY(i) + parameters[1]*z2->GetPointY(i) + parameters[2]*z4->GetPointY(i)));
+#else
+		fit->SetPoint(i, fit->GetX()[i], parameters[0]*((1. - parameters[1] - parameters[2])*z0->GetY()[i] + parameters[1]*z2->GetY()[i] + parameters[2]*z4->GetY()[i]));
+#endif
 		fit->SetPointError(i, 0., std::abs(parameters[0])*TMath::Sqrt(TMath::Power((1. - parameters[1] - parameters[2])*z0->GetErrorY(i), 2) + TMath::Power(parameters[1]*z2->GetErrorY(i), 2) + TMath::Power(parameters[2]*z4->GetErrorY(i), 2)));
 	}
 
 	auto residual = static_cast<TGraphErrors*>(data->Clone("residual"));
 	for(int i = 0; i < residual->GetN(); ++i) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		residual->SetPointY(i, data->GetPointY(i) - fit->GetPointY(i));
+#else
+		residual->SetPoint(i, residual->GetX()[i], data->GetY()[i] - fit->GetY()[i]);
+#endif
 		residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
 	}
 
