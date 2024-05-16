@@ -223,7 +223,7 @@ endforeach()
 add_library(GRSIData SHARED
 	${PROJECT_SOURCE_DIR}/src/GRSIDataLibrary.cxx
 	)
-target_link_libraries(GRSIData ${GRSIDATA_LIBRARIES})
+target_link_libraries(GRSIData ${GRSIDATA_LIBRARIES} ${UTIL_NAMES})
 
 ##----------------------------------------------------------------------------
 # custom target to generate the version header
