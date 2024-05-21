@@ -47,7 +47,11 @@ endif()
 
 #----------------------------------------------------------------------------
 # set c++ standard to the one used for root
-set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+if(DEFINED ROOT_CXX_STANDARD)
+	set(CMAKE_CXX_STANDARD ${ROOT_CXX_STANDARD})
+else()
+	set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #----------------------------------------------------------------------------
