@@ -82,9 +82,10 @@ add_dependencies(TMidas GRSIDataVersion)
 add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/TGRSIDetectorInformation.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/TGRSIMnemonic.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSM.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
 	)
-root_generate_dictionary(G__TGRSIFormat TGRSIDetectorInformation.h TGRSIMnemonic.h MODULE TGRSIFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/LinkDef.h)
-#target_link_libraries(TGRSIFormat TCSM TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+root_generate_dictionary(G__TGRSIFormat TGRSIDetectorInformation.h TGRSIMnemonic.h TCSM.h TCSMHit.h MODULE TGRSIFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/CMakeLinkDef.h)
 target_link_libraries(TGRSIFormat TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
 
 add_library(TGRSIDataParser SHARED
@@ -98,13 +99,6 @@ add_library(TAngularCorrelation SHARED
 	)
 root_generate_dictionary(G__TAngularCorrelation TAngularCorrelation.h MODULE TAngularCorrelation LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAngularCorrelation/LinkDef.h)
 target_link_libraries(TAngularCorrelation TGriffin)
-
-add_library(TCSM SHARED
-	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSM.cxx
-	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
-	)
-root_generate_dictionary(G__TCSM TCSM.h TCSMHit.h MODULE TCSM LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/LinkDef.h)
-target_link_libraries(TCSM TGRSIFormat ${GRSI_LIBRARIES})
 
 add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescant.cxx
@@ -234,7 +228,7 @@ target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegr
 
 ##----------------------------------------------------------------------------
 ## add all executable in util
-set(GRSIDATA_LIBRARIES TAngularCorrelation TCSM TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
+set(GRSIDATA_LIBRARIES TAngularCorrelation TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
 set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
