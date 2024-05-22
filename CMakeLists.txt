@@ -103,6 +103,7 @@ add_library(TCSM SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
 	)
 root_generate_dictionary(G__TCSM TCSM.h TCSMHit.h MODULE TCSM LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/LinkDef.h)
+target_link_libraries(TCSM TFormat ${ROOT_LIBRARIES})
 
 add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescant.cxx
@@ -116,11 +117,13 @@ add_library(TEmma SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/TEmmaHit.cxx
 	)
 root_generate_dictionary(G__TEmma TEmma.h TEmmaHit.h MODULE TEmma LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/LinkDef.h)
+target_link_libraries(TEmma TFormat ${ROOT_LIBRARIES})
 
 add_library(TGenericDetector SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TGenericDetector/TGenericDetector.cxx
 	)
 root_generate_dictionary(G__TGenericDetector TGenericDetector.h MODULE TGenericDetector LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TGenericDetector/LinkDef.h)
+target_link_libraries(TGenericDetector TFormat ${ROOT_LIBRARIES})
 
 add_library(TGriffin SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TGriffin/TGriffinAngles.cxx
@@ -139,23 +142,27 @@ add_library(TLaBr SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TLaBr/TLaBrBgoHit.cxx
 	)
 root_generate_dictionary(G__TLaBr TLaBr.h TLaBrHit.h TLaBrBgo.h TLaBrBgoHit.h MODULE TLaBr LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TLaBr/LinkDef.h)
+target_link_libraries(TLaBr TFormat ${ROOT_LIBRARIES})
 
 add_library(TPaces SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TPaces/TPaces.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TPaces/TPacesHit.cxx
 	)
 root_generate_dictionary(G__TPaces TPaces.h TPacesHit.h MODULE TPaces LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TPaces/LinkDef.h)
+target_link_libraries(TPaces TFormat ${ROOT_LIBRARIES})
 
 add_library(TRF SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TRF/TRF.cxx
 	)
 root_generate_dictionary(G__TRF TRF.h MODULE TRF LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TRF/LinkDef.h)
+target_link_libraries(TRF TFormat ${ROOT_LIBRARIES})
 
 add_library(TS3 SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TS3/TS3.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TS3/TS3Hit.cxx
 	)
 root_generate_dictionary(G__TS3 TS3.h TS3Hit.h MODULE TS3 LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TS3/LinkDef.h)
+target_link_libraries(TS3 TFormat ${ROOT_LIBRARIES})
 
 add_library(TSceptar SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSceptar/TSceptar.cxx
@@ -169,41 +176,48 @@ add_library(TSharc SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSharc/TSharcHit.cxx
 	)
 root_generate_dictionary(G__TSharc TSharc.h TSharcHit.h MODULE TSharc LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSharc/LinkDef.h)
+target_link_libraries(TSharc TFormat ${ROOT_LIBRARIES})
 
 add_library(TSiLi SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSiLi/TSiLi.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSiLi/TSiLiHit.cxx
 	)
 root_generate_dictionary(G__TSiLi TSiLi.h TSiLiHit.h MODULE TSiLi LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSiLi/LinkDef.h)
+target_link_libraries(TSiLi TFormat ${ROOT_LIBRARIES})
 
 add_library(TTAC SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTAC/TTAC.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTAC/TTACHit.cxx
 	)
 root_generate_dictionary(G__TTAC TTAC.h TTACHit.h MODULE TTAC LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTAC/LinkDef.h)
+target_link_libraries(TTAC TFormat ${ROOT_LIBRARIES})
 
 add_library(TTigress SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigress.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigressHit.cxx
 	)
 root_generate_dictionary(G__TTigress TTigress.h TTigressHit.h MODULE TTigress LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/LinkDef.h)
+target_link_libraries(TTigress TFormat ${ROOT_LIBRARIES})
 
 add_library(TTip SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTip/TTip.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTip/TTipHit.cxx
 	)
 root_generate_dictionary(G__TTip TTip.h TTipHit.h MODULE TTip LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTip/LinkDef.h)
+target_link_libraries(TTip TFormat ${ROOT_LIBRARIES})
 
 add_library(TTrific SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTrific/TTrific.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTrific/TTrificHit.cxx
 	)
 root_generate_dictionary(G__TTrific TTrific.h TTrificHit.h MODULE TTrific LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTrific/LinkDef.h)
+target_link_libraries(TTrific TFormat ${ROOT_LIBRARIES})
 
 add_library(TTriFoil SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTriFoil/TTriFoil.cxx
 	)
 root_generate_dictionary(G__TTriFoil TTriFoil.h MODULE TTriFoil LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTriFoil/LinkDef.h)
+target_link_libraries(TTriFoil TFormat ${ROOT_LIBRARIES})
 
 add_library(TZeroDegree SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TZeroDegree/TZeroDegree.cxx
