@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 		outputFileName = std::string("ct_") + outputFileName.substr(lastSlash+1);
 	}
 
-   auto* outputFile = new TFile(outputFileName, "recreate");
+   auto* outputFile = new TFile(outputFileName.c_str(), "recreate");
 
    FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.));
 
