@@ -238,12 +238,13 @@ int main(int argc, char** argv)
 
 	auto userSettings = new TUserSettings();
 	if(argc == 4) {
-		userSettings->ReadFile(argv[3]);
+		userSettings->ReadSettings(argv[3]);
 	}
 
    // Create the output file
 	std::string outputFileName = argv[1];
-	if((auto lastSlash = outputFileName.find_last_of('/')) != std::string::npos) {
+	auto lastSlash = outputFileName.find_last_of('/');
+	if(lastSlash != std::string::npos) {
 		outputFileName = std::string("ct_") + outputFileName.substr(lastSlash+1);
 	}
 
