@@ -12,6 +12,7 @@
 
 #include "TChannel.h"
 #include "TGriffin.h"
+#include "TUserSettings.h"
 
 double CrossTalkFit(double* x, double* par)
 {
@@ -27,10 +28,10 @@ double CrossTalkFit(double* x, double* par)
    return x[0] * slope + intercept;
 }
 
-double* CrossTalkFix(int det, double energy, TFile* in_file)
+double* CrossTalkFix(int det, double energy, TFile* inputFile)
 {
    // The outfile is implicit since it was the last file that was open.
-   static double largest_correction = 0.0;
+   static double largestCorrection = 0.0;
 
    // Clear all of the CT calibrations for this detector.
    for(int i = 0; i < 4; ++i) {
@@ -43,29 +44,29 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
       chan->DestroyCTCal();
    }
 
-   static int largest_det      = -1;
-   static int largest_crystal1 = -1;
-   static int largest_crystal2 = -1;
+   static int largestDet      = -1;
+   static int largestCrystal1 = -1;
+   static int largestCrystal2 = -1;
 
    std::string       namebase = Form("det_%d", det);
 
 	// This range seems to be working fairly well since no shift should be larger than say 6 or 7 keV
-   double low_cut  = energy - 15;
-   double high_cut = energy + 15;
+   double lowCut  = energy - 15;
+   double highCut = energy + 15;
 
 	// create diagonal cut
-   double xpts[5] = {low_cut, 0, 0, high_cut, low_cut};
-   double ypts[5] = {0, low_cut, high_cut, 0, 0};
+   double xpts[5] = {lowCut, 0, 0, highCut, lowCut};
+   double ypts[5] = {0, lowCut, highCut, 0, 0};
    TCutG  cut("cut", 5, xpts, ypts);
 
    auto* d   = new double[16]; // matrix of coefficients
-   auto* e_d = new double[16]; // matrix of errors
+   auto* eD  = new double[16]; // matrix of errors
 
    for(int crystal1 = 0; crystal1 < 4; crystal1++) {
       for(int crystal2 = crystal1 + 1; crystal2 < 4; crystal2++) {
          // Load all of the addback matrices in and put them into a vector of TH2*
          std::string name = Form("%s_%d_%d", namebase.c_str(), crystal1, crystal2);
-         TH2*        mat  = dynamic_cast<TH2*>(in_file->Get(name.c_str()));
+         TH2*        mat  = dynamic_cast<TH2*>(inputFile->Get(name.c_str()));
          if(mat == nullptr) {
             std::cout<<"can not find:  "<<name<<std::endl;
             return nullptr;
@@ -83,13 +84,13 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
 
 			// This loop turns the addback plot and TCut into the TGraphErrors
 			for(int i = 1; i <= xbins; i++) {
-				bool inside_yet = false;
+				bool insideYet = false;
 				for(int j = 1; j <= ybins; j++) {
 					double xc = mat->GetXaxis()->GetBinCenter(i);
 					double yc = mat->GetYaxis()->GetBinCenter(j);
 					if(cut.IsInside(xc, yc) != 0) {
-						if(!inside_yet) {
-							inside_yet = true;
+						if(!insideYet) {
+							insideYet = true;
 						}
 						cmat->Fill(xc, yc, mat->GetBinContent(i, j));
 					}
@@ -122,15 +123,15 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
 			TProfile* px = cmat->ProfileX();
 			px->Write();
 			// Make a residuals plot
-			TH1* residual_plot = new TH1D(Form("%s_resid", fpx->GetName()), "residuals", 2000, 0, 2000);
-			for(int i = 0; i < residual_plot->GetNbinsX(); ++i) {
+			TH1* residualPlot = new TH1D(Form("%s_resid", fpx->GetName()), "residuals", 2000, 0, 2000);
+			for(int i = 0; i < residualPlot->GetNbinsX(); ++i) {
 				if(px->GetBinContent(i) != 0) {
-					residual_plot->SetBinContent(i, px->GetBinContent(i) - fpx->Eval(residual_plot->GetBinCenter(i)));
+					residualPlot->SetBinContent(i, px->GetBinContent(i) - fpx->Eval(residualPlot->GetBinCenter(i)));
 				}
-				residual_plot->SetBinError(i, px->GetBinError(i));
+				residualPlot->SetBinError(i, px->GetBinError(i));
 			}
-			residual_plot->Write();
-			delete residual_plot;
+			residualPlot->Write();
+			delete residualPlot;
 			delete cmat;
 
 			// for some reason from here on out crystal1 and crystal2 are used in reverse?
@@ -144,22 +145,22 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
 			// Fill the parameter matrix with the parameters from the fit.
 			d[crystal2 * 4 + crystal1]   = fpx->GetParameter(0);
 			d[crystal1 * 4 + crystal2]   = fpx->GetParameter(1);
-			e_d[crystal2 * 4 + crystal1] = fpx->GetParError(0);
-			e_d[crystal1 * 4 + crystal2] = fpx->GetParError(1);
+			eD[crystal2 * 4 + crystal1] = fpx->GetParError(0);
+			eD[crystal1 * 4 + crystal2] = fpx->GetParError(1);
 
 			// Keep track of the largest correction and output that to screen,
 			// This helps identify problem channels, or mistakes
-			if(fpx->GetParameter(0) > largest_correction) {
-				largest_correction = fpx->GetParameter(0);
-				largest_det        = det;
-				largest_crystal2   = crystal2;
-				largest_crystal1   = crystal1;
+			if(fpx->GetParameter(0) > largestCorrection) {
+				largestCorrection = fpx->GetParameter(0);
+				largestDet        = det;
+				largestCrystal2   = crystal2;
+				largestCrystal1   = crystal1;
 			}
-			if(fpx->GetParameter(1) > largest_correction) {
-				largest_correction = fpx->GetParameter(1);
-				largest_det        = det;
-				largest_crystal2   = crystal2;
-				largest_crystal1   = crystal1;
+			if(fpx->GetParameter(1) > largestCorrection) {
+				largestCorrection = fpx->GetParameter(1);
+				largestDet        = det;
+				largestCrystal2   = crystal2;
+				largestCrystal1   = crystal1;
 			}
 		}//for(int crystal2 = crystal1 + 1; crystal2 < 4; crystal2++)
 	}// for(int crystal1 = 0; crystal1 < 4; crystal1++)
@@ -177,10 +178,10 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
       for(int j = 0; j < 4; j++) {
          if(i == j) {
             d[i * 4 + j]   = 0.0000;
-            e_d[i * 4 + j] = 0.0000;
+            eD[i * 4 + j] = 0.0000;
          }
          // output a matrix to screen
-         std::cout<<d[j * 4 + i]<<"\t"; //<<"+/-"<<e_d[i*4+j]<<"\t";
+         std::cout<<d[j * 4 + i]<<"\t";
 
          // Time to find the proper channels and build the corrections xind/i is row number
          TChannel* chan = TChannel::FindChannelByName(Form("GRG%02d%sN00A", det, TGriffin::GetColorFromNumber(j)));
@@ -199,20 +200,18 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
 	std::cout.unsetf(std::ios::floatfield);
 
    std::cout<<std::endl;
-   std::cout<<"Largest correction = "<<largest_correction<<" Shift = "<<largest_correction * energy<<std::endl;
-   std::cout<<"Largest combo, det = "<<largest_det<<" Crystals = "<<largest_crystal1<<", "<<largest_crystal2<<std::endl;
+   std::cout<<"Largest correction = "<<largestCorrection<<" Shift = "<<largestCorrection * energy<<std::endl;
+   std::cout<<"Largest combo, det = "<<largestDet<<" Crystals = "<<largestCrystal1<<", "<<largestCrystal2<<std::endl;
    std::cout<<" -------------------- "<<std::endl;
    std::cout<<" -------------------- "<<std::endl;
    return d;
 }
 
-void FixAll(TFile* in_file, TFile*)
+void FixAll(TFile* inputFile, double energy)
 {
-   // This function only loops over 16 clovers (always does) and uses the 1332 keV gamma ray in 60Co
-   // We might want to make this coding a little "softer"
-   double energies[2] = {1173.228, 1332.492};
+   // This function loops over 16 clovers (always does) and by default uses the 1332 keV gamma ray in 60Co
    for(int d = 1; d <= 16; d++) {
-      CrossTalkFix(d, energies[1], in_file);
+      CrossTalkFix(d, energy, inputFile);
    }
 }
 
@@ -220,9 +219,9 @@ void FixAll(TFile* in_file, TFile*)
 int main(int argc, char** argv)
 {
    // Do basic file checks
-   if(argc != 3) {
-      printf("try again (usage: %s <matrix file> <cal file>\n", argv[0]);
-      return 0;
+   if(argc != 3 && argc != 4) {
+		std::cout<<"Usage: "<<argv[0]<<" <matrix file> <cal file> <user settings (optional)>"<<std::endl;
+      return 1;
    }
 
    // We need a cal file to find the channels to write the corrections to
@@ -231,16 +230,26 @@ int main(int argc, char** argv)
       exit(1);
    }
 
-   auto* in_file = new TFile(argv[1]);
-   if(in_file == nullptr || !in_file->IsOpen()) {
-      printf("Failed to open file '%s'!\n", argv[1]);
+   auto* inputFile = new TFile(argv[1]);
+   if(inputFile == nullptr || !inputFile->IsOpen()) {
+		std::cout<<"Failed to open file '"<<argv[1]<<"'!"<<std::endl;
       return 1;
    }
 
-   // Create and output file.
-   auto* out_file = new TFile(Form("ct_%s", in_file->GetName()), "RECREATE");
+	auto userSettings = new TUserSettings();
+	if(argc == 4) {
+		userSettings->ReadFile(argv[3]);
+	}
 
-   FixAll(in_file, out_file);
+   // Create the output file
+	std::string outputFileName = argv[1];
+	if((auto lastSlash = outputFileName.find_last_of('/')) != std::string::npos) {
+		outputFileName = std::string("ct_") + outputFileName.substr(lastSlash+1);
+	}
+
+   auto* outputFile = new TFile(outputFileName, "recreate");
+
+   FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.));
 
    // This function writes a corrections cal_file which can be loaded in with your normal cal file.
    TChannel::WriteCTCorrections("ct_correction.cal");
