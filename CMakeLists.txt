@@ -109,6 +109,7 @@ add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescantHit.cxx
 	)
 root_generate_dictionary(G__TDescant TDescant.h TDescantHit.h MODULE TDescant LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/LinkDef.h)
+target_link_libraries(TDescant TFormat ${ROOT_LIBRARIES})
 
 add_library(TEmma SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/TEmma.cxx
@@ -161,6 +162,7 @@ add_library(TSceptar SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSceptar/TSceptarHit.cxx
 	)
 root_generate_dictionary(G__TSceptar TSceptar.h TSceptarHit.h MODULE TSceptar LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSceptar/LinkDef.h)
+target_link_libraries(TSceptar TFormat ${ROOT_LIBRARIES})
 
 add_library(TSharc SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TSharc/TSharc.cxx
