@@ -84,7 +84,8 @@ add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/TGRSIMnemonic.cxx
 	)
 root_generate_dictionary(G__TGRSIFormat TGRSIDetectorInformation.h TGRSIMnemonic.h MODULE TGRSIFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/LinkDef.h)
-target_link_libraries(TGRSIFormat TCSM TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+#target_link_libraries(TGRSIFormat TCSM TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+target_link_libraries(TGRSIFormat TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
 
 add_library(TGRSIDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIDataParser/TGRSIDataParser.cxx
@@ -103,7 +104,7 @@ add_library(TCSM SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
 	)
 root_generate_dictionary(G__TCSM TCSM.h TCSMHit.h MODULE TCSM LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/LinkDef.h)
-target_link_libraries(TCSM ${GRSI_LIBRARIES})
+target_link_libraries(TCSM TGRSIFormat ${GRSI_LIBRARIES})
 
 add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescant.cxx
