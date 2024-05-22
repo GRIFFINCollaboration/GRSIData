@@ -57,6 +57,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #----------------------------------------------------------------------------
 # configure the include directories and set other variables
 include_directories(${PROJECT_SOURCE_DIR}/include ${ROOT_INCLUDE_DIRS})
+link_directories(${CMAKE_BINARY_DIR}/lib)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -207,6 +208,7 @@ add_library(TZeroDegree SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TZeroDegree/TZeroDegreeHit.cxx
 	)
 root_generate_dictionary(G__TZeroDegree TZeroDegree.h TZeroDegreeHit.h MODULE TZeroDegree LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TZeroDegree/LinkDef.h)
+target_link_libraries(TZeroDegree TFormat ${ROOT_LIBRARIES})
 
 add_library(MakeGriffinHistograms SHARED
 	${PROJECT_SOURCE_DIR}/histos/MakeGriffinHistograms.cxx
