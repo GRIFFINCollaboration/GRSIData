@@ -1999,12 +1999,12 @@ int TGRSIDataParser::EPIXToScalar(float* data, int size, unsigned int midasSeria
 	int                         NumFragsFound = 1;
 	std::shared_ptr<TEpicsFrag> EXfrag        = std::make_shared<TEpicsFrag>();
 
-	EXfrag->fDaqTimeStamp = midasTime;
-	EXfrag->fDaqId        = midasSerialNumber;
+	EXfrag->DaqTimeStamp(midasTime);
+	EXfrag->DaqId(midasSerialNumber);
 
 	for(int x = 0; x < size; x++) {
-		EXfrag->fData.push_back(data[x]);
-		EXfrag->fName.push_back(TEpicsFrag::GetEpicsVariableName(x));
+		EXfrag->AddData(data[x]);
+		EXfrag->AddName(TEpicsFrag::GetEpicsVariableName(x));
 	}
 
 	fScalerOutputQueue->Push(EXfrag);
