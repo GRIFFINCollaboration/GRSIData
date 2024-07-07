@@ -674,7 +674,13 @@ void TMidasFile::SetFileOdb()
       return;
    }
 
-   fOdb = new TXMLOdb(fOdbEvent->GetData(), fOdbEvent->GetDataSize());
+	try {
+		fOdb = new TXMLOdb(fOdbEvent->GetData(), fOdbEvent->GetDataSize());
+	} catch(std::exception& e) {
+		std::cout<<"Got exception '"<<e.what()<<"' trying to read "<<fOdbEvent->GetDataSize()<<" bytes (or words?) from:"<<std::endl;
+		std::cout<<fOdbEvent->GetData()<<std::endl;
+		throw e;
+	}
    TChannel::DeleteAllChannels();
 
    SetRunInfo(fOdbEvent->GetTimeStamp());
@@ -830,7 +836,6 @@ void TMidasFile::SetGRIFFOdb()
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
 			if(x < quads.size()) {
@@ -1000,7 +1005,6 @@ void TMidasFile::SetTIGOdb()
          }
       }
       tempChan->SetIntegration(TPriorityValue<int>(temp_integration, EPriority::kRootFile));
-      tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
       tempChan->AddENGCoefficient(offsets.at(x));
       tempChan->AddENGCoefficient(gains.at(x));
 
@@ -1083,7 +1087,6 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->SetUserInfoNumber(TPriorityValue<int>(x, EPriority::kRootFile));
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
          if(x < quads.size()) tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
