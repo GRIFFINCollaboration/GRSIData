@@ -41,7 +41,7 @@ fi
 libdir=$GRSISYS/GRSIData/lib
 incdir=$GRSISYS/GRSIData/include
 
-libs="-lTAngularCorrelation -lTGRSIDataParser -lTGRSIFormat -lTGenericDetector -lTCSM -lTDescant -lTGriffin -lTLaBr -lTMidas -lTPaces -lTRF -lTS3 -lTSceptar -lTSharc -lTSiLi -lTTAC -lTTigress -lTTip -lTTriFoil -lTZeroDegree -lTEmma -lTTrific"
+libs="TAngularCorrelation TGRSIDataParser TGRSIFormat TGenericDetector TCSM TDescant TGriffin TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTriFoil TZeroDegree TEmma TTrific TRcmp"
 
 if [[ $(root-config --cflags) == *"-std="* ]]
 then
@@ -102,7 +102,14 @@ while test $# -gt 0; do
         continue
       fi
       libsout="yes"
-      out=$"$out -L${libdir} $libs "
+		if [ -d ${libdir} ] ; then
+			out=$"$out -L${libdir}"
+		fi
+		for library in $libs ; do
+			if [ -e ${libdir}/lib${library}.so ] || [ -e ${libdir}/lib${library}.dylib ] ; then
+				out=$"$out -l${library}"
+			fi
+		done
       ;;
     --help)
       ### Print a helpful message...
