@@ -37,9 +37,22 @@ if [ "$?" -ne "0" ]; then
   fullpath1=$fullpath
 fi
 
-
-libdir=$GRSISYS/GRSIData/lib
-incdir=$GRSISYS/GRSIData/include
+if [ -d $GRSISYS/GRSIData/lib ] ; then
+	libdir=$GRSISYS/GRSIData/lib
+elif [ -d $GRSISYS/lib ] ; then
+	libdir=$GRSISYS/lib
+else
+	echo "Couldn't find either $GRSISYS/GRSIData/lib or $GRSISYS/lib directory, not sure what to do"
+	exit
+fi
+if [ -d $GRSISYS/GRSIData/include ] ; then
+	incdir=$GRSISYS/GRSIData/include
+elif [ -d $GRSISYS/include ] ; then
+	incdir=$GRSISYS/include
+else
+	echo "Couldn't find either $GRSISYS/GRSIData/include or $GRSISYS/include directory, not sure what to do"
+	exit
+fi
 
 libs="TAngularCorrelation TGRSIDataParser TGRSIFormat TGenericDetector TCSM TDescant TGriffin TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTriFoil TZeroDegree TEmma TTrific TRcmp"
 
