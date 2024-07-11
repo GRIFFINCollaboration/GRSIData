@@ -37,11 +37,24 @@ if [ "$?" -ne "0" ]; then
   fullpath1=$fullpath
 fi
 
+if [ -d $GRSISYS/GRSIData/lib ] ; then
+	libdir=$GRSISYS/GRSIData/lib
+elif [ -d $GRSISYS/lib ] ; then
+	libdir=$GRSISYS/lib
+else
+	echo "Couldn't find either $GRSISYS/GRSIData/lib or $GRSISYS/lib directory, not sure what to do"
+	exit
+fi
+if [ -d $GRSISYS/GRSIData/include ] ; then
+	incdir=$GRSISYS/GRSIData/include
+elif [ -d $GRSISYS/include ] ; then
+	incdir=$GRSISYS/include
+else
+	echo "Couldn't find either $GRSISYS/GRSIData/include or $GRSISYS/include directory, not sure what to do"
+	exit
+fi
 
-libdir=$GRSISYS/GRSIData/lib
-incdir=$GRSISYS/GRSIData/include
-
-libs="-lTAngularCorrelation -lTGRSIDataParser -lTGRSIFormat -lTGenericDetector -lTCSM -lTDescant -lTGriffin -lTLaBr -lTMidas -lTPaces -lTRF -lTS3 -lTSceptar -lTSharc -lTSiLi -lTTAC -lTTigress -lTTip -lTTriFoil -lTZeroDegree -lTEmma -lTTrific"
+libs="TAngularCorrelation TGRSIDataParser TGRSIFormat TGenericDetector TCSM TDescant TGriffin TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTriFoil TZeroDegree TEmma TTrific TRcmp"
 
 if [[ $(root-config --cflags) == *"-std="* ]]
 then
@@ -102,7 +115,14 @@ while test $# -gt 0; do
         continue
       fi
       libsout="yes"
-      out=$"$out -L${libdir} $libs "
+		if [ -d ${libdir} ] ; then
+			out=$"$out -L${libdir}"
+		fi
+		for library in $libs ; do
+			if [ -e ${libdir}/lib${library}.so ] || [ -e ${libdir}/lib${library}.dylib ] ; then
+				out=$"$out -l${library}"
+			fi
+		done
       ;;
     --help)
       ### Print a helpful message...
