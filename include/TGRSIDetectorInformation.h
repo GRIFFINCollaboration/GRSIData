@@ -24,15 +24,15 @@ class TGRSIDetectorInformation : public TDetectorInformation {
 public:
    TGRSIDetectorInformation();
    ~TGRSIDetectorInformation() override;
-	
-	TEventBuildingLoop::EBuildMode BuildMode() const override;
+   
+   TEventBuildingLoop::EBuildMode BuildMode() const override;
 
-	void Print(Option_t* opt = "") const override;
-	void Clear(Option_t* = "") override;
-	void Set() override;
+   void Print(Option_t* opt = "") const override;
+   void Clear(Option_t* = "") override;
+   void Set() override;
 
-	inline void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
-	inline bool DescantAncillary() const { return fDescantAncillary; }
+   inline void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
+   inline bool DescantAncillary() const { return fDescantAncillary; }
 
    inline void SetTigress(bool flag = true)    { fTigress = flag; }
    inline void SetSharc(bool flag = true)      { fSharc = flag; }
@@ -46,6 +46,7 @@ public:
    inline void SetBambino(bool flag = true)    { fBambino = flag; }
    inline void SetEmma(bool flag = true)       { fEmma = flag; }
    inline void SetTrific(bool flag = true)       { fTrific = flag; }
+   inline void SetSharc2(bool flag = true)     {fSharc2 = flag; }
 
    inline void SetGriffin(bool flag = true)    { fGriffin = flag; }
    inline void SetSceptar(bool flag = true)    { fSceptar = flag; }
@@ -67,6 +68,7 @@ public:
    inline bool S3()         const { return fS3; }
    inline bool Emma()       const { return fEmma; }
    inline bool Trific()     const { return fTrific; }
+   inline bool Sharc2()     const {return fSharc2; }
    inline bool Generic()    const { return fGeneric; }
 
    inline bool Griffin()    const { return fGriffin; }
@@ -82,7 +84,7 @@ private:
    //  detector types to switch over in Set()
    //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
 
-	bool fDescantAncillary{false};  ///< Descant is in the ancillary detector locations
+   bool fDescantAncillary{false};  ///< Descant is in the ancillary detector locations
 
    bool fTigress{false}; ///< flag for Tigress on/off
    bool fSharc{false};   ///< flag for Sharc on/off
@@ -96,6 +98,7 @@ private:
    bool fBambino{false}; ///< flag for Bambino on/off
    bool fEmma{false}; ///< flag for Emma on/off
    bool fTrific{false}; ///< flag for TRIFIC on/off
+   bool fSharc2{false}; ///< flag for SHARC 2 on/off
 
    bool fGriffin{false};    ///< flag for Griffin on/off
    bool fSceptar{false};    ///< flag for Sceptar on/off
@@ -106,7 +109,7 @@ private:
 
    bool fBgo{false};        ///< flag for Bgo on/off
 
-	bool fSortByTriggerId{false}; ///< flag to sort by trigger ID instead of time stamp
+   bool fSortByTriggerId{false}; ///< flag to sort by trigger ID instead of time stamp
 
    /// \cond CLASSIMP
    ClassDefOverride(TGRSIDetectorInformation, 1); // Contains the run-dependent information.

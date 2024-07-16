@@ -59,6 +59,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       str<<"\t\tBGO:                "<<(Bgo() ? "true" : "false")<<std::endl;
       str<<"\t\tEMMA:               "<<(Emma() ? "true" : "false")<<std::endl;
       str<<"\t\tTRIFIC:             "<<(Trific() ? "true" : "false")<<std::endl;
+      str<<"\t\tSHARC2:					"<<(Sharc2() ? "true" : "false")<<std::endl;
       str<<std::endl;
 		std::cout<<str.str();
    }
@@ -83,6 +84,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fBambino = false;
    fEmma    = false;
    fTrific  = false;
+   fSharc2 = false;
 
    fGriffin    = false;
    fSceptar    = false;
@@ -157,6 +159,9 @@ void TGRSIDetectorInformation::Set()
 				break;
 			case TGRSIMnemonic::ESystem::kTrific:
 				SetTrific();
+				break;
+			case TGRSIMnemonic::ESystem::kSharc2:
+				SetSharc2();
 				break;
 			case TGRSIMnemonic::ESystem::kGeneric:
 				SetGeneric();

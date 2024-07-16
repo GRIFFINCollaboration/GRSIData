@@ -48,8 +48,9 @@ public:
 		kTdrPlastic,
 		kEmma,
 		kEmmaS3,
-		kTrific,
-		kClear            //30
+		kTrific,          //30
+      kSharc2,
+		kClear            
    };
 
    ESystem   System() const { return fSystem; }
