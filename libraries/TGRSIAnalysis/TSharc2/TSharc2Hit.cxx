@@ -5,10 +5,6 @@
 #include "TSharc2.h"
 #include "TChannel.h"
 
-/// \cond CLASSIMP
-ClassImp(TSharc2Hit)
-/// \endcond
-
 TSharc2Hit::TSharc2Hit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
