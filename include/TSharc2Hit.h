@@ -19,17 +19,17 @@
 #include "TFragment.h"
 
 /////////////////////////////////////////////////////////////////////////
-//
-//  \class TSharc2Hit, the leaner method.
-//
-//  This is the updated sharc-hit storage class, designed to better work with
-//  the GRSISort Inheritied class method.  A lot has changed, but the main function
-//  stays the same.  Since two physial wire hits are needed to make one sharc hit,
-//  and the "front" side will always have better resolution/timing properties, we
-//  will make the inherited charge/time derive from the front.  So we do not lose the
-//  back information, the class additionally holds a TDetectorHit for the back and
-//  another for the pad if it is present.
-//
+///
+///  \class TSharc2Hit, the leaner method.
+///
+///  This is the updated sharc-hit storage class, designed to better work with
+///  the GRSISort Inheritied class method.  A lot has changed, but the main function
+///  stays the same.  Since two physial wire hits are needed to make one sharc hit,
+///  and the "front" side will always have better resolution/timing properties, we
+///  will make the inherited charge/time derive from the front.  So we do not lose the
+///  back information, the class additionally holds a TDetectorHit for the back and
+///  another for the pad if it is present.
+///
 ////////////////////////////////////////////////////////////////////////////
 
 class TSharc2Hit : public TDetectorHit {
