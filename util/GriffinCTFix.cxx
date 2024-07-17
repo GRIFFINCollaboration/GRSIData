@@ -12,6 +12,7 @@
 
 #include "TChannel.h"
 #include "TGriffin.h"
+#include "TUserSettings.h"
 
 double CrossTalkFit(double* x, double* par)
 {
@@ -27,10 +28,10 @@ double CrossTalkFit(double* x, double* par)
    return x[0] * slope + intercept;
 }
 
-double* CrossTalkFix(int det, double energy, TFile* in_file)
+double* CrossTalkFix(int det, double energy, TFile* inputFile)
 {
    // The outfile is implicit since it was the last file that was open.
-   static double largest_correction = 0.0;
+   static double largestCorrection = 0.0;
 
    // Clear all of the CT calibrations for this detector.
    for(int i = 0; i < 4; ++i) {
@@ -43,142 +44,144 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
       chan->DestroyCTCal();
    }
 
-   static int largest_det      = -1;
-   static int largest_crystal1 = -1;
-   static int largest_crystal2 = -1;
+   static int largestDet      = -1;
+   static int largestCrystal1 = -1;
+   static int largestCrystal2 = -1;
 
    std::string       namebase = Form("det_%d", det);
-   std::vector<TH2*> mats;
-   for(int i = 0; i < 4; i++) {
-      for(int j = i + 1; j < 4; j++) {
-         // Load all of the addback matrices in and put them into a vector of TH2*
-         std::string name = Form("%s_%d_%d", namebase.c_str(), i, j);
-         TH2*        m    = dynamic_cast<TH2*>(in_file->Get(name.c_str()));
-         if(m == nullptr) {
-            std::cout<<"can not find:  "<<name<<std::endl;
-            return nullptr;
-         }
-         mats.push_back(m);
-      }
-   }
 
-   double low_cut =
-      energy - 15; // This range seems to be working fairly well since no shift should be larger than say 6 or 7 keV
-   double high_cut = energy + 15;
+	// This range seems to be working fairly well since no shift should be larger than say 6 or 7 keV
+   double lowCut  = energy - 15;
+   double highCut = energy + 15;
 
-   double xpts[5] = {low_cut, 0, 0, high_cut, low_cut};
-   double ypts[5] = {0, low_cut, high_cut, 0, 0};
+	// create diagonal cut
+   double xpts[5] = {lowCut, 0, 0, highCut, lowCut};
+   double ypts[5] = {0, lowCut, highCut, 0, 0};
    TCutG  cut("cut", 5, xpts, ypts);
 
    auto* d   = new double[16]; // matrix of coefficients
-   auto* e_d = new double[16]; // matrix of errors
+   auto* eD  = new double[16]; // matrix of errors
 
-   for(auto mat : mats) {
-      std::cout<<mat->GetName()<<std::endl;
-      int xbins = mat->GetNbinsX();
-      int ybins = mat->GetNbinsY();
-
-      TH2* cmat = dynamic_cast<TH2*>(mat->Clone(Form("%s_clone", mat->GetName())));
-      cmat->Reset();
-
-      // I make a graph out of the "addback line" because I don't like the way TProfile handles the empty bins
-      auto* fitGraph = new TGraphErrors;
-      fitGraph->SetNameTitle(Form("%s_graph", mat->GetName()), "Graph");
-
-      // This loop turns the addback plot and TCut into the TGraphErrors
-      for(int i = 1; i <= xbins; i++) {
-         bool inside_yet = false;
-         for(int j = 1; j <= ybins; j++) {
-            double xc = mat->GetXaxis()->GetBinCenter(i);
-            double yc = mat->GetYaxis()->GetBinCenter(j);
-            if(cut.IsInside(xc, yc) != 0) {
-               if(!inside_yet) {
-                  inside_yet = true;
-               }
-               cmat->Fill(xc, yc, mat->GetBinContent(i, j));
-            }
+   for(int crystal1 = 0; crystal1 < 4; crystal1++) {
+      for(int crystal2 = crystal1 + 1; crystal2 < 4; crystal2++) {
+         // Load all of the addback matrices in and put them into a vector of TH2*
+         std::string name = Form("%s_%d_%d", namebase.c_str(), crystal1, crystal2);
+         TH2*        mat  = dynamic_cast<TH2*>(inputFile->Get(name.c_str()));
+         if(mat == nullptr) {
+            std::cout<<"can not find:  "<<name<<std::endl;
+            return nullptr;
          }
-         cmat->GetXaxis()->SetRange(i, i);
-         // This makes sure that there are at least 4 counts in the "y bin". I'd prefer this to be higher,
-         // but that requires more 60Co statistics. The reason I do this is because RMS and SD of the mean really only
-         // works
-         // for us if we have enough counts that the mean is actually a good representation of the true value. This is
-         // something
-         // TProfile does not do for us, and seems to skew the result a bit.
-         if(cmat->Integral() > 6) {
-            fitGraph->SetPoint(fitGraph->GetN(), cmat->GetYaxis()->GetBinCenter(i), cmat->GetMean(2));
-            fitGraph->SetPointError(fitGraph->GetN() - 1, cmat->GetXaxis()->GetBinWidth(i), cmat->GetMeanError(2));
-         }
-      }
-      cmat->Write();
+			std::cout<<mat->GetName()<<std::endl;
+			int xbins = mat->GetNbinsX();
+			int ybins = mat->GetNbinsY();
 
-      TString    name    = mat->GetName();
-      TObjArray* strings = name.Tokenize("_");
-      int        xind    = (dynamic_cast<TObjString*>(strings->At(strings->GetEntries() - 1)))->String().Atoi();
-      int        yind    = (dynamic_cast<TObjString*>(strings->At(strings->GetEntries() - 2)))->String().Atoi();
+			TH2* cmat = dynamic_cast<TH2*>(mat->Clone(Form("%s_clone", mat->GetName())));
+			cmat->Reset();
 
-      // This fits the TGraph
-      auto* fpx = new TF1(Form("pxfit_%i_%i_%i", det, yind, xind), CrossTalkFit, 6, 1167, 3);
-      fpx->SetParameter(0, 0.0001);
-      fpx->SetParameter(1, 0.0001);
-      fpx->SetParameter(2, energy);
-      fpx->FixParameter(2, energy);
-      fitGraph->Fit(fpx);
-      fitGraph->Write();
-      TProfile* px = cmat->ProfileX();
+			// I make a graph out of the "addback line" because I don't like the way TProfile handles the empty bins
+			auto* fitGraph = new TGraphErrors;
+			fitGraph->SetNameTitle(Form("%s_graph", mat->GetName()), "Graph");
 
-      px->Write();
-      // Make a residuals plot
-      TH1* residual_plot = new TH1D(Form("%s_resid", fpx->GetName()), "residuals", 2000, 0, 2000);
-      for(int i = 0; i < residual_plot->GetNbinsX(); ++i) {
-         if(px->GetBinContent(i) != 0) {
-            residual_plot->SetBinContent(i, px->GetBinContent(i) - fpx->Eval(residual_plot->GetBinCenter(i)));
-         }
-         residual_plot->SetBinError(i, px->GetBinError(i));
-      }
-      residual_plot->Write();
-      delete cmat;
-      
-      std::cout<<"====================="<<std::endl;
-      std::cout<<mat->GetName()<<std::endl;
-      std::cout<<"d"<<xind<<yind<<" at zero   "<<(fpx->Eval(energy)) / energy<<std::endl;
-      std::cout<<"====================="<<std::endl;
+			// This loop turns the addback plot and TCut into the TGraphErrors
+			for(int i = 1; i <= xbins; i++) {
+				bool insideYet = false;
+				for(int j = 1; j <= ybins; j++) {
+					double xc = mat->GetXaxis()->GetBinCenter(i);
+					double yc = mat->GetYaxis()->GetBinCenter(j);
+					if(cut.IsInside(xc, yc) != 0) {
+						if(!insideYet) {
+							insideYet = true;
+						}
+						cmat->Fill(xc, yc, mat->GetBinContent(i, j));
+					}
+				}
+				cmat->GetXaxis()->SetRange(i, i);
+				// This makes sure that there are at least 4 counts in the "y bin". I'd prefer this to be higher,
+				// but that requires more 60Co statistics. The reason I do this is because RMS and SD of the mean really only
+				// works for us if we have enough counts that the mean is actually a good representation of the true value.
+				// This is something TProfile does not do for us, and seems to skew the result a bit.
+				if(cmat->Integral() > 6) {
+					fitGraph->SetPoint(fitGraph->GetN(), cmat->GetYaxis()->GetBinCenter(i), cmat->GetMean(2));
+					fitGraph->SetPointError(fitGraph->GetN() - 1, cmat->GetXaxis()->GetBinWidth(i), cmat->GetMeanError(2));
+				}
+			}
+			// unzoom the x-axis
+			cmat->GetXaxis()->SetRange(1, cmat->GetXaxis()->GetNbins());
+			cmat->Write();
 
-      // Fill the parameter matrix with the parameters from the fit.
-      d[xind * 4 + yind]   = fpx->GetParameter(0);
-      d[yind * 4 + xind]   = fpx->GetParameter(1);
-      e_d[xind * 4 + yind] = fpx->GetParError(0);
-      e_d[yind * 4 + xind] = fpx->GetParError(1);
+			// This fits the TGraph
+			auto* fpx = new TF1(Form("pxfit_%i_%i_%i", det, crystal1, crystal2), CrossTalkFit, 6, 1167, 3);
+			fpx->SetParameter(0, 0.0001);
+			fpx->SetParameter(1, 0.0001);
+			fpx->SetParameter(2, energy);
+			fpx->FixParameter(2, energy);
+			fitGraph->Fit(fpx);
+			fitGraph->Write();
+			delete fitGraph;
 
-      // Keep track of the largest correction and output that to screen,
-      // This helps identify problem channels, or mistakes
-      if(fpx->GetParameter(0) > largest_correction) {
-         largest_correction = fpx->GetParameter(0);
-         largest_det        = det;
-         largest_crystal1   = xind;
-         largest_crystal2   = yind;
-      }
-      if(fpx->GetParameter(1) > largest_correction) {
-         largest_correction = fpx->GetParameter(1);
-         largest_det        = det;
-         largest_crystal1   = xind;
-         largest_crystal2   = yind;
-      }
-   }
+			// create and write profile
+			TProfile* px = cmat->ProfileX();
+			px->Write();
+			// Make a residuals plot
+			TH1* residualPlot = new TH1D(Form("%s_resid", fpx->GetName()), "residuals", 2000, 0, 2000);
+			for(int i = 0; i < residualPlot->GetNbinsX(); ++i) {
+				if(px->GetBinContent(i) != 0) {
+					residualPlot->SetBinContent(i, px->GetBinContent(i) - fpx->Eval(residualPlot->GetBinCenter(i)));
+				}
+				residualPlot->SetBinError(i, px->GetBinError(i));
+			}
+			residualPlot->Write();
+			delete residualPlot;
+			delete cmat;
+
+			// for some reason from here on out crystal1 and crystal2 are used in reverse?
+			// was this maybe because before we used xind and yind instead which were from the tokenized name using entry N-1 (for xind) and N-2 (for yind)? 
+			// temporary swapped the two - except for the largest stuff?
+			std::cout<<"====================="<<std::endl;
+			std::cout<<mat->GetName()<<std::endl;
+			std::cout<<"d"<<crystal1<<crystal2<<" at zero   "<<(fpx->Eval(energy)) / energy<<std::endl;
+			std::cout<<"====================="<<std::endl;
+
+			// Fill the parameter matrix with the parameters from the fit.
+			d[crystal2 * 4 + crystal1]   = fpx->GetParameter(0);
+			d[crystal1 * 4 + crystal2]   = fpx->GetParameter(1);
+			eD[crystal2 * 4 + crystal1] = fpx->GetParError(0);
+			eD[crystal1 * 4 + crystal2] = fpx->GetParError(1);
+
+			// Keep track of the largest correction and output that to screen,
+			// This helps identify problem channels, or mistakes
+			if(fpx->GetParameter(0) > largestCorrection) {
+				largestCorrection = fpx->GetParameter(0);
+				largestDet        = det;
+				largestCrystal2   = crystal2;
+				largestCrystal1   = crystal1;
+			}
+			if(fpx->GetParameter(1) > largestCorrection) {
+				largestCorrection = fpx->GetParameter(1);
+				largestDet        = det;
+				largestCrystal2   = crystal2;
+				largestCrystal1   = crystal1;
+			}
+		}//for(int crystal2 = crystal1 + 1; crystal2 < 4; crystal2++)
+	}// for(int crystal1 = 0; crystal1 < 4; crystal1++)
 
    std::cout<<" -------------------- "<<std::endl;
    std::cout<<" -------------------- "<<std::endl;
    std::cout<<std::endl;
 
-   // Set the diafonal elements to 0 since you can't cross-talk yourself
+   // Set the diagonal elements to 0 since you can't cross-talk yourself
+	// store current precision and set to fixed 10 precision
+	std::streamsize prec = std::cout.precision();
+	std::cout.precision(10);
+	std::cout.setf(std::ios::fixed, std::ios::floatfield);
    for(int i = 0; i < 4; i++) {
       for(int j = 0; j < 4; j++) {
          if(i == j) {
             d[i * 4 + j]   = 0.0000;
-            e_d[i * 4 + j] = 0.0000;
+            eD[i * 4 + j] = 0.0000;
          }
          // output a matrix to screen
-         std::cout<<d[j * 4 + i]<<"\t"; //<<"+/-"<<e_d[i*4+j]<<"\t";
+         std::cout<<d[j * 4 + i]<<"\t";
 
          // Time to find the proper channels and build the corrections xind/i is row number
          TChannel* chan = TChannel::FindChannelByName(Form("GRG%02d%sN00A", det, TGriffin::GetColorFromNumber(j)));
@@ -192,24 +195,23 @@ double* CrossTalkFix(int det, double energy, TFile* in_file)
       }
       std::cout<<std::endl;
    }
+	// set precision back to old value and remove fixed flag
+	std::cout.precision(prec);
+	std::cout.unsetf(std::ios::floatfield);
 
    std::cout<<std::endl;
-   std::cout<<"Largest correction = "<<largest_correction<<" Shift = "<<largest_correction * energy
-            <<std::endl;
-   std::cout<<"Largest combo, det = "<<largest_det<<" Crystals = "<<largest_crystal1<<", "<<largest_crystal2
-            <<std::endl;
+   std::cout<<"Largest correction = "<<largestCorrection<<" Shift = "<<largestCorrection * energy<<std::endl;
+   std::cout<<"Largest combo, det = "<<largestDet<<" Crystals = "<<largestCrystal1<<", "<<largestCrystal2<<std::endl;
    std::cout<<" -------------------- "<<std::endl;
    std::cout<<" -------------------- "<<std::endl;
    return d;
 }
 
-void FixAll(TFile* in_file, TFile*)
+void FixAll(TFile* inputFile, double energy)
 {
-   // This function only loops over 16 clovers (always does) and uses the 1332 keV gamma ray in 60Co
-   // We might want to make this coding a little "softer"
-   double energies[2] = {1173.228, 1332.492};
+   // This function loops over 16 clovers (always does) and by default uses the 1332 keV gamma ray in 60Co
    for(int d = 1; d <= 16; d++) {
-      CrossTalkFix(d, energies[1], in_file);
+      CrossTalkFix(d, energy, inputFile);
    }
 }
 
@@ -217,9 +219,9 @@ void FixAll(TFile* in_file, TFile*)
 int main(int argc, char** argv)
 {
    // Do basic file checks
-   if(argc != 3) {
-      printf("try again (usage: %s <matrix file> <cal file>\n", argv[0]);
-      return 0;
+   if(argc != 3 && argc != 4) {
+		std::cout<<"Usage: "<<argv[0]<<" <matrix file> <cal file> <user settings (optional)>"<<std::endl;
+      return 1;
    }
 
    // We need a cal file to find the channels to write the corrections to
@@ -228,16 +230,27 @@ int main(int argc, char** argv)
       exit(1);
    }
 
-   auto* in_file = new TFile(argv[1]);
-   if(in_file == nullptr || !in_file->IsOpen()) {
-      printf("Failed to open file '%s'!\n", argv[1]);
+   auto* inputFile = new TFile(argv[1]);
+   if(inputFile == nullptr || !inputFile->IsOpen()) {
+		std::cout<<"Failed to open file '"<<argv[1]<<"'!"<<std::endl;
       return 1;
    }
 
-   // Create and output file.
-   auto* out_file = new TFile(Form("ct_%s", in_file->GetName()), "RECREATE");
+	auto userSettings = new TUserSettings();
+	if(argc == 4) {
+		userSettings->ReadSettings(argv[3]);
+	}
 
-   FixAll(in_file, out_file);
+   // Create the output file
+	std::string outputFileName = argv[1];
+	auto lastSlash = outputFileName.find_last_of('/');
+	if(lastSlash != std::string::npos) {
+		outputFileName = std::string("ct_") + outputFileName.substr(lastSlash+1);
+	}
+
+   auto* outputFile = new TFile(outputFileName.c_str(), "recreate");
+
+   FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.));
 
    // This function writes a corrections cal_file which can be loaded in with your normal cal file.
    TChannel::WriteCTCorrections("ct_correction.cal");

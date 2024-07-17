@@ -299,11 +299,6 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ)
 
    // MidasTimeStamp is the only time we can trust at this level.
 
-   // int fEntries = eventQ->size();
-
-   int FragsIn = 0;
-
-   FragsIn++;
    // Clear lowest hightime
    std::map<uint32_t, int> lowest_hightime;
    std::vector<TEventTime*>::iterator it;
@@ -791,7 +786,7 @@ void WriteCorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
 	char filename[64];
-	sprintf(filename, "corrections%05i.root", runnumber);
+	snprintf(filename, 64, "corrections%05i.root", runnumber);
 	auto* corrfile = new TFile(filename, "RECREATE");
 
 	// Just going to make a corrections map for now...it should be a map throughout....
@@ -818,7 +813,7 @@ int CorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
 	char filename[64];
-	sprintf(filename, "corrections%05i.root", runnumber);
+	snprintf(filename, 64, "corrections%05i.root", runnumber);
 	auto* corrfile = new TFile(filename, "READ");
 	if(!(corrfile->IsOpen())) {
 		delete corrfile;
@@ -879,9 +874,9 @@ int main(int argc, char** argv)
 	}
 	char filename[64];
 	if(subrunnumber > -1) {
-		sprintf(filename, "time_diffs%05i_%03i.root", runnumber, subrunnumber);
+		snprintf(filename, 64, "time_diffs%05i_%03i.root", runnumber, subrunnumber);
 	} else {
-		sprintf(filename, "time_diffs%05i.root", runnumber);
+		snprintf(filename, 64, "time_diffs%05i.root", runnumber);
 	}
 	printf("Creating root outfile: %s\n", filename);
 
