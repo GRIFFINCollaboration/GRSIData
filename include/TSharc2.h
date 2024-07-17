@@ -1,5 +1,5 @@
-#ifndef TSharc2_H
-#define TSharc2_H
+#ifndef TSHARC2_H
+#define TSHARC2_H
 
 /** \addtogroup Detectors
  *  @{
