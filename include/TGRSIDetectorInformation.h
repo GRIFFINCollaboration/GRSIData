@@ -45,7 +45,7 @@ public:
    inline void SetTip(bool flag = true)        { fTip = flag; }
    inline void SetBambino(bool flag = true)    { fBambino = flag; }
    inline void SetEmma(bool flag = true)       { fEmma = flag; }
-   inline void SetTrific(bool flag = true)       { fTrific = flag; }
+   inline void SetTrific(bool flag = true)     { fTrific = flag; }
    inline void SetSharc2(bool flag = true)     {fSharc2 = flag; }
 
    inline void SetGriffin(bool flag = true)    { fGriffin = flag; }
@@ -56,6 +56,7 @@ public:
    inline void SetDescant(bool flag = true)    { fDescant = flag; }
 
    inline void SetBgo(bool flag = true)        { fBgo = flag; }
+   inline void SetRcmp(bool flag = true)       { fRcmp = flag; }
 
    inline bool Tigress()    const { return fTigress; }
    inline bool Sharc()      const { return fSharc; }
@@ -79,6 +80,7 @@ public:
    inline bool Descant()    const { return fDescant; }
 
    inline bool Bgo()        const { return fBgo; }
+   inline bool Rcmp()       const { return fRcmp; }
 
 private:
    //  detector types to switch over in Set()
@@ -108,6 +110,7 @@ private:
    bool fDescant{false};    ///< flag for Descant on/off
 
    bool fBgo{false};        ///< flag for Bgo on/off
+   bool fRcmp{false};       ///< flag for Rcmp on/off
 
    bool fSortByTriggerId{false}; ///< flag to sort by trigger ID instead of time stamp
 
