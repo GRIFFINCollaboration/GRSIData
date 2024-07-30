@@ -10,10 +10,6 @@
 
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TRcmp)
-/// \endcond
-
 // function implementations are below
 
 TRcmp::TRcmp()
