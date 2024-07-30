@@ -50,6 +50,7 @@ public:
 		kEmmaS3,
 		kTrific,          //30
       kSharc2,
+      kRcmp,
 		kClear            
    };
 
