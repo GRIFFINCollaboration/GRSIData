@@ -25,6 +25,7 @@
 #include "TEmma.h"
 #include "TTrific.h"
 #include "TSharc2.h"
+#include "TRcmp.h"
 
 ClassImp(TGRSIMnemonic)
 
@@ -95,6 +96,8 @@ void TGRSIMnemonic::EnumerateSystem()
       fSystem = ESystem::kTrific;
    }  else if(fSystemString.compare("SZ") == 0) {
       fSystem = ESystem::kSharc2;
+   }  else if(fSystemString.compare("RC") == 0) {  
+      fSystem = ESystem::kRcmp;
    }  else {
       fSystem = ESystem::kClear;
    }
@@ -200,7 +203,8 @@ TClass* TGRSIMnemonic::GetClassType() const
 		case ESystem::kEmma:          fClassType = TEmma::Class(); break;
 		case ESystem::kEmmaS3:        fClassType = TS3::Class(); break;
 		case ESystem::kTrific:        fClassType = TTrific::Class(); break;
-		case ESystem::kSharc2: 			fClassType = TSharc2::Class(); break;
+		case ESystem::kSharc2: 		  fClassType = TSharc2::Class(); break;
+		case ESystem::kRcmp: 		  fClassType = TRcmp::Class(); break;
 		
 		default:                      fClassType = nullptr;
    };
