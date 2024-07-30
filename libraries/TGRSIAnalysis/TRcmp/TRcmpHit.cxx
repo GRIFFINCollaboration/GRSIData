@@ -8,10 +8,6 @@
 #include "TMath.h"
 #include "Globals.h"
 
-/// \cond CLASSIMP
-ClassImp(TRcmpHit)
-/// \endcond
-
 // function implementations are below
 
 TRcmpHit::TRcmpHit()
