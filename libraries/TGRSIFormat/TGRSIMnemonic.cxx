@@ -130,8 +130,11 @@ void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerNam
    } else if(name.compare("V1190") == 0) {
 		tmpType = EDigitizer::kV1190;
 		tmpUnit = 50;
+   } else if(name.compare("FMC32") == 0) {
+		tmpType = EDigitizer::kFMC32;
+		tmpUnit = 10;
    } else {
-		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', 'CAEN', 'MADC!' && 'V1190'!"<<std::endl;
+		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'FMC32', 'GRF4G', 'TIG10', 'TIG64', 'CAEN', 'MADC!' && 'V1190'!"<<std::endl;
 	}
 	digitizerType.Set(tmpType, digitizerName.Priority());
 	timeStampUnit.Set(tmpUnit, digitizerName.Priority());
@@ -221,6 +224,7 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
 		Double_t dTime;
 		case EDigitizer::kGRF16:
+		case EDigitizer::kFMC32:
 			// we need to zero the lowest 18 bits of the timestamp as those are included in the CFD value
 			// TODO: what happens close to the wrap-around of those 18 bits??? This only happens every 2^18 * 10e-8 so 2.5 ms so 400 Hz
 			dTime = (timestamp & (~0x3ffff)) * channel->GetTimeStampUnit() + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
