@@ -21,7 +21,8 @@ double TS3::fInnerDiameter  = 22.;
 double TS3::fTargetDistance = 31.;
 
 // Default tigress unpacking settings
-TTransientBits<UShort_t> TS3::fgS3Bits = static_cast<std::underlying_type<TS3::ES3GlobalBits>::type>(TS3::ES3GlobalBits::kMultHit);
+TTransientBits<UShort_t> TS3::fgS3Bits = TTransientBits<UShort_t>(static_cast<std::underlying_type<TS3::ES3GlobalBits>::type>(TS3::ES3GlobalBits::kMultHit));
+//TTransientBits<UShort_t> TS3::fgS3Bits = static_cast<UShort_t>(TS3::ES3GlobalBits::kMultHit);
 
 Int_t  TS3::fFrontBackTime = 75;
 double TS3::fFrontBackEnergy = 0.9;
