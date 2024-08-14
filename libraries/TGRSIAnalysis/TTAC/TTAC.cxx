@@ -45,12 +45,12 @@ void TTAC::Print(Option_t*) const
 void TTAC::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
 void TTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TTACHit* hit = new TTACHit(*frag);
-	fHits.push_back(hit);
+	AddHit(hit);
 }

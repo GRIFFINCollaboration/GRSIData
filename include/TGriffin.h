@@ -44,7 +44,7 @@ public:
    TGriffinHit* GetGriffinHit(const int& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
    using TDetector::GetHit;
    TDetectorHit* GetHit(const int& idx);
-   Short_t GetLowGainMultiplicity() const { return fGriffinLowGainHits.size(); }
+   Short_t GetLowGainMultiplicity() const { return TDetector::GetMultiplicity(); }
    Short_t GetHighGainMultiplicity() const { return fGriffinHighGainHits.size(); }
    Short_t GetMultiplicity() const override { return GetMultiplicity(GetDefaultGainType()); }
 
@@ -133,7 +133,6 @@ private:
    static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fSuppressionCriterion;
 #endif
 
-	std::vector<TDetectorHit*>& fGriffinLowGainHits = fHits; //!<! Reference to default hit vector (needs to be transient)
    std::vector<TDetectorHit*>  fGriffinHighGainHits; //  The set of crystal hits
 
    // static bool fSetBGOHits;                //!<!  Flag that determines if BGOHits are being measured

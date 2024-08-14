@@ -77,7 +77,7 @@ public:
    bool BGOFired() const { return fBgoFired; }
    void SetBGOFired(bool fired) { fBgoFired = fired; }
 
-   int GetTimeToTrigger() { return (fTimeStamp & 0x7fffff) - (static_cast<Int_t>(fCfd) >> 4); }
+   int GetTimeToTrigger() { return (GetTimeStamp() & 0x7fffff) - (static_cast<Int_t>(GetCfd()) >> 4); }
 
    int GetSegmentMultiplicity() const { return fSegments.size(); } //!<!
    int GetNSegments() const { return fSegments.size(); }           //!<!

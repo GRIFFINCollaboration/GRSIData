@@ -67,7 +67,7 @@ TSceptar& TSceptar::operator=(const TSceptar& rhs)
 void TSceptar::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TSceptarHit* hit = new TSceptarHit(*frag); // Construction of TSceptarHit is handled in the constructor
-	fHits.push_back(hit);
+	AddHit(hit);
 }
 
 void TSceptar::Print(Option_t*) const
@@ -79,6 +79,6 @@ void TSceptar::Print(Option_t*) const
 void TSceptar::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }

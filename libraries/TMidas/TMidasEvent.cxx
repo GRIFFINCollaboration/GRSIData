@@ -34,8 +34,6 @@ TMidasEvent::TMidasEvent()
    fEventHeader.fSerialNumber = 0;
    fEventHeader.fTimeStamp    = 0;
    fEventHeader.fDataSize     = 0;
-
-   fGoodFrags = 0;
 }
 
 void TMidasEvent::Copy(TObject& rhs) const
@@ -98,7 +96,7 @@ void TMidasEvent::Clear(Option_t*)
    fEventHeader.fTimeStamp    = 0;
    fEventHeader.fDataSize     = 0;
 
-   fGoodFrags = 0;
+	TRawEvent::Clear();
 }
 
 void TMidasEvent::SetData(uint32_t size, char* data)

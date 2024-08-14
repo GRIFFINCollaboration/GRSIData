@@ -24,6 +24,7 @@
 #include "TLaBrBgo.h"
 #include "TEmma.h"
 #include "TTrific.h"
+#include "TRcmp.h"
 
 ClassImp(TGRSIMnemonic)
 
@@ -37,37 +38,37 @@ void TGRSIMnemonic::EnumerateSystem()
 {
    // Enumerating the fSystemString must come after the total mnemonic has been parsed as the details of other parts of
    // the mnemonic must be known
-   if(fSystemString.compare("TI") == 0) {
+   if(SystemString().compare("TI") == 0) {
       fSystem = ESystem::kTigress;
-   } else if(fSystemString.compare("SH") == 0) {
+   } else if(SystemString().compare("SH") == 0) {
       fSystem = ESystem::kSharc;
-   } else if(fSystemString.compare("TR") == 0) {
+   } else if(SystemString().compare("TR") == 0) {
       fSystem = ESystem::kTriFoil;
-   } else if(fSystemString.compare("RF") == 0) {
+   } else if(SystemString().compare("RF") == 0) {
       fSystem = ESystem::kRF;
-   } else if(fSystemString.compare("SP") == 0) {
+   } else if(SystemString().compare("SP") == 0) {
       if(SubSystem() == EMnemonic::kI) {
          fSystem = ESystem::kSiLi;
       } else {
          fSystem = ESystem::kSiLiS3;
       }
-   } else if(fSystemString.compare("GD") == 0) {
+   } else if(SystemString().compare("GD") == 0) {
          fSystem = ESystem::kGeneric;
-   } else if(fSystemString.compare("CS") == 0) {
+   } else if(SystemString().compare("CS") == 0) {
       fSystem = ESystem::kCSM;
-   } else if(fSystemString.compare("GR") == 0) {
+   } else if(SystemString().compare("GR") == 0) {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kGriffinBgo;
 		} else {
 			fSystem = ESystem::kGriffin;
 		}
-   } else if(fSystemString.compare("SE") == 0) {
+   } else if(SystemString().compare("SE") == 0) {
       fSystem = ESystem::kSceptar;
-   } else if(fSystemString.compare("PA") == 0) {
+   } else if(SystemString().compare("PA") == 0) {
       fSystem = ESystem::kPaces;
-   } else if(fSystemString.compare("DS") == 0) {
+   } else if(SystemString().compare("DS") == 0) {
       fSystem = ESystem::kDescant;
-   } else if((fSystemString.compare("DA") == 0) || (fSystemString.compare("LB") == 0) ) {
+   } else if((SystemString().compare("DA") == 0) || (SystemString().compare("LB") == 0) ) {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kLaBrBgo;
 		} else if(SubSystem() == EMnemonic::kT) {
@@ -75,23 +76,25 @@ void TGRSIMnemonic::EnumerateSystem()
 		} else {
 			fSystem = ESystem::kLaBr;
 		}
-   } else if(fSystemString.compare("BA") == 0) {
+   } else if(SystemString().compare("BA") == 0) {
       fSystem = ESystem::kS3;
-   } else if(fSystemString.compare("ZD") == 0) {
+   } else if(SystemString().compare("ZD") == 0) {
       fSystem = ESystem::kZeroDegree;
-   } else if(fSystemString.compare("TP") == 0) {
+   } else if(SystemString().compare("TP") == 0) {
       fSystem = ESystem::kTip;
-   } else if(fSystemString.compare("BG") == 0) {
+   } else if(SystemString().compare("BG") == 0) {
       fSystem = ESystem::kBgo;
-   } else if((fSystemString.compare("EM") == 0) || (fSystemString.compare("ET") == 0)) {
+   } else if((SystemString().compare("EM") == 0) || (SystemString().compare("ET") == 0)) {
       if(SubSystem() == EMnemonic::kE) {
         fSystem = ESystem::kEmmaS3;
       }
       else {
         fSystem = ESystem::kEmma;
       }
-   } else if(fSystemString.compare("TF") == 0) {
+   } else if(SystemString().compare("TF") == 0) {
       fSystem = ESystem::kTrific;
+   } else if(SystemString().compare("RC") == 0) {
+      fSystem = ESystem::kRcmp;
    } else {
       fSystem = ESystem::kClear;
    }
@@ -147,7 +150,7 @@ void TGRSIMnemonic::Parse(std::string* name)
    if(fSystem == ESystem::kSiLi) {
 		std::string buf;
       buf.assign(*name, 7, 2);
-      fSegment = static_cast<uint16_t>(strtol(buf.c_str(), nullptr, 16));
+      Segment(static_cast<int16_t>(strtol(buf.c_str(), nullptr, 16)));
    }
 
    return;
@@ -157,49 +160,44 @@ void TGRSIMnemonic::Print(Option_t*) const
 {
 	std::ostringstream str;
    str<<"======== GRSIMNEMONIC ========"<<std::endl;
-   str<<"fArrayPosition           = "<<fArrayPosition<<std::endl;
-   str<<"fSegment                 = "<<fSegment<<std::endl;
-   str<<"fSystemString            = "<<fSystemString<<std::endl;
-   str<<"fSubSystemString         = "<<fSubSystemString<<std::endl;
-   str<<"fArraySubPositionString  = "<<fArraySubPositionString<<std::endl;
-   str<<"fCollectedChargeString   = "<<fCollectedChargeString<<std::endl;
-   str<<"fOutputSensorString      = "<<fOutputSensorString<<std::endl;
+	TMnemonic::Print(str);
    str<<"=============================="<<std::endl;
 	std::cout<<str.str();
 }
 
 TClass* TGRSIMnemonic::GetClassType() const
 {
-   if(fClassType != nullptr) {
-      return fClassType;
+   if(TMnemonic::GetClassType() != nullptr) {
+      return TMnemonic::GetClassType();
    }
 
    switch(System()) {
-		case ESystem::kTigress:       fClassType = TTigress::Class(); break;
-		case ESystem::kSharc:         fClassType = TSharc::Class(); break;
-		case ESystem::kTriFoil:       fClassType = TTriFoil::Class(); break;
-		case ESystem::kRF:            fClassType = TRF::Class(); break;
-		case ESystem::kSiLi:          fClassType = TSiLi::Class(); break;
-		case ESystem::kS3:            fClassType = TS3::Class(); break;
-		case ESystem::kSiLiS3:        fClassType = TS3::Class(); break;
-		case ESystem::kCSM:           fClassType = TCSM::Class(); break;
-		case ESystem::kGriffin:       fClassType = TGriffin::Class(); break;
-		case ESystem::kSceptar:       fClassType = TSceptar::Class(); break;
-		case ESystem::kPaces:         fClassType = TPaces::Class(); break;
-		case ESystem::kDescant:       fClassType = TDescant::Class(); break;
-		case ESystem::kLaBr:          fClassType = TLaBr::Class(); break;
-		case ESystem::kTAC:           fClassType = TTAC::Class(); break;
-		case ESystem::kZeroDegree:    fClassType = TZeroDegree::Class(); break;
-		case ESystem::kTip:           fClassType = TTip::Class(); break;
-		case ESystem::kGriffinBgo:    fClassType = TGriffinBgo::Class(); break;
-		case ESystem::kLaBrBgo:       fClassType = TLaBrBgo::Class(); break;
-		case ESystem::kGeneric:       fClassType = TGenericDetector::Class(); break;
-		case ESystem::kEmma:          fClassType = TEmma::Class(); break;
-		case ESystem::kEmmaS3:        fClassType = TS3::Class(); break;
-		case ESystem::kTrific:        fClassType = TTrific::Class(); break;
-		default:                      fClassType = nullptr;
+		case ESystem::kTigress:       SetClassType(TTigress::Class()); break;
+		case ESystem::kSharc:         SetClassType(TSharc::Class()); break;
+		case ESystem::kTriFoil:       SetClassType(TTriFoil::Class()); break;
+		case ESystem::kRF:            SetClassType(TRF::Class()); break;
+		case ESystem::kSiLi:          SetClassType(TSiLi::Class()); break;
+		case ESystem::kS3:            SetClassType(TS3::Class()); break;
+		case ESystem::kSiLiS3:        SetClassType(TS3::Class()); break;
+		case ESystem::kCSM:           SetClassType(TCSM::Class()); break;
+		case ESystem::kGriffin:       SetClassType(TGriffin::Class()); break;
+		case ESystem::kSceptar:       SetClassType(TSceptar::Class()); break;
+		case ESystem::kPaces:         SetClassType(TPaces::Class()); break;
+		case ESystem::kDescant:       SetClassType(TDescant::Class()); break;
+		case ESystem::kLaBr:          SetClassType(TLaBr::Class()); break;
+		case ESystem::kTAC:           SetClassType(TTAC::Class()); break;
+		case ESystem::kZeroDegree:    SetClassType(TZeroDegree::Class()); break;
+		case ESystem::kTip:           SetClassType(TTip::Class()); break;
+		case ESystem::kGriffinBgo:    SetClassType(TGriffinBgo::Class()); break;
+		case ESystem::kLaBrBgo:       SetClassType(TLaBrBgo::Class()); break;
+		case ESystem::kGeneric:       SetClassType(TGenericDetector::Class()); break;
+		case ESystem::kEmma:          SetClassType(TEmma::Class()); break;
+		case ESystem::kEmmaS3:        SetClassType(TS3::Class()); break;
+		case ESystem::kTrific:        SetClassType(TTrific::Class()); break;
+		case ESystem::kRcmp:          SetClassType(TRcmp::Class()); break;
+		default:                      SetClassType(nullptr);
    };
-   return fClassType;
+   return TMnemonic::GetClassType();
 }
 
 double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, const TChannel* channel) const
@@ -241,7 +239,7 @@ int TGRSIMnemonic::NumericArraySubPosition() const
 	/// Except for the LaBr BGOs which use A - 0, B - 1, C - 2
 	/// and a default of 5
 	if(System() == ESystem::kLaBrBgo) {
-		switch(fArraySubPosition) {
+		switch(ArraySubPosition()) {
 			case TMnemonic::EMnemonic::kA:
 				return 0;
 			case TMnemonic::EMnemonic::kB:
@@ -253,7 +251,7 @@ int TGRSIMnemonic::NumericArraySubPosition() const
 		};
 	}
 
-	switch(fArraySubPosition) {
+	switch(ArraySubPosition()) {
 		case TMnemonic::EMnemonic::kB:
 			return 0;
 		case TMnemonic::EMnemonic::kG:

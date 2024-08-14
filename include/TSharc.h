@@ -38,7 +38,7 @@ public:
       fZoffset = z;
    }
 
-   int     GetSize() const { return fHits.size(); } //!<!
+   int     GetSize() const { return GetMultiplicity(); } //!<!
 
    void Copy(TObject&) const override;        //!<!
    void Clear(Option_t* = "") override;       //!<!

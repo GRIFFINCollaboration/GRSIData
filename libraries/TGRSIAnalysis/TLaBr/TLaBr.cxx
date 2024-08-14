@@ -95,7 +95,7 @@ void TLaBr::Print(Option_t*) const
 void TLaBr::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -121,7 +121,7 @@ void TLaBr::ResetSuppressed()
 Short_t TLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
 {
 	/// Automatically builds the suppressed hits using the fSuppressionCriterion and returns the number of suppressed hits
-	if(fHits.empty()) {
+	if(NoHits()) {
 		return 0;
 	}
 	// if the suppressed has been reset, clear the suppressed hits
@@ -132,7 +132,7 @@ Short_t TLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
 		fSuppressedHits.clear();
 	}
 	if(fSuppressedHits.empty()) {
-		CreateSuppressed(bgo, fHits, fSuppressedHits);
+		CreateSuppressed(bgo, Hits(), fSuppressedHits);
 		SetSuppressed(true);
 	}
 
@@ -153,5 +153,5 @@ TLaBrHit* TLaBr::GetSuppressedHit(const int& i)
 void TLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TLaBrHit* hit = new TLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
-	fHits.push_back(hit);
+	AddHit(hit);
 }

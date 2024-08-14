@@ -49,8 +49,6 @@ TMidasFile::TMidasFile()
    fMaxBufferSize = 1E6;
 
    fCurrentEventNumber = 0;
-   fBytesRead         = 0;
-   fFileSize          = 0;
 
    fDoByteSwap = *reinterpret_cast<char*>(&endian) != 0x78;
 
@@ -84,7 +82,7 @@ TMidasFile::~TMidasFile()
 std::string TMidasFile::Status(bool)
 {
    return Form(HIDE_CURSOR " Processing event %i have processed %.2fMB/%.2f MB              " SHOW_CURSOR "\r",
-               fCurrentEventNumber, (fBytesRead / 1000000.0), (fFileSize / 1000000.0));
+               fCurrentEventNumber, (BytesRead() / 1000000.0), (FileSize() / 1000000.0));
 }
 
 static int hasSuffix(const char* name, const char* suffix)
@@ -125,13 +123,13 @@ bool TMidasFile::Open(const char* filename)
       Close();
    }
 
-   fFilename = filename;
+   Filename(filename);
 
    std::string pipe;
 
    std::ifstream in(GetFilename(), std::ifstream::in | std::ifstream::binary);
    in.seekg(0, std::ifstream::end);
-   fFileSize = in.tellg();
+   FileSize(in.tellg());
    in.close();
 
    // Do we need these?
@@ -339,16 +337,16 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
       return -1;
    }
    std::shared_ptr<TMidasEvent> midasEvent = std::static_pointer_cast<TMidasEvent>(event);
-   if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
-      ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - fReadBuffer.size());
+   if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
+      ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - BufferSize());
    }
 
-   if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
+   if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
       return 0;
    }
 
    midasEvent->Clear();
-   memcpy(reinterpret_cast<char*>(midasEvent->GetEventHeader()), fReadBuffer.data(), sizeof(TMidas_EVENT_HEADER));
+   memcpy(reinterpret_cast<char*>(midasEvent->GetEventHeader()), BufferData(), sizeof(TMidas_EVENT_HEADER));
    if(fDoByteSwap) {
 		std::cout<<"Swapping bytes"<<std::endl;
       midasEvent->SwapBytesEventHeader();
@@ -362,23 +360,23 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
    size_t event_size = midasEvent->GetDataSize();
    size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
 
-   if(fReadBuffer.size() < total_size) {
-      ReadMoreBytes(total_size - fReadBuffer.size());
+   if(BufferSize() < total_size) {
+      ReadMoreBytes(total_size - BufferSize());
    }
 
-   if(fReadBuffer.size() < total_size) {
+   if(BufferSize() < total_size) {
       return 0;
    }
 
-   memcpy(midasEvent->GetData(), fReadBuffer.data() + sizeof(TMidas_EVENT_HEADER), event_size);
+   memcpy(midasEvent->GetData(), BufferData() + sizeof(TMidas_EVENT_HEADER), event_size);
    midasEvent->SwapBytes(false);
 
-   size_t bytes_read = fReadBuffer.size();
-   fBytesRead += bytes_read;
+   size_t bytesRead = BufferSize();
+   IncrementBytesRead(bytesRead);
    fCurrentEventNumber++;
-   fReadBuffer.clear();
+   ClearBuffer();
 
-   return bytes_read;
+   return bytesRead;
 }
 
 void TMidasFile::Skip(size_t nofEvents)
@@ -386,18 +384,18 @@ void TMidasFile::Skip(size_t nofEvents)
 	TMidasEvent ev;
 	for(size_t i = 0; i < nofEvents; ++i) {
 		// if we don't have enough data left for a header, we try and read more
-		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
-			ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - fReadBuffer.size());
+		if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
+			ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - BufferSize());
 		}
 
 		// if we don't have enough data to read the header we are done
-		if(fReadBuffer.size() < sizeof(TMidas_EVENT_HEADER)) {
+		if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
 			return;
 		}
 
 		ev.Clear();
 		// copy the header
-		memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), fReadBuffer.data(), sizeof(TMidas_EVENT_HEADER));
+		memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), BufferData(), sizeof(TMidas_EVENT_HEADER));
 		if(fDoByteSwap) {
 			std::cout<<"Swapping bytes"<<std::endl;
 			ev.SwapBytesEventHeader();
@@ -418,39 +416,39 @@ void TMidasFile::Skip(size_t nofEvents)
 		size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
 
 		// try and read the total event if we don't already have it in the buffer
-		if(fReadBuffer.size() < total_size) {
-			ReadMoreBytes(total_size - fReadBuffer.size());
+		if(BufferSize() < total_size) {
+			ReadMoreBytes(total_size - BufferSize());
 		}
 
 		// if we don't have enough data to read the whole event we are done
-		if(fReadBuffer.size() < total_size) {
+		if(BufferSize() < total_size) {
 			return;
 		}
 
 		//increment our counters and clear the buffer
-		size_t bytes_read = fReadBuffer.size();
-		fBytesRead += bytes_read;
+		size_t bytesRead = BufferSize();
+		IncrementBytesRead(bytesRead);
 		fCurrentEventNumber++;
-		fReadBuffer.clear();
+		ClearBuffer();
 	}
 }
 
 void TMidasFile::ReadMoreBytes(size_t bytes)
 {
-   size_t initial_size = fReadBuffer.size();
-   fReadBuffer.resize(initial_size + bytes);
+   size_t initial_size = BufferSize();
+   ResizeBuffer(initial_size + bytes);
    size_t rd = 0;
    if(fGzFile != nullptr) {
 #ifdef HAVE_ZLIB
-      rd = gzread(*(gzFile*)fGzFile, fReadBuffer.data() + initial_size, bytes);
+      rd = gzread(*(gzFile*)fGzFile, BufferData() + initial_size, bytes);
 #else
       assert(!"Cannot get here");
 #endif
    } else {
-      rd = readpipe(fFile, fReadBuffer.data() + initial_size, bytes);
+      rd = readpipe(fFile, BufferData() + initial_size, bytes);
    }
 
-   fReadBuffer.resize(initial_size + rd);
+   ResizeBuffer(initial_size + rd);
 
    if(rd == 0) {
       fLastErrno = 0;
@@ -587,7 +585,7 @@ void TMidasFile::Close()
    }
 
    fFile     = -1;
-   fFilename = "";
+   Filename("");
 }
 
 void TMidasFile::OutClose()
@@ -615,26 +613,26 @@ int TMidasFile::GetRunNumber()
 {
    // Parse the run number from the current TMidasFile. This assumes a format of
    // run#####_###.mid or run#####.mid.
-   if(fFilename.length() == 0) {
+   if(Filename().length() == 0) {
       return 0;
    }
-   std::size_t foundslash = fFilename.rfind('/');
-   std::size_t found      = fFilename.rfind(".mid");
+   std::size_t foundslash = Filename().rfind('/');
+   std::size_t found      = Filename().rfind(".mid");
    if(found == std::string::npos) {
       return 0;
    }
-   std::size_t found2 = fFilename.rfind('-');
+   std::size_t found2 = Filename().rfind('-');
    if((found2 < foundslash && foundslash != std::string::npos) || found2 == std::string::npos) {
-      found2 = fFilename.rfind('_');
+      found2 = Filename().rfind('_');
    }
    if(found2 < foundslash && foundslash != std::string::npos) {
       found2 = std::string::npos;
    }
    std::string temp;
-   if(found2 == std::string::npos || fFilename.compare(found2 + 4, 4, ".mid") != 0) {
-      temp = fFilename.substr(found - 5, 5);
+   if(found2 == std::string::npos || Filename().compare(found2 + 4, 4, ".mid") != 0) {
+      temp = Filename().substr(found - 5, 5);
    } else {
-      temp = fFilename.substr(found - 9, 5);
+      temp = Filename().substr(found - 9, 5);
    }
    return atoi(temp.c_str());
 }
@@ -643,19 +641,19 @@ int TMidasFile::GetSubRunNumber()
 {
    // Parse the sub run number from the current TMidasFile. This assumes a format of
    // run#####_###.mid or run#####.mid.
-   if(fFilename.length() == 0) {
+   if(Filename().empty()) {
       return -1;
    }
-   std::size_t foundslash = fFilename.rfind('/');
-   std::size_t found      = fFilename.rfind('-');
+   std::size_t foundslash = Filename().rfind('/');
+   std::size_t found      = Filename().rfind('-');
    if((found < foundslash && foundslash != std::string::npos) || found == std::string::npos) {
-      found = fFilename.rfind('_');
+      found = Filename().rfind('_');
    }
    if(found < foundslash && foundslash != std::string::npos) {
       found = std::string::npos;
    }
    if(found != std::string::npos) {
-      std::string temp = fFilename.substr(found + 1, 3);
+      std::string temp = Filename().substr(found + 1, 3);
       return atoi(temp.c_str());
    }
    return -1;

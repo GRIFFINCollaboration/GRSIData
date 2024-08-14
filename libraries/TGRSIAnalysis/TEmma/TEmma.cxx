@@ -68,7 +68,7 @@ void TEmma::Print(Option_t*) const
 void TEmma::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -235,7 +235,7 @@ void TEmma::BuildHits()
 				hit->SetTop((hit->GetTop() - fAnodeTrigger));
 				hit->SetBottom((hit->GetBottom() - fAnodeTrigger));
 				hit->SetAnodeTrigger(fAnodeTrigger);
-				fHits.push_back(hit);
+				AddHit(hit);
 			} else {
 				//std::cout<<"TDC Array Failed"<<std::endl;
 				fFail = 0;
@@ -244,7 +244,7 @@ void TEmma::BuildHits()
 				if(hit->GetTop() == 0) fFail++;
 				if(hit->GetBottom() == 0) fFail++;
 				hit->SetFailedFill(fFail);
-				fHits.push_back(hit);
+				AddHit(hit);
 			}
 		} else {
 			return;
@@ -255,7 +255,6 @@ void TEmma::BuildHits()
 void TEmma::Clear(Option_t* opt)
 {
 	TDetector::Clear(opt);
-	fHits.clear();
 	fEmmaICHits.clear();
 	fEmmaAnodeHits.clear();
 	fEmmaTdcHits.clear();

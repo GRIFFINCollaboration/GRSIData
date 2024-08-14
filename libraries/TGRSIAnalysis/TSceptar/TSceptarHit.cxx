@@ -138,12 +138,12 @@ bool TSceptarHit::AnalyzeWaveform()
 {
 	// Calculates the cfd time from the waveform
 	bool error = false;
-	if(fWaveform.empty()) {
+	if(!HasWave()) {
 		return false; // Error!
 	}
 
 	std::vector<Int_t>   baselineCorrections(8, 0);
-	std::vector<Short_t> smoothedWaveform;
+	std::vector<Short_t> newWaveform(*GetWaveform());
 
 	// all timing algorithms use interpolation with this many steps between two samples (all times are stored as
 	// integers)
@@ -153,17 +153,18 @@ bool TSceptarHit::AnalyzeWaveform()
 	int          halfsmoothingwindow = 0; // 2*halfsmoothingwindow + 1 = number of samples in moving window.
 
 	// baseline algorithm: correct each adc with average of first two samples in that adc
-	for(size_t i = 0; i < 8 && i < fWaveform.size(); ++i) {
-		baselineCorrections[i] = fWaveform[i];
+	for(size_t i = 0; i < 8 && i < WaveSize(); ++i) {
+		baselineCorrections[i] = GetWaveform()->at(i);
 	}
-	for(size_t i = 8; i < 16 && i < fWaveform.size(); ++i) {
+	for(size_t i = 8; i < 16 && i < WaveSize(); ++i) {
 		baselineCorrections[i - 8] =
-			((baselineCorrections[i - 8] + fWaveform[i]) + ((baselineCorrections[i - 8] + fWaveform[i]) > 0 ? 1 : -1)) >>
+			((baselineCorrections[i - 8] + GetWaveform()->at(i)) + ((baselineCorrections[i - 8] + GetWaveform()->at(i)) > 0 ? 1 : -1)) >>
 			1;
 	}
-	for(size_t i = 0; i < fWaveform.size(); ++i) {
-		fWaveform[i] -= baselineCorrections[i % 8];
+	for(size_t i = 0; i < WaveSize(); ++i) {
+		newWaveform[i] -= baselineCorrections[i % 8];
 	}
+	SetWaveform(newWaveform);
 
 	SetCfd(CalculateCfd(attenuation, delay, halfsmoothingwindow, interpolationSteps));
 
@@ -192,16 +193,16 @@ Int_t TSceptarHit::CalculateCfdAndMonitor(double attenuation, unsigned int delay
 
 	std::vector<Short_t> smoothedWaveform;
 
-	if(fWaveform.empty()) {
+	if(!HasWave()) {
 		return INT_MAX; // Error!
 	}
 
-	if(static_cast<unsigned int>(fWaveform.size()) > delay + 1) {
+	if(static_cast<unsigned int>(WaveSize()) > delay + 1) {
 
 		if(halfsmoothingwindow > 0) {
 			smoothedWaveform = TSceptarHit::CalculateSmoothedWaveform(halfsmoothingwindow);
 		} else {
-			smoothedWaveform = fWaveform;
+			smoothedWaveform = *GetWaveform();
 		}
 
 		monitor.resize(smoothedWaveform.size() - delay);
@@ -241,16 +242,16 @@ std::vector<Short_t> TSceptarHit::CalculateSmoothedWaveform(unsigned int halfsmo
 {
 	// Used when calculating the CFD from the waveform
 
-	if(fWaveform.empty()) {
+	if(!HasWave()) {
 		return std::vector<Short_t>(); // Error!
 	}
 
-	std::vector<Short_t> smoothedWaveform(std::max(static_cast<size_t>(0), fWaveform.size() - 2 * halfsmoothingwindow),
+	std::vector<Short_t> smoothedWaveform(std::max(static_cast<size_t>(0), WaveSize() - 2 * halfsmoothingwindow),
 			0);
 
-	for(size_t i = halfsmoothingwindow; i < fWaveform.size() - halfsmoothingwindow; ++i) {
+	for(size_t i = halfsmoothingwindow; i < WaveSize() - halfsmoothingwindow; ++i) {
 		for(int j = -static_cast<int>(halfsmoothingwindow); j <= static_cast<int>(halfsmoothingwindow); ++j) {
-			smoothedWaveform[i - halfsmoothingwindow] += fWaveform[i + j];
+			smoothedWaveform[i - halfsmoothingwindow] += GetWaveform()->at(i + j);
 		}
 	}
 
@@ -261,7 +262,7 @@ std::vector<Short_t> TSceptarHit::CalculateCfdMonitor(double attenuation, int de
 {
 	// Used when calculating the CFD from the waveform
 
-	if(fWaveform.empty()) {
+	if(!HasWave()) {
 		return std::vector<Short_t>(); // Error!
 	}
 
@@ -270,7 +271,7 @@ std::vector<Short_t> TSceptarHit::CalculateCfdMonitor(double attenuation, int de
 	if(halfsmoothingwindow > 0) {
 		smoothedWaveform = TSceptarHit::CalculateSmoothedWaveform(halfsmoothingwindow);
 	} else {
-		smoothedWaveform = fWaveform;
+		smoothedWaveform = *GetWaveform();
 	}
 
 	std::vector<Short_t> monitor(std::max(static_cast<size_t>(0), smoothedWaveform.size() - delay), 0);
