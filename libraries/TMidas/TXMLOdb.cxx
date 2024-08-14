@@ -30,13 +30,11 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
    }
    fDoc = fParser->GetXMLDocument();
    if(fDoc == nullptr) {
-      fprintf(stderr, "XmlOdb::XmlOdb: Malformed ODB dump: cannot get XML document\n");
-      return;
+		std::runtime_error("XmlOdb::XmlOdb: Malformed ODB dump: cannot get XML document");
    }
    fOdb = fDoc->GetRootNode();
    if(strcmp(fOdb->GetNodeName(), "odb") != 0) {
-      fprintf(stderr, "XmlOdb::XmlOdb: Malformed ODB dump: cannot find <odb> tag\n");
-      return;
+      std::runtime_error("XmlOdb::XmlOdb: Malformed ODB dump: cannot find <odb> tag");
    }
 }
 
