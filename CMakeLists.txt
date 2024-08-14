@@ -67,6 +67,10 @@ set(CMAKE_INSTALL_LIBDIR ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_INSTALL_BINDIR ${CMAKE_BINARY_DIR}/bin)
 
 #----------------------------------------------------------------------------
+# copy includes
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION ${CMAKE_BINARY_DIR})
+
+#----------------------------------------------------------------------------
 # define all libraries and root dictionaries
 # for some we also create dependencies on other libraries to remove linking errors later on
 
