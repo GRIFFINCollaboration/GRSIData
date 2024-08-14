@@ -54,7 +54,10 @@ else
 	exit
 fi
 
-libs="TAngularCorrelation TGRSIDataParser TGRSIFormat TGenericDetector TCSM TDescant TGriffin TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTriFoil TZeroDegree TEmma TTrific TRcmp"
+libdir=$GRSISYS/GRSIData/lib
+incdir=$GRSISYS/GRSIData/include
+
+libs="TAngularCorrelation TGRSIDataParser TGRSIFormat TGenericDetector TCSM TDescant TGriffin TLaBr TMidas TPaces TRF TS3 TSceptar TSharc TSiLi TTAC TTigress TTip TTriFoil TZeroDegree TEmma TTrific TRcmp TSharc2"
 
 if [[ $(root-config --cflags) == *"-std="* ]]
 then

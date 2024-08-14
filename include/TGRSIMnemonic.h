@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "TClass.h"
 
-enum class EDigitizer : char { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen, kMadc, kV1190 };
+enum class EDigitizer : char { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen, kMadc, kV1190, kFMC32 };
 
 class TGRSIMnemonic : public TMnemonic {
 public:
@@ -48,8 +48,10 @@ public:
 		kTdrPlastic,
 		kEmma,
 		kEmmaS3,
-		kTrific,
-		kClear            //30
+		kTrific,          //30
+      kSharc2,
+      kRcmp,
+		kClear            
    };
 
    ESystem   System() const { return fSystem; }
