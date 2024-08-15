@@ -87,12 +87,6 @@ void TSharc2::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 				fBackFragments.push_back(*frag);
 			}
 			break;
-			//pads here
-		/*
-			case TMnemonic::EMnemonic::kE:
-			fPadFragments.push_back(*frag);
-			break;
-		*/
 		default:
 			break;
 	};
@@ -118,25 +112,13 @@ void TSharc2::BuildHits()
 			TSharc2Hit* hit = new TSharc2Hit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
-			fHits.push_back(hit);
+			AddHit(hit);
 			front = fFrontFragments.erase(front);
 			back  = fBackFragments.erase(back);
 		} else {
 			front++;
 		}
 	}
-	//this is the thick full energy pads in the downstream BOX from SHARC-1. If we add pads to SHARC-2 later, this is a good starting point
-	/*
-	for(auto& fSharcHit : fHits) {
-		for(pad = fPadFragments.begin(); pad != fPadFragments.end(); pad++) {
-			if(fSharcHit->GetDetector() == pad->GetDetector()) {
-				static_cast<TSharc2Hit*>(fSharcHit)->SetPad(*pad);
-				pad = fPadFragments.erase(pad);
-				break;
-			}
-		}
-	}
-	*/
 }
 
 void TSharc2::RemoveHits(std::vector<TSharc2Hit>* hits, std::set<int>* to_remove)
@@ -152,11 +134,9 @@ void TSharc2::RemoveHits(std::vector<TSharc2Hit>* hits, std::set<int>* to_remove
 void TSharc2::Clear(Option_t* option)
 {
 	TDetector::Clear(option);
-	fHits.clear();
 
 	fFrontFragments.clear(); //!
 	fBackFragments.clear();  //!
-	//fPadFragments.clear();   //!
 
 	if(strcmp(option, "ALL") == 0) {
 		fXoffset = 0.00;
@@ -180,8 +160,6 @@ void TSharc2::Print(std::ostream& out) const
 
 void TSharc2::Copy(TObject& rhs) const
 {
-	// if(!rhs.InheritsFrom("TSharc2"))
-	//  return;
 	TDetector::Copy(rhs);
 
 	static_cast<TSharc2&>(rhs).fXoffset   = fXoffset;
@@ -193,7 +171,6 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
 {
 	int FrontDet = detector;
 	int FrontStr = frontstrip;
-	// int BackDet  = detector;
 	int BackStr = backstrip;
 	double nrots   = 0.; // allows us to rotate into correct position
 
@@ -211,19 +188,16 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
 		double z = fZminUB - (BackStr + 0.5) * fStripBPitch;  // [(-5.0) - (-53.0)]
 		position.SetXYZ(x, y, z);
 		position.RotateZ(TMath::Pi() * nrots / 2.); //we rotate here because the rotation will be different for the cS2 detectors
-	} 
-
-	//only 1 up/downstream detector for SHARC-2 instead of the 4 QQQs from SHARC-1. We will set them at detector number 1 and 16
-	//so that we have a few spare detectors in case we want to add e.g. a thick pad behind the downstream S2 later.
-	else if(FrontDet == 1) { // forward (downstream) compact S2
+	} else if(FrontDet == 1) { // forward (downstream) compact S2
+										//only 1 up/downstream detector for SHARC-2 instead of the 4 QQQs from SHARC-1. We will set them at detector number 1 and 16
+										//so that we have a few spare detectors in case we want to add e.g. a thick pad behind the downstream S2 later.
 		nrots = (FrontStr - 10) + 0.5; //sector 10 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
 		double x = fXminDS2 + fStripPitchDS2 * (BackStr + 0.5); //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
 		double y = 0; //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
 		double z = fZposDS2;
 		position.SetXYZ(x, y, z);
 		position.RotateZ(fSectorWidthDS2 * nrots);
-	} 
-	else if(FrontDet == 16) { // backward (upstream) compact S2
+	} else if(FrontDet == 16) { // backward (upstream) compact S2
 		nrots = (FrontStr - 3) + 0.5; //sector 3 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
 		double x = fXminUS2 + fStripPitchUS2 * (BackStr + 0.5); //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
 		double y = 0; //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
@@ -236,47 +210,3 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
 	
 	return (position + position_offset);
 }
-
-//these are all old from the SHARC-1 class. Aren't really used in analysis.
-/*
-double TSharc2::GetDetectorThickness(TSharc2Hit& hit, double dist)
-{
-	static double fDetectorThickness[16] = {998., 998.,  998.,  1001., 141., 142., 133., 143.,
-		999., 1001., 1001., 1002., 390., 390., 383., 385.};
-	if(dist < 0.0) {
-		dist = fDetectorThickness[hit.GetDetector()];
-	}
-
-	double phi_90 = fmod(std::fabs(hit.GetPosition().Phi()), TMath::Pi() / 2);
-	double phi_45 = phi_90;
-	if(phi_90 > (TMath::Pi() / 4.)) {
-		phi_45 = TMath::Pi() / 2 - phi_90;
-	}
-
-	if(hit.GetDetector() >= 5 && hit.GetDetector() <= 12) {
-		return dist / (TMath::Sin(hit.GetPosition().Theta()) * TMath::Cos(phi_45));
-	}
-	return std::fabs(dist / (TMath::Cos(hit.GetPosition().Theta())));
-}
-
-double TSharc2::GetDeadLayerThickness(TSharc2Hit& hit)
-{
-	static double fDeadLayerThickness[16] = {0.7, 0.7, 0.7, 0.7, 0.1, 0.1, 0.1, 0.1,
-		0.1, 0.1, 0.1, 0.1, 0.7, 0.7, 0.7, 0.7};
-	return GetDetectorThickness(hit, fDeadLayerThickness[hit.GetDetector()]);
-}
-
-double TSharc2::GetPadThickness(TSharc2Hit& hit)
-{
-	static double fPadThickness[16] = {0.0, 0.0, 0.0, 0.0, 1534, 1535, 1535, 1539,
-		0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0};
-	return GetDetectorThickness(hit, fPadThickness[hit.GetDetector()]);
-}
-
-double TSharc2::GetPadDeadLayerThickness(TSharc2Hit& hit)
-{
-	static double fPadDeadLayerThickness[16] = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-		0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	return GetDetectorThickness(hit, fPadDeadLayerThickness[hit.GetDetector()]);
-}
-*/

@@ -94,9 +94,9 @@ void TGRSIMnemonic::EnumerateSystem()
       }
    } else if(SystemString().compare("TF") == 0) {
       fSystem = ESystem::kTrific;
-   }  else if(fSystemString.compare("SZ") == 0) {
+   }  else if(SystemString().compare("SZ") == 0) {
       fSystem = ESystem::kSharc2;
-   }  else if(fSystemString.compare("RC") == 0) {  
+   }  else if(SystemString().compare("RC") == 0) {  
       fSystem = ESystem::kRcmp;
    }  else {
       fSystem = ESystem::kClear;

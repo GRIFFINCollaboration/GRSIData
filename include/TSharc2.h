@@ -38,7 +38,7 @@ public:
       fZoffset = z;
    }
 
-   int     GetSize() const { return fHits.size(); } //!<!
+   int     GetSize() const { return Hits().size(); } //!<!
 
    void Copy(TObject&) const override;        //!<!
    void Clear(Option_t* = "") override;       //!<!
@@ -68,17 +68,7 @@ private:
 	// After that these vectors aren't used again.
    std::vector<TFragment> fFrontFragments; //!
    std::vector<TFragment> fBackFragments;  //!
-   //std::vector<TFragment> fPadFragments;   //!
 
-public:
-   /* //old from SHARC-1 class
-   static double GetDetectorThickness(TSharc2Hit& hit, double dist = -1.0); //!
-   static double GetDeadLayerThickness(TSharc2Hit& hit);                    //!
-   static double GetPadThickness(TSharc2Hit& hit);                          //!
-   static double GetPadDeadLayerThickness(TSharc2Hit& hit);                 //!
-   */
-
-private:
    static double fXoffset; //!<!
    static double fYoffset; //!<!
    static double fZoffset; //!<!
