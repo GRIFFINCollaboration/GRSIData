@@ -215,7 +215,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffin, 5) // Griffin Physics structure
+   ClassDefOverride(TGriffin, 6) // Griffin Physics structure
    /// \endcond
 };
 /*! @} */
