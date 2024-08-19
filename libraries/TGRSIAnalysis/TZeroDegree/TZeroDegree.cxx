@@ -50,7 +50,7 @@ void TZeroDegree::Print(Option_t*) const
 void TZeroDegree::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<"TZeroDegree contains "<<fHits.size()<<" fHits"<<std::endl;
+	str<<"TZeroDegree contains "<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -63,5 +63,5 @@ void TZeroDegree::AddFragment(const std::shared_ptr<const TFragment>& frag, TCha
    }
 
    TZeroDegreeHit* hit = new TZeroDegreeHit(*frag);
-   fHits.push_back(hit);
+   AddHit(hit);
 }

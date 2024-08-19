@@ -125,7 +125,7 @@ void TDescant::Print(Option_t*) const
 void TDescant::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<fHits.size()<<" fHits"<<std::endl;
+   str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -139,7 +139,7 @@ void TDescant::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    }
 
    TDescantHit* hit = new TDescantHit(*frag);
-   fHits.push_back(hit);
+   AddHit(hit);
 }
 
 TVector3 TDescant::GetPosition(int DetNbr, double dist)

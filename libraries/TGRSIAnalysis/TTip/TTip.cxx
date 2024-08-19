@@ -173,7 +173,7 @@ void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
 
    TTipHit* hit = new TTipHit(*frag);
    hit->SetUpNumbering(chan);          // Think about moving this to ctor
-   fHits.push_back(hit);
+   AddHit(hit);
 }
 
 void TTip::Print(Option_t*) const
@@ -185,7 +185,7 @@ void TTip::Print(Option_t*) const
 void TTip::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<fHits.size()<<" fHits"<<std::endl;
+   str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 

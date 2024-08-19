@@ -87,7 +87,7 @@ CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
 LINKFLAGS += $(shell grsi-config --all-libs)
-LINKFLAGS += $(shell grsi-config --GRSIData-libs)
+#LINKFLAGS += $(shell grsi-config --GRSIData-libs)
 
 # RCFLAGS are being used for rootcint
 ifeq ($(MATHMORE_INSTALLED),yes)
@@ -149,10 +149,10 @@ doxygen:
 	$(MAKE) -C $@
 
 $(GRSISYS)/bin/%: .build/myAnalysis/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(shell grsi-config --GRSIData-libs),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 $(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/GRSIDataVersion.h lib/libGRSIData.so
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(shell grsi-config --GRSIData-libs),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/GRSIDataVersion.h
 	@mkdir -p $@

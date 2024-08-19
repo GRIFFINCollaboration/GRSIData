@@ -39,10 +39,6 @@ public:
    ~TSharc2Hit() override;
 
 private:
-   // UShort_t   fDetectorNumber;  //
-   // UShort_t   fFrontStrip;     //
-   // UShort_t   fBackStrip;      //
-
    TDetectorHit fBackHit; //
    TDetectorHit fPadHit;  //
 
@@ -81,8 +77,6 @@ public:
    inline Double_t GetPadE() const { return GetPad().GetEnergy(); } //!<!
    inline Double_t GetPadT() const { return GetPad().GetTime(); }   //!<!
 
-   // std::pair<int,int>  GetPixel()  { return std::make_pair(fFrontStrip,fBackStrip);  }  //!<!
-
    Float_t GetFrontCharge() const
    {
       return TDetectorHit::GetCharge();
@@ -103,13 +97,6 @@ public:
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
    };                                                                          //!<!
    Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0); //!<!
-
-   ///////////////////////////////////////////////////////////////////////
-   ///////////////////////////////////////////////////////////////////////
-   ///////////////////////////////////////////////////////////////////////
-   // void SetDetectorNumber(const UShort_t& det) { fDetectorNumber = det;   }  //!<!
-   // void SetFrontStrip(const UShort_t& strip)   { fFrontStrip    = strip; }  //!<!
-   // void SetBackStrip(const UShort_t& strip)    { fBackStrip     = strip; }  //!<!
 
    void SetFront(const TFragment& frag); //!<!
    void SetBack(const TFragment& frag);  //!<!

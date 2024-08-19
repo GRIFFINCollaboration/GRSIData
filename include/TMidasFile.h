@@ -58,7 +58,6 @@ public:
    bool WriteBuffer();
    // int GetBufferSize() const { return fWriteBuffer.size(); }
 
-   const char* GetFilename() const override { return fFilename.c_str(); } ///< Get the name of this file
    int         GetLastErrno() const { return fLastErrno; }                ///< Get error value for the last file error
    const char* GetLastError() const { return fLastError.c_str(); }        ///< Get error text for the last file error
 

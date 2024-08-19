@@ -57,7 +57,7 @@ public:
 
    void UseFitCharge()
    {
-      for(auto& fSiLiHit : fHits) {
+      for(auto& fSiLiHit : Hits()) {
          static_cast<TSiLiHit*>(fSiLiHit)->UseFitCharge();
       }
    }

@@ -65,7 +65,6 @@ class TTrific : public TDetector {
 			fRange = 0;
    		}
 
-		virtual Short_t GetMultiplicity() const override {return fHits.size();}
 		virtual Short_t GetXMultiplicity() const {return fXFragments.size();}
 		virtual Short_t GetYMultiplicity() const {return fYFragments.size();}
 		virtual Short_t GetSingMultiplicity() const {return fSingFragments.size();}

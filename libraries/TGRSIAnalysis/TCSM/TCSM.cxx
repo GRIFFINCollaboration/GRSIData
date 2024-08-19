@@ -72,7 +72,7 @@ void TCSM::BuildHits()
          BuildVH(fFragment.second.at(i), hits[i]);
       }
    }
-   BuilddEE(hits, fHits);
+   BuilddEE(hits, Hits());
 }
 
 TVector3 TCSM::GetPosition(int detector, char pos, int horizontalstrip, int verticalstrip, double X, double Y, double Z)

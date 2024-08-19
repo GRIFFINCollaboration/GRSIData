@@ -64,7 +64,7 @@ void TSiLi::Print(Option_t*) const
 void TSiLi::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<fHits.size()<<" sili_hits"<<std::endl;
+   str<<GetMultiplicity()<<" sili_hits"<<std::endl;
    str<<fAddbackHits.size()<<" sili_addback_hits"<<std::endl;
 	out<<str.str();
 }
@@ -76,7 +76,7 @@ void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
    }
 
    TSiLiHit* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
-   fHits.push_back(hit);
+   AddHit(hit);
 }
 
 // For mapping you may want to us -position.X() to account for looking upstream
@@ -166,7 +166,7 @@ Int_t TSiLi::GetAddbackMultiplicity()
 {
 	// Automatically builds the addback hits using the addback_criterion (if the size of the addback_hits vector is zero)
 	// and return the number of addback hits.
-	short basehits = fHits.size();
+	short basehits = GetMultiplicity();
 
 	// if the addback has been reset, clear the addback hits
 	if(fSiLiBits.TestBit(ESiLiBits::kAddbackSet)) {
@@ -285,9 +285,9 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 	}
 
 	if(cluster.size()>1&&!ContainsReject){
-		TSiLiHit* A=static_cast<TSiLiHit*>(fHits.at(cluster[0]));
-		TSiLiHit* B=static_cast<TSiLiHit*>(fHits.at(cluster[1]));
-		int rA=A->GetRing(),rB=B->GetRing();
+      TSiLiHit* A = static_cast<TSiLiHit*>(GetHit(cluster[0]));
+      TSiLiHit* B = static_cast<TSiLiHit*>(GetHit(cluster[1]));
+      int rA=A->GetRing(),rB=B->GetRing();
 		int sA=A->GetSector(),sB=B->GetSector();
 		int rAB=std::abs(rA-rB);
 		int sAB=std::abs(sA-sB);
@@ -295,10 +295,10 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 
 		if(cluster.size()==2){
 			//Reject events with missing middle pixel
-			if(rAB+sAB>1)ContainsReject=true;
-		}else{
-			TSiLiHit* C=static_cast<TSiLiHit*>(fHits.at(cluster[2]));
-			int rC=C->GetRing();
+         if(rAB + sAB > 1) ContainsReject = true;
+      }else{
+         TSiLiHit* C  = static_cast<TSiLiHit*>(GetHit(cluster[2]));
+         int rC=C->GetRing();
 			int sC=C->GetSector();
 			int rAC=std::abs(rA-rC),rBC=std::abs(rB-rC);
 			int sAC=std::abs(sA-sC),sBC=std::abs(sB-sC);

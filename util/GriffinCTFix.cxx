@@ -211,6 +211,7 @@ void FixAll(TFile* inputFile, double energy)
 {
    // This function loops over 16 clovers (always does) and by default uses the 1332 keV gamma ray in 60Co
    for(int d = 1; d <= 16; d++) {
+		std::cout << "Starting CrossTalkFix for detector "<<d<<", using energy "<<energy<<std::endl;
       CrossTalkFix(d, energy, inputFile);
    }
 }
@@ -254,5 +255,8 @@ int main(int argc, char** argv)
 
    // This function writes a corrections cal_file which can be loaded in with your normal cal file.
    TChannel::WriteCTCorrections("ct_correction.cal");
+
+	outputFile->Write();
+	outputFile->Close();
 }
 #endif

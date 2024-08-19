@@ -123,9 +123,9 @@ void TTigress::Print(Option_t*) const
 void TTigress::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<fHits.size()<<" tigress hits"<<std::endl;
+   str<<GetMultiplicity()<<" tigress hits"<<std::endl;
    for(Short_t i = 0; i < GetMultiplicity(); i++) {
-      fHits.at(i)->Print(str);
+      GetHit(i)->Print(str);
    }
 	out<<str.str();
 }
@@ -140,7 +140,7 @@ Int_t TTigress::GetAddbackMultiplicity()
 {
    // Automatically builds the addback hits using the addback_criterion
    // (if the size of the addback_hits vector is zero) and return the number of addback hits.
-   if(fHits.empty()) {
+   if(NoHits()) {
       return 0;
    }
    // if the addback has been reset, clear the addback hits
@@ -152,25 +152,25 @@ Int_t TTigress::GetAddbackMultiplicity()
 	}
 
 	// use the first (highest E) tigress hit as starting point for the addback hits
-	fAddbackHits.push_back(fHits[0]);
+	fAddbackHits.push_back(GetHit(0));
 	fAddbackFrags.push_back(1);
 
 	// loop over remaining tigress hits
-	size_t i, j;
-	for(i = 1; i < fHits.size(); i++) {
+	for(Short_t i = 1; i < GetMultiplicity(); i++) {
 		// check for each existing addback hit if this tigress hit should be added
+		size_t j = 0;
 		for(j = 0; j < fAddbackHits.size(); j++) {
-			if(fAddbackCriterion(fAddbackHits[j], fHits[i])) {
+			if(fAddbackCriterion(fAddbackHits[j], GetHit(i))) {
 				// SumHit preserves time and position from first (highest E) hit, but adds segments so this hit becomes
 				// LastPosition()
-				static_cast<TTigressHit*>(fAddbackHits[j])->SumHit(static_cast<TTigressHit*>(fHits[i])); // Adds
+				static_cast<TTigressHit*>(fAddbackHits[j])->SumHit(static_cast<TTigressHit*>(GetHit(i))); // Adds
 				fAddbackFrags[j]++;
 				break;
 			}
 		}
 		// if hit[i] was not added to a higher energy hit, create its own addback hit
 		if(j == fAddbackHits.size()) {
-			fAddbackHits.push_back(fHits[i]);
+			fAddbackHits.push_back(GetHit(i));
 			static_cast<TTigressHit*>(fAddbackHits.back())->SumHit(static_cast<TTigressHit*>(fAddbackHits.back())); // Does nothing // then why are we doing this?
 			fAddbackFrags.push_back(1);
 		}
@@ -196,11 +196,11 @@ void TTigress::BuildHits()
 {
 	// remove all hits of segments only
 	// remove_if moves all elements to be removed to the end and returns an iterator to the first one to be removed
-	auto remove = std::remove_if(fHits.begin(), fHits.end(), [](TDetectorHit* h) -> bool { return !(static_cast<TTigressHit*>(h)->CoreSet());});
+	auto remove = std::remove_if(Hits().begin(), Hits().end(), [](TDetectorHit* h) -> bool { return !(static_cast<TTigressHit*>(h)->CoreSet());});
 	// using remove_if the elements to be removed are left in an undefined state so we can only log how many we are removing!
-	TSortingDiagnostics::Get()->RemovedHits(IsA(), std::distance(remove, fHits.end()), fHits.size());
-	fHits.erase(remove, fHits.end());
-	for(auto& hit : fHits) {
+	TSortingDiagnostics::Get()->RemovedHits(IsA(), std::distance(remove, Hits().end()), Hits().size());
+	Hits().erase(remove, Hits().end());
+	for(auto& hit : Hits()) {
 		auto tigressHit = static_cast<TTigressHit*>(hit);
 		if(tigressHit->GetNSegments() > 1) {
 			tigressHit->SortSegments();
@@ -210,12 +210,12 @@ void TTigress::BuildHits()
 			tigressHit->SetWavefit();
 		}
 	}
-	if(fHits.size() > 1) {
-		std::sort(fHits.begin(), fHits.end());
+	if(!NoHits()) {
+		std::sort(Hits().begin(), Hits().end());
 	}
 
 	// Label all hits as being suppressed or not
-	for(auto& fTigressHit : fHits) {
+	for(auto& fTigressHit : Hits()) {
 		bool suppressed = false;
 		for(auto& fBgo : fBgos) {
 			if(fSuppressionCriterion(fTigressHit, fBgo)) {
@@ -239,7 +239,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 		TTigressHit* corehit = new TTigressHit;
 		// loop over existing hits to see if this core was already created by a previously found segment
 		// of course this means if we have a core in "coincidence" with itself we will overwrite the first hit
-		for(size_t i = 0; i < fHits.size(); ++i) {
+		for(Short_t i = 0; i < GetMultiplicity(); ++i) {
 			TTigressHit* hit = GetTigressHit(i);
 			if((hit->GetDetector() == chan->GetDetectorNumber()) &&
 					(hit->GetCrystal() == chan->GetCrystalNumber())) { // we have a match;
@@ -268,12 +268,12 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 		if(TestGlobalBit(ETigressGlobalBits::kSetCoreWave)) {
 			frag->CopyWave(*corehit);
 		}
-		fHits.push_back(corehit);
+		AddHit(corehit);
 		return;
 	}
 	if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kG) { // its ge but its not a core...
 		TDetectorHit temp(*frag);
-		for(size_t i = 0; i < fHits.size(); ++i) {
+		for(Short_t i = 0; i < GetMultiplicity(); ++i) {
 			TTigressHit* hit = GetTigressHit(i);
 			if((hit->GetDetector() == chan->GetDetectorNumber()) &&
 					(hit->GetCrystal() == chan->GetCrystalNumber())) { // we have a match;
@@ -290,7 +290,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 			frag->CopyWave(temp);
 		}
 		corehit->AddSegment(temp);
-		fHits.push_back(corehit);
+		AddHit(corehit);
 		return;
 	}
 	if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kS) {

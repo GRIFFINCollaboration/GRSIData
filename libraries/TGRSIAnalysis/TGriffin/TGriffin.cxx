@@ -257,7 +257,7 @@ void TGriffin::Print(std::ostream& out) const
    str<<"Griffin Contains: "<<std::endl;
    str<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto& hit : fGriffinLowGainHits) {
+		for(auto& hit : Hits()) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
@@ -305,7 +305,7 @@ void TGriffin::SetDefaultGainType(const EGainBits& gain_type)
 Short_t TGriffin::GetMultiplicity(const EGainBits& gain_type) const
 {
    switch(gain_type) {
-		case EGainBits::kLowGain: return fGriffinLowGainHits.size();
+		case EGainBits::kLowGain: return TDetector::GetMultiplicity();
 		case EGainBits::kHighGain: return fGriffinHighGainHits.size();
    };
    return 0;
@@ -314,19 +314,19 @@ Short_t TGriffin::GetMultiplicity(const EGainBits& gain_type) const
 const std::vector<TDetectorHit*>& TGriffin::GetHitVector(const EGainBits& gain_type) const
 {
    switch(gain_type) {
-		case EGainBits::kLowGain:  return fGriffinLowGainHits;
+		case EGainBits::kLowGain:  return Hits();
 		case EGainBits::kHighGain: return fGriffinHighGainHits;
    };
-	return fGriffinLowGainHits;
+	return Hits();
 }
 
 std::vector<TDetectorHit*>& TGriffin::GetHitVector(const EGainBits& gain_type)
 {
    switch(gain_type) {
-		case EGainBits::kLowGain:  return fGriffinLowGainHits;
+		case EGainBits::kLowGain:  return Hits();
 		case EGainBits::kHighGain: return fGriffinHighGainHits;
    };
-	return fGriffinLowGainHits;
+	return Hits();
 }
 
 std::vector<TDetectorHit*>& TGriffin::GetAddbackVector(const EGainBits& gain_type)

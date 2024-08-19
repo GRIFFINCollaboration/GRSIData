@@ -63,7 +63,7 @@ void TPaces::Print(Option_t*) const
 void TPaces::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -76,6 +76,6 @@ TPaces& TPaces::operator=(const TPaces& rhs)
 void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TPacesHit* hit = new TPacesHit(*frag);
-	fHits.push_back(hit);
+	AddHit(hit);
 }
 

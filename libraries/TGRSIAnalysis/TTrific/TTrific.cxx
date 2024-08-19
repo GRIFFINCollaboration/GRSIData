@@ -82,7 +82,7 @@ void TTrific::Print(Option_t*) const
 void TTrific::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<GetMultiplicity()<<" hits"<<std::endl;
 	str<<fXFragments.size()<<" xHits"<<std::endl;
 	str<<fYFragments.size()<<" yHits"<<std::endl;
 	str<<fSingFragments.size()<<" singHits"<<std::endl;
@@ -114,7 +114,7 @@ void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 			break;
 	};
 
-	fHits.push_back(hit);
+	AddHit(hit);
 	
 	return;
 }
@@ -123,7 +123,6 @@ void TTrific::Clear(Option_t* option)
 {
 
 	TDetector::Clear(option);
-	fHits.clear();
 	
 	fXFragments.clear(); //!
 	fYFragments.clear(); //!

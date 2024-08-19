@@ -76,7 +76,7 @@ void TGriffinHit::Print(std::ostream& out) const
 	str<<"Griffin Detector: "<<GetDetector()<<std::endl
 		<<"Griffin Crystal:  "<<GetCrystal()<<std::endl
 		<<"Griffin Energy:   "<<GetEnergy()<<std::endl
-		<<"Griffin hit time:   "<<GetTime()<<", TS (in ns) "<<GetTimeStampNs()<<", TS "<<fTimeStamp<<std::endl
+		<<"Griffin hit time:   "<<GetTime()<<", TS (in ns) "<<GetTimeStampNs()<<", TS "<<GetTimeStamp()<<std::endl
 		<<"Griffin hit TV3 theta: "<<GetPosition().Theta() * 180 / (3.141597)<<" \tphi: "<<GetPosition().Phi() * 180 / (3.141597)<<std::endl;
 	out<<str.str();
 }

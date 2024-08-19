@@ -258,3 +258,9 @@ add_custom_target(GRSIDataVersion
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
   )
 
+#----------------------------------------------------------------------------
+# create a compile_commands.json file which can be used for clang-tidy
+if(NOT DEFINED ENV{CMAKE_EXPORT_COMPILE_COMMANDS})
+    message("ENV(CMAKE_EXPORT_COMPILE_COMMANDS) NOT DEFINED")
+    set($ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
+endif()

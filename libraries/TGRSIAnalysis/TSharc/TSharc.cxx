@@ -133,7 +133,7 @@ void TSharc::BuildHits()
 			TSharcHit* hit = new TSharcHit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
-			fHits.push_back(hit);
+			AddHit(hit);
 			front = fFrontFragments.erase(front);
 			back  = fBackFragments.erase(back);
 		} else {
@@ -141,7 +141,7 @@ void TSharc::BuildHits()
 		}
 	}
 
-	for(auto& fSharcHit : fHits) {
+	for(auto& fSharcHit : Hits()) {
 		for(pad = fPadFragments.begin(); pad != fPadFragments.end(); pad++) {
 			if(fSharcHit->GetDetector() == pad->GetDetector()) {
 				static_cast<TSharcHit*>(fSharcHit)->SetPad(*pad);
@@ -165,7 +165,6 @@ void TSharc::RemoveHits(std::vector<TSharcHit>* hits, std::set<int>* to_remove)
 void TSharc::Clear(Option_t* option)
 {
 	TDetector::Clear(option);
-	fHits.clear();
 
 	fFrontFragments.clear(); //!
 	fBackFragments.clear();  //!
