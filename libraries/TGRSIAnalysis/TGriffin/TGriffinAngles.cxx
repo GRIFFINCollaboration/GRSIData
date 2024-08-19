@@ -314,18 +314,14 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 
 bool TGriffinAngles::ExcludeDetector(int detector) const
 {
-	for(auto exclude : fExcludedDetectors) {
-		if(detector == exclude) return true;
-	}
-	return false;
+	/// Returns true if any of the detectors in fExcludedDetectors matches the given detector.
+	return std::any_of(fExcludedDetectors.begin(), fExcludedDetectors.end(), [&detector](auto iter) { return detector == iter.second; });
 }
 
 bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 {
-	for(auto exclude : fExcludedCrystals) {
-		if(4*(detector-1)+crystal+1 == exclude) return true;
-	}
-	return false;
+	/// Returns true if any of the crystals in fExcludedCrystals matches the given detector and crystal (using 4*(detector-1)+crystal+1).
+	return std::any_of(fExcludedCrystals.begin(), fExcludedCrystals.end(), [&detector,&crystal](auto iter) { return 4*(detector-1)+crystal+1 == iter.second; });
 }
 
 void TGriffinAngles::Print(Option_t*) const
