@@ -901,16 +901,12 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 									// low bits; signed, so we
 									// extend the sign bit from 14
 									// (31) to 16 bits
-									if(false && (data[x] & 0x02000000) == 0x02000000) {                             // overflow bit was set - disabled VB
-										tmpCharge.push_back(std::numeric_limits<int>::max());
-									} else {
-										tmpCharge.push_back((data[x] & 0x01ffffff) |
-												(((data[x] & 0x01000000) == 0x01000000)
-												 ? 0xfe000000
-												 : 0x0)); // extend the sign bit of 25bit charge word
-									}
-									++x;
-									tmpIntLength.push_back(tmp | ((data[x] & 0x7fc00000) >> 22));
+                           tmpCharge.push_back((data[x] & 0x01ffffff) |
+                                               (((data[x] & 0x01000000) == 0x01000000)
+                                                   ? 0xfe000000
+                                                   : 0x0));   // extend the sign bit of 25bit charge word
+                           ++x;
+                           tmpIntLength.push_back(tmp | ((data[x] & 0x7fc00000) >> 22));
 									tmpCfd.push_back(data[x] & 0x003fffff);
 									// check if we have two more words (X & XI) with (8 num hits, 2 reserved, 14 IntLength2)(31 Charge2);
 									// x has already been incremented once!

@@ -370,8 +370,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 					if(usetimestamps) tg3 = grif->GetGriffinHit(three)->GetTimeStamp();
 					else tg3 = grif->GetGriffinHit(three)->GetTime();
 
-					if(ggTlow > TMath::Abs(tg3-tg1) || TMath::Abs(tg3-tg1) > ggThigh || ggTlow > TMath::Abs(tg3-tg2) || TMath::Abs(tg3-tg2) > ggThigh) TimeCoincident = false;
-					else TimeCoincident = true; 
+					TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;
 					ggTimeDiff_g1g2->Fill(TMath::Abs(tg2 - tg1));
 					ggTimeDiff_g1g3->Fill(TMath::Abs(tg3 - tg1));
 					ggTimeDiff_g2g3->Fill(TMath::Abs(tg3 - tg2));
