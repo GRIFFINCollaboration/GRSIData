@@ -993,7 +993,7 @@ void TMidasFile::SetTIGOdb()
       tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
       int temp_integration = 0;
       if(type.at(x) != 0) {
-         tempChan->SetDigitizerType(TPriorityValue<std::string>(typemap[type.at(x)].second.c_str(), EPriority::kRootFile));
+         tempChan->SetDigitizerType(TPriorityValue<std::string>(typemap[type.at(x)].second, EPriority::kRootFile));
          if(strcmp(tempChan->GetDigitizerTypeString(), "Tig64") ==
             0) { // TODO: maybe use enumerations via GetDigitizerType()
             temp_integration = 25;
