@@ -39,37 +39,37 @@ void TGRSIMnemonic::EnumerateSystem()
 {
    // Enumerating the fSystemString must come after the total mnemonic has been parsed as the details of other parts of
    // the mnemonic must be known
-   if(SystemString().compare("TI") == 0) {
+   if(SystemString() == "TI") {
       fSystem = ESystem::kTigress;
-   } else if(SystemString().compare("SH") == 0) {
+   } else if(SystemString() == "SH") {
       fSystem = ESystem::kSharc;
-   } else if(SystemString().compare("TR") == 0) {
+   } else if(SystemString() == "TR") {
       fSystem = ESystem::kTriFoil;
-   } else if(SystemString().compare("RF") == 0) {
+   } else if(SystemString() == "RF") {
       fSystem = ESystem::kRF;
-   } else if(SystemString().compare("SP") == 0) {
+   } else if(SystemString() == "SP") {
       if(SubSystem() == EMnemonic::kI) {
          fSystem = ESystem::kSiLi;
       } else {
          fSystem = ESystem::kSiLiS3;
       }
-   } else if(SystemString().compare("GD") == 0) {
+   } else if(SystemString() == "GD") {
          fSystem = ESystem::kGeneric;
-   } else if(SystemString().compare("CS") == 0) {
+   } else if(SystemString() == "CS") {
       fSystem = ESystem::kCSM;
-   } else if(SystemString().compare("GR") == 0) {
+   } else if(SystemString() == "GR") {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kGriffinBgo;
 		} else {
 			fSystem = ESystem::kGriffin;
 		}
-   } else if(SystemString().compare("SE") == 0) {
+   } else if(SystemString() == "SE") {
       fSystem = ESystem::kSceptar;
-   } else if(SystemString().compare("PA") == 0) {
+   } else if(SystemString() == "PA") {
       fSystem = ESystem::kPaces;
-   } else if(SystemString().compare("DS") == 0) {
+   } else if(SystemString() == "DS") {
       fSystem = ESystem::kDescant;
-   } else if((SystemString().compare("DA") == 0) || (SystemString().compare("LB") == 0) ) {
+   } else if((SystemString() == "DA") || (SystemString() == "LB") ) {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kLaBrBgo;
 		} else if(SubSystem() == EMnemonic::kT) {
@@ -77,26 +77,26 @@ void TGRSIMnemonic::EnumerateSystem()
 		} else {
 			fSystem = ESystem::kLaBr;
 		}
-   } else if(SystemString().compare("BA") == 0) {
+   } else if(SystemString() == "BA") {
       fSystem = ESystem::kS3;
-   } else if(SystemString().compare("ZD") == 0) {
+   } else if(SystemString() == "ZD") {
       fSystem = ESystem::kZeroDegree;
-   } else if(SystemString().compare("TP") == 0) {
+   } else if(SystemString() == "TP") {
       fSystem = ESystem::kTip;
-   } else if(SystemString().compare("BG") == 0) {
+   } else if(SystemString() == "BG") {
       fSystem = ESystem::kBgo;
-   } else if((SystemString().compare("EM") == 0) || (SystemString().compare("ET") == 0)) {
+   } else if((SystemString() == "EM") || (SystemString() == "ET")) {
       if(SubSystem() == EMnemonic::kE) {
         fSystem = ESystem::kEmmaS3;
       }
       else {
         fSystem = ESystem::kEmma;
       }
-   } else if(SystemString().compare("TF") == 0) {
+   } else if(SystemString() == "TF") {
       fSystem = ESystem::kTrific;
-   }  else if(SystemString().compare("SZ") == 0) {
+   }  else if(SystemString() == "SZ") {
       fSystem = ESystem::kSharc2;
-   }  else if(SystemString().compare("RC") == 0) {  
+   }  else if(SystemString() == "RC") {  
       fSystem = ESystem::kRcmp;
    }  else {
       fSystem = ESystem::kClear;
@@ -109,28 +109,28 @@ void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerNam
    std::transform(name.begin(), name.end(), name.begin(), ::toupper);
 	EDigitizer tmpType = EDigitizer::kDefault;
 	int tmpUnit = 1;
-   if(name.compare("GRF16") == 0) {
+   if(name == "GRF16") {
 		tmpType = EDigitizer::kGRF16;
 		tmpUnit = 10;
-   } else if(name.compare("GRF4G") == 0) {
+   } else if(name == "GRF4G") {
 		tmpType = EDigitizer::kGRF4G;
 		tmpUnit = 10;
-   } else if(name.compare("TIG10") == 0) {
+   } else if(name == "TIG10") {
 		tmpType = EDigitizer::kTIG10;
 		tmpUnit = 10;
-   } else if(name.compare("TIG64") == 0) {
+   } else if(name == "TIG64") {
 		tmpType = EDigitizer::kTIG64;
 		tmpUnit = 10;
-   } else if(name.compare("CAEN") == 0) {
+   } else if(name == "CAEN") {
 		tmpType = EDigitizer::kCaen;
 		tmpUnit = 2;
-   } else if(name.compare("MADC") == 0) {
+   } else if(name == "MADC") {
 		tmpType = EDigitizer::kMadc;
 		tmpUnit = 50;
-   } else if(name.compare("V1190") == 0) {
+   } else if(name == "V1190") {
 		tmpType = EDigitizer::kV1190;
 		tmpUnit = 50;
-   } else if(name.compare("FMC32") == 0) {
+   } else if(name == "FMC32") {
 		tmpType = EDigitizer::kFMC32;
 		tmpUnit = 10;
    } else {

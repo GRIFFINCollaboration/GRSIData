@@ -63,7 +63,7 @@ TXMLNode* TXMLOdb::FindNode(const char* name, TXMLNode* node)
    node = node->GetChildren();
    while(node != nullptr) {
       std::string nodename = GetNodeName(node);
-      if(nodename.compare(name) == 0) {
+      if(nodename == name) {
          return node;
       }
       node = node->GetNextNode();

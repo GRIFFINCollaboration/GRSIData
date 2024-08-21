@@ -700,7 +700,7 @@ void TMidasFile::SetFileOdb()
    std::string expt;
    while(true) {
       std::string key = fOdb->GetNodeName(node);
-      if(key.compare("Name") == 0) {
+      if(key == "Name") {
          expt = node->GetText();
          break;
       }
@@ -709,12 +709,12 @@ void TMidasFile::SetFileOdb()
       }
       node = node->GetNextNode();
    }
-   if(expt.compare("tigress") == 0) {
+   if(expt == "tigress") {
       SetTIGOdb();
    } else if(expt.find("grif") != std::string::npos) {
 		// for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
-   } else if(expt.compare("tigdaq") == 0) { //New TIGRESS DAQ
+   } else if(expt == "tigdaq") { //New TIGRESS DAQ
       SetTIGDAQOdb();
    } else {
 		std::cerr<<RED<<"Unknown experiment name \""<<expt<<"\", ODB won't be read!"<<RESET_COLOR<<std::endl;

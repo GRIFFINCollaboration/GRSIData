@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 		// [/Experiment/Run parameters]
 		// Comment = STRING : [256] 
 		// Run Title = STRING : [256]
-		if(line.compare("[/Experiment/Run parameters]") == 0) {
+		if(line == "[/Experiment/Run parameters]") {
 			std::cout<<"found line "<<line<<std::endl;
 			std::getline(odbFile, line);
 			runComment = line.substr(25, std::string::npos);
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 		// Start time binary = DWORD : 1637963612
 		// Stop time = STRING : [32] Fri Nov 26 14:56:26 2021
 		// Stop time binary = DWORD : 1637967386
-		if(line.compare("[/Runinfo]") == 0) {
+		if(line == "[/Runinfo]") {
 			std::cout<<"found line "<<line<<std::endl;
 			std::getline(odbFile, line); // skipping state
 			std::getline(odbFile, line); // skipping online mode

@@ -173,10 +173,10 @@ void TGRSIDetectorInformation::Set()
 				break;
 			default:
 				std::string system = iter->second->GetMnemonic()->SystemString();
-				if(system.compare("SP") == 0) {
+				if(system == "SP") {
 					SetSpice();
 					SetS3();
-				} else if(system.compare("BA") == 0) {
+				} else if(system == "BA") {
 					SetBambino();
 				}
 		};
