@@ -21,7 +21,7 @@ TTAC::~TTAC()
 	// Default Destructor
 }
 
-TTAC::TTAC(const TTAC& rhs) : TDetector()
+TTAC::TTAC(const TTAC& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

@@ -40,7 +40,7 @@ TS3& TS3::operator=(const TS3& rhs)
    return *this;
 }
 
-TS3::TS3(const TS3& rhs) : TDetector()
+TS3::TS3(const TS3& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

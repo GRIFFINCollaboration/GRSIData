@@ -114,18 +114,18 @@ TVector3 TGriffin::gCloverPosition[17] = {
             TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
             TMath::Cos(TMath::DegToRad() * (135.0)))};
 
-TGriffin::TGriffin() : TSuppressed()
+TGriffin::TGriffin()
 {
-// Default ctor. Ignores TObjectStreamer in ROOT < 6
+	/// Default ctor. Ignores TObjectStreamer in ROOT < 6
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed()
+TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed(rhs)
 {
-// Copy ctor. Ignores TObjectStreamer in ROOT < 6
+	/// Copy ctor. Ignores TObjectStreamer in ROOT < 6
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif

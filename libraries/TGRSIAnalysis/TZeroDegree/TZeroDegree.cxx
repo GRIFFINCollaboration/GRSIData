@@ -26,7 +26,7 @@ TZeroDegree::~TZeroDegree()
    // Default Destructor
 }
 
-TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector()
+TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector(rhs)
 {
 // Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

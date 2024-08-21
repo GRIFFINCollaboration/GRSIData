@@ -38,7 +38,7 @@ void TSiLi::Copy(TObject& rhs) const
    static_cast<TSiLi&>(rhs).fSiLiBits    = 0;
 }
 
-TSiLi::TSiLi(const TSiLi& rhs) : TDetector()
+TSiLi::TSiLi(const TSiLi& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

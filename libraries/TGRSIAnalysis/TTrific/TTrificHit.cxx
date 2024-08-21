@@ -6,7 +6,7 @@
 ClassImp(TTrificHit)
 /// \endcond
 
-TTrificHit::TTrificHit() : TDetectorHit()
+TTrificHit::TTrificHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -14,7 +14,7 @@ TTrificHit::TTrificHit() : TDetectorHit()
 	Clear();
 }
 
-TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit()
+TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

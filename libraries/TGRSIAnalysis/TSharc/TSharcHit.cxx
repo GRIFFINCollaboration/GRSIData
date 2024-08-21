@@ -19,7 +19,7 @@ TSharcHit::TSharcHit()
 
 TSharcHit::~TSharcHit() = default;
 
-TSharcHit::TSharcHit(const TSharcHit& rhs) : TDetectorHit()
+TSharcHit::TSharcHit(const TSharcHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

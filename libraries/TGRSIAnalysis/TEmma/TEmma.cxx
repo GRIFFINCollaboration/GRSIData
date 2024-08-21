@@ -27,7 +27,7 @@ double TEmma::fXlength = 80.; //Size of X focal plane in mm
 double TEmma::fYlength = 30.; //Size of Y focal plane in mm
 short TEmma::fFail = 0;
 
-TEmma::TEmma() : TDetector()
+TEmma::TEmma()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -35,7 +35,7 @@ TEmma::TEmma() : TDetector()
 	Clear();
 }
 
-TEmma::TEmma(const TEmma& rhs) : TDetector()
+TEmma::TEmma(const TEmma& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

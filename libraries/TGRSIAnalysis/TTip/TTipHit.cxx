@@ -35,7 +35,7 @@ TTipHit::TTipHit(const TFragment& frag) : TDetectorHit(frag)
 
 TTipHit::~TTipHit() = default;
 
-TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit()
+TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);

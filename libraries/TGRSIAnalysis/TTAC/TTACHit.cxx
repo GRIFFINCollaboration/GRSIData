@@ -22,7 +22,7 @@ TTACHit::TTACHit()
 
 TTACHit::~TTACHit() = default;
 
-TTACHit::TTACHit(const TTACHit& rhs) : TDetectorHit()
+TTACHit::TTACHit(const TTACHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

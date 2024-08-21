@@ -80,12 +80,12 @@ std::underlying_type<TTigress::ETigressGlobalBits>::type operator |(TTigress::ET
    static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(rhs);
 }
 
-TTigress::TTigress() : TDetector()
+TTigress::TTigress()
 {
    Clear();
 }
 
-TTigress::TTigress(const TTigress& rhs) : TDetector()
+TTigress::TTigress(const TTigress& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

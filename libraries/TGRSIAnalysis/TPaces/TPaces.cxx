@@ -26,7 +26,7 @@ ROOT::Math::Polar3DVector TPaces::gDetectorPosition[6] = {
 	ROOT::Math::Polar3DVector(1., 120.299/180.*TMath::Pi(), 237./180.*TMath::Pi()),
 	ROOT::Math::Polar3DVector(1., 120.193/180.*TMath::Pi(), 313./180.*TMath::Pi())};
 
-TPaces::TPaces() : TDetector()
+TPaces::TPaces()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -34,7 +34,7 @@ TPaces::TPaces() : TDetector()
 	Clear();
 }
 
-TPaces::TPaces(const TPaces& rhs) : TDetector()
+TPaces::TPaces(const TPaces& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

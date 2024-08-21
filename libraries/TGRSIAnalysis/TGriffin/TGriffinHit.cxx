@@ -8,18 +8,18 @@
 ClassImp(TGriffinHit)
 /// \endcond
 
-TGriffinHit::TGriffinHit() : TDetectorHit()
+TGriffinHit::TGriffinHit()
 {
-// Default Ctor. Ignores TObject Streamer in ROOT < 6.
+	/// Default Ctor. Ignores TObject Streamer in ROOT < 6.
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit()
+TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit(rhs)
 {
-   // Copy Ctor. Ignores TObject Streamer in ROOT < 6.
+   /// Copy Ctor. Ignores TObject Streamer in ROOT < 6.
    Clear();
    rhs.Copy(*this);
 }

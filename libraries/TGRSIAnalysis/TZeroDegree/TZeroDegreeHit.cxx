@@ -39,7 +39,7 @@ TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag) : TDetectorHit(frag)
    }
 }
 
-TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TDetectorHit()
+TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TDetectorHit(rhs)
 {
 // Copy Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

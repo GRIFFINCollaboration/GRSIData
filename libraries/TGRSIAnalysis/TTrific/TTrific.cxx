@@ -38,7 +38,7 @@ double TTrific::fTargetToWindowCart = 700.0; //mm. Non-constant static that repr
 
 bool TTrific::fSetCoreWave = false;
 
-TTrific::TTrific() : TDetector()
+TTrific::TTrific()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -46,7 +46,7 @@ TTrific::TTrific() : TDetector()
 	Clear();
 }
 
-TTrific::TTrific(const TTrific& rhs) : TDetector()
+TTrific::TTrific(const TTrific& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

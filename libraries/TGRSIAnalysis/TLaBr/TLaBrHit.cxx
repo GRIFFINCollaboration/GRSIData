@@ -22,7 +22,7 @@ TLaBrHit::TLaBrHit()
 
 TLaBrHit::~TLaBrHit() = default;
 
-TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit()
+TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit(rhs)
 {
 // Copy Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

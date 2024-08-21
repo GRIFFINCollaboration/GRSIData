@@ -18,7 +18,7 @@ void TRF::Copy(TObject& rhs) const
    static_cast<TRF&>(rhs).fPeriod    = fPeriod;
 }
 
-TRF::TRF(const TRF& rhs) : TDetector()
+TRF::TRF(const TRF& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

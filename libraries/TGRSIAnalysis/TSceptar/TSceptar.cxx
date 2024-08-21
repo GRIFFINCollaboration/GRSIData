@@ -49,7 +49,7 @@ TSceptar::~TSceptar()
 	// Default Destructor
 }
 
-TSceptar::TSceptar(const TSceptar& rhs) : TDetector()
+TSceptar::TSceptar(const TSceptar& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

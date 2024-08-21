@@ -12,7 +12,7 @@
 ClassImp(TSceptarHit)
 /// \endcond
 
-TSceptarHit::TSceptarHit() : TDetectorHit()
+TSceptarHit::TSceptarHit()
 {
 	// Default Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -23,7 +23,7 @@ TSceptarHit::TSceptarHit() : TDetectorHit()
 
 TSceptarHit::~TSceptarHit() = default;
 
-TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit()
+TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

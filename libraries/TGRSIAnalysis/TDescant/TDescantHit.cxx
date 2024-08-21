@@ -22,7 +22,7 @@ TDescantHit::TDescantHit()
    Clear();
 }
 
-TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit()
+TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit(rhs)
 {
    Clear();
    rhs.Copy(*this);

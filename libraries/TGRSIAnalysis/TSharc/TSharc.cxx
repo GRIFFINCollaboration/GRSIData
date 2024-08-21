@@ -85,7 +85,7 @@ TSharc::TSharc()
 
 TSharc::~TSharc() = default;
 
-TSharc::TSharc(const TSharc& rhs) : TDetector()
+TSharc::TSharc(const TSharc& rhs) : TDetector(rhs)
 {
 	Class()->IgnoreTObjectStreamer(kTRUE);
 	Clear("ALL");

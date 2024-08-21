@@ -24,7 +24,7 @@ TGenericDetector& TGenericDetector::operator=(const TGenericDetector& rhs)
    return *this;
 }
 
-TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector()
+TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

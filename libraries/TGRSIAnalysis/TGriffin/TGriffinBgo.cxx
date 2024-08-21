@@ -24,13 +24,13 @@
 ClassImp(TGriffinBgo)
 /// \endcond
 
-TGriffinBgo::TGriffinBgo() : TBgo()
+TGriffinBgo::TGriffinBgo()
 {
 	/// Default ctor.
    TBgo::Clear();
 }
 
-TGriffinBgo::TGriffinBgo(const TGriffinBgo& rhs) : TBgo()
+TGriffinBgo::TGriffinBgo(const TGriffinBgo& rhs) : TBgo(rhs)
 {
 	/// Copy ctor.
    rhs.Copy(*this);

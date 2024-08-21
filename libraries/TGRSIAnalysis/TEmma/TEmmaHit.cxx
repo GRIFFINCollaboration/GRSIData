@@ -11,7 +11,7 @@ double TEmmaHit::fRdelay = 20;
 double TEmmaHit::fTdelay = 10;
 double TEmmaHit::fBdelay = 20;
 
-TEmmaHit::TEmmaHit() : TDetectorHit()
+TEmmaHit::TEmmaHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -19,7 +19,7 @@ TEmmaHit::TEmmaHit() : TDetectorHit()
    Clear();
 }
 
-TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TDetectorHit()
+TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);

@@ -96,7 +96,7 @@ void TDescant::Copy(TObject& rhs) const
 #endif
 }
 
-TDescant::TDescant(const TDescant& rhs) : TDetector()
+TDescant::TDescant(const TDescant& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }

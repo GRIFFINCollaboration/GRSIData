@@ -24,13 +24,13 @@
 ClassImp(TLaBrBgo)
 /// \endcond
 
-TLaBrBgo::TLaBrBgo() : TBgo()
+TLaBrBgo::TLaBrBgo()
 {
 	/// Default ctor.
    TBgo::Clear();
 }
 
-TLaBrBgo::TLaBrBgo(const TLaBrBgo& rhs) : TBgo()
+TLaBrBgo::TLaBrBgo(const TLaBrBgo& rhs) : TBgo(rhs)
 {
 	/// Copy ctor.
    rhs.Copy(*this);
