@@ -36,7 +36,6 @@ class TMidasEvent : public TRawEvent {
 public:
 #include "TMidasBanks.h"
 
-public:
    // houskeeping functions
    TMidasEvent();                                      ///< default constructor
    TMidasEvent(const TMidasEvent&);                    ///< copy constructor

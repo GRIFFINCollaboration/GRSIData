@@ -117,7 +117,6 @@ public:
    TVector3 GetPosition(Double_t dist = 0.) const override;
    TVector3 GetLastPosition(Double_t dist = 0.) const;
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Copy(TObject&) const override;            //!<!
    void Copy(TObject&, bool) const override;      //!<!

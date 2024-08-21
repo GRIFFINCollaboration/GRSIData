@@ -23,7 +23,6 @@ public:
    ~TSharc2() override;
    TSharc2(const TSharc2& rhs);
 
-public:
    TSharc2Hit* GetSharc2Hit(const int& i) const { return static_cast<TSharc2Hit*>(GetHit(i)); }
    static TVector3 GetPosition(int detector, int frontstrip, int backstrip, double X = 0.00, double Y = 0.00,
                                double Z = 0.00); //!<!

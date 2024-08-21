@@ -38,7 +38,6 @@ public:
    TCSM();
    ~TCSM() override;
 
-public:
    TCSMHit* GetCSMHit(const int& i) const { return static_cast<TCSMHit*>(GetHit(i)); }
 
    static TVector3 GetPosition(int detector, char pos, int horizontalstrip, int verticalstrip, double X = 0.00,

@@ -30,7 +30,6 @@ public:
    TDescant(const TDescant&);
    ~TDescant() override;
 
-public:
    TDescantHit* GetDescantHit(const Int_t& i = 0) const { return static_cast<TDescantHit*>(GetHit(i)); }
 
    static TVector3 GetPosition(int DetNbr, double dist = 222); //!<!
@@ -42,16 +41,15 @@ public:
 
    TDescant& operator=(const TDescant&); //
 
-private:
-   static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF
-   bool                     fHitFlag;   ///<   Is there a Descant hit?
-
 public:
    static bool SetWave() { return fSetWave; }         //!<!
    void SetWave(bool flag) { fSetWave = flag; }       //!<!
    bool              Hit() { return fHitFlag; }       //!<!
    void SetHit(bool flag = true) { fHitFlag = flag; } //!<!
 private:
+   static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF
+   bool                     fHitFlag;   ///<   Is there a Descant hit?
+
    static TVector3 gPosition[71];         //!<!
    static TVector3 gAncillaryPosition[9]; //!<!
 public:

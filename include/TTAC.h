@@ -30,7 +30,6 @@ public:
    ~TTAC() override;
    TTAC(const TTAC& rhs);
 
-public:
    TTACHit* GetTACHit(const int& i) const { return static_cast<TTACHit*>(GetHit(i)); }
 
 #ifndef __CINT__
@@ -40,7 +39,6 @@ public:
 
    TTAC& operator=(const TTAC&); //!<!
 
-public:
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 

@@ -25,7 +25,6 @@ public:
       kSiLiBit7   = BIT(7)
    };
 
-public:
    TSiLi();
    TSiLi(const TSiLi&);
    ~TSiLi() override;

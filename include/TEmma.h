@@ -17,13 +17,11 @@
 #include "TChannel.h"
 
 class TEmma : public TDetector {
-
 public:
    TEmma();
    TEmma(const TEmma&);
    ~TEmma() override;
 
-public:
    TEmmaHit* GetEmmaHit(const int& i) const { return static_cast<TEmmaHit*>(GetHit(i)); }
    TEmmaHit* GetICHit(const int& i);
    TEmmaHit* GetAnodeHit(const int& i);
@@ -68,7 +66,6 @@ private:
 
 
 public:
-
    void Copy(TObject&) const override;            //!<!
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!

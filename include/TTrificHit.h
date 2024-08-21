@@ -22,10 +22,6 @@ public:
    TTrificHit(const TFragment& frag) : TDetectorHit(frag) {}
    ~TTrificHit() override;
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////  Setters	/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
    // void SetHit();
@@ -36,7 +32,6 @@ public:
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -48,6 +43,8 @@ public:
 
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
+
+   Int_t fFilter{0};
 
    /// \cond CLASSIMP
    ClassDefOverride(TTrificHit, 3);

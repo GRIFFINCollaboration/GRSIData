@@ -30,7 +30,6 @@ public:
    ~TZeroDegree() override;
    TZeroDegree(const TZeroDegree& rhs);
 
-public:
    TZeroDegreeHit* GetZeroDegreeHit(const int& i) const { return static_cast<TZeroDegreeHit*>(GetHit(i)); }
 
    static TVector3 GetPosition(double dist) { return TVector3(0, 0, dist); } //!<!
@@ -48,7 +47,6 @@ private:
 public:
    static bool SetWave() { return fSetWave; } //!<!
 
-public:
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 

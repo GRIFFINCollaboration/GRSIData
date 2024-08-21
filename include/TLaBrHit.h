@@ -31,10 +31,6 @@ public:
    TLaBrHit(const TLaBrHit&);
    TLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
 
@@ -43,7 +39,6 @@ public:
 
    bool InFilter(Int_t); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -53,6 +48,8 @@ public:
    TVector3 GetPosition() const override;
 
 private:
+   Int_t fFilter{0};
+
    Double_t GetDefaultDistance() const { return 0.; } // This needs to be updated
 
    /// \cond CLASSIMP

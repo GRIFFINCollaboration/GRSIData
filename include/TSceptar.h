@@ -30,7 +30,6 @@ public:
    ~TSceptar() override;
    TSceptar(const TSceptar& rhs);
 
-public:
    TSceptarHit* GetSceptarHit(const int& i) const { return static_cast<TSceptarHit*>(GetHit(i)); }
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
@@ -41,13 +40,10 @@ public:
 
    TSceptar& operator=(const TSceptar&); //!<!
 
-private:
-   static bool fSetWave; //  Flag for Waveforms ON/OFF
-
-public:
    static bool SetWave() { return fSetWave; } //!<!
 
 private:
+   static bool fSetWave; //  Flag for Waveforms ON/OFF
    static TVector3 gPaddlePosition[21]; //!<!  Position of each Paddle
 
 public:
@@ -56,7 +52,7 @@ public:
 
    /// \cond CLASSIMP
    ClassDefOverride(TSceptar, 2) // Sceptar Physics structure
-                                 /// \endcond
+	/// \endcond
 };
 /*! @} */
 #endif

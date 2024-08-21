@@ -22,10 +22,6 @@ public:
    TEmmaHit(const TFragment& frag) : TDetectorHit(frag) {}
    ~TEmmaHit() override;
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////  Setters	/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
    // void SetHit();
@@ -54,7 +50,6 @@ public:
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -62,6 +57,8 @@ public:
    void Copy(TObject&, bool) const override;           //!<!
 
 private:
+   Int_t fFilter{0};
+
    Double_t fLeft{0};             // Left Cathode
    Double_t fRight{0};            // Right Cathode
    Double_t fTop{0};              // Top Cathode

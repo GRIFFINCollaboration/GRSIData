@@ -36,7 +36,6 @@ public:
    Double_t fTimeFit{0.};
    Double_t fSig2Noise{0.};
 
-public:
    void Copy(TObject&) const override; //!
    void Copy(TObject&, bool) const override;           //!<!
    void Print(Option_t* opt = "") const override;

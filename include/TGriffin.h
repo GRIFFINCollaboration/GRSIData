@@ -38,7 +38,6 @@ public:
    TGriffin(const TGriffin&);
    ~TGriffin() override;
 
-public:
    TGriffinHit* GetGriffinLowGainHit(const int& i);                                              //!<!
    TGriffinHit* GetGriffinHighGainHit(const int& i);                                             //!<!
    TGriffinHit* GetGriffinHit(const int& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
