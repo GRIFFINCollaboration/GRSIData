@@ -45,8 +45,6 @@ TPaces::TPaces(const TPaces& rhs) : TDetector()
 void TPaces::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
-
-	static_cast<TPaces&>(rhs).fSetCoreWave = fSetCoreWave;
 }
 
 TPaces::~TPaces()

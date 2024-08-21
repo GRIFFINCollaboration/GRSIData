@@ -161,10 +161,6 @@ void TSharc2::Print(std::ostream& out) const
 void TSharc2::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
-
-	static_cast<TSharc2&>(rhs).fXoffset   = fXoffset;
-	static_cast<TSharc2&>(rhs).fYoffset   = fYoffset;
-	static_cast<TSharc2&>(rhs).fZoffset   = fZoffset;
 }
 
 TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, double X, double Y, double Z)

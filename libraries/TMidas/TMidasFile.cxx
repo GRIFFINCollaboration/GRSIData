@@ -725,27 +725,26 @@ void TMidasFile::SetFileOdb()
 void TMidasFile::SetRunInfo(uint32_t time)
 {
 #ifdef HAS_XML
-   TRunInfo* runInfo = TRunInfo::Get();
    TXMLNode*     node    = fOdb->FindPath("/Runinfo/Start time binary");
    if(node != nullptr) {
 		std::stringstream str(node->GetText());
 		unsigned int odbTime;
 		str>>odbTime;
-		if(runInfo->SubRunNumber() == 0 && time != odbTime) {
+		if(TRunInfo::SubRunNumber() == 0 && time != odbTime) {
 			std::cout<<"Warning, ODB start time of first subrun ("<<odbTime<<") does not match midas time of first event in this subrun ("<<time<<")!"<<std::endl;
 		}
-      runInfo->SetRunStart(time);
+		TRunInfo::SetRunStart(time);
    }
 
    node = fOdb->FindPath("/Experiment/Run parameters/Run Title");
    if(node != nullptr) {
-      runInfo->SetRunTitle(node->GetText());
+		TRunInfo::SetRunTitle(node->GetText());
       std::cout<<"Title: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
    }
 
    if(node != nullptr) {
       node = fOdb->FindPath("/Experiment/Run parameters/Comment");
-      runInfo->SetRunComment(node->GetText());
+		TRunInfo::SetRunComment(node->GetText());
       std::cout<<"Comment: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
    }
 #endif

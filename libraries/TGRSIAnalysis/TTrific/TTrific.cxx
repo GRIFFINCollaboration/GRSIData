@@ -58,8 +58,6 @@ void TTrific::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
 
-	static_cast<TTrific&>(rhs).fSetCoreWave = fSetCoreWave;
-	
 	static_cast<TTrific&>(rhs).fXFragments = fXFragments;
 	static_cast<TTrific&>(rhs).fYFragments = fYFragments;
 	static_cast<TTrific&>(rhs).fSingFragments = fSingFragments;

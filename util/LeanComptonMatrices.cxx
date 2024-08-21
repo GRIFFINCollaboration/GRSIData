@@ -112,8 +112,8 @@ int main(int argc, char **argv)
 			while(inputname.size() > 9) inputname.erase(inputname.begin());
 			outputname = Form("test_%s.root", inputname.c_str());
 		} else {
-			int runnumber = runInfo->RunNumber();
-			int subrunnumber = runInfo->SubRunNumber();
+			int runnumber = TRunInfo::RunNumber();
+			int subrunnumber = TRunInfo::SubRunNumber();
 			printf("Run number = %d and subrun number = %d\n", runnumber, subrunnumber);
 			outputname = Form("CompHists_%05d_%03d.root", runnumber, subrunnumber);
 		}

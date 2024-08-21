@@ -80,12 +80,12 @@ int main(int argc, char** argv)
 	TRunInfo* runInfo = TRunInfo::Get();
 	std::cout<<"old run info:"<<std::endl;
 	runInfo->Print();
-	runInfo->SetRunNumber(runNumber);
-	runInfo->SetRunTitle(runTitle.c_str());
-	runInfo->SetRunComment(runComment.c_str());
-	runInfo->SetRunStart(runStart);
-	runInfo->SetRunStop(runStop);
-	runInfo->SetRunLength();
+	TRunInfo::SetRunNumber(runNumber);
+	TRunInfo::SetRunTitle(runTitle.c_str());
+	TRunInfo::SetRunComment(runComment.c_str());
+	TRunInfo::SetRunStart(runStart);
+	TRunInfo::SetRunStop(runStop);
+	TRunInfo::SetRunLength();
 
 	for(int i = 2; i < argc; ++i) {
 		// parse file name to get run number and sub-run number

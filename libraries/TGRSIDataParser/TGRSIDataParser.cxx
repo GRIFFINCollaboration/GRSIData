@@ -106,7 +106,6 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 			// end of file ODB
 #ifdef HAS_XML
 			TXMLOdb*  odb     = new TXMLOdb(event->GetData(), event->GetDataSize());
-			TRunInfo* runInfo = TRunInfo::Get();
 			TXMLNode* node    = odb->FindPath("/Runinfo/Stop time binary");
 			if(node != nullptr) {
 				std::stringstream str(node->GetText());
@@ -116,9 +115,9 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 				if(atoi(node->GetText()) != 0 && odbTime != event->GetTimeStamp() && !TGRSIOptions::Get()->SuppressErrors()) {
 					std::cout<<"Warning, ODB stop time of last subrun ("<<odbTime<<") does not match midas time of last event in this subrun ("<<event->GetTimeStamp()<<")!"<<std::endl;
 				}
-				runInfo->SetRunStop(event->GetTimeStamp());
+				TRunInfo::SetRunStop(event->GetTimeStamp());
 			}
-			runInfo->SetRunLength();
+			TRunInfo::SetRunLength();
 			delete odb;
 #endif
 			break;

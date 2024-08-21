@@ -94,8 +94,6 @@ void TDescant::Copy(TObject& rhs) const
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-
-   static_cast<TDescant&>(rhs).fSetWave     = fSetWave;
 }
 
 TDescant::TDescant(const TDescant& rhs) : TDetector()

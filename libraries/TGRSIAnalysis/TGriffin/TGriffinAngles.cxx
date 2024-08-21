@@ -10,7 +10,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	SetName("GriffinAngles");
 	// get user settings for excluded detectors/crystals
 	if(TGRSIOptions::Get() != nullptr) {
-		auto* settings = TGRSIOptions::Get()->UserSettings();
+		auto* settings = TGRSIOptions::UserSettings();
 		if(settings != nullptr) {
 			// try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
 			try {

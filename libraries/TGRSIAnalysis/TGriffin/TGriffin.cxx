@@ -173,7 +173,6 @@ void TGriffin::Copy(TObject& rhs) const
    static_cast<TGriffin&>(rhs).fSuppressedAddbackLowGainFrags.clear();
    static_cast<TGriffin&>(rhs).fSuppressedAddbackHighGainFrags.clear();
 
-   static_cast<TGriffin&>(rhs).fSetCoreWave          = fSetCoreWave;
    static_cast<TGriffin&>(rhs).fCycleStart           = fCycleStart;
 }
 
