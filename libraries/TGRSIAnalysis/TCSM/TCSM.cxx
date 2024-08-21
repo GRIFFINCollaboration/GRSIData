@@ -347,7 +347,7 @@ void TCSM::BuilddEE(std::vector<std::vector<TDetectorHit*>>& hitVec, std::vector
    std::vector<TDetectorHit*> e2;
 
    for(auto& i : hitVec[0]) {
-		auto hit = static_cast<TCSMHit*>(i);
+		auto* hit = static_cast<TCSMHit*>(i);
       if(hit->GetDetectorNumber() == 3 || hit->GetDetectorNumber() == 4) { // I am in side detectors
          // I will never have a pair in the side detector, so go ahead and send it through.
          builtHits.push_back(i);
@@ -361,7 +361,7 @@ void TCSM::BuilddEE(std::vector<std::vector<TDetectorHit*>>& hitVec, std::vector
    }
 
    for(auto& i : hitVec[1]) {
-		auto hit = static_cast<TCSMHit*>(i);
+		auto* hit = static_cast<TCSMHit*>(i);
       if(hit->GetDetectorNumber() == 1) {
          e1.push_back(i);
       } else if(hit->GetDetectorNumber() == 2) {
@@ -598,8 +598,8 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
 
 TCSMHit* TCSM::CombineHits(TDetectorHit* d_hit, TDetectorHit* e_hit)
 {
-	auto dHit = static_cast<TCSMHit*>(d_hit);
-	auto eHit = static_cast<TCSMHit*>(e_hit);
+	auto* dHit = static_cast<TCSMHit*>(d_hit);
+	auto* eHit = static_cast<TCSMHit*>(e_hit);
    if(dHit->GetDetectorNumber() != eHit->GetDetectorNumber()) {
       std::cerr<<"Something is wrong.  In combine hits, the detector numbers don't match"<<std::endl;
    }

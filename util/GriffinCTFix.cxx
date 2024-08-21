@@ -237,7 +237,7 @@ int main(int argc, char** argv)
       return 1;
    }
 
-	auto userSettings = new TUserSettings();
+	auto* userSettings = new TUserSettings();
 	if(argc == 4) {
 		userSettings->ReadSettings(argv[3]);
 	}

@@ -214,7 +214,7 @@ TVector3 TTrific::GetPosition()
 
 	std::vector<int> hitXDets; //vector to hold the x-segments that have a nonzero hit in them
 
-	for (auto hit: fXFragments){
+	for(auto* hit: fXFragments){
 		//TDetectorHit *hit = fXFragments.at(i);
 		//TDetectorHit *hit = i;
 		Int_t seg = hit->GetSegment();
@@ -260,7 +260,7 @@ TVector3 TTrific::GetPosition()
 
 	std::vector<int> hitYDets; //vector to hold the y-segments that have a nonzero hit in them
 
-	for (auto hit: fYFragments){
+	for (auto* hit: fYFragments){
 		//TDetectorHit *hit = i;
 		Int_t seg = hit->GetSegment();
 		
@@ -330,7 +330,7 @@ Int_t TTrific::GetRange()
 	else fRange=0;
 
 	//first we'll check the single grid fragment, since there are more of them and they extend further
-	for (auto hit: fSingFragments){
+	for(auto* hit: fSingFragments){
 		if(hit->GetDetector() > fRange) fRange = hit->GetDetector();		
 	}
 	//check if the range is less than the furthest position grid. If so, we need to check that the range isn't at the x or y grid

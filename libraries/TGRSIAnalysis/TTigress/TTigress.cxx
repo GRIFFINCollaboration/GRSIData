@@ -201,7 +201,7 @@ void TTigress::BuildHits()
 	TSortingDiagnostics::Get()->RemovedHits(IsA(), std::distance(remove, Hits().end()), Hits().size());
 	Hits().erase(remove, Hits().end());
 	for(auto& hit : Hits()) {
-		auto tigressHit = static_cast<TTigressHit*>(hit);
+		auto* tigressHit = static_cast<TTigressHit*>(hit);
 		if(tigressHit->GetNSegments() > 1) {
 			tigressHit->SortSegments();
 		}

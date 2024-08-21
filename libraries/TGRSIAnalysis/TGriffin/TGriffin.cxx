@@ -257,13 +257,13 @@ void TGriffin::Print(std::ostream& out) const
    str<<"Griffin Contains: "<<std::endl;
    str<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto& hit : Hits()) {
+		for(const auto& hit : Hits()) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
    str<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto& hit : fGriffinHighGainHits) {
+		for(const auto& hit : fGriffinHighGainHits) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}

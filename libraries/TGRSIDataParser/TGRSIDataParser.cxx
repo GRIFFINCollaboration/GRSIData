@@ -2237,7 +2237,7 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 int TGRSIDataParser::EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
 {
 	/// Extract SRAW data, i.e. the instantaneous rates
-	auto scaler = new TScalerData;
+	auto* scaler = new TScalerData;
 	scaler->SetAddress(0xfffe); // magic address for raw scaler
 	// counter used to set time
 	static UInt_t nofRawScalers = 0;
@@ -2250,7 +2250,7 @@ int TGRSIDataParser::EmmaRawDataToFragment(uint32_t* data, int size, std::shared
 int TGRSIDataParser::EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
 {
 	/// Extract SSUM data, i.e. the cumulative counts
-	auto scaler = new TScalerData;
+	auto* scaler = new TScalerData;
 	scaler->SetAddress(0xffff); // magic address for sum scaler
 	// counter used to set time
 	static UInt_t nofSumScalers = 0;

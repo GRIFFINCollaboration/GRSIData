@@ -10,7 +10,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	SetName("GriffinAngles");
 	// get user settings for excluded detectors/crystals
 	if(TGRSIOptions::Get() != nullptr) {
-		auto settings = TGRSIOptions::Get()->UserSettings();
+		auto* settings = TGRSIOptions::Get()->UserSettings();
 		if(settings != nullptr) {
 			// try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
 			try {
@@ -153,9 +153,9 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 	// folding first
 	if(fFolding) {
 		// we first change the angles of the data points, then we re-sort the graphs, and finally we combine points for the same angle into one
-		auto angle0 = z0->GetX();
-		auto angle2 = z2->GetX();
-		auto angle4 = z4->GetX();
+		auto* angle0 = z0->GetX();
+		auto* angle2 = z2->GetX();
+		auto* angle4 = z4->GetX();
 		for(int i = 0; i < z0->GetN(); ++i) {
 			if(angle0[i] > 90.) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
@@ -186,9 +186,12 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 		}
 #endif
 		angle0 = z0->GetX();
-		auto counts0 = z0->GetY(); auto errors0 = z0->GetEY();
-		auto counts2 = z2->GetY(); auto errors2 = z2->GetEY();
-		auto counts4 = z4->GetY(); auto errors4 = z4->GetEY();
+		auto* counts0 = z0->GetY();
+		auto* errors0 = z0->GetEY();
+		auto* counts2 = z2->GetY();
+		auto* errors2 = z2->GetEY();
+		auto* counts4 = z4->GetY();
+		auto* errors4 = z4->GetEY();
 		for(int i = 1; i < z0->GetN(); ++i) {
 			if(std::abs(angle0[i] - angle0[i-1]) < fRounding) {
 				if(verbose) {
@@ -227,9 +230,12 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 	if(fGrouping) {
 		// Due to the way lower_bound works, we use the highest angle of each group as the angle of that group.
 		// This is just for the purpose of this algorithm, when plotting the correct average angle of the group should be used!
-		auto counts0 = z0->GetY(); auto errors0 = z0->GetEY();
-		auto counts2 = z2->GetY(); auto errors2 = z2->GetEY();
-		auto counts4 = z4->GetY(); auto errors4 = z4->GetEY();
+		auto* counts0 = z0->GetY();
+		auto* errors0 = z0->GetEY();
+		auto* counts2 = z2->GetY();
+		auto* errors2 = z2->GetEY();
+		auto* counts4 = z4->GetY();
+		auto* errors4 = z4->GetEY();
 		for(int i = 0; i < z0->GetN(); ++i) {
 			switch(i) {
 				case 0:
@@ -308,18 +314,14 @@ void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphError
 
 bool TGriffinAngles::ExcludeDetector(int detector) const
 {
-	for(auto exclude : fExcludedDetectors) {
-		if(detector == exclude) return true;
-	}
-	return false;
+	/// Returns true if any of the detectors in fExcludedDetectors matches the given detector.
+	return std::any_of(fExcludedDetectors.begin(), fExcludedDetectors.end(), [&detector](auto exclude) { return detector == exclude; });
 }
 
 bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 {
-	for(auto exclude : fExcludedCrystals) {
-		if(4*(detector-1)+crystal+1 == exclude) return true;
-	}
-	return false;
+	/// Returns true if any of the crystals in fExcludedCrystals matches the given detector and crystal (using 4*(detector-1)+crystal+1).
+	return std::any_of(fExcludedCrystals.begin(), fExcludedCrystals.end(), [&detector,&crystal](auto exclude) { return 4*(detector-1)+crystal+1 == exclude; });
 }
 
 void TGriffinAngles::Print(Option_t*) const
