@@ -263,7 +263,6 @@ void TGRSIDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragment
 	} else {
 		currentFrag->AddWaveformSample(static_cast<Short_t>((value >> 14) & 0x00001fff));
 	}
-	return;
 }
 
 void TGRSIDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
@@ -271,8 +270,6 @@ void TGRSIDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>
 	/// Sets the CFD of a Tigress Event.
 
 	currentFrag->SetCfd(int32_t(value & 0x07ffffff));
-
-	return;
 }
 
 void TGRSIDataParser::SetTIGLed(uint32_t, const std::shared_ptr<TFragment>&)

@@ -250,7 +250,6 @@ void TEmma::BuildHits()
 			return;
 		}
 	}
-	return;
 }
 void TEmma::Clear(Option_t* opt)
 {

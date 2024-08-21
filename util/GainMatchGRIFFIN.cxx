@@ -326,7 +326,6 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 {
 	std::vector<int> dummy;
 	create_gainmatch_graphs(histFileName,minchannel,maxchannel,dummy,largepeak,peaks,type,mindistance,roughenergy,twopeaks,largepeak2);
-	return;
 }
 
 TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<double> peaklocations, double windowsize, EType type = EType::kTSpectrum)

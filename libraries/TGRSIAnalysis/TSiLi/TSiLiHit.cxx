@@ -39,8 +39,6 @@ void TSiLiHit::Copy(TObject& rhs, bool suppress) const
       static_cast<TSiLiHit&>(rhs).fAddBackSegments = fAddBackSegments;
       static_cast<TSiLiHit&>(rhs).fAddBackEnergy   = fAddBackEnergy;
    }
-
-   return;
 }
 
 void TSiLiHit::Clear(Option_t* opt)

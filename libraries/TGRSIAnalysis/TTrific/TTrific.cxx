@@ -113,8 +113,6 @@ void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 	};
 
 	AddHit(hit);
-	
-	return;
 }
 
 void TTrific::Clear(Option_t* option)
@@ -131,8 +129,6 @@ void TTrific::Clear(Option_t* option)
 	//clear the static event variables
 	//fParticle.SetXYZ(0,0,0); //!
 	//fRange = 0; //!
-	
-	return;
 }
 
 void TTrific::GetXYGrid()
@@ -151,8 +147,6 @@ void TTrific::GetXYGrid()
 			 fGridY = hit->GetDetector();
 		}	
 	}
-
-	return;
 }
 
 TVector3 TTrific::GetPosition(Int_t detectorNumber)

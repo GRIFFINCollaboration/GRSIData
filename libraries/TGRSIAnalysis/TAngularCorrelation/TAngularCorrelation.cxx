@@ -1650,8 +1650,6 @@ void TAngularCorrelation::UpdateIndexCorrelation()
       static_cast<TH1D*>(GetIndexCorrelation())->SetBinContent(bin, area);
       static_cast<TH1D*>(GetIndexCorrelation())->SetBinError(bin, area_err);
    }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1704,8 +1702,6 @@ void TAngularCorrelation::UpdateDiagnostics()
       static_cast<TH1D*>(GetFWHMHst())->SetBinContent(bin, fwhm);
       static_cast<TH1D*>(GetFWHMHst())->SetBinError(bin, fwhm_err);
    }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1796,7 +1792,6 @@ void TAngularCorrelation::PrintModifiedConditions()
    } else {
 		std::cout<<"Grouped: no"<<std::endl;
    }
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

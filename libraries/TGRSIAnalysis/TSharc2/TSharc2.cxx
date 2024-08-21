@@ -143,7 +143,6 @@ void TSharc2::Clear(Option_t* option)
 		fYoffset = 0.00;
 		fZoffset = 0.00;
 	}
-	return;
 }
 
 void TSharc2::Print(Option_t*) const

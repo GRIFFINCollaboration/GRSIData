@@ -289,7 +289,6 @@ void CheckFile(const char*& fname)
       printf("\n");
       printf(DBLUE "ROOT file %s opens with no problems.." RESET_COLOR "\n", fname);
    }
-   return;
 }
 
 void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& patlen, int&, int* trun, double& eor,
@@ -967,5 +966,4 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    } else {
       printf(DBLUE "Correct # of PPG transitions obtained for %i out of %i spectra" RESET_COLOR "\n", good, cnt);
    }
-   return;
 }

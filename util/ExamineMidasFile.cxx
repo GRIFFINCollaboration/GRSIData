@@ -74,7 +74,6 @@ void ExamineMidasFile(const char *filename) {
 	printf("\n");
 	printf("Run length =  %lli  seconds\n",stoptime-starttime);
 	printf("\n");
-	return;
 }
 
 

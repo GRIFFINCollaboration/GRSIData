@@ -158,8 +158,6 @@ void TGRSIMnemonic::Parse(std::string* name)
       buf.assign(*name, 7, 2);
       Segment(static_cast<int16_t>(strtol(buf.c_str(), nullptr, 16)));
    }
-
-   return;
 }
 
 void TGRSIMnemonic::Print(Option_t*) const
