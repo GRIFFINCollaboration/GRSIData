@@ -36,7 +36,7 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr) { return gPaddlePosition[DetNbr]; } //!<!
+   static TVector3 GetPosition(int DetNbr) { return fPaddlePosition[DetNbr]; } //!<!
 
    TSceptar& operator=(const TSceptar&); //!<!
 
@@ -44,7 +44,7 @@ public:
 
 private:
    static bool fSetWave; //  Flag for Waveforms ON/OFF
-   static TVector3 gPaddlePosition[21]; //!<!  Position of each Paddle
+   static std::array<TVector3, 21> fPaddlePosition; //!<!  Position of each Paddle
 
 public:
    void Print(Option_t* opt = "") const override; //!<!

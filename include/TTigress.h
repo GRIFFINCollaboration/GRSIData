@@ -110,20 +110,20 @@ private:
    static double fRadialOffset; //!<!
    
    // Vectors constructed from segment array and manual adjustments once at start of sort
-   static TVector3 fPositionVectors[2][17][4][9];     //!<!
+   static std::array<std::array<std::array<std::array<TVector3, 9>, 4>, 17>, 2> fPositionVectors;     //!<!
    
-   static TVector3 fCloverRadial[17];      	//!<!  clover direction vectors
-   static TVector3 fCloverCross[17][2];      	//!<!  clover perpendicular vectors, for smearing
+   static std::array<TVector3, 17> fCloverRadial;      	//!<!  clover direction vectors
+   static std::array<std::array<TVector3, 2>, 17> fCloverCross;      	//!<!  clover perpendicular vectors, for smearing
 
    // These array contain the original data that is used
-   static double GeBluePosition[17][9][3];      //!<!  detector segment XYZ
-   static double GeGreenPosition[17][9][3];     //!<!
-   static double GeRedPosition[17][9][3];       //!<!
-   static double GeWhitePosition[17][9][3];     //!<!
-   static double GeBluePositionBack[17][9][3];  //!<!  detector segment XYZ
-   static double GeGreenPositionBack[17][9][3]; //!<!
-   static double GeRedPositionBack[17][9][3];   //!<!
-   static double GeWhitePositionBack[17][9][3]; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeBluePosition;      //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeGreenPosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeRedPosition;       //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeWhitePosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeBluePositionBack;  //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeGreenPositionBack; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeRedPositionBack;   //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> GeWhitePositionBack; //!<!
 
    //    void ClearStatus();                      // WARNING: this will change the building behavior!
    //		void ClearGlobalStatus() { fTigressBits = 0; }
@@ -172,7 +172,7 @@ public:
    static bool GetArrayBackPos() { return TestGlobalBit(ETigressGlobalBits::kArrayBackPos); } //!<!
    static bool GetVectorsBuilt() { return TestGlobalBit(ETigressGlobalBits::kVectorsBuilt); } //!<!
 
-   static bool BGOSuppression[4][4][5]; //!<!
+   static std::array<std::array<std::array<bool, 5>, 4>, 4> BGOSuppression; //!<!
 
    static void SetTargetOffset(double offset) {
 	   fTargetOffset = offset; 

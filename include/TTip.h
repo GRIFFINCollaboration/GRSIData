@@ -41,7 +41,7 @@ public:
 private:
 
    // Position vectors for individual TIP detectors
-   static TVector3 fPositionVectors[128];     //!<!
+   static std::array<TVector3, 128> fPositionVectors;     //!<!
 
 public:
 

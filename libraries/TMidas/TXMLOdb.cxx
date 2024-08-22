@@ -11,7 +11,7 @@
 ClassImp(TXMLOdb)
 /// \endcond
 
-char TXMLOdb::fTextBuffer[256];
+std::array<char, 256> TXMLOdb::fTextBuffer;
 
 TXMLOdb::TXMLOdb(char* buffer, int size)
 {
@@ -116,8 +116,8 @@ const char* TXMLOdb::GetNodeName(TXMLNode* node)
    TList* list = node->GetAttributes();
    if(list != nullptr) {
       std::string buffer = (static_cast<TXMLAttr*>(list->At(0)))->GetValue();
-      strlcpy(fTextBuffer, buffer.c_str(), sizeof(fTextBuffer));
-      return ((const char*)fTextBuffer);
+      strlcpy(fTextBuffer.data(), buffer.c_str(), fTextBuffer.size());
+      return fTextBuffer.data();
    }
    return "";
 }

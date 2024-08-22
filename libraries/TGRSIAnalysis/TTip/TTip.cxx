@@ -12,7 +12,7 @@ ClassImp(TTip)
 
 // Coordinates for the TIP detectors (in mm)
 // Assumes the target position is at (0,0,0)
-TVector3 TTip::fPositionVectors[128] = {
+std::array<TVector3, 128> TTip::fPositionVectors = {
    TVector3(12.8039,0.0000,91.1047),
    TVector3(0.0000,12.8039,91.1047),
    TVector3(-12.8039,0.0000,91.1047),

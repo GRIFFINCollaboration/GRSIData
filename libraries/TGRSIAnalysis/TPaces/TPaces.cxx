@@ -18,7 +18,7 @@ ClassImp(TPaces)
 
 bool TPaces::fSetCoreWave = false;
 
-ROOT::Math::Polar3DVector TPaces::gDetectorPosition[6] = {
+std::array<ROOT::Math::Polar3DVector, 6> TPaces::fDetectorPosition = {
 	ROOT::Math::Polar3DVector(1., 0., 0.),
 	ROOT::Math::Polar3DVector(1., 120.178/180.*TMath::Pi(),  21./180.*TMath::Pi()),
 	ROOT::Math::Polar3DVector(1., 120.827/180.*TMath::Pi(),  94./180.*TMath::Pi()),

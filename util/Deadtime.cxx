@@ -53,38 +53,38 @@ int main(int argc, char* argv[])
    TApplication theApp("Analysis", &argc, argv);
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER
    //INPUTS
-   std::ifstream filelist("/home/mbowry/Documents/ROOT/Backup/newfilelist_hs.txt"); // input file(s) DATA
-   std::ifstream ODBlist("/home/mbowry/Documents/ROOT/Backup/ODBlist_hs.txt");      // input file(s) ODB (runinfo)
-   const char* fname = "viewscaler.root";                                           // output file (scaler spectra)
-   const char* hname = "random_counts.txt";    // output file (frequency histograms, source)
-   const char* iname = "combined_counts.txt";  // output file (frequency histograms, source+pulser)
-   const char* jname = "random_seed.txt";      // output file (check random number generation)
-   const char* kname = "RESULTS.txt";          // output file (deadtime results)
-   const char* lname = "asymmetric_error.txt"; // output file (error combination histogram)
-   const char* mname = "random_deadtime.txt";  // output file (random deadtime histogram)
-   const char* nname = "accepted_rand.txt";    // output file (accepted random rate histogram)
-   int         nsclr   = 9;                    // total number of pulser inputs
-   int         addr[9] = {0x0000, 0x000d, 0x0101, 0x0107, 0x020b,
-                  0x020c, 0x0302, 0x030c, 0x030d}; // addresses with pulser inputs
-   double freq[4] = {2.e3, 5.e3, 1.e4, 2.e4};      // precision pulser rates (2,5,10,20 kHz)
-   int patlen  = 10;                               // pattern length in seconds
-   int ncycle  = 1;                                // read out period of scalers (seconds);
-   int scaleri = 0;                                // scaler# START
-   int scalerf = 3;                                // scaler# END (0->3 = all scalers)
-   double thresh = 0.3;                            // threshold for rejection of spurious scaler events
-   double eor     = 0.3;                           // threshold for end-of-run cut off
-   int    specoff = 1;                             // temporary flag: if =1, only analysis performed
-   //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~DEFINITIONS
-   int     tdiff[4] = {0, 0, 0, 0}; // run time extracted from ODB
-   int*    td       = &tdiff[0];
-   int*    p        = &addr[0];
-   double* q        = &freq[0];
-   int     counter  = 0;
-   int     nds      = 0;
-   int     nscaler  = 0;
-   int     len      = 70;
-   auto*   line     = new char[len];
-   auto*   odb      = new char[len];
+   std::ifstream         filelist("/home/mbowry/Documents/ROOT/Backup/newfilelist_hs.txt");   // input file(s) DATA
+   std::ifstream         ODBlist("/home/mbowry/Documents/ROOT/Backup/ODBlist_hs.txt");        // input file(s) ODB (runinfo)
+   const char*           fname   = "viewscaler.root";                                         // output file (scaler spectra)
+   const char*           hname   = "random_counts.txt";                                       // output file (frequency histograms, source)
+   const char*           iname   = "combined_counts.txt";                                     // output file (frequency histograms, source+pulser)
+   const char*           jname   = "random_seed.txt";                                         // output file (check random number generation)
+   const char*           kname   = "RESULTS.txt";                                             // output file (deadtime results)
+   const char*           lname   = "asymmetric_error.txt";                                    // output file (error combination histogram)
+   const char*           mname   = "random_deadtime.txt";                                     // output file (random deadtime histogram)
+   const char*           nname   = "accepted_rand.txt";                                       // output file (accepted random rate histogram)
+   int                   nsclr   = 9;                                                         // total number of pulser inputs
+   std::array<int, 9>    addr    = {0x0000, 0x000d, 0x0101, 0x0107, 0x020b,
+                                    0x020c, 0x0302, 0x030c, 0x030d};   // addresses with pulser inputs
+   std::array<double, 4> freq    = {2.e3, 5.e3, 1.e4, 2.e4};           // precision pulser rates (2,5,10,20 kHz)
+   int                   patlen  = 10;                                 // pattern length in seconds
+   int                   ncycle  = 1;                                  // read out period of scalers (seconds);
+   int                   scaleri = 0;                                  // scaler# START
+   int                   scalerf = 3;                                  // scaler# END (0->3 = all scalers)
+   double                thresh  = 0.3;                                // threshold for rejection of spurious scaler events
+   double                eor     = 0.3;                                // threshold for end-of-run cut off
+   int                   specoff = 1;                                  // temporary flag: if =1, only analysis performed
+                                                                       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~DEFINITIONS
+   std::array<int, 4> tdiff   = {0, 0, 0, 0};                          // run time extracted from ODB
+   int*               td      = tdiff.data();
+   int*               p       = addr.data();
+   double*            q       = freq.data();
+   int                counter = 0;
+   int                nds     = 0;
+   int                nscaler = 0;
+   int                len     = 70;
+   auto*              line    = new char[len];
+   auto*              odb     = new char[len];
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    if(!(filelist.is_open())) {
       std::cerr<<"Failed to open filelist. Check path. "<<std::endl;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
    filelist.seekg(0, std::ios::beg);
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    Printaddress(p); // Credit to to E.Kwan for this part
-   p = &addr[0];
+   p = addr.data();
    while(counter < line_count) {
       filelist.getline(line, len, '\n');
       const char* filename = line;
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
          } else {
             MakeSpectra(filename, counter, fname, nsclr, ncycle, q, p, index, td, thresh);
          }
-         p = &addr[0];
+         p = addr.data();
          nds += 1;
       }
       counter++;
@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
    }
    delete[] line;
    delete[] odb;
-   q  = &freq[0];
-   td = &tdiff[0];
+   q  = freq.data();
+   td = tdiff.data();
    if(counter > 0) {
       nscaler = nds / counter;
    }
@@ -310,7 +310,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
 
    int nsc        = nsclr;
    int cnt        = 0;
-   int ppgstat[2] = {0, 0};
+	std::array<int, 2> ppgstat = {0, 0};
    // generate random seed from system time for use in error analysis
    time_t timer;
    timer = time(nullptr);
@@ -324,11 +324,11 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER EDITABLE
    // limits for deadtime matrices [us]
    // NOTE: The order of the limits (rp1,rp2 etc.) MUST be identical to the file order
-   double  rp1[8]  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 2kHz, scaler0-3
-   double  rp2[8]  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 5kHz, scaler0-3
-   double  rp3[8]  = {-15, 15, -15, 15, 0, 20, 170, 230}; // 10kHz, scaler0-3
-   double  rp4[8]  = {-15, 15, -15, 15, 0, 20, 200, 300}; // 20kHz, scaler0-3
-   double* lowrtau = &rp1[0]; // internal pointers: points to correction coefficients in each array
+	std::array<double, 8>  rp1  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 2kHz, scaler0-3
+   std::array<double, 8>  rp2  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 5kHz, scaler0-3
+   std::array<double, 8>  rp3  = {-15, 15, -15, 15, 0, 20, 170, 230}; // 10kHz, scaler0-3
+   std::array<double, 8>  rp4  = {-15, 15, -15, 15, 0, 20, 200, 300}; // 20kHz, scaler0-3
+   double* lowrtau = rp1.data(); // internal pointers: points to correction coefficients in each array
    double* upprtau = &rp1[1]; //
    int     cflag   = 0;       // counter
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~

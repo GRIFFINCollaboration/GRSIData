@@ -15,7 +15,7 @@ ClassImp(TDescant)
 
 bool TDescant::fSetWave = false;
 
-TVector3 TDescant::gPosition[71] = {
+std::array<TVector3, 71> TDescant::fPosition = {
    // Descant positions from James' Thesis
    TVector3(0.0, 0.0, 1.0),         TVector3(98.6, 0.0, 490.2),      TVector3(30.5, 93.8, 490.2),
    TVector3(-79.8, 57.9, 490.2),    TVector3(-79.8, -57.9, 490.2),   TVector3(30.5, -93.8, 490.2),
@@ -41,7 +41,7 @@ TVector3 TDescant::gPosition[71] = {
    TVector3(-288.6, -325.6, 246.5), TVector3(-188.8, -382.5, 260.9), TVector3(-72.1, -420.4, 260.9),
    TVector3(42.1, -433.0, 246.5),   TVector3(220.4, -375.0, 246.5),  TVector3(305.4, -297.7, 260.9),
    TVector3(377.5, -198.5, 260.9),  TVector3(424.8, -93.8, 246.5)};
-TVector3 TDescant::gAncillaryPosition[9] = {
+std::array<TVector3, 9> TDescant::fAncillaryPosition = {
    // Ancillary detector locations from Evan.
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
@@ -149,12 +149,12 @@ TVector3 TDescant::GetPosition(int DetNbr, double dist)
       if(DetNbr > 8) {
          return TVector3(0, 0, 1);
       }
-      TVector3 temp_pos(gAncillaryPosition[DetNbr]);
+      TVector3 temp_pos(fAncillaryPosition[DetNbr]);
       temp_pos.SetMag(dist);
       return temp_pos;
    }
    if(DetNbr > 70) {
       return TVector3(0, 0, 1);
    }
-   return gPosition[DetNbr];
+   return fPosition[DetNbr];
 }

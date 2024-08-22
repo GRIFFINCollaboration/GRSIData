@@ -18,7 +18,7 @@ bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TLaBr::fSuppressionCriterion = DefaultLaBrSuppression;
 
-TVector3 TLaBr::gPosition[9] = {
+std::array<TVector3, 9> TLaBr::fPosition = {
 	// These positions should be updated (they are currently SCEPTAR-ish)
 	TVector3(0, 0, 1),
 	TVector3(14.3025, 4.6472, 22.8096),

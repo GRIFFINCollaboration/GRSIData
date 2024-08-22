@@ -66,7 +66,7 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr) { return gPosition[DetNbr]; } //!<!
+   static TVector3 GetPosition(int DetNbr) { return fPosition[DetNbr]; } //!<!
 
    TLaBr& operator=(const TLaBr&); //!<!
 
@@ -76,7 +76,7 @@ private:
 #endif
    std::vector<TDetectorHit*> fSuppressedHits; //   The set of suppressed LaBr hits
 
-   static TVector3 gPosition[9]; //!<!  Position of each detectir
+   static std::array<TVector3, 9> fPosition; //!<!  Position of each detectir
 
    mutable TTransientBits<UChar_t> fLaBrBits;  // Transient member flags
 

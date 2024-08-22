@@ -163,7 +163,7 @@ public:
    static EGainBits GetDefaultGainType() { return fDefaultGainType; }
 
 private:
-   static TVector3 gCloverPosition[17];                      //!<! Position of each HPGe Clover
+   static std::array<TVector3, 17> fCloverPosition;                      //!<! Position of each HPGe Clover
    void            ClearStatus() const { fGriffinBits = 0; } //!<!
    void SetBitNumber(EGriffinBits bit, Bool_t set) const;
    Bool_t TestBitNumber(EGriffinBits bit) const { return fGriffinBits.TestBit(bit); }

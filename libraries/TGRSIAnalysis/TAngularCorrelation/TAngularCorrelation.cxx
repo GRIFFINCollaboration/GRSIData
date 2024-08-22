@@ -52,8 +52,8 @@ TH2D* TAngularCorrelation::Create2DSlice(THnSparse* hst, Double_t min, Double_t 
    // identify the axes (angular index, energy, energy)
    // we assume that the two axes with identical limits are the energy axes
    Int_t    indexaxis, energy1axis, energy2axis;
-   Double_t xmin[3];
-   Double_t xmax[3];
+	std::array<Double_t, 3> xmin;
+   std::array<Double_t, 3> xmax;
    for(int i = 0; i < 3; i++) { // goes through all three dimensions of THnSparse and finds the min and max values
       xmin[i] = hst->GetAxis(i)->GetXmin();
       xmax[i] = hst->GetAxis(i)->GetXmax();

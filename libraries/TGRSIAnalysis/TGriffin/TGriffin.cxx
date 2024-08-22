@@ -58,7 +58,7 @@ TGriffin::EGainBits TGriffin::fDefaultGainType = TGriffin::EGainBits::kLowGain;
 //                                                                             theta                                 phi
 //                                                                             theta                                phi
 //                                                                             theta
-TVector3 TGriffin::gCloverPosition[17] = {
+std::array<TVector3, 17> TGriffin::fCloverPosition = {
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
             TMath::Cos(TMath::DegToRad() * (0.0))),
@@ -518,7 +518,7 @@ TVector3 TGriffin::GetPosition(int DetNbr, int CryNbr, double dist)
       return TVector3(0, 0, 1);
    }
 
-   TVector3 temp_pos(gCloverPosition[DetNbr]);
+   TVector3 temp_pos(fCloverPosition[DetNbr]);
 
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
@@ -549,7 +549,7 @@ TVector3 TGriffin::GetDetectorPosition(int DetNbr)
       return TVector3(0, 0, 1);
    }
 
-   return gCloverPosition[DetNbr];
+   return fCloverPosition[DetNbr];
 }
 
 void TGriffin::ResetFlags() const

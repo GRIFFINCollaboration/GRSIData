@@ -169,12 +169,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 	int ThetaBins =  180; // Binsize = 180deg / bins
 	int XiBins    = 180;
 
-	// double gEnergy[2]   = { 1063.656, 569.698 };//keV
-	//double gEnergy[2]   = { 569.698, 1063.656 };//keV
-	//double gEnergy[2]   = { 344.2785, 778.9040 };//keV
-	//double gEnergy[2]   = { 1299.140, 344.2785 };//keV
-	//double gEnergy[2]   = { 344.2785, 1299.140 };//keV
-	double gEnergy[2]   = { 1332.5, 1173.2 };
+	std::array<double, 2> gEnergy   = { 1332.5, 1173.2 };
 	double gEnergyErr = 5.0;//Energies within this on eithr side of gEnergy will be considered a good interaction
 	double gEnergySumErr = gEnergyErr; //If the energy of the two scattering gamma rays sum to within this from either side of gEnergy then they are considered a good interaction.  
 

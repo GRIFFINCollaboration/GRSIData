@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
 	TChannel* channel = nullptr;
 
-	double offset[8];
+	std::array<double, 8> offset;
 
 	for(int n = FIRST_CHANNEL; n <= LAST_CHANNEL; n++) {
 		channel = TChannel::GetChannelByNumber(n);
@@ -86,30 +86,32 @@ int main(int argc, char** argv) {
 	Int_t  multi_labr, multi_tac, multi_grif;
 
 	//TAC offset histograms
-	TH1D* TAC_offset[8];
+	std::array<TH1D*, 8> TAC_offset;
 	for(int i = 0; i < 8; ++i) {
 		TAC_offset[i] = new TH1D(Form("TAC_offset_%d",i), Form("TAC_offset_%d; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(TAC_offset[i]); 
 	}
 
-	TH1D* TAC_offset_corrected[8];
+	std::array<TH1D*, 8> TAC_offset_corrected;
 	for(int i = 0; i < 8; ++i) {
 		TAC_offset_corrected[i] = new TH1D(Form("TAC_offset_corrected_%d",i), Form("TAC_offset_corrected_%d; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(TAC_offset_corrected[i]); 
 	}
 
-	TH1D* time_diff[8];
+	std::array<TH1D*, 8> time_diff;
 	for(int i = 0; i < 8; ++i) {
 		time_diff[i] = new TH1D(Form("time_diff%d",i), Form("Time difference for LaBr_%d - LaBr with TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(time_diff[i]); 
 	}
-	TH1D* time_diff_noTAC[8];
+
+	std::array<TH1D*, 8> time_diff_noTAC;
 	for(int i = 0; i < 8; ++i) {
 		time_diff_noTAC[i] = new TH1D(Form("time_diff_noTAC%d",i), Form("Time difference for LaBr_%d - LaBr with no TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(time_diff_noTAC[i]); 
 	}
 
-	TH1D* timestamp_diff_noTACcoinc[8];
+	std::array<TH1D*, 8> timestamp_diff_noTACcoinc;
 	for(int i = 0; i < 8; ++i) {
 		timestamp_diff_noTACcoinc[i] = new TH1D(Form("timestamp_diff_noTACcoinc%d",i), Form("Timestamp difference for LaBr_%d - LaBr, no TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(timestamp_diff_noTACcoinc[i]); 
 	}
-	TH1D* timestamp_diff_TACcoinc[8];
+
+	std::array<TH1D*, 8> timestamp_diff_TACcoinc;
 	for(int i = 0; i < 8; ++i) {
 		timestamp_diff_TACcoinc[i] = new TH1D(Form("timestamp_diff_TACcoinc%d",i), Form("Timestamp difference for LaBr_%d - LaBr, with TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(timestamp_diff_TACcoinc[i]); 
 	}

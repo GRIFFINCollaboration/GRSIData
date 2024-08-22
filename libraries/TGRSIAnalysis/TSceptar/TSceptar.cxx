@@ -9,7 +9,7 @@ ClassImp(TSceptar)
 
 bool TSceptar::fSetWave = false;
 
-TVector3 TSceptar::gPaddlePosition[21] = {
+std::array<TVector3, 21> TSceptar::fPaddlePosition = {
 	// Sceptar positions from Evan; Thanks Evan.
 	TVector3(0, 0, 1),
 	TVector3(14.3025, 4.6472, 22.8096),

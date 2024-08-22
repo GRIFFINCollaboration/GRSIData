@@ -50,8 +50,8 @@ private:
    static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF
    bool                     fHitFlag;   ///<   Is there a Descant hit?
 
-   static TVector3 gPosition[71];         //!<!
-   static TVector3 gAncillaryPosition[9]; //!<!
+   static std::array<TVector3, 71> fPosition;          //!<!
+   static std::array<TVector3, 9>  fAncillaryPosition; //!<!
 public:
    void Copy(TObject&) const override;            //!<!
    void Clear(Option_t* opt = "") override;       //!<!

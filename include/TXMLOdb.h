@@ -47,7 +47,7 @@ public:
    std::vector<std::string> ReadStringArray(TXMLNode* node);
 
 private:
-   static char fTextBuffer[256];
+   static std::array<char, 256> fTextBuffer;
 
    /// \cond CLASSIMP
    ClassDef(TXMLOdb, 0)

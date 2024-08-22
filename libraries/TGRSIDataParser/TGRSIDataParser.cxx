@@ -361,7 +361,7 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
 		return false;
 	}
 
-	unsigned int time[5] = {0}; // tigress can report up to 5 valid timestamp words
+	std::array<unsigned int, 5> time = {0}; // tigress can report up to 5 valid timestamp words
 	int          x       = 0;
 
 	while((*(data + x) & 0xf0000000) == 0xa0000000) {
@@ -1246,15 +1246,15 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 {
 	// Parses special RF scaler events which contain only timestamps and fit paramteters
 
-	ULong64_t        ts = 0;
-	ULong64_t        tshigh;
-	double           rfFreq = -1.0;
-	double           rfPar[4];
-	bool             freqSet=false;
-	bool             tsSet=false;
-	int              failedWord = -1;
+   ULong64_t             ts = 0;
+   ULong64_t             tshigh;
+   double                rfFreq = -1.0;
+   std::array<double, 4> rfPar;
+   bool                  freqSet    = false;
+   bool                  tsSet      = false;
+   int                   failedWord = -1;
 
-	int x=0;
+   int x=0;
 	for(int i = 0; i < size; i++) {
 		
 		if(x >= size){

@@ -177,9 +177,6 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
    return bklen;
 }
 
-static const unsigned TID_SIZE[] = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
-static const unsigned TID_MAX    = (sizeof(TID_SIZE) / sizeof(TID_SIZE[0]));
-
 /// Find a data bank.
 /// \param [in] name Name of the data bank to look for.
 /// \param [out] bklen Number of array elements in this bank.
@@ -191,29 +188,10 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
 {
    const TMidas_BANK_HEADER* pbkh = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
    TMidas_BANK*              pbk;
-   // uint32_t dname;
+
+	std::array<unsigned, 17> TID_SIZE = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
 
    if(((pbkh->fFlags & (1<<4)) > 0)) {
-#if 0
-		TMidas_BANK32 *pbk32;
-		pbk32 = (TMidas_BANK32 *) (pbkh + 1);
-		memcpy(&dname, name, 4);
-		do {
-			if(*((uint32_t *) pbk32->fName) == dname) {
-				*pdata = pbk32 + 1;
-				if(TID_SIZE[pbk32->fType & 0xFF] == 0)
-					*bklen = pbk32->fDataSize;
-				else
-					*bklen = pbk32->fDataSize / TID_SIZE[pbk32->fType & 0xFF];
-
-				*bktype = pbk32->fType;
-				return 1;
-			}
-			pbk32 = (TMidas_BANK32 *) ((char*) (pbk32 + 1) +
-					(((pbk32->fDataSize)+7) & ~7));
-		} while ((char*) pbk32 < (char*) pbkh + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
-#endif
-
       TMidas_BANK32* pbk32 = nullptr;
 
       while(true) {
@@ -468,8 +446,8 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
    TMidas_BANK32* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
 
-   if((*pbk)->fType > TID_MAX) {// bad - unknown bank type - it's invalid MIDAS file?
-      if(bk4->fType <= TID_MAX) {// okey, this is a malformed T2K/ND280 data file
+   if((*pbk)->fType > 17) {// bad - unknown bank type - it's invalid MIDAS file?
+      if(bk4->fType <= 17) {// okey, this is a malformed T2K/ND280 data file
          *pbk = bk4;
       } else {
          // truncate invalid data

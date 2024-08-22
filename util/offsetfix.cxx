@@ -785,9 +785,9 @@ void WriteEvents(TMidasFile * file)
 void WriteCorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
-	char filename[64];
-	snprintf(filename, 64, "corrections%05i.root", runnumber);
-	auto* corrfile = new TFile(filename, "RECREATE");
+	std::array<char, 64> filename;
+	snprintf(filename.data(), filename.size(), "corrections%05i.root", runnumber);
+	auto* corrfile = new TFile(filename.data(), "RECREATE");
 
 	// Just going to make a corrections map for now...it should be a map throughout....
 
@@ -812,15 +812,15 @@ void WriteCorrectionFile(int runnumber)
 int CorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
-	char filename[64];
-	snprintf(filename, 64, "corrections%05i.root", runnumber);
-	auto* corrfile = new TFile(filename, "READ");
+	std::array<char, 64> filename;
+	snprintf(filename.data(), filename.size(), "corrections%05i.root", runnumber);
+	auto* corrfile = new TFile(filename.data(), "READ");
 	if(!(corrfile->IsOpen())) {
 		delete corrfile;
 		return 0;
 	}
 
-	printf(DGREEN "Found Correction File %s\n" RESET_COLOR, filename);
+	printf(DGREEN "Found Correction File %s\n" RESET_COLOR, filename.data());
 
 	TTree* t;
 	corrfile->GetObject("correctiontree", t);
@@ -872,13 +872,13 @@ int main(int argc, char** argv)
 	} else {
 		midfile->OutOpen(argv[2]);
 	}
-	char filename[64];
+	std::array<char, 64> filename;
 	if(subrunnumber > -1) {
-		snprintf(filename, 64, "time_diffs%05i_%03i.root", runnumber, subrunnumber);
+		snprintf(filename.data(), filename.size(), "time_diffs%05i_%03i.root", runnumber, subrunnumber);
 	} else {
-		snprintf(filename, 64, "time_diffs%05i.root", runnumber);
+		snprintf(filename.data(), filename.size(), "time_diffs%05i.root", runnumber);
 	}
-	printf("Creating root outfile: %s\n", filename);
+	printf("Creating root outfile: %s\n", filename.data());
 
 	int nDigitizers = 0;
 	if(argc > 3) {
@@ -894,7 +894,7 @@ int main(int argc, char** argv)
 	TGRSIOptions::Get()->SuppressErrors(true);
 
 	if(nDigitizers == 0) {
-		auto* outfile = new TFile(filename, "RECREATE");
+		auto* outfile = new TFile(filename.data(), "RECREATE");
 		auto* eventQ  = new std::vector<TEventTime*>;
 		QueueEvents(midfile, eventQ);
 		std::cout<<"Number of Digitizers Found: "<<TEventTime::digmap.size()<<std::endl;

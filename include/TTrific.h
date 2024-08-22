@@ -113,10 +113,8 @@ public:
 private:
 	//physical information on the grids
 
-	static const double fXmm[12]; //!
-											//static double xW[12]; //!
-	static const double fYmm[12]; //!
-											//static double yW[12]; //!
+	static const std::array<double, 12> fXmm; //!
+	static const std::array<double, 12> fYmm; //!
 
 											//for use in determining the XY grids
 	static Int_t fGridX; //!

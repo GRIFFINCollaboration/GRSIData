@@ -14,13 +14,8 @@ Int_t TTrific::fGridY = 0;
 //declaration of constant variables
 
 //grid parameters for TRIFIC
-//double TTrific::fXmm[12]={-42,-27,-21,-15,-9,-3,3,9,15,21,27,42};
-const double TTrific::fXmm[12]={-33,-27,-21,-15,-9,-3,3,9,15,21,27,33}; //mm distance to the middle of each wire set readout from centre of grid
-//double TTrific::xW[12]={12,3,3,3,3,3,3,3,3,3,3,12}; //number of wires in eachreadout set
-
-//double TTrific::fYmm[12]={48,36,28,20,12,4,-4,-12,-20,-28,-36,-48};
-const double TTrific::fYmm[12]={42,36,28,20,12,4,-4,-12,-20,-28,-36,-42};
-//double TTrific::yW[12]={8,4,4,4,4,4,4,4,4,4,4,8};//number of wires, 2 mm spacing
+const std::array<double, 12> TTrific::fXmm={-33,-27,-21,-15,-9,-3,3,9,15,21,27,33}; //mm distance to the middle of each wire set readout from centre of grid
+const std::array<double, 12> TTrific::fYmm={42,36,28,20,12,4,-4,-12,-20,-28,-36,-42};
 
 //angle that grids are offset by (in rads)
 const double TTrific::fAngle = (60./180.)*TMath::Pi();
