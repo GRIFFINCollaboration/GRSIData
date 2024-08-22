@@ -30,7 +30,7 @@
 
 class TXMLOdb {
 public:
-   TXMLOdb(char* buffer, int size = 0);
+   explicit TXMLOdb(char* buffer, int size = 0);
    virtual ~TXMLOdb();
 
    TXMLDocument* fDoc;

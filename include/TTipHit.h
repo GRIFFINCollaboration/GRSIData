@@ -19,7 +19,7 @@
 class TTipHit : public TDetectorHit {
 public:
    TTipHit();
-   TTipHit(const TFragment&);
+   explicit TTipHit(const TFragment&);
    ~TTipHit() override;
    TTipHit(const TTipHit&);
 

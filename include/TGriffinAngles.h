@@ -25,7 +25,7 @@
 
 class TGriffinAngles : public TNamed {
 public:
-	TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
+	explicit TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
 	~TGriffinAngles() {}
 
 	double Distance() { return fDistance; }

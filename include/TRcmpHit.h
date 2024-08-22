@@ -24,7 +24,7 @@ public:
    TRcmpHit();                  ///< default constructor
    TRcmpHit(const TRcmpHit&);   ///< copy constructor
    // TRcmpHit(const TRcmpHit& front, const TRcmpHit& back);          ///< dual parameter constructor for front and back hits
-   TRcmpHit(const TFragment& frag);                                   ///< single fragment constructor (either front or back)
+   explicit TRcmpHit(const TFragment& frag);                                   ///< single fragment constructor (either front or back)
    TRcmpHit(const TFragment& fragFront, const TFragment& fragBack);   ///< dual parameter constructor for front and back fragments
    ~TRcmpHit() override;                                              ///< destructor
 

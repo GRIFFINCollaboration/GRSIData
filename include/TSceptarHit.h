@@ -30,7 +30,7 @@ public:
    TSceptarHit();
    ~TSceptarHit() override;
    TSceptarHit(const TSceptarHit&);
-   TSceptarHit(const TFragment& frag);
+   explicit TSceptarHit(const TFragment& frag);
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

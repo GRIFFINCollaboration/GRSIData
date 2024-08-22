@@ -19,7 +19,7 @@ class TTrificHit : public TDetectorHit {
 public:
    TTrificHit();
    TTrificHit(const TTrificHit&);
-   TTrificHit(const TFragment& frag) : TDetectorHit(frag) {}
+   explicit TTrificHit(const TFragment& frag) : TDetectorHit(frag) {}
    ~TTrificHit() override;
 
    /////////////////////////  Setters	/////////////////////////////////////

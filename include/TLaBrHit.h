@@ -29,7 +29,7 @@ public:
    TLaBrHit();
    ~TLaBrHit() override;
    TLaBrHit(const TLaBrHit&);
-   TLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
+   explicit TLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

@@ -29,7 +29,7 @@ public:
    TZeroDegreeHit();
    ~TZeroDegreeHit() override;
    TZeroDegreeHit(const TZeroDegreeHit&);
-   TZeroDegreeHit(const TFragment& frag);
+   explicit TZeroDegreeHit(const TFragment& frag);
 
 private:
    Int_t              fFilter{0};

@@ -647,7 +647,7 @@ int main(int argc, char** argv)
 
 class Ac {
 public:
-	Ac(TGraphErrors* data = nullptr, TGraphErrors* z0 = nullptr, TGraphErrors* z2 = nullptr, TGraphErrors* z4 = nullptr)
+	explicit Ac(TGraphErrors* data = nullptr, TGraphErrors* z0 = nullptr, TGraphErrors* z2 = nullptr, TGraphErrors* z4 = nullptr)
 		: fData(data), fZ0(z0), fZ2(z2), fZ4(z4) {}
 
 	void Data(TGraphErrors* data) { fData = data; }

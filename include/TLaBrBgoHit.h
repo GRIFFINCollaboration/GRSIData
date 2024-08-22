@@ -25,7 +25,7 @@ class TLaBrBgoHit : public TBgoHit {
 public:
    TLaBrBgoHit();
    TLaBrBgoHit(const TLaBrBgoHit& hit) : TBgoHit(static_cast<const TBgoHit&>(hit)) {}
-   TLaBrBgoHit(const TFragment& frag) : TBgoHit(frag) {}
+   explicit TLaBrBgoHit(const TFragment& frag) : TBgoHit(frag) {}
    ~TLaBrBgoHit() override;
 
    /////////////////////////		/////////////////////////////////////

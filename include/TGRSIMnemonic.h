@@ -11,7 +11,7 @@ enum class EDigitizer : char { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen, 
 class TGRSIMnemonic : public TMnemonic {
 public:
    TGRSIMnemonic() : TMnemonic() { Clear(); }
-   TGRSIMnemonic(const char* name) : TGRSIMnemonic() { TMnemonic::Parse(name); }
+   explicit TGRSIMnemonic(const char* name) : TGRSIMnemonic() { TMnemonic::Parse(name); }
    ~TGRSIMnemonic() override = default;
 
    // standard C++ makes these enumerations global to the class. ie, the name of the enumeration

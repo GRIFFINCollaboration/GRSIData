@@ -21,7 +21,7 @@ public:
    TDescantHit();
    ~TDescantHit() override;
    TDescantHit(const TDescantHit&);
-   TDescantHit(const TFragment& frag);
+   explicit TDescantHit(const TFragment& frag);
 
 private:
    Int_t              fFilter;

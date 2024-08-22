@@ -31,7 +31,7 @@ public:
 
    TGriffinHit();
    TGriffinHit(const TGriffinHit&);
-   TGriffinHit(const TFragment&);
+   explicit TGriffinHit(const TFragment&);
    ~TGriffinHit() override;
 
 private:

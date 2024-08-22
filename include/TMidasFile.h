@@ -32,7 +32,7 @@
 class TMidasFile : public TRawFile {
 public:
    TMidasFile(); ///< default constructor
-   TMidasFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
+   explicit TMidasFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
    ~TMidasFile() override; ///< destructor
 
    bool Open(const char* filename) override; ///< Open input file

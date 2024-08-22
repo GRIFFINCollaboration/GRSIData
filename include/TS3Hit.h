@@ -12,7 +12,7 @@
 class TS3Hit : public TDetectorHit {
 public:
    TS3Hit();
-   TS3Hit(const TFragment&);
+   explicit TS3Hit(const TFragment&);
    ~TS3Hit() override;
    TS3Hit(const TS3Hit&);
 
