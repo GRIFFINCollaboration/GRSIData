@@ -41,8 +41,7 @@ void TMidasEvent::Copy(TObject& rhs) const
    // Copies the entire TMidasEvent. This includes the bank information.
    static_cast<TMidasEvent&>(rhs).fEventHeader = fEventHeader;
 
-   static_cast<TMidasEvent&>(rhs).fData =
-      static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize));
+   static_cast<TMidasEvent&>(rhs).fData = static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
    assert(static_cast<TMidasEvent&>(rhs).fData);
    memcpy(static_cast<TMidasEvent&>(rhs).fData, fData, static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize);
    static_cast<TMidasEvent&>(rhs).fAllocatedByUs = true;
@@ -77,13 +76,11 @@ TMidasEvent& TMidasEvent::operator=(const TMidasEvent& rhs)
 void TMidasEvent::Clear(Option_t*)
 {
    // Clears the TMidasEvent.
-   if(fBankList != nullptr) {
-      free(fBankList);
-   }
+	delete fBankList;
    fBankList = nullptr;
 
-   if((fData != nullptr) && fAllocatedByUs) {
-      free(fData);
+   if(fAllocatedByUs) {
+      delete fData;
    }
    fData = nullptr;
 
@@ -345,7 +342,7 @@ void TMidasEvent::AllocateData()
    // Allocates space for the data from the event header if it is a good size
    assert(!fAllocatedByUs);
    assert(IsGoodSize());
-   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize));
+   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
    assert(fData);
    fAllocatedByUs = true;
 }
@@ -378,7 +375,7 @@ int TMidasEvent::SetBankList()
    while(true) {
       if(fBanksN * 4 >= listSize) {
          listSize += 400;
-         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize));
+         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize)); // NOLINT(cppcoreguidelines-no-malloc)
       }
 
       if(IsBank32()) {
