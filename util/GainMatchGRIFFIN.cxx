@@ -154,7 +154,7 @@ void make_calibration_histograms(const char* fragFileName, const char* histFileN
 		printf("Failed to open file '%s'!\n",fragFileName);
 		return;
 	}
-	TTree* FragmentTree = (TTree*) f->Get("FragmentTree");
+	auto* FragmentTree = static_cast<TTree*>(f->Get("FragmentTree"));
 	TChannel::ReadCalFromTree(FragmentTree);
 	TList* hstlist = MakeGRIFFINChargeHsts(FragmentTree,minchannel,maxchannel,channelstoskip,bins,xmin,xmax);
 	TFile* outfile = new TFile(histFileName,"recreate");
@@ -273,7 +273,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 		}
 		if(skipChannel) continue;
 		std::cout <<"Creating graph for channel " <<i <<std::endl;
-		TH1F* h = (TH1F*) f->Get(Form("hst%i",i)); // grab histogram
+		auto* h = static_cast<TH1F*>(f->Get(Form("hst%i",i))); // grab histogram
 		if(h==0) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
 			continue;
@@ -372,7 +372,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 			if(i == skip) skipChannel = kTRUE;
 		}
 		if(skipChannel) continue;
-		g[i] = (TGraph*) f->Get(Form("graph%i",i));
+		g[i] = static_cast<TGraph*>(f->Get(Form("graph%i",i)));
 		if(g[i] == nullptr) {
 			std::cout <<"Error: graph" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
 			std::cout <<"Function create_GRIFFIN_cal will continue, but will skip this channel." <<std::endl;
@@ -530,7 +530,7 @@ void recalibrate_spectra(const char* fragFile, const char* newFile, const char* 
 		return;
 	}
 
-	TTree* FragmentTree = (TTree*) fdata->Get("FragmentTree");
+	auto* FragmentTree = static_cast<TTree*>(fdata->Get("FragmentTree"));
 	TChannel::ReadCalFile(calFile);
 	TList *list = MakeGRIFFINEnergyHsts(FragmentTree,minchannel,maxchannel,channelsToSkip,xbins,xmin,xmax,"GRIFFINcal.cal");
 	TFile* f = new TFile(newFile,"recreate");
@@ -622,8 +622,8 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}
 
 	TH1F** hsts = new TH1F*[maxchannel+1];
-	TH1F* temphst = (TH1F*) gFile->Get(Form("hst%i",minchannel));
-	TH1F* hstall = (TH1F*) temphst->Clone("hstall");
+	auto* temphst = static_cast<TH1F*>(gFile->Get(Form("hst%i",minchannel)));
+	auto* hstall = static_cast<TH1F*>(temphst->Clone("hstall"));
 
 	// declare 2D histograms for use
 	// energy along the x-axis, fwhm along the y-axis
@@ -660,7 +660,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 			}
 		}
 		if(skipChannel) continue;
-		hsts[i] = (TH1F*) gFile->Get(Form("hst%i",i));
+		hsts[i] = static_cast<TH1F*>(gFile->Get(Form("hst%i",i)));
 		if(hsts[i]==0) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your newcal and calib_hst files and your inputs to GainMatchGRIFFIN." <<std::endl;
 			std::cout <<"Function check_calibration will continue, but will skip this channel." <<std::endl;

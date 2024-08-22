@@ -63,14 +63,14 @@ int main(int argc, char** argv) {
 		TList list;
 
 
-		TTree * tree = (TTree*)f->Get("AnalysisTree");
+		auto* tree = static_cast<TTree*>(f->Get("AnalysisTree"));
 
 		TChannel::ReadCalFromTree(tree);
 
 
-		TLaBr* labr = NULL;
-		TZeroDegree* zds = NULL;
-		TTAC* tac = NULL;
+		TLaBr* labr = nullptr;
+		TZeroDegree* zds = nullptr;
+		TTAC* tac = nullptr;
 
 
 		if(tree->FindBranch("TLaBr") != 0) {    //We check to see if we have a LaBr branch in the analysis tree

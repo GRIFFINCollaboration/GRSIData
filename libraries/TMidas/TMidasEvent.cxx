@@ -207,7 +207,7 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
          }
       }
    } else {
-      pbk = (TMidas_BANK*)(pbkh + 1);
+      pbk = static_cast<TMidas_BANK*>(pbkh + 1);
       do {
          if(name[0] == pbk->fName[0] && name[1] == pbk->fName[1] && name[2] == pbk->fName[2] &&
             name[3] == pbk->fName[3]) {
@@ -222,7 +222,7 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
             return 1;
          }
          pbk = reinterpret_cast<TMidas_BANK*>(reinterpret_cast<char*>(pbk + 1) + (((pbk->fDataSize) + 7) & ~7));
-      } while(reinterpret_cast<char*>(pbk) < (char*)pbkh + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
+      } while(reinterpret_cast<char*>(pbk) < reinterpret_cast<char*r>(pbkh) + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
    }
    //
    // bank not found
@@ -430,7 +430,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
    const TMidas_BANK_HEADER* event = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
    if(*pbk == nullptr) {
-      *pbk = (TMidas_BANK32*)(event + 1);
+      *pbk = static_cast<TMidas_BANK32*>(event + 1);
    } else {
       uint32_t length          = (*pbk)->fDataSize;
       uint32_t length_adjusted = (length + 7) & ~7;
@@ -452,7 +452,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
    *pdata = reinterpret_cast<char*>((*pbk) + 1);
 
-   if(reinterpret_cast<char*>(*pbk) >= (char*)event + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
+   if(reinterpret_cast<char*>(*pbk) >= reinterpret_cast<char*>(event) + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
       *pbk   = nullptr;
       *pdata = nullptr;
       return 0;
