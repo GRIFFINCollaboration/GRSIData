@@ -72,11 +72,6 @@ public:
 	static void SetCustomTargetChamber(Double_t distance){fTargetToWindowCart = distance;}
 
 
-	TVector3 fParticle = TVector3(0,0,0); //!<!
-
-	Int_t fRange = 0; //!<!
-
-	//TVector3 GetPosition(const TTrificHit& hit,Int_t detectorNumber); //!<!
 	TVector3 GetPosition(Int_t detectorNumber); //!<!
 
 	TVector3 GetPosition(); //!<!
@@ -88,15 +83,6 @@ public:
 	void GetXYGrid(); //!<!
 
 	TTrific& operator=(const TTrific&); //!<!
-
-private:
-	static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
-
-	std::vector<TTrificHit*> fXFragments; 
-	std::vector<TTrificHit*> fYFragments; 
-	std::vector<TTrificHit*> fSingFragments; 
-
-	TTransientBits<UShort_t> fTrificBits;
 
 public:
 	static bool SetCoreWave() { return fSetCoreWave; } //!<!
@@ -111,8 +97,19 @@ public:
 	static double fTargetToWindowCart; //!
 
 private:
-	//physical information on the grids
+	static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
 
+	std::vector<TTrificHit*> fXFragments; 
+	std::vector<TTrificHit*> fYFragments; 
+	std::vector<TTrificHit*> fSingFragments; 
+
+	TTransientBits<UShort_t> fTrificBits;
+
+	TVector3 fParticle = TVector3(0,0,0); //!<!
+
+	Int_t fRange = 0; //!<!
+
+	//physical information on the grids
 	static const std::array<double, 12> fXmm; //!
 	static const std::array<double, 12> fYmm; //!
 

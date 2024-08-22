@@ -77,7 +77,7 @@ public:
    void SwapBytesEventHeader();   ///< convert event header between little-endian (Linux-x86) and big endian (MacOS-PPC)
    int  SwapBytes(bool) override; ///< convert event data between little-endian (Linux-x86) and big endian (MacOS-PPC)
 
-protected:
+private:
    TMidas_EVENT_HEADER fEventHeader;   ///< event header
    char*               fData;          ///< event data buffer
    int                 fBanksN;        ///< number of banks in this event

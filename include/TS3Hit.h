@@ -33,9 +33,6 @@ public:
    }
    
 
-   Double_t fTimeFit{0.};
-   Double_t fSig2Noise{0.};
-
    void Copy(TObject&) const override; //!
    void Copy(TObject&, bool) const override;           //!<!
    void Print(Option_t* opt = "") const override;
@@ -86,6 +83,9 @@ private:
    Bool_t  fIsDownstream{false}; // Downstream check
    Short_t fRing{0};         // front
    Short_t fSector{0};       // back
+
+   Double_t fTimeFit{0.};
+   Double_t fSig2Noise{0.};
 
    /// \cond CLASSIMP
    ClassDefOverride(TS3Hit, 4);

@@ -45,10 +45,6 @@ public:
       kVectorsBuilt = BIT(6) // 110 or 145
    };
 
-#ifndef __CINT__
-   std::vector<std::vector<std::shared_ptr<const TFragment>>> SegmentFragments;
-#endif
-
    TTigress();
    TTigress(const TTigress&);
    ~TTigress() override;
@@ -59,7 +55,6 @@ public:
    static TVector3         GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 0., bool smear = false); //!<!
    static TVector3         GetPosition(const TTigressHit&, double dist = 0., bool smear = false);                 //!<!
 
-   std::vector<TBgoHit> fBgos;
    void AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }                      //!<!
    Short_t                  GetBGOMultiplicity() const { return fBgos.size(); } //!<!
    int                  GetNBGOs() const { return fBgos.size(); }           //!<!
@@ -100,6 +95,7 @@ public:
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
+   std::vector<std::vector<std::shared_ptr<const TFragment>>> SegmentFragments;
    static std::function<bool(TDetectorHit*, TDetectorHit*)> fAddbackCriterion;
    static std::function<bool(TDetectorHit*, TBgoHit&)>      fSuppressionCriterion;
 #endif
@@ -132,6 +128,7 @@ private:
 
    std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
    std::vector<UShort_t>      fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
+   std::vector<TBgoHit> fBgos;
 
    static void BuildVectors();  //!<!
    
