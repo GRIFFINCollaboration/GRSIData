@@ -10,12 +10,11 @@ ClassImp(TCSM)
 int TCSM::fCfdBuildDiff = 5;
 
 TCSM::TCSM()
+   : fAlmostEqualWindow(0.2)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-   // InitializeSRIMInputs();
-   fAlmostEqualWindow = .2;
 }
 
 TCSM::~TCSM() = default;

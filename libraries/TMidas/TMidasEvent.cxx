@@ -21,14 +21,9 @@ ClassImp(TMidasEvent)
 /// \endcond
 
 TMidasEvent::TMidasEvent()
+	: fData(nullptr), fAllocatedByUs(false), fBanksN(0), fBankList(nullptr)
 {
    // Default constructor
-   fData          = nullptr;
-   fAllocatedByUs = false;
-
-   fBanksN   = 0;
-   fBankList = nullptr;
-
    fEventHeader.fEventId      = 0;
    fEventHeader.fTriggerMask  = 0;
    fEventHeader.fSerialNumber = 0;

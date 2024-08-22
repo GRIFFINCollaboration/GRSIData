@@ -27,35 +27,13 @@ ClassImp(TMidasFile)
 /// \endcond
 
 TMidasFile::TMidasFile()
+#ifdef HAS_XML
+	: fOdb(nullptr)
+#endif
 {
    // Default Constructor
    uint32_t endian = 0x12345678;
-
-   fFile              = -1;
-   fGzFile            = nullptr;
-   fPoFile            = nullptr;
-   fLastErrno         = 0;
-   fCurrentBufferSize = 0;
-
-   fFile              = -1;
-   fGzFile            = nullptr;
-   fPoFile            = nullptr;
-   fLastErrno         = 0;
-   fCurrentBufferSize = 0;
-
-   fOutFile   = -1;
-   fOutGzFile = nullptr;
-
-   fMaxBufferSize = 1E6;
-
-   fCurrentEventNumber = 0;
-
    fDoByteSwap = *reinterpret_cast<char*>(&endian) != 0x78;
-
-#ifdef HAS_XML
-	fOdb = nullptr;
-#endif
-   fOdbEvent = nullptr;//std::make_shared<TMidasEvent>();
 }
 
 TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TMidasFile()

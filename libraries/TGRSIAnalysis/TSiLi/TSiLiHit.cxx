@@ -10,10 +10,9 @@ TSiLiHit::TSiLiHit()
    Clear();
 }
 
-TSiLiHit::TSiLiHit(const TFragment& frag) : TDetectorHit(frag)
+TSiLiHit::TSiLiHit(const TFragment& frag)
+	: TDetectorHit(frag), fFitCharge(frag.GetCharge())
 {
-
-   fFitCharge = frag.GetCharge();
    SetWavefit(frag);
 }
 
@@ -22,7 +21,7 @@ TSiLiHit::~TSiLiHit() = default;
 TSiLiHit::TSiLiHit(const TSiLiHit& rhs) : TDetectorHit(rhs)
 {
    Clear();
-   (const_cast<TSiLiHit&>(rhs)).Copy(*this);
+   rhs.Copy(*this);
 }
 
 void TSiLiHit::Copy(TObject& rhs, bool suppress) const

@@ -14,14 +14,12 @@ ClassImp(TXMLOdb)
 std::array<char, 256> TXMLOdb::fTextBuffer;
 
 TXMLOdb::TXMLOdb(char* buffer, int size)
+   : fDoc(nullptr), fOdb(nullptr), fParser(new TDOMParser)
 {
 	/// Creator, tries to open buffer as input file and parse it, if that fails, parses size bytes of the buffer.
 	
-   fOdb = nullptr;
-   fDoc = nullptr;
    std::ifstream input;
    input.open(buffer);
-   fParser = new TDOMParser;
    fParser->SetValidate(false);
    if(input.is_open()) {
       fParser->ParseFile(buffer);

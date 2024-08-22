@@ -18,10 +18,8 @@
 #include "TBadFragment.h"
 
 TGRSIDataParser::TGRSIDataParser()
-   : TDataParser()
+   : TDataParser(), fState(EDataParserState::kGood), fIgnoreMissingChannel(TGRSIOptions::Get()->IgnoreMissingChannel())
 {
-	fState = EDataParserState::kGood;
-	fIgnoreMissingChannel = TGRSIOptions::Get()->IgnoreMissingChannel();
 }
 
 TGRSIDataParser::~TGRSIDataParser()

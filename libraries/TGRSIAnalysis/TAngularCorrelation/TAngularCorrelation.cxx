@@ -18,11 +18,8 @@ ClassImp(TAngularCorrelation)
 /// Angular correlation default constructor
 ///
 TAngularCorrelation::TAngularCorrelation()
+	: fIndexCorrelation(nullptr), fIndexMapSize(0), fFolded(kFALSE), fGrouped(kFALSE)
 {
-   fIndexCorrelation = nullptr; // used the 1D histograms for a specific energy ranged used for FitSlices
-   fIndexMapSize     = 0;       // number of indexes, never called in making the histograms
-   fFolded           = kFALSE;  // not set yet
-   fGrouped          = kFALSE;  // not set yet
 }
 
 ////////////////////////////////////////////////////////////////////////////////
