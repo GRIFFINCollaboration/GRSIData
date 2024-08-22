@@ -57,7 +57,7 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
 	// create diagonal cut
 	std::array<double, 5> xpts = {lowCut, 0, 0, highCut, lowCut};
    std::array<double, 5> ypts = {0, lowCut, highCut, 0, 0};
-   TCutG  cut("cut", 5, xpts.data(), ypts.data());
+   TCutG cut("cut", 5, xpts.data(), ypts.data());
 
    auto* d   = new double[16]; // matrix of coefficients
    auto* eD  = new double[16]; // matrix of errors

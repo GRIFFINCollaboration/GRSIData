@@ -49,6 +49,6 @@ void TGenericDetector::Print(Option_t*) const
 void TGenericDetector::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 	out<<str.str();
 }

@@ -486,7 +486,7 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 	}
 
 	if(mnemonic->SubSystem() != TMnemonic::EMnemonic::kG) {
-		std::cerr<<__PRETTY_FUNCTION__<<": not a GRIFFIN detector: "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem())<<std::endl;
+		std::cerr<<__PRETTY_FUNCTION__<<": not a GRIFFIN detector: "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem())<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 		return;
 	}
 

@@ -378,14 +378,14 @@ int TMidasEvent::SetBankList()
          if(pmbk32 == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4);
+         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       } else {
          IterateBank(&pmbk, &pdata);
          if(pmbk == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4);
+         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       }
    }
