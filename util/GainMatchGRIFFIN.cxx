@@ -82,8 +82,8 @@ double GetCentroidTPeak(TH1* hst, double xmin, double xmax)
 	double fwhm = FWHM(hst,xmin,xmax);
 
 	// initial fit
-	TPeak* peak;
 	hst->GetXaxis()->SetRangeUser(xmin,xmax);
+	TPeak* peak = nullptr;
 	if(guesscentroid-1.5*fwhm>xmin && guesscentroid+1.5*fwhm<xmax) {
 		peak = new TPeak(guesscentroid,guesscentroid-1.5*fwhm,guesscentroid+1.5*fwhm);
 	} else {
@@ -110,7 +110,7 @@ double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=
 
 	// search for big keV peak (or peaks)
 	spec2->Search(h);
-	double posbigb;
+	double posbigb = 0.;
 	if(!twopeaks) {
 		if(spec2->GetNPeaks()==2) {
 			// if we get two peaks, check the height of the peaks to find the actual tallest one
@@ -296,7 +296,8 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 		if(i==minchannel) {
 			if(roughenergy) g[i]->Fit("pol1","q","goff");
 			for(int j=0;j<g[i]->GetN();j++) {
-				double x,y;
+				double x = 0.;
+				double y = 0.;
 				g[i]->GetPoint(j,x,y);
 				if(!roughenergy) {
 					peaks[j] = x;
@@ -780,7 +781,7 @@ double FWXM(TH1* h, double xmin, double xmax, double percent = 0.5)
 	int maxbin = h->GetMaximumBin();
 	double bincontent = max;
 	int binbelow = maxbin;
-	double low,high;
+	double high = 0.;
 
 	// rough estimation of background
 	int lowbin = h->FindBin(xmin);
@@ -796,14 +797,13 @@ double FWXM(TH1* h, double xmin, double xmax, double percent = 0.5)
 		}
 		bincontent = h->GetBinContent(binbelow);
 	}
-	double x1,y1,x2,y2,y3,m;
-	y3 = (max-bg)*percent+bg;
-	x1 = h->GetBinCenter(binbelow);
-	x2 = h->GetBinCenter(binbelow+1);
-	y1 = h->GetBinContent(binbelow);
-	y2 = h->GetBinContent(binbelow+1);
-	m = (y2-y1)/(x2-x1);
-	low = (y3-y1)/m+x1;
+	double y3 = (max-bg)*percent+bg;
+	double x1 = h->GetBinCenter(binbelow);
+	double x2 = h->GetBinCenter(binbelow+1);
+	double y1 = h->GetBinContent(binbelow);
+	double y2 = h->GetBinContent(binbelow+1);
+	double m = (y2-y1)/(x2-x1);
+	double low = (y3-y1)/m+x1;
 
 	binbelow = maxbin;
 	bincontent = max;
@@ -906,12 +906,16 @@ int main(int argc, char **argv) {
 	//-------------- END OF VARIABLE DECLARATION SECTION --------------//
 
 	// filename strings
-	std::string fileName, calibfileName, newfileName;
-	char *original_name, *calib_hst_name, *test_file_name;
+   std::string fileName;
+   std::string calibfileName;
+   std::string newfileName;
+   char*       original_name  = nullptr;
+   char*       calib_hst_name = nullptr;
+   char*       test_file_name = nullptr;
 
-	// here, we allow a loop over multiple fragment files
-	for(int i=1;i<argc;i++) {
-		fileName = argv[i];
+   // here, we allow a loop over multiple fragment files
+   for(int i = 1; i < argc; i++) {
+      fileName = argv[i];
 		calibfileName = argv[i];
 		if(calibfileName.find_last_of("/") != std::string::npos) {
 			calibfileName.insert(calibfileName.find_last_of("/")+1,"calib_hsts_");
@@ -939,9 +943,9 @@ int main(int argc, char **argv) {
 		if(do_make_calibration_histograms) {
 			make_calibration_histograms(original_name,calib_hst_name,minchannel,maxchannel,channelsToSkip,xbins_charge,xmin_charge,xmax_charge);
 		}
-	}
+   }
 
-	if(argc>2) {
+   if(argc>2) {
 		std::string buffer = "hadd calib_hsts_summed.root ";
 		for(int i=1;i<argc;i++) {
 			calibfileName = argv[i];

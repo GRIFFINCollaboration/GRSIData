@@ -43,9 +43,7 @@ int main(int argc, char** argv)
          continue;
       }
 
-      TTree* tree;
-
-      tree = dynamic_cast<TTree*>(f.Get("FragmentTree"));
+      auto* tree = dynamic_cast<TTree*>(f.Get("FragmentTree"));
       if(tree != nullptr) {
          std::cout<<argv[i]<<" - FragmentTree: "<<tree->GetEntries()<<std::endl;
          continue;

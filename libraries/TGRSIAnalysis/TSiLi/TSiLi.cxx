@@ -264,14 +264,14 @@ bool TSiLi::fRejectCriterion(TSiLiHit* one, TSiLiHit* two)
 
 bool TSiLi::fCoincidenceTime(TSiLiHit* one, TSiLiHit* two)
 {
-	double T;
+	double time = 0.;
 	if(one->GetTimeFit() > 0 && two->GetTimeFit() > 0) {
-		T = (one->GetTimeFit() - two->GetTimeFit()) * 10;
+		time = (one->GetTimeFit() - two->GetTimeFit()) * 10;
 	} else {
-		T = one->GetTime() - two->GetTime();
+		time = one->GetTime() - two->GetTime();
 	}
 
-	return (std::abs(T) < fSiLiCoincidenceTime);
+	return std::abs(time) < fSiLiCoincidenceTime;
 }
 
 
@@ -293,44 +293,44 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 		int sAB=std::abs(sA-sB);
 		if(sAB>5)sAB=12-sAB;
 
-		if(cluster.size()==2){
-			//Reject events with missing middle pixel
+      if(cluster.size() == 2) {
+         //Reject events with missing middle pixel
          if(rAB + sAB > 1) ContainsReject = true;
-      }else{
-         TSiLiHit* C  = static_cast<TSiLiHit*>(GetHit(cluster[2]));
-         int rC=C->GetRing();
-			int sC=C->GetSector();
-			int rAC=std::abs(rA-rC),rBC=std::abs(rB-rC);
-			int sAC=std::abs(sA-sC),sBC=std::abs(sB-sC);
+      } else {
+         TSiLiHit* C   = static_cast<TSiLiHit*>(GetHit(cluster[2]));
+         int       rC  = C->GetRing();
+         int       sC  = C->GetSector();
+         int       rAC = std::abs(rA - rC), rBC = std::abs(rB - rC);
+         int       sAC = std::abs(sA - sC), sBC = std::abs(sB - sC);
 
-			if(sAC>5)sAC=12-sAC;
-			if(sBC>5)sBC=12-sBC;
+         if(sAC > 5) sAC = 12 - sAC;
+         if(sBC > 5) sBC = 12 - sBC;
 
-			if(rA==rB&&rB==rC){
-				//Reject events that cross 3 sectors
-				ContainsReject=true;
-			}else if(rAB+sAB>2||rAC+sAC>2||rBC+sBC>2){
-				//Reject events that are too far apart (1 or more missing middles)
-				ContainsReject=true;
-			}else{
-				//Must be an allowed L OR 3 rings same sector
-				if(sA==sB&&sB==sC){
-					//if event crosses 3 rings
-					double midE;
-					if(((rA-rB)*(rA-rC))<0){
-						midE=A->GetEnergy();
-					}else if(((rB-rA)*(rB-rC))<0){
-						midE=B->GetEnergy();
-					}else{
-						midE=C->GetEnergy();
-					}
+         if(rA == rB && rB == rC) {
+            //Reject events that cross 3 sectors
+            ContainsReject = true;
+         } else if(rAB + sAB > 2 || rAC + sAC > 2 || rBC + sBC > 2) {
+            //Reject events that are too far apart (1 or more missing middles)
+            ContainsReject = true;
+         } else {
+            //Must be an allowed L OR 3 rings same sector
+            if(sA == sB && sB == sC) {
+               //if event crosses 3 rings
+               double midE = 0.;
+               if(((rA - rB) * (rA - rC)) < 0) {
+                  midE = A->GetEnergy();
+               } else if(((rB - rA) * (rB - rC)) < 0) {
+                  midE = B->GetEnergy();
+               } else {
+                  midE = C->GetEnergy();
+               }
 
-					//Minimum possible energy
+               //Minimum possible energy
 					if(midE<1400)ContainsReject=true;
-				}
-			}
-		}
-	}
+            }
+         }
+      }
+   }
 
 
 	if(ContainsReject){

@@ -64,7 +64,7 @@ TVector3 TTigressHit::GetPosition(Double_t dist) const
 
 TVector3 TTigressHit::GetLastPosition(Double_t dist) const
 {
-   const TDetectorHit* seg;
+   const TDetectorHit* seg = nullptr;
    if(GetNSegments() > 0) {
       seg = &GetSegmentHit(GetNSegments() - 1); // returns the last segment in the segment vector.
    } else {

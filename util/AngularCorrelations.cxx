@@ -662,8 +662,8 @@ public:
 		double chi2 = 0;
 		for(int point = 0; point < fData->GetN(); ++point) {
 			// get data values
-			double x;
-			double y;
+			double x = 0.;
+			double y = 0.;
 			fData->GetPoint(point, x, y);
 			double yError = fData->GetErrorY(point);
 

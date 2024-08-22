@@ -24,7 +24,7 @@ public:
    {
       event->SetBankList();
 
-      void* ptr;
+      void* ptr = nullptr;
       int   banksize = event->LocateBank(nullptr, "GRF1", &ptr);
 
       uint32_t type  = 0xffffffff;
@@ -174,8 +174,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
 
    // MidasTimeStamp is the only time we can trust at this level.
 
-   int* lowest_hightime;
-   lowest_hightime = new int[TEventTime::NDigitizers()];
+   auto* lowest_hightime = new int[TEventTime::NDigitizers()];
    // Clear lowest hightime
    for(int i = 0; i < TEventTime::NDigitizers(); i++) {
       lowest_hightime[i] = 0;
@@ -243,7 +242,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1C* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1C* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -333,7 +332,7 @@ void GetTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -433,8 +432,7 @@ int main(int argc, char** argv)
    QueueEvents(infile, eventQ);
    std::cout<<"SIZE: "<<TEventTime::digmap.size()<<std::endl;
 
-   int64_t* correction;
-   correction = new int64_t[TEventTime::NDigitizers()];
+   auto* correction = new int64_t[TEventTime::NDigitizers()];
    CheckHighTimeStamp(eventQ, correction);
    GetRoughTimeDiff(eventQ, correction);
    GetTimeDiff(eventQ, correction);

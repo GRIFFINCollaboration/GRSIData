@@ -34,7 +34,7 @@ public:
    {
       event->SetBankList();
 
-      void* ptr;
+      void* ptr = nullptr;
       int   banksize = event->LocateBank(nullptr, "GRF2", &ptr);
       int   bank     = 2;
 
@@ -208,8 +208,8 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
    const int                    event_start = 1E5;
    std::shared_ptr<TMidasEvent> event       = std::make_shared<TMidasEvent>();
    eventQ->reserve(total_events);
-   void* ptr;
-   int   banksize;
+   void* ptr = nullptr;
+   int   banksize = 0;
 
    int subrun = infile->GetSubRunNumber();
 
@@ -252,7 +252,7 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
          }
 
          if(banksize > 0) {
-            int frags;
+            int frags = 0;
             try {
                frags = parser.GriffinDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF2,
                                                     mserial, mtime);
@@ -378,7 +378,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -486,7 +486,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 	// The "best digitizer" is set when we fill the event Q
 	printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-	TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+	TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
 	std::vector<TEventTime*>::iterator hit1;
 	std::vector<TEventTime*>::iterator hit2;
@@ -585,7 +585,7 @@ bool ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
 	// int size;
 	// int data[1024];
 
-	void* ptr;
+	void* ptr = nullptr;
 
 	int banksize = event->LocateBank(nullptr, "GRF2", &ptr);
 	int bank     = 2;
@@ -791,8 +791,8 @@ void WriteCorrectionFile(int runnumber)
 
 	// Just going to make a corrections map for now...it should be a map throughout....
 
-	uint32_t address;
-	Long64_t correction;
+	uint32_t address = 0;
+	Long64_t correction = 0;
 	auto*    t = new TTree("correctiontree", "Tree with map");
 	t->Branch("address", &address);
 	t->Branch("correction", &correction);
@@ -822,12 +822,12 @@ int CorrectionFile(int runnumber)
 
 	printf(DGREEN "Found Correction File %s\n" RESET_COLOR, filename.data());
 
-	TTree* t;
+	TTree* t = nullptr;
 	corrfile->GetObject("correctiontree", t);
 	TBranch* baddress    = nullptr;
 	TBranch* bcorrection = nullptr;
-	uint32_t address;
-	Long64_t correction;
+	uint32_t address = 0;
+	Long64_t correction = 0;
 	t->SetBranchAddress("address", &address, &baddress);
 	t->SetBranchAddress("correction", &correction, &bcorrection);
 

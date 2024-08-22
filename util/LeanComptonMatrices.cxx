@@ -81,9 +81,9 @@ int main(int argc, char **argv)
 	TStopwatch w;
 	w.Start();
 
-	TFile* file;
-	TFile* outfile;
-	TList* outlist;
+	TFile* file = nullptr;
+	TFile* outfile = nullptr;
+	TList* outlist = nullptr;
 	for(int f = 0; f < argc - 1; ++f) {
 		file = new TFile(argv[f+1]); //maybe should be new?
 
@@ -158,13 +158,24 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 	Double_t ggThigh = 20.0; //false ensure that they are the same as GetTime
 	
 	//These are the time values for each gamma. (Used in Section 2 for coincidence gating)
-	int tg1, tg2, tg3;
+	int tg1 = 0;
+	int tg2 = 0;
+	int tg3 = 0;
 	//These are the indices of the two hits being compared.  (Used in both Section 1 and Section 2)
-	int one, two, three;
+	int one = 0;
+	int two = 0;
+	int three = 0;
 	//Experimental Angles to be calculated: (Used in both Section 1 and Section 2)
-	double Xi, CoTheta;
+	double Xi = 0.;
+	double CoTheta = 0.;
 	//Vectors (Used in both Section 1 and Section 2)
-	TVector3 v1,v2,v3, n1, n2, d1, d2;
+	TVector3 v1;
+	TVector3 v2;
+	TVector3 v3;
+	TVector3 n1;
+	TVector3 n2;
+	TVector3 d1;
+	TVector3 d2;
 
 	int ThetaBins =  180; // Binsize = 180deg / bins
 	int XiBins    = 180;
@@ -175,7 +186,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 
 	bool ForceG1 = true; //If true it will make gEnergy[0] the energy of the scattered gamma ray in the cascade.
 
-	int gEnergyIndex1; //The index for gEnergy of gamma 1.  Set within the code. 
+	int gEnergyIndex1 = 0; //The index for gEnergy of gamma 1.  Set within the code. 
 							 //These parameters could potentially be automated but right now my attempts were unsuccesful  
 	std::vector<int> MissingClovers = {}; // = {1,2,3,4};//13 //Put Missing Detectors in vector below.  Any detector combinations including these detectors will be ignored.  Detectors are 1 through 16. 
 	double DetectorHeight = 145.0;   //This should be found from runinfo->HPGeArrayPosition();, however this may not have been actively set for the experiment. For 
@@ -273,7 +284,6 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 
 	std::cout<<"Starting event analysis (Section 2) after "<<w->RealTime()<<" seconds"<<std::endl; w->Continue();
 
-	bool TimeCoincident;
 	// int curloopval = 0;
 	int PrintRate = 1000;
 	while(PrintRate >= maxEntries){
@@ -365,7 +375,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 					if(usetimestamps) tg3 = grif->GetGriffinHit(three)->GetTimeStamp();
 					else tg3 = grif->GetGriffinHit(three)->GetTime();
 
-					TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;
+					bool TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;
 					ggTimeDiff_g1g2->Fill(TMath::Abs(tg2 - tg1));
 					ggTimeDiff_g1g3->Fill(TMath::Abs(tg3 - tg1));
 					ggTimeDiff_g2g3->Fill(TMath::Abs(tg3 - tg2));

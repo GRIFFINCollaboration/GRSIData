@@ -22,7 +22,7 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    evt->SetBankList();
 
    // Need to put something in that says "if not a Griffin fragment (ie epics) return true"
-   void* ptr;
+   void* ptr      = nullptr;
    int   banksize = evt->LocateBank(nullptr, "GRF2", &ptr);
    int   bank     = 2;
 

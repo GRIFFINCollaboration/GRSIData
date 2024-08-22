@@ -31,8 +31,8 @@ TGRSIDataParser::~TGRSIDataParser()
 int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 {
 	std::shared_ptr<TMidasEvent> event = std::static_pointer_cast<TMidasEvent>(rawEvent);
-   int   banksize;
-   void* ptr;
+   int   banksize = 0;
+   void* ptr = nullptr;
    int   frags = 0;
    try {
       switch(event->GetEventId()) {
@@ -109,7 +109,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 			TXMLNode* node    = odb->FindPath("/Runinfo/Stop time binary");
 			if(node != nullptr) {
 				std::stringstream str(node->GetText());
-				unsigned int odbTime;
+				unsigned int odbTime = 0;
 				str>>odbTime;
 				odbTime *= 10; // convert from 10 ns to 1 ns units
 				if(atoi(node->GetText()) != 0 && odbTime != event->GetTimeStamp() && !TGRSIOptions::Get()->SuppressErrors()) {
@@ -150,8 +150,8 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 	int      x     = 0;
 	uint32_t dword = *(data + x);
 
-	uint32_t type;
-	uint32_t value;
+	uint32_t type = 0;
+	uint32_t value = 0;
 
 	if(!SetTIGTriggerID(dword, eventFrag)) {
 		std::cout<<RED<<"Setting TriggerId ("<<hex(dword, 8)<<") failed on midas event: "<<DYELLOW<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
@@ -288,7 +288,7 @@ void TGRSIDataParser::SetTIGCharge(uint32_t value, const std::shared_ptr<TFragme
 	}
 	std::string dig_type = chan->GetDigitizerTypeString();
 
-	int charge;
+	int charge = 0;
 	if((dig_type.compare(0, 5, "Tig10") == 0) || (dig_type.compare(0, 5, "TIG10") == 0)) {
 		if((value & 0x02000000) != 0u) {
 			charge = (-((~(static_cast<int32_t>(value) & 0x01ffffff)) & 0x01ffffff) + 1);
@@ -444,7 +444,7 @@ int TGRSIDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank
 	for(int index = 0; index < size;) {
 		if(((data[index]) & 0xf0000000) == 0x80000000) {
 			// if we found a fragment header we use GriffinDataToFragment which returns the number of words read
-			int words;
+			int words = 0;
 			try {
 				words = GriffinDataToFragment(&data[index], size - index, bank, event->GetSerialNumber(), event->GetTimeStamp());
 			} catch(TGRSIDataParserException& e) {
@@ -1247,7 +1247,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 	// Parses special RF scaler events which contain only timestamps and fit paramteters
 
    ULong64_t             ts = 0;
-   ULong64_t             tshigh;
+   ULong64_t             tshigh = 0;
    double                rfFreq = -1.0;
    std::array<double, 4> rfPar;
    bool                  freqSet    = false;
@@ -1389,7 +1389,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 	double A = sqrt(rfPar[1] * rfPar[1] + rfPar[0] * rfPar[0]);
 	double s = -rfPar[0] / A;
 	double c = rfPar[1] / A;
-	double rfPhaseShift; //the phase shift, in ns
+	double rfPhaseShift = 0.; //the phase shift, in ns
 	if(s >= 0) {
 		rfPhaseShift = acos(c) * T / (2 * TMath::Pi());
 	} else {
@@ -2029,11 +2029,11 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 	int      x     = 0;
 	uint32_t dword = *(data + x);
 
-	uint32_t type;
-	uint32_t adcchannel;
-	uint32_t adcdata;
-	uint32_t adctimestamp;
-	uint32_t adchightimestamp;
+	uint32_t type = 0;
+	uint32_t adcchannel = 0;
+	uint32_t adcdata = 0;
+	uint32_t adctimestamp = 0;
+	uint32_t adchightimestamp = 0;
 
 	eventFrag->SetTimeStamp(0);
 	for(x=size; x-- > 0; ) { // Reads the event backwards 
@@ -2102,7 +2102,7 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 	bool multipleErrors = false; // Variable to store if multiple errors occured parsing one fragment
 	uint32_t tmpTimestamp = 0;
 	uint32_t tmpAddress = 0;
-	Long64_t ts;
+	Long64_t ts = 0;
 
 	std::vector<uint32_t> addresses;
 	std::vector<uint32_t> charges;
@@ -2186,25 +2186,24 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 					std::cout<<"Something went horribly wrong, the number of addresses read "<<addresses.size()<<" doesn't match the number of charges read "<<charges.size()<<std::endl;
 					return 0;
 				}
-				for(size_t i = 0; i < addresses.size(); ++i) {
-					size_t duped = 0;
-					size_t ii;
-					if (i>0) {
-						for (ii=0; ii<i; ii++) {
-							if (addresses[i]==addresses[ii]) {
-								duped++;
-							}
-						}
-					}
-					if (duped==0) {
-						eventFrag->SetAddress(addresses[i]);
-						eventFrag->SetCharge(static_cast<Int_t>(charges[i]));
-						Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
-						++numFragsFound;
-					} 
-				}
+            for(size_t i = 0; i < addresses.size(); ++i) {
+               size_t duped = 0;
+               if(i > 0) {
+                  for(size_t j = 0; j < i; j++) {
+                     if(addresses[i] == addresses[j]) {
+                        duped++;
+                     }
+                  }
+               }
+               if(duped == 0) {
+                  eventFrag->SetAddress(addresses[i]);
+                  eventFrag->SetCharge(static_cast<Int_t>(charges[i]));
+                  Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
+                  ++numFragsFound;
+               }
+            }
 
-				// clear the old data
+            // clear the old data
 				addresses.clear();
 				charges.clear();
 				tmpTimestamp = 0;

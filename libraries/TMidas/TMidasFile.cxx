@@ -728,7 +728,7 @@ void TMidasFile::SetRunInfo(uint32_t time)
    TXMLNode*     node    = fOdb->FindPath("/Runinfo/Start time binary");
    if(node != nullptr) {
 		std::stringstream str(node->GetText());
-		unsigned int odbTime;
+		unsigned int odbTime = 0;
 		str>>odbTime;
 		if(TRunInfo::SubRunNumber() == 0 && time != odbTime) {
 			std::cout<<"Warning, ODB start time of first subrun ("<<odbTime<<") does not match midas time of first event in this subrun ("<<time<<")!"<<std::endl;

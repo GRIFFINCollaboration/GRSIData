@@ -346,9 +346,11 @@ TVector3 TTigress::GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist, 
 	}
 
 	if(smear && SegNbr==0){
-		double   x, y, r = sqrt(gRandom->Uniform(0, 400));
-		gRandom->Circle(x, y, r);
-		return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr] + fCloverCross[DetNbr][0]*x + fCloverCross[DetNbr][1]*y;
+      double x = 0.;
+      double y = 0.;
+      double r = sqrt(gRandom->Uniform(0, 400));
+      gRandom->Circle(x, y, r);
+      return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr] + fCloverCross[DetNbr][0]*x + fCloverCross[DetNbr][1]*y;
 	}
 
 	return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr];

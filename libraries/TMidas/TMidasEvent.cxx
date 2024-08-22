@@ -165,7 +165,8 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
 {
    /// See FindBank()
 
-   int bktype, bklen;
+   int bktype = 0;
+	int bklen = 0;
 
    int status = FindBank(name, &bklen, &bktype, pdata);
 
@@ -187,7 +188,7 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
 int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdata) const
 {
    const TMidas_BANK_HEADER* pbkh = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
-   TMidas_BANK*              pbk;
+   TMidas_BANK*              pbk = nullptr;
 
 	std::array<unsigned, 17> TID_SIZE = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
 
@@ -525,11 +526,11 @@ void TMidasEvent::SwapBytesEventHeader()
 int TMidasEvent::SwapBytes(bool force)
 {
    // Swaps bytes for endian-ness reasons
-   TMidas_BANK_HEADER* pbh;
-   TMidas_BANK*        pbk;
-   TMidas_BANK32*      pbk32;
-   void*               pdata;
-   uint16_t            type;
+   TMidas_BANK_HEADER* pbh = nullptr;
+   TMidas_BANK*        pbk = nullptr;
+   TMidas_BANK32*      pbk32 = nullptr;
+   void*               pdata = nullptr;
+   uint16_t            type = 0;
 
    pbh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
 

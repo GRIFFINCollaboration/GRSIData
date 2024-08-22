@@ -98,15 +98,15 @@ int main(int argc, char* argv[])
    // Start time binary = DWORD : 1445453916
    // Stop time binary = DWORD : 1445454042
    // the difference (stop-start) equals the run time in seconds. Useful for histogram binning purposes.
-   size_t      posa;
-   size_t      posb;
-   int         sub       = 28;
-   const char* starttime = "Start time binary";
-   const char* stoptime  = "Stop time binary";
-   int         tstart    = 0;
-   int         tend      = 0;
-   int         runtime   = 0;
-   int         nppg      = 0;
+   size_t           posa      = 0;
+   size_t           posb      = 0;
+   int              sub       = 28;
+   const char*      starttime = "Start time binary";
+   const char*      stoptime  = "Stop time binary";
+   int              tstart    = 0;
+   int              tend      = 0;
+   int              runtime   = 0;
+   int              nppg      = 0;
    std::string      odbline;
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    int line_count = std::count( // read in number of lines(files)
@@ -210,7 +210,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
    // define spectra
    auto** grif = new TH1D*[nsc];
    // define file pointer
-   TFile* vs;
+   TFile* vs = nullptr;
 
    // make spectra
    auto*  rf    = new TFile(filename, "read");
@@ -312,13 +312,12 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    int cnt        = 0;
 	std::array<int, 2> ppgstat = {0, 0};
    // generate random seed from system time for use in error analysis
-   time_t timer;
-   timer = time(nullptr);
+   time_t timer = time(nullptr);
    srand(timer);
 
    TFile  f(fname);
    TIter  next(f.GetListOfKeys());
-   TKey*  key;
+   TKey*  key = nullptr;
    auto** spec = new TH1D*[nfile * (nsc * nscaler)];
 
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER EDITABLE
@@ -362,33 +361,34 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double nrand  = 0;
       double rrand  = 0;
       double sdrand = 0;
-      double sum = 0, sumc = 0;
-      double maxl  = 0;
-      double minl  = 1e6;
-      double x     = 0;
-      double w     = 0;
-      double diff  = 0;
-      double rcmin = 0;
-      int    minb  = 0;
-      double lbd;
-      double ubd;
-      double rmax = 0;
-      int    flag = 0;
-      double z    = 0;
-      double y    = 0;
-      double v    = 0;
-      double dz   = 0;
-      double dv   = 0;
-      double d2z  = 0;
-      int    fbin = 10;
-      double max  = 0;
-      double dlim = 0;
-      int    nt   = 0;
-      int    ord  = 0;
-      int    sref = 0;
-      int    pref = 0;
-      int    chop = 2; //'chop'= ignore first/last two bins of each pattern
-      auto** ppg  = new int*[numpat];
+      double sum    = 0;
+      double sumc   = 0;
+      double maxl   = 0;
+      double minl   = 1e6;
+      double x      = 0;
+      double w      = 0;
+      double diff   = 0;
+      double rcmin  = 0;
+      int    minb   = 0;
+      double lbd    = 0.;
+      double ubd    = 0.;
+      double rmax   = 0.;
+      int    flag   = 0;
+      double z      = 0;
+      double y      = 0;
+      double v      = 0;
+      double dz     = 0;
+      double dv     = 0;
+      double d2z    = 0;
+      int    fbin   = 10;
+      double max    = 0;
+      double dlim   = 0;
+      int    nt     = 0;
+      int    ord    = 0;
+      int    sref   = 0;
+      int    pref   = 0;
+      int    chop   = 2;   //'chop'= ignore first/last two bins of each pattern
+      auto** ppg    = new int*[numpat];
       for(int i = 0; i < numpat; ++i) {
          ppg[i] = new int[2];
       };
@@ -702,20 +702,20 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double du   = (uhi - ulo) / 1e3;
       double u    = ulo;
       int    itr  = 0;
-      int    umin = 0;
-      double w1;
-      double x1;
-      double x2;
+      int    umin  = 0;
+      double w1    = 0.;
+      double x1    = 0.;
+      double x2    = 0.;
       int    nrow  = int((uhi - ulo) / du);
-      double w2    = pow((pow(sdrand, 2)), 2) / ((2. * pow(sdrand, 2))); // const.
+      double w2    = pow((pow(sdrand, 2)), 2) / ((2. * pow(sdrand, 2)));   // const.
       minl         = -1e6;
       auto** array = new double*[nrow];
       for(int i = 0; i < nrow; ++i) {
          array[i] = new double[2];
       }
-      double sigm;
-      double sigp;
-      double lnl;
+      double sigm = 0.;
+      double sigp = 0.;
+      double lnl = 0.;
 
       while(itr < nrow) {
          if(itr == 0) {
@@ -774,9 +774,13 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // tau
 
       int    iter = 1e4, bin = 10;
-      double tempa, tempb;
-      double var1, var2, var3;
-      double l1, l2;
+      double tempa = 0.;
+		double tempb = 0.;
+      double var1 = 0.;
+		double var2 = 0.;
+		double var3 = 0.;
+      double l1 = 0.;
+		double l2 = 0.;
       int    wbin = 40;
       int    wrow = 0, wsize = int(pow(wbin, 2));
       auto** randcheck = new double*[bin];

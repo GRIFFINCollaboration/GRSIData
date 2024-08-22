@@ -202,8 +202,7 @@ std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
    while(true) {
       if(TList* index = child->GetAttributes()) {
          int         indexnum = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
-         const char* value;
-         value = child->GetText();
+         const char* value    = child->GetText();
 
          // Make sure we actually read a word
          std::string value_str;

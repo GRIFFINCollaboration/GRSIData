@@ -80,10 +80,14 @@ int main(int argc, char** argv) {
 
 	TList list;
 
-	UInt_t labr1,labr2,tac1; //counters
+	UInt_t labr1 = 0;
+	UInt_t labr2 = 0;
+	UInt_t tac1 = 0; //counters
 
 	Double_t  progress;
-	Int_t  multi_labr, multi_tac, multi_grif;
+	Int_t  multi_labr = 0;
+	Int_t multi_tac = 0;
+	Int_t multi_grif = 0;
 
 	//TAC offset histograms
 	std::array<TH1D*, 8> TAC_offset;
