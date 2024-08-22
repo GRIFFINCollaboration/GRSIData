@@ -212,8 +212,8 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 		return static_cast<Double_t>((timestamp) + gRandom->Uniform());
    }
 	
+	Double_t dTime = 0.;
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
-		Double_t dTime = 0.;
 		case EDigitizer::kGRF16:
 		case EDigitizer::kFMC32:
 			// we need to zero the lowest 18 bits of the timestamp as those are included in the CFD value
