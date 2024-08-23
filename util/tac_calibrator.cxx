@@ -73,13 +73,13 @@ int main(int argc, char** argv) {
 		TTAC* tac = nullptr;
 
 
-		if(tree->FindBranch("TLaBr") != 0) {    //We check to see if we have a LaBr branch in the analysis tree
+		if(tree->FindBranch("TLaBr") != nullptr) {    //We check to see if we have a LaBr branch in the analysis tree
 			tree->SetBranchAddress("TLaBr", &labr);
 		}
-		if(tree->FindBranch("TZeroDegree") != 0) {   //We check to see if we have a ZeroDegree branch in the analysis tree
+		if(tree->FindBranch("TZeroDegree") != nullptr) {   //We check to see if we have a ZeroDegree branch in the analysis tree
 			tree->SetBranchAddress("TZeroDegree", &zds);
 		}
-		if(tree->FindBranch("TTAC") == 0) {   //We check to see if we have a TAC branch in the analysis tree
+		if(tree->FindBranch("TTAC") == nullptr) {   //We check to see if we have a TAC branch in the analysis tree
 			std::cout << "Exiting the program because there are no TACs to calibrate   " << std::endl;
 			exit(-1);
 		} else {

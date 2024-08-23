@@ -173,8 +173,8 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 {
 	// initialization stuff
 	auto* list = new TList;
-	TFragment *currentFrag = 0;
-	TChannel::ReadCalFromTree(tree);
+   TFragment* currentFrag = nullptr;
+   TChannel::ReadCalFromTree(tree);
 	TBranch *branch = tree->GetBranch("TFragment");
 	branch->SetAddress(&currentFrag);
 
@@ -274,12 +274,12 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 		if(skipChannel) continue;
 		std::cout <<"Creating graph for channel " <<i <<std::endl;
 		auto* h = static_cast<TH1F*>(f->Get(Form("hst%i",i))); // grab histogram
-		if(h==0) {
-			std::cout <<"Error: hst" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
+      if(h == nullptr) {
+         std::cout <<"Error: hst" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
 			continue;
-		}
+      }
 
-		// calculate rough gain
+      // calculate rough gain
 		double gain = GetRoughGain(h,largepeak,mindistance,twopeaks,largepeak2);
 		//		std::cout <<"Rough gain for channel " <<i <<" is " <<gain <<std::endl;
 
@@ -334,7 +334,7 @@ TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<do
 	size_t n = peakvalues.size();
 	if(peaklocations.size()!=n) {
 		std::cout <<"Error: input vectors are not the same size." <<std::endl;
-		return 0;
+		return nullptr;
 	}
 
 	auto* graph = new TGraph();
@@ -549,7 +549,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 {
 	// initialization stuff
 	auto* list = new TList;
-	TFragment *currentFrag = 0;
+	TFragment *currentFrag = nullptr;
 	TChannel::ReadCalFile(calfile);
 	TBranch *branch = tree->GetBranch("TFragment");
 	branch->SetAddress(&currentFrag);
@@ -661,7 +661,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 		}
 		if(skipChannel) continue;
 		hsts[i] = static_cast<TH1F*>(gFile->Get(Form("hst%i",i)));
-		if(hsts[i]==0) {
+		if(hsts[i]==nullptr) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your newcal and calib_hst files and your inputs to GainMatchGRIFFIN." <<std::endl;
 			std::cout <<"Function check_calibration will continue, but will skip this channel." <<std::endl;
 			channelsToSkip.push_back(i);

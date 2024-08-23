@@ -235,7 +235,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 	if(maxEntries == 0 || maxEntries > tree->GetEntries()) {
 		maxEntries = tree->GetEntries();
 	}
-	TGriffin* grif = 0;
+	TGriffin* grif = nullptr;
 	tree->SetBranchAddress("TGriffin", &grif);
 
 	////////////////////////////////////////////////////////////////////////////////////
