@@ -917,8 +917,8 @@ int main(int argc, char **argv) {
    for(int i = 1; i < argc; i++) {
       fileName = argv[i];
 		calibfileName = argv[i];
-		if(calibfileName.find_last_of("/") != std::string::npos) {
-			calibfileName.insert(calibfileName.find_last_of("/")+1,"calib_hsts_");
+		if(calibfileName.find_last_of('/') != std::string::npos) {
+			calibfileName.insert(calibfileName.find_last_of('/')+1,"calib_hsts_");
 		} else {
 			calibfileName.insert(0,"calib_hsts_");
 		}
@@ -949,8 +949,8 @@ int main(int argc, char **argv) {
 		std::string buffer = "hadd calib_hsts_summed.root ";
 		for(int i=1;i<argc;i++) {
 			calibfileName = argv[i];
-			if(calibfileName.find_last_of("/") != std::string::npos) {
-				calibfileName.insert(calibfileName.find_last_of("/")+1,"calib_hsts_");
+			if(calibfileName.find_last_of('/') != std::string::npos) {
+				calibfileName.insert(calibfileName.find_last_of('/')+1,"calib_hsts_");
 			} else {
 				calibfileName.insert(0,"calib_hsts_");
 			}
@@ -978,8 +978,8 @@ int main(int argc, char **argv) {
 	for(int i=1;i<argc;i++) {
 		fileName = argv[i];
 		newfileName = argv[i];
-		if(newfileName.find_last_of("/") != std::string::npos) {
-			newfileName.insert(newfileName.find_last_of("/")+1,"newcal_");
+		if(newfileName.find_last_of('/') != std::string::npos) {
+			newfileName.insert(newfileName.find_last_of('/')+1,"newcal_");
 		} else {
 			newfileName.insert(0,"newcal_");
 		}
@@ -1010,8 +1010,8 @@ int main(int argc, char **argv) {
 		std::string buffer = "hadd newcal_summed.root ";
 		for(int i=1;i<argc;i++) {
 			newfileName = argv[i];
-			if(newfileName.find_last_of("/") != std::string::npos) {
-				newfileName.insert(newfileName.find_last_of("/")+1,"newcal_");
+			if(newfileName.find_last_of('/') != std::string::npos) {
+				newfileName.insert(newfileName.find_last_of('/')+1,"newcal_");
 			} else {
 				newfileName.insert(0,"newcal_");
 			}
