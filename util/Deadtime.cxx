@@ -13,7 +13,6 @@
 #include <string>
 #include <cmath>
 #include <cstdio>
-#include <cmath> /* round, floor, ceil, trunc */
 #include <ctime>
 
 #include "TF1.h"
