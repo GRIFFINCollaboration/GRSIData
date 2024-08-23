@@ -217,14 +217,14 @@ void TEmma::BuildHits()
 	std::vector <double> icArray;
 	if(fEmmaTdcHits.size() > 4 ) {   // Require a Good hit to contain only the PGAC TDC signals
 		TEmmaHit * hit = new TEmmaHit();
-		for(size_t i = 0; i < fEmmaTdcHits.size(); ++i) { 
-			hit->SetTimeStamp(fEmmaTdcHits[i].GetTimeStamp());
-			hit->SetAddress(fEmmaTdcHits[i].GetAddress());
-			if(fEmmaTdcHits[i].GetTdcNumber() < 10) tdcArray.push_back(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 10) hit->SetLeft(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 11) hit->SetRight(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 12) hit->SetTop(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 13) hit->SetBottom(fEmmaTdcHits[i].GetEnergy());
+		for(auto& emmaTdcHit : fEmmaTdcHits) {
+			hit->SetTimeStamp(emmaTdcHit.GetTimeStamp());
+			hit->SetAddress(emmaTdcHit.GetAddress());
+			if(emmaTdcHit.GetTdcNumber() < 10) tdcArray.push_back(emmaTdcHit.GetEnergy());
+			if(emmaTdcHit.GetTdcNumber() == 10) hit->SetLeft(emmaTdcHit.GetEnergy());
+			if(emmaTdcHit.GetTdcNumber() == 11) hit->SetRight(emmaTdcHit.GetEnergy());
+			if(emmaTdcHit.GetTdcNumber() == 12) hit->SetTop(emmaTdcHit.GetEnergy());
+			if(emmaTdcHit.GetTdcNumber() == 13) hit->SetBottom(emmaTdcHit.GetEnergy());
 		}
 
 		if(tdcArray.size() != 0) {

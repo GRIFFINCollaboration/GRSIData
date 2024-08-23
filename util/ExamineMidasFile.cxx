@@ -68,8 +68,8 @@ void ExamineMidasFile(const char *filename) {
 			currenteventnumber,(bytesread/1000000.0),(filesize/1000000.0),(bytesread/1000000.0)/sw.RealTime());
 	printf("\n\n");
 	printf("EventTypes Seen: \n");
-	for(std::map<int,int>::iterator it=type_counter.begin();it!=type_counter.end();it++) {
-		printf("\tEventId[0x%x]  =  %i\n",it->first,it->second);
+	for(auto& it : type_counter) {
+		printf("\tEventId[0x%x]  =  %i\n",it.first,it.second);
 	}
 	printf("\n");
 	printf("Run length =  %lli  seconds\n",stoptime-starttime);

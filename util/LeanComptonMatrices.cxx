@@ -316,18 +316,18 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 			if(one == 0){ //only needs to be done once per entry, as it doesn't depend on current entries multiplicity.
 							  // eliminate parts of lists that are too old
 				int counter=0;
-				for (std::list<int>::iterator it = NonCo_Entries.begin(); it != NonCo_Entries.end(); ++it ){
+				for(int NonCo_Entry : NonCo_Entries) {
 					// the number subtracted from entry in the next line determines how far back the BG loop looks for coincidences
 					// it should be one more than the number of entries you want to compare
 					// i.e. if you want to compare ten entries, this number should be eleven
-					if (*it<entry-11) counter++;
+					if(NonCo_Entry < entry-11) { counter++; }
 				}
-				for (int i=0;i<counter;i++){
-					NonCo_Entries.pop_front();
+            for(int i = 0; i < counter; i++) {
+               NonCo_Entries.pop_front();
 					NonCo_Energies.pop_front();
 					NonCo_CryNums.pop_front();
-				}
-			}
+            }
+         }
 			//---------------------------------------End of list maintenance---------------------------------------// 
 
 			//one will be the first gamma ray of the scatter event
@@ -409,29 +409,29 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 				//Unpolarized Work - Third gamma chosen from uncorrelated (in time) events.  This is used
 				//for event mixing weighting of triplets.
 
-				std::list<double>::iterator it_Energy = NonCo_Energies.begin();
-				std::list<int>::iterator it_CryNum = NonCo_CryNums.begin();
-				for ( std::list<int>::iterator it = NonCo_Entries.begin(); it != NonCo_Entries.end(); ++it ){ // background gamma two loop (using list)
-					if ( *it <= entry-2 ){ // if the second entry is more than two behind... (this gives a sufficient time window to ensure no time correlation)
-						double Energy3 = *it_Energy;
-						int CrystalNum = *it_CryNum;
-						if( (grif->GetGriffinHit(one)->GetDetector() != CrystalNum/4 + 1) && (TMath::Abs(gEnergy[1-gEnergyIndex1] - Energy3) < gEnergyErr) ) {
-							d2 = TGriffin::GetPosition( (CrystalNum / 4) + 1, 5, DetectorHeight );
-							v3 = TGriffin::GetPosition( (CrystalNum / 4) + 1, CrystalNum % 4, DetectorHeight );
-							n1 = v3.Cross(v1);
-							n2 = v1.Cross(v2);
+            std::list<double>::iterator it_Energy = NonCo_Energies.begin();
+            std::list<int>::iterator    it_CryNum = NonCo_CryNums.begin();
+            for(int NonCo_Entry : NonCo_Entries) {
+               if(NonCo_Entry <= entry - 2) {   // if the second entry is more than two behind... (this gives a sufficient time window to ensure no time correlation)
+                  double Energy3    = *it_Energy;
+                  int    CrystalNum = *it_CryNum;
+                  if((grif->GetGriffinHit(one)->GetDetector() != CrystalNum / 4 + 1) && (TMath::Abs(gEnergy[1 - gEnergyIndex1] - Energy3) < gEnergyErr)) {
+                     d2 = TGriffin::GetPosition((CrystalNum / 4) + 1, 5, DetectorHeight);
+                     v3 = TGriffin::GetPosition((CrystalNum / 4) + 1, CrystalNum % 4, DetectorHeight);
+                     n1 = v3.Cross(v1);
+                     n2 = v1.Cross(v2);
 
-							Xi = n1.Angle(n2)*TMath::RadToDeg();
-							CoTheta = v3.Angle(v1)*TMath::RadToDeg();
+                     Xi      = n1.Angle(n2) * TMath::RadToDeg();
+                     CoTheta = v3.Angle(v1) * TMath::RadToDeg();
 
-							XiHist2DNonCo_DetDet->Fill( Xi, TMath::RadToDeg()*d1.Angle(d2) );
-							XiHist2DNonCo_CryCry->Fill( Xi, CoTheta ); 
-						}
-					}
-					++it_Energy;
-					++it_CryNum;
-				} // End of event mixing (NonCo) work.
-			}
+                     XiHist2DNonCo_DetDet->Fill(Xi, TMath::RadToDeg() * d1.Angle(d2));
+                     XiHist2DNonCo_CryCry->Fill(Xi, CoTheta);
+                  }
+               }
+               ++it_Energy;
+               ++it_CryNum;
+            }   // End of event mixing (NonCo) work.
+         }
 		}
 	}
 
