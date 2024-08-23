@@ -22,10 +22,6 @@ TGRSIDataParser::TGRSIDataParser()
 {
 }
 
-TGRSIDataParser::~TGRSIDataParser()
-{
-}
-
 int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 {
 	std::shared_ptr<TMidasEvent> event = std::static_pointer_cast<TMidasEvent>(rawEvent);

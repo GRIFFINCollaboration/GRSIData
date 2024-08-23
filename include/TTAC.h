@@ -27,7 +27,7 @@
 class TTAC : public TDetector {
 public:
    TTAC();
-   ~TTAC() override;
+   ~TTAC() override = default;
    TTAC(const TTAC& rhs);
 
    TTACHit* GetTACHit(const int& i) const { return static_cast<TTACHit*>(GetHit(i)); }

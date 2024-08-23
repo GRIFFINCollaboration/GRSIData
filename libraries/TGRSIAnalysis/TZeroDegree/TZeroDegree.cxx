@@ -21,11 +21,6 @@ TZeroDegree::TZeroDegree()
    Clear();
 }
 
-TZeroDegree::~TZeroDegree()
-{
-   // Default Destructor
-}
-
 TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector(rhs)
 {
 // Copy Contructor

@@ -61,11 +61,6 @@ void TTrific::Copy(TObject& rhs) const
 	
 }
 
-TTrific::~TTrific()
-{
-	// Default Destructor
-}
-
 void TTrific::Print(Option_t*) const
 {
 	// Prints out TTrific members.

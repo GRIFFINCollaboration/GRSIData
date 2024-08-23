@@ -13,7 +13,7 @@ class TLaBrBgo : public TBgo {
 public:
    TLaBrBgo();
    TLaBrBgo(const TLaBrBgo&);
-   virtual ~TLaBrBgo();
+   virtual ~TLaBrBgo() = default;
 
    TLaBrBgoHit* GetLaBrBgoHit(const int& i) const { return static_cast<TLaBrBgoHit*>(GetHit(i)); }
 

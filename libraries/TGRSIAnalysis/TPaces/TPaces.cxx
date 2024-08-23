@@ -47,11 +47,6 @@ void TPaces::Copy(TObject& rhs) const
 	TDetector::Copy(rhs);
 }
 
-TPaces::~TPaces()
-{
-	// Default Destructor
-}
-
 void TPaces::Print(Option_t*) const
 {
 	/// Prints out TPaces members, currently shows only multiplicity.

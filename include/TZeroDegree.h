@@ -27,8 +27,8 @@
 class TZeroDegree : public TDetector {
 public:
    TZeroDegree();
-   ~TZeroDegree() override;
    TZeroDegree(const TZeroDegree& rhs);
+   ~TZeroDegree() override = default;
 
    TZeroDegreeHit* GetZeroDegreeHit(const int& i) const { return static_cast<TZeroDegreeHit*>(GetHit(i)); }
 

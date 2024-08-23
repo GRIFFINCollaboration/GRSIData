@@ -146,11 +146,6 @@ TTip::TTip()
 {
 }
 
-TTip::~TTip()
-{
-   // Default Destructor
-}
-
 TTip::TTip(const TTip& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

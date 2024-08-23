@@ -27,7 +27,7 @@
 class TSceptar : public TDetector {
 public:
    TSceptar();
-   ~TSceptar() override;
+   ~TSceptar() override = default;
    TSceptar(const TSceptar& rhs);
 
    TSceptarHit* GetSceptarHit(const int& i) const { return static_cast<TSceptarHit*>(GetHit(i)); }

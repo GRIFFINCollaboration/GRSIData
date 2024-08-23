@@ -83,11 +83,6 @@ TDescant::TDescant()
    Clear();
 }
 
-TDescant::~TDescant()
-{
-   /// Default Destructor
-}
-
 void TDescant::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);

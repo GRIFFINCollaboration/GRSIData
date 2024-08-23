@@ -15,7 +15,7 @@
 class TGRSIDataParserException : public std::exception {
 public:
    TGRSIDataParserException(TGRSIDataParser::EDataParserState state, int failedWord, bool multipleErrors);
-   ~TGRSIDataParserException() override;
+   ~TGRSIDataParserException() override = default;
 
    const char* what() const noexcept override;
 

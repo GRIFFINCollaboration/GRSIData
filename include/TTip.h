@@ -22,9 +22,9 @@
 class TTip : public TDetector {
 public:
 
-   ~TTip() override;
    TTip();
    TTip(const TTip& rhs);
+   ~TTip() override = default;
 
    static TVector3 GetPosition(int DetNbr); //!<!
    static TVector3 GetPosition(const TTipHit&);

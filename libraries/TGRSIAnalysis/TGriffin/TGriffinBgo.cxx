@@ -36,11 +36,6 @@ TGriffinBgo::TGriffinBgo(const TGriffinBgo& rhs) : TBgo(rhs)
    rhs.Copy(*this);
 }
 
-TGriffinBgo::~TGriffinBgo()
-{
-   // Default Destructor
-}
-
 TGriffinBgo& TGriffinBgo::operator=(const TGriffinBgo& rhs)
 {
    rhs.Copy(*this);

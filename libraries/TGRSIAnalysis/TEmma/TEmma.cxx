@@ -54,11 +54,6 @@ void TEmma::Copy(TObject& rhs) const
 	static_cast<TEmma&>(rhs).fEmmaTriggerHits   = fEmmaTriggerHits;
 }
 
-TEmma::~TEmma()
-{
-	// Default Destructor
-}
-
 void TEmma::Print(Option_t*) const
 {
 	/// Prints out TEmma members, currently only prints multiplicity.

@@ -44,7 +44,7 @@
 class TGRSIDataParser : public TDataParser {
 public:
    TGRSIDataParser();
-   ~TGRSIDataParser();
+   ~TGRSIDataParser() override = default;
 
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);
    enum class EBank { kWFDN = 0, kGRF1 = 1, kGRF2 = 2, kGRF3 = 3, kGRF4 = 4, kFME0 = 5, kFME1 = 6, kFME2 = 7, kFME3 = 8, kMADC = 9, kEMMT = 10};

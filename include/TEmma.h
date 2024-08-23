@@ -20,7 +20,7 @@ class TEmma : public TDetector {
 public:
    TEmma();
    TEmma(const TEmma&);
-   ~TEmma() override;
+   ~TEmma() override = default;
 
    TEmmaHit* GetEmmaHit(const int& i) const { return static_cast<TEmmaHit*>(GetHit(i)); }
    TEmmaHit* GetICHit(const int& i);

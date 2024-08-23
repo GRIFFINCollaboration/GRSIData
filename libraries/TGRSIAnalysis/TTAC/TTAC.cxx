@@ -16,11 +16,6 @@ TTAC::TTAC()
 	Clear();
 }
 
-TTAC::~TTAC()
-{
-	// Default Destructor
-}
-
 TTAC::TTAC(const TTAC& rhs) : TDetector(rhs)
 {
 	// Copy Contructor

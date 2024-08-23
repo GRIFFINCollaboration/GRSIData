@@ -12,7 +12,7 @@ class TGriffinBgo : public TBgo {
 public:
    TGriffinBgo();
    TGriffinBgo(const TGriffinBgo&);
-   virtual ~TGriffinBgo();
+   virtual ~TGriffinBgo() = default;
 
    TGriffinBgo& operator=(const TGriffinBgo&); //!<!
 

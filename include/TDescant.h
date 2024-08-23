@@ -28,7 +28,7 @@ class TDescant : public TDetector {
 public:
    TDescant();
    TDescant(const TDescant&);
-   ~TDescant() override;
+   ~TDescant() override = default;
 
    TDescantHit* GetDescantHit(const Int_t& i = 0) const { return static_cast<TDescantHit*>(GetHit(i)); }
 

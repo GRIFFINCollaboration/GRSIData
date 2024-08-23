@@ -36,11 +36,6 @@ TLaBrBgo::TLaBrBgo(const TLaBrBgo& rhs) : TBgo(rhs)
    rhs.Copy(*this);
 }
 
-TLaBrBgo::~TLaBrBgo()
-{
-   // Default Destructor
-}
-
 TLaBrBgo& TLaBrBgo::operator=(const TLaBrBgo& rhs)
 {
    rhs.Copy(*this);

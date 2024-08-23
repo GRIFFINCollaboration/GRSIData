@@ -41,7 +41,7 @@ public:
 
 	TTrific();
 	TTrific(const TTrific&);
-	~TTrific() override;
+	~TTrific() override = default;
 
 
 	TTrificHit* GetTrificHit(const int& i) const {return static_cast<TTrificHit*>(GetHit(i));}

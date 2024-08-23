@@ -44,11 +44,6 @@ TSceptar::TSceptar()
 	Clear();
 }
 
-TSceptar::~TSceptar()
-{
-	// Default Destructor
-}
-
 TSceptar::TSceptar(const TSceptar& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
