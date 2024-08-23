@@ -506,24 +506,24 @@ int main(int argc, char** argv)
 					// first check which of the vectors we iterate over
 					if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
 						for(auto twoJ : twoJLow) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
 						for(auto twoJ : twoJMiddle) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
 						for(auto twoJ : twoJHigh) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else {
-						parameters.push_back(std::vector<double>());
+						parameters.emplace_back();
 						spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
 						spinLabel.push_back(twoJHigh.at(0)/2.);
 					}
