@@ -19,7 +19,7 @@ class TPaces : public TDetector {
 public:
    TPaces();
    TPaces(const TPaces&);
-   ~TPaces() override = override;
+   ~TPaces() override = default;
 
    TPacesHit* GetPacesHit(const int& i) const { return static_cast<TPacesHit*>(GetHit(i)); }
 

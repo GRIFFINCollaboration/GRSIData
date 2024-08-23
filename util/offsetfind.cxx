@@ -20,7 +20,7 @@
 
 class TEventTime {
 public:
-   explicit TEventTime(std::shared_ptr<TMidasEvent> event)
+   explicit TEventTime(const std::shared_ptr<TMidasEvent>& event)
    {
       event->SetBankList();
 

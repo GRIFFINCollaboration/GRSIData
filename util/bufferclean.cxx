@@ -104,12 +104,7 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    }
 }
 
-/*void AddToQueue(std::shared_ptr<TMidasEvent> evt){
-   evtQ.push(evt);
-}
-*/
-
-void Write(std::shared_ptr<TMidasEvent> evt, TMidasFile* outfile)
+void Write(const std::shared_ptr<TMidasEvent>& evt, TMidasFile* outfile)
 {
    outfile->FillBuffer(evt);
 }
@@ -166,7 +161,6 @@ int main(int argc, char** argv)
       switch(event->GetEventId()) {
       case 0x8000:
          printf("start of run\n");
-         // file->Write(event,"q");
          Write(event, file);
          printf(DGREEN);
          event->Print();
@@ -177,13 +171,11 @@ int main(int argc, char** argv)
          printf(DRED);
          event->Print();
          printf(RESET_COLOR);
-         //  file->Write(event,"q");
          Write(event, file);
          break;
       case 0x0001: // This is a GRIFFIN digitizer event
          if(CheckEvent(event)) {
             Write(event, file);
-            // file->Write(event,"q");
          } else {
             num_bad_evt++;
          }
@@ -191,7 +183,6 @@ int main(int argc, char** argv)
          break;
       default: // Probably epics
          Write(event, file);
-         //  file->Write(event,"q");
          break;
       };
 
