@@ -400,7 +400,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
          continue;
       }
 
-      int64_t time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
+      auto time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
 
       if(event1count > range) {
          hit2 = hit1 - range;
@@ -426,7 +426,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
                dynamic_cast<TH1D*>(roughlist->At((*hit2)->DigIndex())); // This is where that pointer comes in handy
             int64_t time2 = static_cast<int64_t>((*hit2)->GetTimeStamp()) -
                             TEventTime::correctionmap.find((*hit2)->Digitizer())->second;
-            Int_t bin = static_cast<Int_t>(time2 - time1);
+            auto bin = static_cast<Int_t>(time2 - time1);
 
 				if((fillhist->FindBin(bin) > 0) && (fillhist->FindBin(bin) < fillhist->GetNbinsX())) {
 					fillhist->Fill(bin);
@@ -509,7 +509,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 			continue;
 		}
 
-		int64_t time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
+		auto time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
 
 		if(event1count > range) {
 			hit2 = hit1 - range;
@@ -534,7 +534,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 					TEventTime::correctionmap.find((*hit2)->Digitizer())->second;
 				if((time2 - time1 < 2147483647) &&
 						(time2 - time1 > -2147483647)) { // Make sure we are casting this to 32 bit properly
-					Int_t bin = static_cast<Int_t>(time2 - time1);
+					auto bin = static_cast<Int_t>(time2 - time1);
 					fillhist->Fill(bin);
 				}
 			}

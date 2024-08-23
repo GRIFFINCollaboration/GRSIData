@@ -195,7 +195,7 @@ void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>
 
 TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragment, TGRSIMnemonic>& v)
 {
-   TCSMHit* csmHit = new TCSMHit;
+   auto* csmHit = new TCSMHit;
 
    if(h.second.ArrayPosition() != v.second.ArrayPosition()) {
       std::cerr<<"\tSomething is wrong, Horizontal and Vertical detector numbers don't match."<<std::endl;
@@ -240,7 +240,7 @@ TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragme
 TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
                       std::vector<std::pair<TFragment, TGRSIMnemonic>>& vvV)
 {
-   TCSMHit* csmHit = new TCSMHit;
+   auto* csmHit = new TCSMHit;
 
    if(hhV.empty() || vvV.empty()) {
       std::cerr<<"\tSomething is wrong, empty vector in MakeHit"<<std::endl;
@@ -523,7 +523,7 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
       return;
    }
 
-   TCSMHit* csmHit = new TCSMHit;
+   auto* csmHit = new TCSMHit;
 
    int  detno = hit.second.ArrayPosition();
    char pos   = hit.second.ArraySubPositionString()[0];
@@ -625,7 +625,7 @@ TCSMHit* TCSM::CombineHits(TDetectorHit* d_hit, TDetectorHit* e_hit)
 
 bool TCSM::AlmostEqual(int val1, int val2)
 {
-   double diff = double(std::abs(val1 - val2));
+   auto   diff = double(std::abs(val1 - val2));
    double ave  = (val1 + val2) / 2.;
    double frac = diff / ave;
    return frac < fAlmostEqualWindow;

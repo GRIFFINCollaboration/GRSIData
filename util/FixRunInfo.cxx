@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 			std::cout<<"new run info:"<<std::endl;
 			runInfo->Print();
 			TFile f(argv[i]);
-			TRunInfo* fileRunInfo = static_cast<TRunInfo*>(f.Get("RunInfo"));
+			auto* fileRunInfo = static_cast<TRunInfo*>(f.Get("RunInfo"));
 			if(fileRunInfo == nullptr) {
 				std::cout<<"no run info found in "<<line<<std::endl;
 			} else {

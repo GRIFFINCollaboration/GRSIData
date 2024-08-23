@@ -75,7 +75,7 @@ void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
       return;
    }
 
-   TSiLiHit* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
+   auto* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
    AddHit(hit);
 }
 

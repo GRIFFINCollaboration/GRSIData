@@ -494,13 +494,13 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 	switch(mnemonic->OutputSensor()) {
 		case TMnemonic::EMnemonic::kA:
 			{
-				TGriffinHit* hit = new TGriffinHit(*frag);
+				auto* hit = new TGriffinHit(*frag);
 				GetHitVector(EGainBits::kLowGain).push_back(hit);
 			}
 			break;
 		case TMnemonic::EMnemonic::kB:
 			{
-				TGriffinHit* hit = new TGriffinHit(*frag);
+				auto* hit = new TGriffinHit(*frag);
 				GetHitVector(EGainBits::kHighGain).push_back(hit);
 			}
 			break;

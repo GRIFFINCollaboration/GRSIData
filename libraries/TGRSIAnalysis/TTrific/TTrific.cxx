@@ -90,8 +90,7 @@ TTrific& TTrific::operator=(const TTrific& rhs)
 
 void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-	//TDetectorHit* hit = new TDetectorHit(*frag);
-	TTrificHit* hit = new TTrificHit(*frag);
+	auto* hit = new TTrificHit(*frag);
 	
 	//separate the fragments depending on if they are x, y, or single readout grids.
 	//this is based on the ArraySubPosition value of the hit. 

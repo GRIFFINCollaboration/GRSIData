@@ -136,7 +136,7 @@ void TDescant::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
       return;
    }
 
-   TDescantHit* hit = new TDescantHit(*frag);
+   auto* hit = new TDescantHit(*frag);
    AddHit(hit);
 }
 

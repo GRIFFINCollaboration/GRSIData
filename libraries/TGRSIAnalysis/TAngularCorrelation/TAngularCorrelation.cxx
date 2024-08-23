@@ -155,19 +155,19 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    const Char_t* name     = nullptr;
    const Char_t* title    = nullptr;
    if(sparse) {
-      THnSparse* firsthst = static_cast<THnSparse*>(hstarray->At(0));
-      bins                = firsthst->GetAxis(0)->GetNbins();
-      xmin                = firsthst->GetAxis(0)->GetBinLowEdge(1);
-      xmax                = firsthst->GetAxis(0)->GetBinUpEdge(bins);
-      name                = firsthst->GetName();
-      title               = firsthst->GetTitle();
+      auto* firsthst = static_cast<THnSparse*>(hstarray->At(0));
+      bins           = firsthst->GetAxis(0)->GetNbins();
+      xmin           = firsthst->GetAxis(0)->GetBinLowEdge(1);
+      xmax           = firsthst->GetAxis(0)->GetBinUpEdge(bins);
+      name           = firsthst->GetName();
+      title          = firsthst->GetTitle();
    } else if(hst2d) {
-      TH2* firsthst = static_cast<TH2*>(hstarray->At(0));
-      bins          = firsthst->GetXaxis()->GetNbins();
-      xmin          = firsthst->GetXaxis()->GetBinLowEdge(1);
-      xmax          = firsthst->GetXaxis()->GetBinUpEdge(bins);
-      name          = firsthst->GetName();
-      title         = firsthst->GetTitle();
+      auto* firsthst = static_cast<TH2*>(hstarray->At(0));
+      bins           = firsthst->GetXaxis()->GetNbins();
+      xmin           = firsthst->GetXaxis()->GetBinLowEdge(1);
+      xmax           = firsthst->GetXaxis()->GetBinUpEdge(bins);
+      name           = firsthst->GetName();
+      title          = firsthst->GetTitle();
    }
    Int_t ybins = elements;
 
@@ -194,14 +194,12 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
       TH1D* tempslice = nullptr;
       // sparse option
       if(sparse) {
-         THnSparse* thishst = static_cast<THnSparse*>(hstarray->At(i));
+         auto* thishst = static_cast<THnSparse*>(hstarray->At(i));
          thishst->GetAxis(0)->SetRangeUser(min, max);
          tempslice = thishst->Projection(
             1, "oe"); // the "e" option pushes appropriate errors, the "o" makes the projection correct
-      }
-      // TH2 option
-      else if(hst2d) {
-         TH2* thishst = static_cast<TH2*>(hstarray->At(i)); // itterating through all the indexes
+      } else if(hst2d) {
+         auto* thishst = static_cast<TH2*>(hstarray->At(i)); // itterating through all the indexes
          thishst->GetXaxis()->SetRangeUser(min, max);
          tempslice = thishst->ProjectionY(); // projecting result of gate into temporary slice
       }
@@ -1630,7 +1628,7 @@ void TAngularCorrelation::UpdateIndexCorrelation()
       Int_t bin   = (GetIndexCorrelation())->FindBin(index);
 
       // extract area
-      TPeak* peak = static_cast<TPeak*>(GetPeak(index));
+      auto* peak = static_cast<TPeak*>(GetPeak(index));
       if(peak == nullptr) {
          return;
       }
@@ -1683,12 +1681,12 @@ void TAngularCorrelation::UpdateDiagnostics()
       Int_t bin   = (GetIndexCorrelation())->FindBin(index);
 
       // extract pertinent values from TPeaks
-      TPeak* peak = static_cast<TPeak*>(GetPeak(index));
+      auto* peak = static_cast<TPeak*>(GetPeak(index));
       if(peak == nullptr) {
          return;
       }
       Double_t chi2         = peak->GetChisquare();
-      Double_t NDF          = static_cast<Double_t>(peak->GetNDF());
+      auto     NDF          = static_cast<Double_t>(peak->GetNDF());
       Double_t centroid     = peak->GetCentroid();
       Double_t centroid_err = peak->GetCentroidErr();
       Double_t fwhm         = peak->GetFWHM();
@@ -1732,7 +1730,7 @@ void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this
    // fit peak
    // peak->SetName(name);
    peak->Fit(Get1DSlice(index), "");
-   TPeak* hstpeak = static_cast<TPeak*>(temphst->GetListOfFunctions()->Last());
+   auto* hstpeak = static_cast<TPeak*>(temphst->GetListOfFunctions()->Last());
 
    // push new peak
    SetPeak(index, hstpeak);

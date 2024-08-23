@@ -95,14 +95,14 @@ int main(int argc, char **argv)
 		std::cout<<"Analyzing file: "<<DBLUE<<file->GetName()<<RESET_COLOR<<std::endl;
 
 		//Opening AnalysisTree and getting run info.   
-		TTree* tree = static_cast<TTree*>(file->Get("AnalysisTree"));
+		auto* tree = static_cast<TTree*>(file->Get("AnalysisTree"));
 		if(tree == nullptr) {
 			printf("Failed to find analysis tree in file '%s'!\n", argv[f+1]);
 			return 1;
 		}
 		TChannel::ReadCalFromTree(tree);
 
-		TRunInfo* runInfo = static_cast<TRunInfo*>(file->Get("RunInfo"));
+		auto* runInfo = static_cast<TRunInfo*>(file->Get("RunInfo"));
 		std::string inputname = argv[f+1];
 		std::string outputname;
 		if(runInfo == nullptr || !runInfo) {
@@ -201,32 +201,32 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 	//--------------------- Setting up output histograms -----------------------------//
 	////////////////////////////////////////////////////////////////////////////////////
 
-	TList* list = new TList;  //Output list
+	auto* list = new TList;  //Output list
 
-	TH2D* XiHist2DGeo_DetDet = new TH2D("XiHist2D_DetDetCoincidenceTheta_Geo", "Possible #xi Angles in GRIFFIN Array for Coincidence Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DGeo_DetDet);
-	TH2D* XiHist2DGeo_CryCry = new TH2D("XiHist2D_CryCryCoincidenceTheta_Geo", "Possible #xi Angles in GRIFFIN Array for Coincidence Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DGeo_CryCry);
+	auto* XiHist2DGeo_DetDet = new TH2D("XiHist2D_DetDetCoincidenceTheta_Geo", "Possible #xi Angles in GRIFFIN Array for Coincidence Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DGeo_DetDet);
+	auto* XiHist2DGeo_CryCry = new TH2D("XiHist2D_CryCryCoincidenceTheta_Geo", "Possible #xi Angles in GRIFFIN Array for Coincidence Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DGeo_CryCry);
 
-	TH2D* XiHist2D_DetDet    = new TH2D("XiHist2D_DetDetCoincidenceTheta", "Measured #xi Angles for Coincidence Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2D_DetDet);
-	TH2D* XiHist2D_CryCry    = new TH2D("XiHist2D_CryCryCoincidenceTheta", "Measured #xi Angles for Coincidence Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2D_CryCry);
+	auto* XiHist2D_DetDet    = new TH2D("XiHist2D_DetDetCoincidenceTheta", "Measured #xi Angles for Coincidence Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2D_DetDet);
+	auto* XiHist2D_CryCry    = new TH2D("XiHist2D_CryCryCoincidenceTheta", "Measured #xi Angles for Coincidence Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2D_CryCry);
 
-	TH2D* XiHist2DNonCo_DetDet = new TH2D("XiHist2D_DetDetCoincidenceTheta_NonCo", "Measured #xi Angles for Non-Coincidenct #gamma_{1} and #gamma_{2} at Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DNonCo_DetDet);
-	TH2D* XiHist2DNonCo_CryCry = new TH2D("XiHist2D_CryCryCoincidenceTheta_NonCo", "Measured #xi Angles for Non-Coincidenct #gamma_{1} and #gamma_{2} at Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DNonCo_CryCry);
+	auto* XiHist2DNonCo_DetDet = new TH2D("XiHist2D_DetDetCoincidenceTheta_NonCo", "Measured #xi Angles for Non-Coincidenct #gamma_{1} and #gamma_{2} at Angle #theta (Measured from Clover Faces)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DNonCo_DetDet);
+	auto* XiHist2DNonCo_CryCry = new TH2D("XiHist2D_CryCryCoincidenceTheta_NonCo", "Measured #xi Angles for Non-Coincidenct #gamma_{1} and #gamma_{2} at Angle #theta (Measured from Crystal Positions)", XiBins, 0.0, 180.000001, ThetaBins, 0.0, 180.000001); list->Add(XiHist2DNonCo_CryCry);
 
-	TH1D* gammaSinglesAll    = new TH1D("gammaSingles", "#gamma singles (All Events);Energy [keV]", nofBins, low, high); list->Add(gammaSinglesAll);
-	TH2D* gammagammaAll      = new TH2D("gammagamma", "#gamma - #gamma (All Events);Energy [keV];Energy [keV]", nofBins, low, high, nofBins, low, high); list->Add(gammagammaAll);
-	TH2D* gammaCrystalAll    = new TH2D("gammaCrystal", "#gamma Crystal (All Events);Energy [keV];Crystal Number", nofBins, low, high, 64, 0, 64); list->Add(gammaCrystalAll);
-	TH2D* XiCrystalGeo       = new TH2D("XiCrystalGeo", "Possible #xi Crystal (All Events);#xi;Crystal Number", XiBins, 0.0, 180.000001, 64, 0, 64); list->Add(XiCrystalGeo);
-	TH2D* thetaCrystalGeo    = new TH2D("thetaCrystalGeo", "Possible #theta Crystal (All Events);#theta;Crystal Number", ThetaBins, 0.0, 180.000001, 64, 0, 64); list->Add(thetaCrystalGeo);
-	TH2D* XiCrystalAll       = new TH2D("XiCrystal", "#xi Crystal (All Events);#xi;Crystal Number", XiBins, 0.0, 180.000001, 64, 0, 64); list->Add(XiCrystalAll);
-	TH2D* thetaCrystalAll    = new TH2D("thetaCrystal", "#theta Crystal (All Events);#theta;Crystal Number", ThetaBins, 0.0, 180.000001, 64, 0, 64); list->Add(thetaCrystalAll);
-	TH2D* gammaXi_g1         = new TH2D("gammaXi_g1", "#xi - #gamma (Only #gamma_{1} from Triple Coincidence);#xi;Energy [keV]", XiBins, 0.0, 180.000001, nofBins, low, high ); list->Add(gammaXi_g1);
-	TH2D* gammaXi_g2         = new TH2D("gammaXi_g2", "#xi - #gamma (Only #gamma_{2} from Triple Coincidence);#xi;Energy [keV]", XiBins, 0.0, 180.000001, nofBins, low, high ); list->Add(gammaXi_g2);
-	TH1D* gammaSingles_g1    = new TH1D("gammaSingles_g1", "#gamma singles (Only #gamma_{1} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g1);
-	TH1D* gammaSingles_g2    = new TH1D("gammaSingles_g2", "#gamma singles (Only #gamma_{2} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g2);
-	TH1D* gammaSingles_g3    = new TH1D("gammaSingles_g3", "#gamma singles (Only #gamma_{3} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g3);
-	TH1D* ggTimeDiff_g1g2    = new TH1D("ggTimeDiff_g1g2", "#gamma_{1}-#gamma_{2} time difference", 300, 0, 300); list->Add(ggTimeDiff_g1g2);
-	TH1D* ggTimeDiff_g1g3    = new TH1D("ggTimeDiff_g1g3", "#gamma_{1}-#gamma_{3} time difference", 300, 0, 300); list->Add(ggTimeDiff_g1g3);
-	TH1D* ggTimeDiff_g2g3    = new TH1D("ggTimeDiff_g2g3", "#gamma_{2}-#gamma_{3} time difference", 300, 0, 300); list->Add(ggTimeDiff_g2g3);
+	auto* gammaSinglesAll    = new TH1D("gammaSingles", "#gamma singles (All Events);Energy [keV]", nofBins, low, high); list->Add(gammaSinglesAll);
+	auto* gammagammaAll      = new TH2D("gammagamma", "#gamma - #gamma (All Events);Energy [keV];Energy [keV]", nofBins, low, high, nofBins, low, high); list->Add(gammagammaAll);
+	auto* gammaCrystalAll    = new TH2D("gammaCrystal", "#gamma Crystal (All Events);Energy [keV];Crystal Number", nofBins, low, high, 64, 0, 64); list->Add(gammaCrystalAll);
+	auto* XiCrystalGeo       = new TH2D("XiCrystalGeo", "Possible #xi Crystal (All Events);#xi;Crystal Number", XiBins, 0.0, 180.000001, 64, 0, 64); list->Add(XiCrystalGeo);
+	auto* thetaCrystalGeo    = new TH2D("thetaCrystalGeo", "Possible #theta Crystal (All Events);#theta;Crystal Number", ThetaBins, 0.0, 180.000001, 64, 0, 64); list->Add(thetaCrystalGeo);
+	auto* XiCrystalAll       = new TH2D("XiCrystal", "#xi Crystal (All Events);#xi;Crystal Number", XiBins, 0.0, 180.000001, 64, 0, 64); list->Add(XiCrystalAll);
+	auto* thetaCrystalAll    = new TH2D("thetaCrystal", "#theta Crystal (All Events);#theta;Crystal Number", ThetaBins, 0.0, 180.000001, 64, 0, 64); list->Add(thetaCrystalAll);
+	auto* gammaXi_g1         = new TH2D("gammaXi_g1", "#xi - #gamma (Only #gamma_{1} from Triple Coincidence);#xi;Energy [keV]", XiBins, 0.0, 180.000001, nofBins, low, high ); list->Add(gammaXi_g1);
+	auto* gammaXi_g2         = new TH2D("gammaXi_g2", "#xi - #gamma (Only #gamma_{2} from Triple Coincidence);#xi;Energy [keV]", XiBins, 0.0, 180.000001, nofBins, low, high ); list->Add(gammaXi_g2);
+	auto* gammaSingles_g1    = new TH1D("gammaSingles_g1", "#gamma singles (Only #gamma_{1} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g1);
+	auto* gammaSingles_g2    = new TH1D("gammaSingles_g2", "#gamma singles (Only #gamma_{2} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g2);
+	auto* gammaSingles_g3    = new TH1D("gammaSingles_g3", "#gamma singles (Only #gamma_{3} from Triple Coincidence);Energy [keV]", nofBins, low, high); list->Add(gammaSingles_g3);
+	auto* ggTimeDiff_g1g2    = new TH1D("ggTimeDiff_g1g2", "#gamma_{1}-#gamma_{2} time difference", 300, 0, 300); list->Add(ggTimeDiff_g1g2);
+	auto* ggTimeDiff_g1g3    = new TH1D("ggTimeDiff_g1g3", "#gamma_{1}-#gamma_{3} time difference", 300, 0, 300); list->Add(ggTimeDiff_g1g3);
+	auto* ggTimeDiff_g2g3    = new TH1D("ggTimeDiff_g2g3", "#gamma_{2}-#gamma_{3} time difference", 300, 0, 300); list->Add(ggTimeDiff_g2g3);
 
 	////////////////////////////////////////////////////////////////////////////////////
 	//------------------------------- Entry Setup ------------------------------------//
@@ -409,8 +409,8 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 				//Unpolarized Work - Third gamma chosen from uncorrelated (in time) events.  This is used
 				//for event mixing weighting of triplets.
 
-            std::list<double>::iterator it_Energy = NonCo_Energies.begin();
-            std::list<int>::iterator    it_CryNum = NonCo_CryNums.begin();
+            auto it_Energy = NonCo_Energies.begin();
+            auto it_CryNum = NonCo_CryNums.begin();
             for(int NonCo_Entry : NonCo_Entries) {
                if(NonCo_Entry <= entry - 2) {   // if the second entry is more than two behind... (this gives a sufficient time window to ensure no time correlation)
                   double Energy3    = *it_Energy;

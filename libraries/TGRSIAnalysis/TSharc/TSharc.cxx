@@ -130,7 +130,7 @@ void TSharc::BuildHits()
 			}
 		}
 		if(front_used && back_used) {
-			TSharcHit* hit = new TSharcHit;
+			auto* hit = new TSharcHit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
 			AddHit(hit);

@@ -236,7 +236,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 	if((chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kG) &&
 			(chan->GetSegmentNumber() == 0 || chan->GetSegmentNumber() == 9)) { // it is a core
 
-		TTigressHit* corehit = new TTigressHit;
+		auto* corehit = new TTigressHit;
 		// loop over existing hits to see if this core was already created by a previously found segment
 		// of course this means if we have a core in "coincidence" with itself we will overwrite the first hit
 		for(Short_t i = 0; i < GetMultiplicity(); ++i) {
@@ -284,7 +284,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 				return;
 			}
 		}
-		TTigressHit* corehit = new TTigressHit;
+		auto* corehit = new TTigressHit;
 		corehit->SetAddress((frag->GetAddress())); // fake it till you make it
 		if(TestGlobalBit(ETigressGlobalBits::kSetSegWave)) {
 			frag->CopyWave(temp);

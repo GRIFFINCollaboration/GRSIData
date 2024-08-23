@@ -223,7 +223,7 @@ bool TMidasFile::Open(const char* filename)
 	TRunInfo::ClearLibraryVersion();
 	TRunInfo::SetLibraryVersion(GRSIDATA_RELEASE);
 
-	TGRSIDetectorInformation* detInfo = new TGRSIDetectorInformation();
+	auto* detInfo = new TGRSIDetectorInformation();
 	TRunInfo::SetDetectorInformation(detInfo);
 
    return true;

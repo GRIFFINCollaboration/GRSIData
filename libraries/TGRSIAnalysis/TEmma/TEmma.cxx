@@ -216,7 +216,7 @@ void TEmma::BuildHits()
 	std::vector <double> tdcArray;
 	std::vector <double> icArray;
 	if(fEmmaTdcHits.size() > 4 ) {   // Require a Good hit to contain only the PGAC TDC signals
-		TEmmaHit * hit = new TEmmaHit();
+		auto * hit = new TEmmaHit();
 		for(auto& emmaTdcHit : fEmmaTdcHits) {
 			hit->SetTimeStamp(emmaTdcHit.GetTimeStamp());
 			hit->SetAddress(emmaTdcHit.GetAddress());

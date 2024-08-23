@@ -214,7 +214,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
 
    // make spectra
    auto*  rf    = new TFile(filename, "read");
-   TTree* maple = dynamic_cast<TTree*>(rf->Get("ScalerTree")); // Scaler data
+   auto* maple = static_cast<TTree*>(rf->Get("ScalerTree")); // Scaler data
 
    int    nofBins = *trun / ncycle;
    double xaxis   = 0;

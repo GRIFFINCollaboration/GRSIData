@@ -67,7 +67,7 @@ double GetCentroidMaxBin(TH1* hst, double xmin, double xmax)
 double GetCentroidTSpectrum(TH1* hst, double xmin, double xmax)
 {
 	hst->GetXaxis()->SetRangeUser(xmin,xmax);
-	TSpectrum* spec = new TSpectrum(1);
+	auto* spec = new TSpectrum(1);
 	spec->Search(hst);
 	double centroid = spec->GetPositionX()[0];
 	hst->GetXaxis()->UnZoom();
@@ -106,7 +106,7 @@ double GetCentroid(EType type, TH1* hst, double xmin, double xmax)
 
 double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=kFALSE, double largepeak2 = 0.0)
 {
-	TSpectrum* spec2 = new TSpectrum(2);
+	auto* spec2 = new TSpectrum(2);
 
 	// search for big keV peak (or peaks)
 	spec2->Search(h);
@@ -145,7 +145,7 @@ double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=
 void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, int bins = 40e3, int xmin = 0, int xmax = 4000)
 {
 	// create histograms
-	TFile* f = new TFile(fragFileName);
+	auto* f = new TFile(fragFileName);
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",fragFileName);
 		return;
@@ -157,7 +157,7 @@ void make_calibration_histograms(const char* fragFileName, const char* histFileN
 	auto* FragmentTree = static_cast<TTree*>(f->Get("FragmentTree"));
 	TChannel::ReadCalFromTree(FragmentTree);
 	TList* hstlist = MakeGRIFFINChargeHsts(FragmentTree,minchannel,maxchannel,channelstoskip,bins,xmin,xmax);
-	TFile* outfile = new TFile(histFileName,"recreate");
+	auto* outfile = new TFile(histFileName,"recreate");
 	hstlist->Write();
 	outfile->Close();
 	f->Close();
@@ -172,7 +172,7 @@ void make_calibration_histograms(const char* fragFileName, const char* histFileN
 TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int bins, double xmin, double xmax)
 {
 	// initialization stuff
-	TList* list = new TList;
+	auto* list = new TList;
 	TFragment *currentFrag = 0;
 	TChannel::ReadCalFromTree(tree);
 	TBranch *branch = tree->GetBranch("TFragment");
@@ -251,7 +251,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 
 	/*---------------------------------------------------------------*/
 
-	TFile* f = new TFile(histFileName,"update");
+	auto* f = new TFile(histFileName,"update");
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",histFileName);
 		return;
@@ -262,7 +262,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 	}
 
 	// fit histograms, create graphs, save slopes and offsets
-	TGraph** g = new TGraph*[maxchannel+1];
+	auto** g = new TGraph*[maxchannel+1];
 
 	// create and save the graphs
 	for(int i=minchannel;i<=maxchannel;i++) {
@@ -337,7 +337,7 @@ TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<do
 		return 0;
 	}
 
-	TGraph* graph = new TGraph();
+	auto* graph = new TGraph();
 
 	std::cout <<"Peaks for " <<hst->GetName() <<std::endl;
 	for(size_t i=0;i<n;i++)	{
@@ -355,7 +355,7 @@ TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<do
 // i imagine a lot of this function could be rewritten with the TGainMatch class
 void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, const char* paramImgName = "GRIFFIN_fitting_params.png", const char* graphImgName="GRIFFIN_calgraph.png", int order = 1)
 {
-	TFile* f = new TFile(ROOTFileName);
+	auto* f = new TFile(ROOTFileName);
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",ROOTFileName);
 		return;
@@ -365,7 +365,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 		return;
 	}
 
-	TGraph** g = new TGraph*[maxchannel+1];
+	auto** g = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) { // channel number
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
@@ -386,10 +386,10 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::vector<double> offsets(maxchannel+1);
 	std::vector<double> chi2(maxchannel+1);
 	for(int i=0;i<=maxchannel;i++) chi2[i] = 0; // initialize array
-	TGraphErrors* slopeg = new TGraphErrors();
-	TGraphErrors* offsetg = new TGraphErrors();
-	TGraphErrors* chi2g = new TGraphErrors();
-	TMultiGraph* allgraphs = new TMultiGraph();
+	auto* slopeg = new TGraphErrors();
+	auto* offsetg = new TGraphErrors();
+	auto* chi2g = new TGraphErrors();
+	auto* allgraphs = new TMultiGraph();
 	std::vector<std::vector<double> > parameters(maxchannel+1, std::vector<double>(order+1));
 
 	// fit graphs 
@@ -431,7 +431,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	}
 
 	// draw graphs
-	TCanvas* c1 = new TCanvas("c1","c1",800,600);
+	auto* c1 = new TCanvas("c1","c1",800,600);
 	allgraphs->Draw("ap");
 	allgraphs->SetTitle("GRIFFIN calibration curves;ADC channel;Energy (keV)");
 	allgraphs->GetXaxis()->CenterTitle(kTRUE);
@@ -469,7 +469,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 
 	// display slopes and offsets and chi2 values
 	TGaxis::SetMaxDigits(3);
-	TCanvas *c3 = new TCanvas("c3","c3",1200,400);
+	auto *c3 = new TCanvas("c3","c3",1200,400);
 	c3->Divide(3,1);
 	c3->cd(1);
 	slopeg->Draw("pe1a");
@@ -520,7 +520,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 
 void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int xbins = 40e3, double xmin = 0, double xmax = 4000)
 {
-	TFile* fdata = new TFile(fragFile);
+	auto* fdata = new TFile(fragFile);
 	if(fdata == nullptr) {
 		printf("Failed to open file '%s'!\n",fragFile);
 		return;
@@ -533,7 +533,7 @@ void recalibrate_spectra(const char* fragFile, const char* newFile, const char* 
 	auto* FragmentTree = static_cast<TTree*>(fdata->Get("FragmentTree"));
 	TChannel::ReadCalFile(calFile);
 	TList *list = MakeGRIFFINEnergyHsts(FragmentTree,minchannel,maxchannel,channelsToSkip,xbins,xmin,xmax,"GRIFFINcal.cal");
-	TFile* f = new TFile(newFile,"recreate");
+	auto* f = new TFile(newFile,"recreate");
 	list->Write();
 	f->Close();
 	fdata->Close();
@@ -548,7 +548,7 @@ void recalibrate_spectra(const char* fragFile, const char* newFile, const char* 
 TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int bins, double xmin, double xmax, const char* calfile)
 {
 	// initialization stuff
-	TList* list = new TList;
+	auto* list = new TList;
 	TFragment *currentFrag = 0;
 	TChannel::ReadCalFile(calfile);
 	TBranch *branch = tree->GetBranch("TFragment");
@@ -611,7 +611,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, int bi
 
 void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, std::vector<double> peaks, EType type = EType::kTSpectrum, double width = 10, bool UseMyList = kFALSE, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png", const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
 {
-	TFile* f = new TFile(testFileName,"update");
+	auto* f = new TFile(testFileName,"update");
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",testFileName);
 		return;
@@ -639,7 +639,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 
 	if(!UseMyList) { // generate vector of peaks
 		peaks.clear();
-		TSpectrum* spec = new TSpectrum();
+		auto* spec = new TSpectrum();
 		int n = spec->Search(temphst);
 		for(int i=0;i<n;i++) {
 			peaks.push_back(spec->GetPositionX()[i]);
@@ -648,7 +648,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}
 
 	gStyle->SetOptStat(0);
-	THStack* stack = new THStack("stack","All histograms");
+	auto* stack = new THStack("stack","All histograms");
 
 	// create hstall
 	for(int i=minchannel;i<=maxchannel;i++) {
@@ -678,7 +678,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}	
 
 	// formatting, FWHM, residuals, etc.
-	TGraph** residuals = new TGraph*[maxchannel+1];
+	auto** residuals = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
@@ -729,13 +729,13 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	fwratio_all->Write();
 
 	// draw fwhm results
-	TCanvas* c_fwhm = new TCanvas("c_fwhm","FWHM comparison, crystals and summed spectrum", 600,400);
+	auto* c_fwhm = new TCanvas("c_fwhm","FWHM comparison, crystals and summed spectrum", 600,400);
 	fwhm->SetTitle("FWHM values of individual crystals and summed spectrum;Energy (keV);FWHM (keV)");
 	fwhm->SetMarkerStyle(4);
 	fwhm->Draw("candle");
 	fwhm_all->SetMarkerStyle(30);
 	fwhm_all->Draw("same");
-	TLegend* legend = new TLegend(0.6,0.6,0.88,0.85);
+	auto* legend = new TLegend(0.6,0.6,0.88,0.85);
 	legend->SetFillColor(kWhite);
 	legend->AddEntry(fwhm,"Single crystal mean","p");
 	legend->AddEntry(fwhm_all,"Summed","p");
@@ -743,7 +743,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	c_fwhm->SaveAs(fwhmImgName);
 
 	// draw fwhm results
-	TCanvas* c_fwratio = new TCanvas("c_fwratio","FWTM:FWHM, crystals and summed spectrum", 600,400);
+	auto* c_fwratio = new TCanvas("c_fwratio","FWTM:FWHM, crystals and summed spectrum", 600,400);
 	fwratio->SetTitle("FWTM:FWHM values of individual crystals and summed spectrum;Energy (keV);FWTM/FWHM");
 	fwratio->Draw("candle");
 	fwratio_all->SetMarkerStyle(30);
@@ -923,7 +923,7 @@ int main(int argc, char **argv) {
 			calibfileName.insert(0,"calib_hsts_");
 		}
 
-		TFile* file = new TFile(argv[i]);
+		auto* file = new TFile(argv[i]);
 		if(file == nullptr) {
 			printf("Failed to open file '%s'!\n",argv[1]);
 			return 1;
@@ -984,7 +984,7 @@ int main(int argc, char **argv) {
 			newfileName.insert(0,"newcal_");
 		}
 
-		TFile* file = new TFile(argv[i]);
+		auto* file = new TFile(argv[i]);
 		if(file == nullptr) {
 			printf("Failed to open file '%s'!\n",argv[1]);
 			return 1;

@@ -39,9 +39,9 @@ int main(int argc, char** argv) {
 	         <<"WARNING: This script assumes that the TACs are in channels FIRST_CHANNEL-LAST_CHANNEL (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly"<<std::endl
 	         <<std::endl;
 
-	TFile* file = new TFile(argv[1]);
+	auto* file = new TFile(argv[1]);
 
-	TTree* AnalysisTree = static_cast<TTree*>(file->Get("AnalysisTree"));
+	auto* AnalysisTree = static_cast<TTree*>(file->Get("AnalysisTree"));
 
 	TChannel::ReadCalFromTree(AnalysisTree);
 

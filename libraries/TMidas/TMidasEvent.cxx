@@ -179,8 +179,8 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
 ///
 int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdata) const
 {
-   TMidas_BANK_HEADER* pbkh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
-   TMidas_BANK*        pbk  = nullptr;
+   auto*        pbkh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
+   TMidas_BANK* pbk  = nullptr;
 
    std::array<unsigned, 17> TID_SIZE = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
 
@@ -238,7 +238,7 @@ void TMidasEvent::Print(const char* option) const
    /// printed out too.
    ///
 
-   time_t t = static_cast<time_t>(fEventHeader.fTimeStamp);
+   auto t = static_cast<time_t>(fEventHeader.fTimeStamp);
 
 	std::cout<<"Event start:"<<std::endl;
    std::cout<<"  event id:       "<<hex(fEventHeader.fEventId,4)<<std::endl;
@@ -404,7 +404,7 @@ int TMidasEvent::IterateBank(TMidas_BANK** pbk, char** pdata) const
    /// \param [in] pdata Pointer to data area of bank. Returns nullptr if no more banks
    /// \returns Size of bank in bytes or 0 if no more banks.
    ///
-   TMidas_BANK_HEADER* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
+   auto* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
 
    if(*pbk == nullptr) {
       *pbk = reinterpret_cast<TMidas_BANK*>(event + 1);
@@ -428,7 +428,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 {
    /// See IterateBank()
 
-   TMidas_BANK_HEADER* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
+   auto* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
    if(*pbk == nullptr) {
       *pbk = reinterpret_cast<TMidas_BANK32*>(event + 1);
    } else {
@@ -437,7 +437,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
       *pbk = reinterpret_cast<TMidas_BANK32*>(reinterpret_cast<char*>(*pbk + 1) + length_adjusted);
    }
 
-   TMidas_BANK32* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
+   auto* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
 
    if((*pbk)->fType > 17) {// bad - unknown bank type - it's invalid MIDAS file?
       if(bk4->fType <= 17) {// okey, this is a malformed T2K/ND280 data file

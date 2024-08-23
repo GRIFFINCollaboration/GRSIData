@@ -171,7 +171,7 @@ void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
       return;
    }
 
-   TTipHit* hit = new TTipHit(*frag);
+   auto* hit = new TTipHit(*frag);
    hit->SetUpNumbering(chan);          // Think about moving this to ctor
    AddHit(hit);
 }

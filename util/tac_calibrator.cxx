@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 
 
 	for(int file_num=1; file_num < argc; ++file_num){
-		TFile* f = new TFile(argv[file_num]);
+		auto* f = new TFile(argv[file_num]);
 
 		std::cout << "Reading from file:   " << f << std::endl;
 
@@ -139,12 +139,12 @@ int main(int argc, char** argv) {
 					calibration_hist[j]->SetBinContent((int)vec.at(i)+1,(double)(i)*calibrator_period );
 				}
 			}
-			TF1 * fitfunc = new TF1("fitfunc","[0] + [1]*x");//linear polinomy
+			auto* fitfunc = new TF1("fitfunc","[0] + [1]*x");//linear polinomy
 
 			g.Fit(fitfunc,"Q");
 			calibration_hist[j]->Fit(fitfunc,"Q");
 
-			TGainMatch * gm = new TGainMatch();
+			auto* gm = new TGainMatch();
 			gm->SetFitFunction(fitfunc);
 			gm->SetChannel(j+first_TAC_channel);//TAC channel, this may need a better implamentation
 

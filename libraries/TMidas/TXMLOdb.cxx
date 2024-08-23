@@ -14,7 +14,7 @@ ClassImp(TXMLOdb)
 std::array<char, 256> TXMLOdb::fTextBuffer;
 
 TXMLOdb::TXMLOdb(char* buffer, int size)
-   : fDoc(nullptr), fOdb(nullptr), fParser(new TDOMParser)
+   : fDoc(nullptr), fParser(new TDOMParser), fOdb(nullptr)
 {
 	/// Creator, tries to open buffer as input file and parse it, if that fails, parses size bytes of the buffer.
 	
@@ -147,7 +147,7 @@ std::vector<int> TXMLOdb::ReadIntArray(TXMLNode* node)
    }
    TIter iter(list);
    int   size = 0;
-   while(TXMLAttr* attr = static_cast<TXMLAttr*>(iter.Next())) {
+   while(auto* attr = static_cast<TXMLAttr*>(iter.Next())) {
       if(strcmp(attr->GetName(), "num_values") == 0) {
          size = atoi(attr->GetValue());
       }
@@ -189,7 +189,7 @@ std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
    }
    TIter iter(list);
    int   size = 0;
-   while(TXMLAttr* attr = static_cast<TXMLAttr*>(iter.Next())) {
+   while(auto* attr = static_cast<TXMLAttr*>(iter.Next())) {
       if(strcmp(attr->GetName(), "num_values") == 0) {
          size = atoi(attr->GetValue());
       }
@@ -239,7 +239,7 @@ std::vector<double> TXMLOdb::ReadDoubleArray(TXMLNode* node)
    }
    TIter iter(list);
    int   size = 0;
-   while(TXMLAttr* attr = static_cast<TXMLAttr*>(iter.Next())) {
+   while(auto* attr = static_cast<TXMLAttr*>(iter.Next())) {
       if(strcmp(attr->GetName(), "num_values") == 0) {
          size = atoi(attr->GetValue());
       }
