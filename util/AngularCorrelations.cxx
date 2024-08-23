@@ -836,7 +836,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	fitter.Config().SetMinimizer("Minuit2", "Migrad"); // or simplex?
 	if(!fitter.FitFCN()) {
 		std::cerr<<"Fit failed"<<std::endl;
-		return std::vector<double>();
+		return {};
 	}
 
 

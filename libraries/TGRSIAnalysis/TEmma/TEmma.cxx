@@ -144,7 +144,7 @@ TVector3 TEmma::GetPosition(double left, double right, double top, double bottom
 	double Xpos = ( Xdiff / Xsum )*fXlength;
 	double Ypos = ( Ydiff / Ysum )*fYlength;
 
-	return TVector3(Xpos, Ypos, 1);
+	return {Xpos, Ypos, 1};
 }
 
 TEmmaHit* TEmma::GetICHit(const int& i)

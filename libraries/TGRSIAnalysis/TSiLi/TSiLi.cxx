@@ -99,7 +99,7 @@ TVector3 TSiLi::GetPosition(int ring, int sector, bool smear)
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);
    }
 
-   return TVector3(cos(phi) * radius, sin(phi) * radius, dist);
+   return {cos(phi) * radius, sin(phi) * radius, dist};
 }
 
 double TSiLi::GetSegmentArea(Int_t seg)

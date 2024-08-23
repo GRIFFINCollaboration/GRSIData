@@ -361,7 +361,7 @@ TVector3 TS3::GetPosition(int ring, int sector, double offsetphi, double offsetZ
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);
    }
 
-   return TVector3(cos(phi) * radius, sin(phi) * radius, offsetZ);
+   return {cos(phi) * radius, sin(phi) * radius, offsetZ};
 }
 
 void TS3::ResetRingsSectors(){

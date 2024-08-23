@@ -233,7 +233,7 @@ std::vector<Short_t> TZeroDegreeHit::CalculateSmoothedWaveform(unsigned int half
    /// Used when calculating the CFD from the waveform
 
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
 
    std::vector<Short_t> smoothedWaveform(std::max(static_cast<size_t>(0), WaveSize() - 2 * halfsmoothingwindow),
@@ -253,7 +253,7 @@ std::vector<Short_t> TZeroDegreeHit::CalculateCfdMonitor(double attenuation, int
    /// Used when calculating the CFD from the waveform
 
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
 
    std::vector<Short_t> smoothedWaveform;

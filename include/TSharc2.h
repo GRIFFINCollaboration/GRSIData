@@ -29,7 +29,7 @@ public:
    static double   GetXOffset() { return fXoffset; }
    static double   GetYOffset() { return fYoffset; }
    static double   GetZOffset() { return fZoffset; }
-   static TVector3 GetOffset() { return TVector3(fXoffset, fYoffset, fZoffset); }
+   static TVector3 GetOffset() { return {fXoffset, fYoffset, fZoffset}; }
    static void SetXYZOffset(const double x, const double y, const double z)
    {
       fXoffset = x;

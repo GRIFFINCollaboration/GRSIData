@@ -147,14 +147,14 @@ TVector3 TDescant::GetPosition(int DetNbr, double dist)
 
    if(TRunInfo::GetDetectorInformation() != nullptr && static_cast<TGRSIDetectorInformation*>(TRunInfo::GetDetectorInformation())->DescantAncillary()) {
       if(DetNbr > 8) {
-         return TVector3(0, 0, 1);
+         return {0, 0, 1};
       }
       TVector3 temp_pos(fAncillaryPosition[DetNbr]);
       temp_pos.SetMag(dist);
       return temp_pos;
    }
    if(DetNbr > 70) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
    return fPosition[DetNbr];
 }

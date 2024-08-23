@@ -154,7 +154,7 @@ TVector3 TTrific::GetPosition(Int_t detectorNumber)
 	//detectorNumber is indexed at 1. 
 
 	//TRIFIC only holds 24 detectors, so doesn't make sense to get the position for detectors 25+. Also doesn't make sense to get the position for grid numbers <1.
-	if (24 < detectorNumber || 1 > detectorNumber) return TVector3(-1,-1,-1*abs(detectorNumber));
+	if (24 < detectorNumber || 1 > detectorNumber) return {1.,-1.,-1.*abs(detectorNumber)};
 	//-1*abs(detNum) ensures we return a value of (-1,-1,-#), which indicates a problem
 
 	TVector3 vec = TTrific::GetPosition();
@@ -169,10 +169,7 @@ TVector3 TTrific::GetPosition(Int_t detectorNumber)
 	zCart += zCart*vec.Y()/(TMath::Sqrt(3)-vec.Y()); //this adds (or subtracts) the extra Z distance (Z') due to the offset in Y (which are tilted at 30 degs. from vertical)
 	//notes on geometry: 30-60-90 triangle, so Y=sqrt(3)*Z', and Y/(Z+Z') = tan(theta)
 	
-	TVector3 particleCart(zCart*vec.X(),zCart*vec.Y(),zCart);
-	
-	//return TVector3(0,0,detectorNumber);
-	return particleCart;
+	return {zCart*vec.X(),zCart*vec.Y(),zCart};
 }
 
 TVector3 TTrific::GetPosition()

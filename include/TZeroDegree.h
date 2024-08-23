@@ -32,7 +32,7 @@ public:
 
    TZeroDegreeHit* GetZeroDegreeHit(const int& i) const { return static_cast<TZeroDegreeHit*>(GetHit(i)); }
 
-   static TVector3 GetPosition(double dist) { return TVector3(0, 0, dist); } //!<!
+   static TVector3 GetPosition(double dist) { return {0, 0, dist}; } //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

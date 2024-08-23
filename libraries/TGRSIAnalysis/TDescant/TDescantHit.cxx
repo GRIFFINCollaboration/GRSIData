@@ -272,7 +272,7 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
                                                       unsigned int halfSmoothingWindow)
 {
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
    std::vector<Short_t> smoothedWaveform;
 

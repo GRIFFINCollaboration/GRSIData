@@ -515,7 +515,7 @@ TVector3 TGriffin::GetPosition(int DetNbr, int CryNbr, double dist)
    // Gets the position vector for a crystal specified by CryNbr within Clover DetNbr at a distance of dist mm away.
    // This is calculated to the most likely interaction point within the crystal.
    if(DetNbr > 16) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
 
    TVector3 temp_pos(fCloverPosition[DetNbr]);
@@ -546,7 +546,7 @@ TVector3 TGriffin::GetDetectorPosition(int DetNbr)
 {
    // Gets the position vector for a Clover DetNbr.
    if(DetNbr > 16) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
 
    return fCloverPosition[DetNbr];

@@ -197,7 +197,7 @@ TVector3 TTip::GetPosition(const TTipHit& hit)
 TVector3 TTip::GetPosition(int DetNbr)
 {
    if(DetNbr > 127) {
-      return TVector3(0, 0, 1); //handle invalid detector index as in TGriffin
+      return {0, 0, 1}; //handle invalid detector index as in TGriffin
    }
 	return fPositionVectors[DetNbr];
 }
