@@ -96,14 +96,14 @@ public:
    /* int GetLastSeg()  const { if(fSegments.size()>0) return fSegments.back().GetSegment(); return -1; } */
    int GetFirstSeg() const
    {
-      if(fSegments.size() > 0) {
+      if(!fSegments.empty()) {
          return fSegments.front().GetSegment();
       }
       return 0;
    }
    int GetLastSeg() const
    {
-      if(fSegments.size() > 0) {
+      if(!fSegments.empty()) {
          return fSegments.back().GetSegment();
       }
       return 0;

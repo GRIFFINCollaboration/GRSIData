@@ -122,20 +122,20 @@ void TTrific::Clear(Option_t* option)
 
 void TTrific::GetXYGrid()
 {
-	//check if we have already found the X grid location yet. If so, we don't need to do it again.
-	if (!fGridX){ //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet	
-		if (fXFragments.size()){ //we have to have an x-grid hit in this event to determine the x-grid number
-			 TTrificHit *hit = fXFragments.at(0);
-			 fGridX = hit->GetDetector();
-		}
-	}
-	//check if we have already found the Y grid location yet. If so, we don't need to do it again.
-	if (!fGridY){ //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
-		if (fYFragments.size()){//we have to have an y-grid hit in this event to determine the y-grid number
-			 TTrificHit *hit = fYFragments.at(0);
-			 fGridY = hit->GetDetector();
-		}	
-	}
+   //check if we have already found the X grid location yet. If so, we don't need to do it again.
+   if(!fGridX) {                   //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet
+      if(!fXFragments.empty()) {   //we have to have an x-grid hit in this event to determine the x-grid number
+         TTrificHit* hit = fXFragments.at(0);
+         fGridX          = hit->GetDetector();
+      }
+   }
+   //check if we have already found the Y grid location yet. If so, we don't need to do it again.
+   if(!fGridY) {                   //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
+      if(!fYFragments.empty()) {   //we have to have an y-grid hit in this event to determine the y-grid number
+         TTrificHit* hit = fYFragments.at(0);
+         fGridY          = hit->GetDetector();
+      }
+   }
 }
 
 TVector3 TTrific::GetPosition(Int_t detectorNumber)
@@ -181,7 +181,7 @@ TVector3 TTrific::GetPosition()
 	GetXYGrid();
 
 	//if we don't have both an x and y grid hit in this event, position reconstruction won't be possible.
-	if(0 == fXFragments.size() || 0 == fYFragments.size()){
+	if(fXFragments.empty() || fYFragments.empty()){
 		//return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
@@ -207,13 +207,13 @@ TVector3 TTrific::GetPosition()
 
 	//check if hitXDets.size() is zero. This happens when we have an x-grid hit or hits, but the energy for all hits is below our arbitrary "noise" threshold.
 	//without this, the function will seg-fault when it tries to check for the continuity
-	if (!hitXDets.size()){
-		//return an error vector
+   if(hitXDets.empty()) {
+      //return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
-	}
+   }
 
-	//to check for hit continuity in the grids, we need to sort the vector of segments and then check that every segment
+   //to check for hit continuity in the grids, we need to sort the vector of segments and then check that every segment
 	//between the first and last segment with a nonzero energy in the array is present. If not, we have a discontinuous hit 
 	//and will return an error vector for now. in the future we might instead flag this event
 	//Ex: we want hits that like this: [0,0,4,3,5,6,5,3] not [0,0,5,0,0,2,3,0]
@@ -252,7 +252,7 @@ TVector3 TTrific::GetPosition()
 
 	//check if hitYDets.size() is zero. This happens when we have an y-grid hit or hits, but the energy for all hits is below our arbitrary "noise" threshold.
 	//without this, the function will seg-fault when it tries to check for the continuity
-	if (!hitYDets.size()){
+	if (hitYDets.empty()){
 		//return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
@@ -320,8 +320,8 @@ Int_t TTrific::GetRange()
 	//check if the range is less than the max of the grid numbers+1. The +1 is because the higher grid number will be at std::max(xGrid,yGrid) by default
 	if (fRange < std::max(fGridX,fGridY)+1){
 
-		if (fRange < fGridX && fXFragments.size()) fRange = fGridX; //we need to check if the current range is less than the x grid AND that there is an x-grid hit in this event
-		if (fRange < fGridY && fYFragments.size()) fRange = fGridY; //we need to check if the current range is less than the y grid AND that there is a y-grid hit in this event
+		if (fRange < fGridX && !fXFragments.empty()) fRange = fGridX; //we need to check if the current range is less than the x grid AND that there is an x-grid hit in this event
+		if (fRange < fGridY && !fYFragments.empty()) fRange = fGridY; //we need to check if the current range is less than the y grid AND that there is a y-grid hit in this event
 	} //there may be a problem here if fXFragments.size() != 0 (or Y frags too) but all the fragments have E<arb cutoff. However, GetRange() isn't referenced in any other function currently,
 	//and the likelihood of that occuring is very small I think.
 

@@ -222,7 +222,7 @@ void TEmma::BuildHits()
 			if(emmaTdcHit.GetTdcNumber() == 13) hit->SetBottom(emmaTdcHit.GetEnergy());
 		}
 
-		if(tdcArray.size() != 0) {
+		if(!tdcArray.empty()) {
 			fAnodeTrigger = * std::min_element(tdcArray.begin(), tdcArray.end());
 			if(hit->GetLeft() != 0 && hit->GetRight() != 0 && hit->GetTop() != 0 && hit->GetBottom() != 0 && fAnodeTrigger != 0) {
 				hit->SetLeft((hit->GetLeft() - fAnodeTrigger));
