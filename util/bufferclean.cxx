@@ -111,11 +111,7 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
 
 void Write(std::shared_ptr<TMidasEvent> evt, TMidasFile* outfile)
 {
-   outfile->FillBuffer(std::move(evt));
-
-   // if(outfile->GetBufferSize() > 100000){
-   //    outfile->WriteBuffer();
-   // }
+   outfile->FillBuffer(evt);
 }
 
 int main(int argc, char** argv)
