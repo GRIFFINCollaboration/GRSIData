@@ -170,8 +170,7 @@ private:
 
    // Cross-Talk stuff
 public:
-   static Double_t CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, const TGriffinHit* const other_hit,
-                                     Bool_t time_constraint = true);
+   static Double_t CTCorrectedEnergy(const TGriffinHit* hit_to_correct, const TGriffinHit* other_hit, bool time_constraint = true);
    Bool_t IsCrossTalkSet(const EGainBits& gain_type) const;
    void FixLowGainCrossTalk();
    void FixHighGainCrossTalk();

@@ -82,23 +82,21 @@ public:
         int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaMadcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaTdcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaRawDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaSumDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaMadcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 #endif
 
-   int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0,
-                             time_t midasTime = 0);
+   int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToScalerEvent(uint32_t* data, int address);
 
-   int RFScalerToFragment(uint32_t* data, const int size, const std::shared_ptr<TFragment>& frag);
+   int RFScalerToFragment(uint32_t* data, int size, const std::shared_ptr<TFragment>& frag);
 
    int EPIXToScalar(float* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int SCLRToScalar(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
-   int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0,
-                             time_t midasTime = 0);
+   int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
 
 private:
 	EDataParserState fState;

@@ -58,7 +58,7 @@ public:
    TLaBrHit* GetSuppressedHit(const int& i);                          //!<!
    Short_t GetSuppressedMultiplicity(const TBgo* fBgo);
    bool IsSuppressed() const;
-	void SetSuppressed(const bool flag);
+	void SetSuppressed(bool flag);
    void ResetSuppressed();
 
 #if !defined(__CINT__) && !defined(__CLING__)
