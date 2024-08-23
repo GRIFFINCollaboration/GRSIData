@@ -39,9 +39,7 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
 TXMLOdb::~TXMLOdb()
 {
 	/// Default destructor, deletes the parser.
-   if(fParser != nullptr) {
-      delete fParser;
-   }
+	delete fParser;
 }
 
 TXMLNode* TXMLOdb::FindNode(const char* name, TXMLNode* node)
