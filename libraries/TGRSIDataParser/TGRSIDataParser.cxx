@@ -263,7 +263,7 @@ void TGRSIDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>
 {
 	/// Sets the CFD of a Tigress Event.
 
-	currentFrag->SetCfd(int32_t(value & 0x07ffffff));
+	currentFrag->SetCfd(static_cast<int32_t>(value & 0x07ffffff));
 }
 
 void TGRSIDataParser::SetTIGLed(uint32_t, const std::shared_ptr<TFragment>&)
@@ -325,7 +325,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 		currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
 	} else {
 		if(LastTriggerIdLoBits < MaxTriggerId() / 10) {
-			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value - MaxTriggerId()));
+			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value - MaxTriggerId()));
 			std::cout<<DRED<<"We are backwards looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));

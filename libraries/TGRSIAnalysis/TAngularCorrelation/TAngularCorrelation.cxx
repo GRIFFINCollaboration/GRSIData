@@ -173,18 +173,18 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
 
    Int_t iteration = 0;
    TH2D* newslice = nullptr;
-   if(gFile->Get(Form("%s_%i_%i", name, Int_t(min), Int_t(max))) == nullptr) {
-      newslice = new TH2D(Form("%s_%i_%i", name, Int_t(min), Int_t(max)),
+   if(gFile->Get(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max))) == nullptr) {
+      newslice = new TH2D(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max)),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
    } else {
       while(iteration < 10) {
-         if(gFile->Get(Form("%s_%i_%i_%i", name, Int_t(min), Int_t(max), iteration)) == nullptr) {
+         if(gFile->Get(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration)) == nullptr) {
             break;
          } else {
             ++iteration;
          }
       }
-      newslice = new TH2D(Form("%s_%i_%i_%i", name, Int_t(min), Int_t(max), iteration),
+      newslice = new TH2D(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
    }
 

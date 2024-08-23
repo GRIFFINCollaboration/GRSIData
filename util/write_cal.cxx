@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
 		}
 
 		if(n%10000 == 0) {
-			progress = ((double_t) n)/((double_t) nEntries);
+			progress = (static_cast<double>(n))/(static_cast<double>(nEntries));
 			std::cout<<std::setw(4)<<100*progress<<"% done\r"<<std::flush;
 		}
 

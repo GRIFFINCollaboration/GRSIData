@@ -45,7 +45,7 @@ public:
          case 0xb0000000: timehigh = value & 0x00003fff; break;
          };
       }
-      timemidas = (unsigned int)(event->GetTimeStamp());
+      timemidas = static_cast<unsigned int>(event->GetTimeStamp());
       if(timemidas < low_timemidas) {
          low_timemidas = timemidas;
       }

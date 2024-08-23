@@ -625,7 +625,7 @@ TCSMHit* TCSM::CombineHits(TDetectorHit* d_hit, TDetectorHit* e_hit)
 
 bool TCSM::AlmostEqual(int val1, int val2)
 {
-   auto   diff = double(std::abs(val1 - val2));
+   auto   diff = static_cast<double>(std::abs(val1 - val2));
    double ave  = (val1 + val2) / 2.;
    double frac = diff / ave;
    return frac < fAlmostEqualWindow;

@@ -257,7 +257,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
          if(scaler->GetAddress() == static_cast<UInt_t>(*channel)) {
             xaxis = (scaler->GetTimeStamp() / 1e9);
             // we check both the value of the scaler and the timestamp (ts difference should be = readout time)
-            if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= (double(ncycle) + clk)) {
+            if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= static_cast<double>(ncycle) + clk) {
                yaxis = (scaler->GetScaler(index) - prev);
                grif[k]->Fill(xaxis, yaxis);
             }
@@ -451,7 +451,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                }
             }
             if(z == 0) {
-               for(int j = *trun; j >= (*trun - (int(0.7 * patlen))); j--) {
+               for(int j = *trun; j >= (*trun - static_cast<int>(0.7 * patlen)); j--) {
                   y = spec[cnt]->GetBinContent(j);
                   if(y > 0 && v > 0) {
                      dz = (abs(y - v) / v);
@@ -490,11 +490,11 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int i = 0; i <= xbins; i++) {
          for(int j = 0; j < fbin; j++) {
             if(i == 1) {
-               freq[j][0] = (0. + (double(j) * (rmax / double(fbin))));
+               freq[j][0] = (0. + j * (rmax / fbin));
                freq[j][1] = 0;
             }
-            if(abs(trans[i][1]) > (0. + (double(j) * (rmax / double(fbin)))) &&
-               abs(trans[i][1]) <= (rmax / double(fbin)) + (double(j) * (rmax / double(fbin)))) {
+            if(abs(trans[i][1]) > (0. + j * (rmax / fbin)) &&
+               abs(trans[i][1]) <= (rmax / fbin) + (j * (rmax / fbin))) {
                freq[j][1] = freq[j][1] + 1;
             }
          }
@@ -503,7 +503,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int j = 0; j < fbin; j++) {
          if(freq[j][1] > max) {
             max  = freq[j][1];
-            dlim = (2 * ((rmax / double(fbin)) + (double(j) * (rmax / double(fbin)))));
+            dlim = (2 * ((rmax / fbin) + (j * (rmax / fbin))));
          }
       }
       // std::cout<<"PPG transitions assumed above "<<(dlim*100.)<<" % change in rate.."<<std::endl;
@@ -706,7 +706,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double w1    = 0.;
       double x1    = 0.;
       double x2    = 0.;
-      int    nrow  = int((uhi - ulo) / du);
+      int    nrow  = static_cast<int>((uhi - ulo) / du);
       double w2    = pow((pow(sdrand, 2)), 2) / ((2. * pow(sdrand, 2)));   // const.
       minl         = -1e6;
       auto** array = new double*[nrow];
@@ -782,7 +782,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double l1 = 0.;
 		double l2 = 0.;
       int    wbin = 40;
-      int    wrow = 0, wsize = int(pow(wbin, 2));
+      int    wrow = 0;
+		int    wsize = static_cast<int>(pow(wbin, 2));
       auto** randcheck = new double*[bin];
       for(int i = 0; i < bin; ++i) {
          randcheck[i] = new double[2];
@@ -799,15 +800,15 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
 
       // Check the "randomness" of the random number generator **RCHECK**
       for(int i = 0; i < bin; i++) {
-         randcheck[i][0] = 0 + (double(i) * (1 / double(bin)));
+         randcheck[i][0] = 0 + (static_cast<double>(i) * (1 / static_cast<double>(bin)));
          randcheck[i][1] = 0;
       }
       // initialise matrix to get final uncertainty
       for(int i = 0; i < wbin; i++) {
          for(int j = 0; j < wbin; j++) {
-            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (double(i) * ((sigp - sigm) / double(wbin))); // x,
+            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (static_cast<double>(i) * ((sigp - sigm) / static_cast<double>(wbin))); // x,
                                                                                                       // (rcmin-rrand)
-            wspec[wrow][1] = (*lowrtau) + (double(j) * ((*upprtau - *lowrtau) / double(wbin))); // y, (rtau);
+            wspec[wrow][1] = (*lowrtau) + (static_cast<double>(j) * ((*upprtau - *lowrtau) / static_cast<double>(wbin))); // y, (rtau);
             wspec[wrow][2] = 0;                                                                 // z, frequency
             wrow += 1;
          }
@@ -820,9 +821,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             l2 = ((rcmin - rrand) + array[i + binsize][0]);
 
             for(int j = 0; j < iter; j++) {
-               tempa = rand() / double(RAND_MAX);
+               tempa = rand() / static_cast<double>(RAND_MAX);
                var1  = ((tempa * (a1 + a2)) + (rcmin - a2));
-               tempb = rand() / double(RAND_MAX);
+               tempb = rand() / static_cast<double>(RAND_MAX);
                var2  = ((tempb * (2.e0 * sdrand)) + (rrand - sdrand));
                var3  = (var1 - var2);
                //~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~'good'

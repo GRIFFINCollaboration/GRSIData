@@ -301,7 +301,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 		}
 		tree->GetEntry(entry);
 		grif->ResetAddback();
-		for(one = 0; one < (int) grif->GetMultiplicity(); ++one) {
+		for(one = 0; one < static_cast<int>(grif->GetMultiplicity()); ++one) {
 			//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(one)->GetDetector() )) continue;  //These could be added to gate out clovers.
 			gammaSinglesAll->Fill(grif->GetGriffinHit(one)->GetEnergy());
 			gammaCrystalAll->Fill(grif->GetGriffinHit(one)->GetEnergy(), 4*(grif->GetGriffinHit(one)->GetDetector() - 1) + grif->GetGriffinHit(one)->GetCrystal() );
@@ -334,7 +334,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 			if(usetimestamps) tg1 = grif->GetGriffinHit(one)->GetTimeStamp();
 			else tg1 = grif->GetGriffinHit(one)->GetTime();
 
-			for(two = 0; two < (int) grif->GetMultiplicity(); ++two) {
+			for(two = 0; two < static_cast<int<(grif->GetMultiplicity()); ++two) {
 				//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(two)->GetDetector() )) continue; //These could be added to gate out clovers.
 				if(two == one) continue;
 				//Two will be the second event in the scatter.  It must have lower energy and sum with g1 to
@@ -366,7 +366,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 				v2 = grif->GetGriffinHit(two)->GetPosition(DetectorHeight);
 				d1 = TGriffin::GetPosition( grif->GetGriffinHit(one)->GetDetector(), 5, DetectorHeight );
 
-				for(three = 0; three < (int) grif->GetMultiplicity(); ++three){
+				for(three = 0; three < static_cast<int>(grif->GetMultiplicity()); ++three){
 					//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(three)->GetDetector() )) continue; //These could be added to gate out clovers.
 
 					if(one == three || two == three) continue;

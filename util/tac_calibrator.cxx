@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 		double tac_range = 50000.; //TAC range, 50 ns for most experiments
 		double ps_per_chan = 10.; //binning of the TACs, in ps per channel, 10 is a reasonable number 
 		int first_TAC_channel = 75; //This is the channel number of the first TAC, it is needed to write the calibration file. In general it will be 84
-		int number_of_peaks=(int) (tac_range/calibrator_period); //maximum number of peaks that we expect to find in the TAC-calibrator spectra
+		int number_of_peaks= static_cast<int>(tac_range/calibrator_period); //maximum number of peaks that we expect to find in the TAC-calibrator spectra
 																					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
 		std::array<TH1F*, 8> raw_tac_calibrator = {};
 		for(int i=0; i<8; i++){
-			raw_tac_calibrator[i] = new TH1F(Form("raw_TAC_calibrator%d",i),Form("raw_TAC_calibrator%d",i),(int) (tac_range/ps_per_chan),0,tac_range); list.Add(raw_tac_calibrator[i]);
+			raw_tac_calibrator[i] = new TH1F(Form("raw_TAC_calibrator%d",i),Form("raw_TAC_calibrator%d",i),static_cast<int>(tac_range/ps_per_chan),0,tac_range); list.Add(raw_tac_calibrator[i]);
 		}
 
 		for(int i=0; i<tree->GetEntries(); i++){ //Loops through the whole AnalysisTree
@@ -135,8 +135,8 @@ int main(int argc, char** argv) {
 			TGraph g;
 			for(int i=0;i<nfound;i++){
 				if(vec.at(i)>10){
-					g.SetPoint(i,vec.at(i), (double)(i)*calibrator_period);
-					calibration_hist[j]->SetBinContent((int)vec.at(i)+1,(double)(i)*calibrator_period );
+					g.SetPoint(i,vec.at(i), i*calibrator_period);
+					calibration_hist[j]->SetBinContent(static_cast<int>(vec.at(i)+1),i*calibrator_period);
 				}
 			}
 			auto* fitfunc = new TF1("fitfunc","[0] + [1]*x");//linear polinomy

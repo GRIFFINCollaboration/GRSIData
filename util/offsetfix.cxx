@@ -221,7 +221,7 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
    // Do checks on the event
    unsigned int mserial = 0;
    if(event) {
-      mserial = (unsigned int)(event->GetSerialNumber());
+      mserial = static_cast<unsigned int>(event->GetSerialNumber());
    }
    unsigned int mtime = 0;
    if(event) {
