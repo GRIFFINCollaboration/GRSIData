@@ -123,14 +123,14 @@ void TTrific::Clear(Option_t* option)
 void TTrific::GetXYGrid()
 {
    //check if we have already found the X grid location yet. If so, we don't need to do it again.
-   if(!fGridX) {                   //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet
+   if(fGridX == 0) {                   //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet
       if(!fXFragments.empty()) {   //we have to have an x-grid hit in this event to determine the x-grid number
          TTrificHit* hit = fXFragments.at(0);
          fGridX          = hit->GetDetector();
       }
    }
    //check if we have already found the Y grid location yet. If so, we don't need to do it again.
-   if(!fGridY) {                   //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
+   if(fGridY == 0) {                   //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
       if(!fYFragments.empty()) {   //we have to have an y-grid hit in this event to determine the y-grid number
          TTrificHit* hit = fYFragments.at(0);
          fGridY          = hit->GetDetector();

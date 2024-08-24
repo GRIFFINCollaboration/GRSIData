@@ -100,11 +100,13 @@ int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, int segment)
 
 int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, TChannel* channel)
 {
-  	if(!pulse)return 0;
+  	if(pulse == nullptr) { return 0; }
 	if(pulse->IsSet()){
-		double Decay=0,Rise=0,Base=0;
+		double Decay=0.;
+		double Rise=0.;
+		double Base=0.;
 		
-		if(channel){
+		if(channel != nullptr){
 			if(channel->UseWaveParam()){
 				Rise=channel->GetWaveRise();
 				Decay=channel->GetWaveDecay();
@@ -113,9 +115,9 @@ int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, TChannel* ch
 		}
 // 		std::cout<<std::endl<<Decay<<" "<<Rise<<" "<<Base;
 
-		if(!Decay)Decay=TSiLi::sili_default_decay;
-		if(!Rise)Rise=TSiLi::sili_default_rise;
-		if(!Base)Base=TSiLi::sili_default_baseline;
+		if(Decay == 0.)Decay=TSiLi::sili_default_decay;
+		if(Rise == 0.)Rise=TSiLi::sili_default_rise;
+		if(Base == 0.)Base=TSiLi::sili_default_baseline;
 		
 		bool goodfit=false;
 		if(ShapeFit<2)goodfit=pulse->GetSiliShape(Decay,Rise);

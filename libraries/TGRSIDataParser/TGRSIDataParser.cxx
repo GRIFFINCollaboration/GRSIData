@@ -1352,11 +1352,11 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 				return -1;
 			}
 			
-			if(dword & (1<<29)){ 
+			if(dword & (1<<29) != 0x0){ 
 				//parameter value is negative
 				//take two's complement
 				for(int j=0;j<30;j++){
-					if(dword & (1<<j)){
+					if(dword & (1<<j) != 0x0){
 						pos=j;
 						break;
 					}

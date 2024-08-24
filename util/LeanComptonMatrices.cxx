@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 		auto* runInfo = static_cast<TRunInfo*>(file->Get("RunInfo"));
 		std::string inputname = argv[f+1];
 		std::string outputname;
-		if(runInfo == nullptr || !runInfo) {
+		if(runInfo == nullptr) {
 			std::cout<<"Failed to find run information in file '"<<argv[f+1]<<"'!"<<std::endl
 				      <<"Trying to accomodate filenames"<<std::endl;
 			for(int pop = 0; pop < 5; pop++) inputname.pop_back();

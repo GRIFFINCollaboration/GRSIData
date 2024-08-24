@@ -55,7 +55,7 @@ public:
    inline Int_t    GetTipChannel() const { return fTipChannel; }   //!<!
 
    inline bool IsCsI() { return csi_flag; }                    //!<!
-   inline void SetCsI(bool flag = "true") { csi_flag = flag; } //!<!
+   inline void SetCsI(bool flag = true) { csi_flag = flag; } //!<!
    inline void SetFitChiSq(int chisq) { fChiSq = chisq; }      //!<!
 
    bool InFilter(Int_t); //!<!
@@ -68,7 +68,7 @@ public:
    void SetUpNumbering(TChannel*)
    {
       TChannel* channel = GetChannel();
-      if(!channel) {
+      if(channel == nullptr) {
          Error("SetDetector", "No TChannel exists for address %u", GetAddress());
          return;
       }

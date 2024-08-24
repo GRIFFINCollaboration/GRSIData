@@ -49,7 +49,7 @@ void TTACHit::Copy(TObject& obj, bool waveform) const
 
 Double_t TTACHit::GetTempCorrectedCharge(TGraph* correction_graph) const {
 	//Applies the kValue ot the charge
-	if(!correction_graph){
+	if(correction_graph == nullptr){
 		std::cout << "Graph for temperture corrections is null" << std::endl;
 	}
 
@@ -58,7 +58,7 @@ Double_t TTACHit::GetTempCorrectedCharge(TGraph* correction_graph) const {
 
 Double_t TTACHit::TempCorrectedCharge(TGraph* correction_graph) const {
 	//Returns the raw charge with no kValue applied
-	if(!correction_graph){
+	if(correction_graph == nullptr){
 		std::cout << "Graph for temperture corrections is null" << std::endl;
 	}
 
@@ -67,7 +67,7 @@ Double_t TTACHit::TempCorrectedCharge(TGraph* correction_graph) const {
 
 Double_t TTACHit::GetTempCorrectedEnergy(TGraph* correction_graph) const {
 	//This will not overwrite the normal energy, nor will it get stored as the energy.
-	if(!correction_graph){
+	if(correction_graph == nullptr){
 		std::cout << "Graph for temperture corrections is null" << std::endl;
 	}
 

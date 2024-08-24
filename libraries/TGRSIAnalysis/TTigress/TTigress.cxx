@@ -418,7 +418,7 @@ void TTigress::BuildVectors(){
 
 					det_pos.SetXYZ(xx, yy, zz - fTargetOffset);
 
-					if(fRadialOffset){
+					if(fRadialOffset != 0.){
 						det_pos+=fCloverRadial[DetNbr].Unit()*fRadialOffset;
 					}
 
