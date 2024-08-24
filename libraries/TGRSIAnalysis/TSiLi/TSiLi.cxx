@@ -93,7 +93,8 @@ TVector3 TSiLi::GetPosition(int ring, int sector, bool smear)
    double radius = inner_radius + ring_width * (ring + 0.5);
    if(smear) {
       double sep = ring_width * 0.025;
-      double r1 = radius - ring_width * 0.5 + sep, r2 = radius + ring_width * 0.5 - sep;
+      double r1 = radius - ring_width * 0.5 + sep;
+		double r2 = radius + ring_width * 0.5 - sep;
       radius        = sqrt(gRandom->Uniform(r1 * r1, r2 * r2));
       double sepphi = sep / radius;
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);
@@ -287,8 +288,10 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 	if(cluster.size()>1&&!ContainsReject){
       TSiLiHit* A = static_cast<TSiLiHit*>(GetHit(cluster[0]));
       TSiLiHit* B = static_cast<TSiLiHit*>(GetHit(cluster[1]));
-      int rA=A->GetRing(),rB=B->GetRing();
-		int sA=A->GetSector(),sB=B->GetSector();
+      int rA=A->GetRing();
+		int rB=B->GetRing();
+		int sA=A->GetSector();
+		int sB=B->GetSector();
 		int rAB=std::abs(rA-rB);
 		int sAB=std::abs(sA-sB);
 		if(sAB>5)sAB=12-sAB;
@@ -300,8 +303,10 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
          TSiLiHit* C   = static_cast<TSiLiHit*>(GetHit(cluster[2]));
          int       rC  = C->GetRing();
          int       sC  = C->GetSector();
-         int       rAC = std::abs(rA - rC), rBC = std::abs(rB - rC);
-         int       sAC = std::abs(sA - sC), sBC = std::abs(sB - sC);
+         int       rAC = std::abs(rA - rC);
+         int       rBC = std::abs(rB - rC);
+         int       sAC = std::abs(sA - sC);
+         int       sBC = std::abs(sB - sC);
 
          if(sAC > 5) sAC = 12 - sAC;
          if(sBC > 5) sBC = 12 - sBC;

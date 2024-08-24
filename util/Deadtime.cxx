@@ -853,9 +853,16 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // "\n",(rcmin-rrand),sigp,sigm,rrand,sdrand);
       //~*~*~*~*~*~*~*~*~*~*~*~~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
       // Determine final error bounds using wspec matrix
-      double gmax = 0, hmax = 0;
-      double erbp = 0, erbm = 0, erfp = 0, erfm = 0;
-      double frmin = 1e6, frmax = 0, srmin = 1e6, srmax = 0;
+      double gmax = 0.;
+		double hmax = 0.;
+      double erbp = 0.;
+		double erbm = 0.;
+		double erfp = 0.;
+		double erfm = 0.;
+      double frmin = 1e6.;
+		double frmax = 0.;
+		double srmin = 1e6.;
+		double srmax = 0.;
 
       for(i = 0; i < wsize; i++) {
          if(wspec[i][2] > gmax) {

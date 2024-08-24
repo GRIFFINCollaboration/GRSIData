@@ -119,8 +119,10 @@ void TS3::BuildPixels()
 
       // We are going to want energies several times
       // So build a quick vector
-      std::vector<double> EneR, EneS;
-      std::vector<bool>   UsedRing, UsedSector;
+      std::vector<double> EneR;
+      std::vector<double> EneS;
+      std::vector<bool>   UsedRing;
+      std::vector<bool>   UsedSector;
       for(auto& fS3RingHit : fS3RingHits) {
          EneR.push_back(fS3RingHit.GetEnergy());
          UsedRing.push_back(false);
@@ -355,7 +357,8 @@ TVector3 TS3::GetPosition(int ring, int sector, double offsetphi, double offsetZ
    //This produces a uniform distribution over the area of a pixel
    if(smear) {
       double sep = ring_width * 0.025;
-      double r1 = radius - ring_width * 0.5 + sep, r2 = radius + ring_width * 0.5 - sep;
+      double r1 = radius - ring_width * 0.5 + sep;
+		double r2 = radius + ring_width * 0.5 - sep;
       radius        = sqrt(gRandom->Uniform(r1 * r1, r2 * r2));
       double sepphi = sep / radius;
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);

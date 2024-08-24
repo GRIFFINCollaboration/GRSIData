@@ -86,7 +86,9 @@ TVector3 TCSM::GetPosition(int detector, char pos, int horizontalstrip, int vert
    double   EX       = 58.062412;
    double   EZ       = 48.09198;
    double   detTheta = 31. * (TMath::Pi() / 180.);
-   double   x = 0.0, y = 0.0, z = 0.0;
+   double   x        = 0.;
+   double   y        = 0.;
+   double   z        = 0.;
 
    if(detector == 3 && pos == 'D') {
       // Right Side
