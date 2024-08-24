@@ -149,7 +149,7 @@ private:
 
 
    /// \cond CLASSIMP
-   ClassDefOverride(TS3, 4)
+   ClassDefOverride(TS3, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

@@ -90,7 +90,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLaBr, 1) // LaBr Physics structure
+   ClassDefOverride(TLaBr, 1) // LaBr Physics structure // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

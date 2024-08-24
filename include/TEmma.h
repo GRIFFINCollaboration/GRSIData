@@ -72,7 +72,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TEmma, 4) // Emma Physics structure
+   ClassDefOverride(TEmma, 4) // Emma Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

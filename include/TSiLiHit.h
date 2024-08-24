@@ -138,7 +138,7 @@ private:
    Double_t fFitBase{0.};
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSiLiHit, 10);
+   ClassDefOverride(TSiLiHit, 10); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

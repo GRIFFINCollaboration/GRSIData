@@ -66,7 +66,7 @@ private:
    bool    AlmostEqual(double, double);
 
    /// \cond CLASSIMP
-   ClassDefOverride(TCSM, 5) // CSM Analysis structure
+   ClassDefOverride(TCSM, 5) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

@@ -54,7 +54,7 @@ private:
    Int_t fFilter{0};
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTACHit, 2) // Stores the information for a TACrHit
+   ClassDefOverride(TTACHit, 2) // Stores the information for a TACrHit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

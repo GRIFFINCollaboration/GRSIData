@@ -51,7 +51,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSceptar, 2) // Sceptar Physics structure
+   ClassDefOverride(TSceptar, 2) // Sceptar Physics structure // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

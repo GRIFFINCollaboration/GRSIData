@@ -180,9 +180,8 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
       while(iteration < 10) {
          if(gFile->Get(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration)) == nullptr) {
             break;
-         } else {
-            ++iteration;
          }
+			++iteration;
       }
       newslice = new TH2D(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);

@@ -99,9 +99,8 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    if(trigId < chanId_threshold) {
       triggermap.find(chanadd)->second = true;
       return true;
-   } else {
-      return false;
-   }
+	}
+	return false;
 }
 
 void Write(const std::shared_ptr<TMidasEvent>& evt, TMidasFile* outfile)

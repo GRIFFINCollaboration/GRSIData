@@ -51,7 +51,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TZeroDegree, 2) // ZeroDegree Physics structure
+   ClassDefOverride(TZeroDegree, 2) // ZeroDegree Physics structure // NOLINT(readability-else-after-return)
                                     /// \endcond
 };
 /*! @} */

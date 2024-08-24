@@ -34,7 +34,7 @@ double GetYError(TGraphErrors* graph, const double& x)
 		if(graph->GetPointX(i) == x) return graph->GetErrorY(i);
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		else if(graph->GetPointX(i) > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(graph->GetPointX(i) > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
 #else
 		double px, py;
 		graph->GetPoint(i, px, py);
@@ -42,7 +42,7 @@ double GetYError(TGraphErrors* graph, const double& x)
 		if(px == x) return graph->GetErrorY(i);
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		else if(px > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(px > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
 #endif
 	}
 	return 0.;

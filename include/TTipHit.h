@@ -92,7 +92,7 @@ public:
    void Copy(TObject&, bool) const override;      //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTipHit, 1);
+   ClassDefOverride(TTipHit, 1); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

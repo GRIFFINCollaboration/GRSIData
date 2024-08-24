@@ -75,7 +75,7 @@ private:
    void EnumerateSystem();
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGRSIMnemonic, 1)
+   ClassDefOverride(TGRSIMnemonic, 1) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 

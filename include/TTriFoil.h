@@ -26,9 +26,8 @@ public:
    {
       if(n < fTBeam.size()) {
          return fTBeam.at(n);
-      } else {
-         return -1;
-      }
+		}
+		return -1;
    }
 
    bool   HasWave() const { return !fTfWave.empty(); }
@@ -51,7 +50,7 @@ private:
    std::vector<int>     fTBeam;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTriFoil, 2)
+   ClassDefOverride(TTriFoil, 2) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

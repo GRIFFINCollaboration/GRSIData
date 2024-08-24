@@ -111,7 +111,7 @@ private:
    void* fOutGzFile{nullptr}; ///< zlib compressed output file reader
 
    /// \cond CLASSIMP
-   ClassDefOverride(TMidasFile, 0) // Used to open and write Midas Files
+   ClassDefOverride(TMidasFile, 0) // Used to open and write Midas Files // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

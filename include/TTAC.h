@@ -43,7 +43,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTAC, 1) // TAC Physics structure
+   ClassDefOverride(TTAC, 1) // TAC Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

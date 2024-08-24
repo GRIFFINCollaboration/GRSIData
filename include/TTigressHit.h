@@ -126,7 +126,7 @@ public:
    void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); } //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTigressHit, 4)
+   ClassDefOverride(TTigressHit, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

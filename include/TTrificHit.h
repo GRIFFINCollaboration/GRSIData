@@ -47,7 +47,7 @@ private:
    Int_t fFilter{0};
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTrificHit, 3);
+   ClassDefOverride(TTrificHit, 3); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

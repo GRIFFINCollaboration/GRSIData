@@ -432,7 +432,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                   diff = ((x - z) / z);
                   ord  = 1;
                   break;
-               } else if(z > 0 && x < z) {
+               } 
+					if(z > 0 && x < z) {
                   diff = ((z - x) / x);
                   ord  = 0;
                   break;
@@ -516,10 +517,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                // std::cout<<"(see bin number "<<i<<" in spectrum "<<sname<<")"<<std::endl;
                ppgstat[1] += 1;
                break;
-            } else {
-               bnd[nt - 1][0] = i;
-               bnd[nt - 1][1] = trans[i][2];
-            }
+            } 
+				bnd[nt - 1][0] = i;
+				bnd[nt - 1][1] = trans[i][2];
          }
       }
       if(nt == numpat) {

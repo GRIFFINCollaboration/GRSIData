@@ -85,7 +85,7 @@ private:
    bool                fAllocatedByUs; ///< "true" if we own the data buffer
 
    /// \cond CLASSIMP
-   ClassDefOverride(TMidasEvent, 0) // All of the data contained in a Midas Event
+   ClassDefOverride(TMidasEvent, 0) // All of the data contained in a Midas Event // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

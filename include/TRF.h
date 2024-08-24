@@ -25,9 +25,8 @@ public:
    {
       if(fPeriod > 0.0f) {
          return (fTime / fPeriod) * TMath::TwoPi(); 
-      } else {
-         return -10.0; //negative value indicates failed RF fit
       }
+		return -10.0; //negative value indicates failed RF fit
    }
    Double_t Time() const { return fTime; } //in ns, not tstamp 10ns
    Double_t Period() const { return fPeriod; } //in ns
@@ -74,7 +73,7 @@ private:
    double fPeriod;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TRF, 4)
+   ClassDefOverride(TRF, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

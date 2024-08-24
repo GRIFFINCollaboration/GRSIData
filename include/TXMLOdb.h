@@ -50,7 +50,7 @@ private:
    static std::array<char, 256> fTextBuffer;
 
    /// \cond CLASSIMP
-   ClassDef(TXMLOdb, 0)
+   ClassDef(TXMLOdb, 0) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 #endif

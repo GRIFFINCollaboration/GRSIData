@@ -104,7 +104,7 @@ private:
    static double fSegmentPitch; //! angular pitch, degrees
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSharc2, 7)
+   ClassDefOverride(TSharc2, 7) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

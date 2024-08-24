@@ -162,7 +162,7 @@ public:
    void ClearModifiedMaps();
 
    /// \cond CLASSIMP
-   ClassDefOverride(TAngularCorrelation, 1)
+   ClassDefOverride(TAngularCorrelation, 1) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

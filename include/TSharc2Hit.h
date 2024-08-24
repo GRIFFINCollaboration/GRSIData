@@ -109,7 +109,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.; };
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSharc2Hit, 6)
+   ClassDefOverride(TSharc2Hit, 6) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

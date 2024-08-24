@@ -120,7 +120,7 @@ private:
 	static const TVector3 fNormalGridVec; //!
 
 	/// \cond CLASSIMP
-	ClassDefOverride(TTrific, 4) // TRIFIC Physics structure
+	ClassDefOverride(TTrific, 4) // TRIFIC Physics structure // NOLINT(readability-else-after-return)
 										  /// \endcond
 };
 /*! @} */

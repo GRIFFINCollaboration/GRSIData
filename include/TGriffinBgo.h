@@ -17,7 +17,7 @@ public:
    TGriffinBgo& operator=(const TGriffinBgo&); //!<!
 
    /// \cond CLASSIMP
-   ClassDef(TGriffinBgo, 1) // GriffinBgo Physics structure
+   ClassDef(TGriffinBgo, 1) // GriffinBgo Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

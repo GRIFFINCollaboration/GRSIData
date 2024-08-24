@@ -59,7 +59,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TDescant, 1) // Descant Physics structure
+   ClassDefOverride(TDescant, 1) // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

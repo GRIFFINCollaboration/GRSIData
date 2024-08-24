@@ -49,7 +49,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTip, 2);
+   ClassDefOverride(TTip, 2); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

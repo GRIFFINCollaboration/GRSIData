@@ -44,7 +44,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TPaces, 4) // Paces Physics structure
+   ClassDefOverride(TPaces, 4) // Paces Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

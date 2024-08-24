@@ -194,7 +194,7 @@ public:
    void Copy(TObject&) const override;            //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTigress, 7) // Tigress Physics structure
+   ClassDefOverride(TTigress, 7) // Tigress Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 

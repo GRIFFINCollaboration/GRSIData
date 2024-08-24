@@ -173,7 +173,7 @@ TVector3 TTrific::GetPosition()
 
 	//check if we've already calculated the position for this event. If so, just return it. If not, then reset the position variable.
 	if (fTrificBits.TestBit(ETrificBits::kPositionCalculated)) return fParticle;
-	else fParticle.SetXYZ(0,0,0);
+	fParticle.SetXYZ(0,0,0);
 	//flag that we're going to (try to at least) calculate the position vector for this event
 	fTrificBits.SetBit(ETrificBits::kPositionCalculated,true);
 
@@ -305,7 +305,7 @@ Int_t TTrific::GetRange()
 
 	//check if we've already calculated the fRange for this event. If so, return it. If not, we need to reset the range.
 	if (fTrificBits.TestBit(ETrificBits::kRangeCalculated)) return fRange;
-	else fRange=0;
+	fRange=0;
 
 	//first we'll check the single grid fragment, since there are more of them and they extend further
 	for(auto* hit: fSingFragments){

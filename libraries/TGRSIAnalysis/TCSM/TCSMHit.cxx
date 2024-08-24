@@ -148,10 +148,9 @@ Double_t TCSMHit::GetDEnergy() const
       return (GetDHorizontalEnergy());
    } else if(!trustVertical && !trustVertical) { // Are these correct??? RD
       return (0.);
-   } else {
-      std::cerr<<"  ERROR, I don't know who to trust in GetDEnergy()"<<std::endl;
-      return -1; // I added this here so that there is guaranteed a return at the end of the function RD
-   }
+	}
+	std::cerr<<"  ERROR, I don't know who to trust in GetDEnergy()"<<std::endl;
+	return -1; // I added this here so that there is guaranteed a return at the end of the function RD
 }
 
 Double_t TCSMHit::GetEEnergy() const
@@ -196,10 +195,9 @@ Double_t TCSMHit::GetEEnergy() const
       return (GetEHorizontalEnergy());
    } else if(!trustVertical && !trustVertical) { // Are these correct? RD
       return (0.);
-   } else {
-      return -1; // I added this here so that there is guaranteed a return at the end of the function RD
-      std::cerr<<"  ERROR, I don't know who to trust in GetEEnergy()"<<std::endl;
    }
+	std::cerr<<"  ERROR, I don't know who to trust in GetEEnergy()"<<std::endl;
+	return -1; // I added this here so that there is guaranteed a return at the end of the function RD
 }
 
 void TCSMHit::Print(Option_t*) const

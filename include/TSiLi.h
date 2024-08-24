@@ -132,7 +132,7 @@ public:
    static bool  fRejectPossibleCrosstalk; //!<!
    
    /// \cond CLASSIMP
-   ClassDefOverride(TSiLi, 6);
+   ClassDefOverride(TSiLi, 6); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

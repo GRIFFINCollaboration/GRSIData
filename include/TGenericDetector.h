@@ -33,7 +33,7 @@ private:
    void  ClearStatus() {  }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGenericDetector, 1)
+   ClassDefOverride(TGenericDetector, 1) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

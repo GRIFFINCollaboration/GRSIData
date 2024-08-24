@@ -74,7 +74,7 @@ private:
    static double fBdelay;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TEmmaHit, 3);
+   ClassDefOverride(TEmmaHit, 3); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */
