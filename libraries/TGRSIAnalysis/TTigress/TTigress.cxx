@@ -17,8 +17,7 @@ ClassImp(TTigress)
 double TTigress::fTargetOffset = 0.;
 double TTigress::fRadialOffset = 0.;
 
-// Default tigress unpacking settings
-TTransientBits<UShort_t> TTigress::fgTigressBits(ETigressGlobalBits::kSetCoreWave | ETigressGlobalBits::kSetBGOHits);
+TTransientBits<UShort_t> TTigress::fGlobalTigressBits(ETigressGlobalBits::kSetCoreWave | ETigressGlobalBits::kSetBGOHits);
 
 // Why arent these TTigress class functions?
 bool DefaultAddback(TDetectorHit* one, TDetectorHit* two)
@@ -370,48 +369,48 @@ void TTigress::BuildVectors(){
 						switch(CryNbr) {
 							case -1: break;
 							case 0:
-										xx = GeBluePositionBack[DetNbr][SegNbr][0];
-										yy = GeBluePositionBack[DetNbr][SegNbr][1];
-										zz = GeBluePositionBack[DetNbr][SegNbr][2];
+										xx = fGeBluePositionBack[DetNbr][SegNbr][0];
+										yy = fGeBluePositionBack[DetNbr][SegNbr][1];
+										zz = fGeBluePositionBack[DetNbr][SegNbr][2];
 										break;
 							case 1:
-										xx = GeGreenPositionBack[DetNbr][SegNbr][0];
-										yy = GeGreenPositionBack[DetNbr][SegNbr][1];
-										zz = GeGreenPositionBack[DetNbr][SegNbr][2];
+										xx = fGeGreenPositionBack[DetNbr][SegNbr][0];
+										yy = fGeGreenPositionBack[DetNbr][SegNbr][1];
+										zz = fGeGreenPositionBack[DetNbr][SegNbr][2];
 										break;
 							case 2:
-										xx = GeRedPositionBack[DetNbr][SegNbr][0];
-										yy = GeRedPositionBack[DetNbr][SegNbr][1];
-										zz = GeRedPositionBack[DetNbr][SegNbr][2];
+										xx = fGeRedPositionBack[DetNbr][SegNbr][0];
+										yy = fGeRedPositionBack[DetNbr][SegNbr][1];
+										zz = fGeRedPositionBack[DetNbr][SegNbr][2];
 										break;
 							case 3:
-										xx = GeWhitePositionBack[DetNbr][SegNbr][0];
-										yy = GeWhitePositionBack[DetNbr][SegNbr][1];
-										zz = GeWhitePositionBack[DetNbr][SegNbr][2];
+										xx = fGeWhitePositionBack[DetNbr][SegNbr][0];
+										yy = fGeWhitePositionBack[DetNbr][SegNbr][1];
+										zz = fGeWhitePositionBack[DetNbr][SegNbr][2];
 										break;
 						};
 					} else {
 						switch(CryNbr) {
 							case -1: break;
 							case 0:
-										xx = GeBluePosition[DetNbr][SegNbr][0];
-										yy = GeBluePosition[DetNbr][SegNbr][1];
-										zz = GeBluePosition[DetNbr][SegNbr][2];
+										xx = fGeBluePosition[DetNbr][SegNbr][0];
+										yy = fGeBluePosition[DetNbr][SegNbr][1];
+										zz = fGeBluePosition[DetNbr][SegNbr][2];
 										break;
 							case 1:
-										xx = GeGreenPosition[DetNbr][SegNbr][0];
-										yy = GeGreenPosition[DetNbr][SegNbr][1];
-										zz = GeGreenPosition[DetNbr][SegNbr][2];
+										xx = fGeGreenPosition[DetNbr][SegNbr][0];
+										yy = fGeGreenPosition[DetNbr][SegNbr][1];
+										zz = fGeGreenPosition[DetNbr][SegNbr][2];
 										break;
 							case 2:
-										xx = GeRedPosition[DetNbr][SegNbr][0];
-										yy = GeRedPosition[DetNbr][SegNbr][1];
-										zz = GeRedPosition[DetNbr][SegNbr][2];
+										xx = fGeRedPosition[DetNbr][SegNbr][0];
+										yy = fGeRedPosition[DetNbr][SegNbr][1];
+										zz = fGeRedPosition[DetNbr][SegNbr][2];
 										break;
 							case 3:
-										xx = GeWhitePosition[DetNbr][SegNbr][0];
-										yy = GeWhitePosition[DetNbr][SegNbr][1];
-										zz = GeWhitePosition[DetNbr][SegNbr][2];
+										xx = fGeWhitePosition[DetNbr][SegNbr][0];
+										yy = fGeWhitePosition[DetNbr][SegNbr][1];
+										zz = fGeWhitePosition[DetNbr][SegNbr][2];
 										break;
 						};
 					}
@@ -459,7 +458,7 @@ std::array<TVector3, 17> TTigress::fCloverRadial = {TVector3(0., 0., 0.),
                                                     TVector3(-0.9239, -0.3827, -1.),
                                                     TVector3(0.3827, -0.9239, -1.)};
 
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeBluePosition = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeBluePosition = {{{{{0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
@@ -614,7 +613,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeBluePosition = 
                                                                                     {72.34, -135.56, -95.31}}}}};
 
 // Assuming this is the 1
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeGreenPosition = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeGreenPosition = {{{{{0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
@@ -769,7 +768,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeGreenPosition =
                                                                                     {81.09, -89.31, -134.70}}}}};
 
 // Assuming this is the 2
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeRedPosition = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeRedPosition = {{{{{0., 0., 0.},
                                                                                   {0., 0., 0.},
                                                                                   {0., 0., 0.},
                                                                                   {0., 0., 0.},
@@ -924,7 +923,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeRedPosition = {
                                                                                   {22.65, -93.78, -152.93}}}}};
 
 // Assuming this is the 3
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeWhitePosition = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeWhitePosition = {{{{{0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
                                                                                     {0., 0., 0.},
@@ -1078,7 +1077,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeWhitePosition =
                                                                                     {37.87, -129.91, -113.68},
                                                                                     {13.91, -140.03, -113.54}}}}};
 
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeBluePositionBack = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeBluePositionBack = {{{{{0., 0., 0.},
                                                                                        {0., 0., 0.},
                                                                                        {0., 0., 0.},
                                                                                        {0., 0., 0.},
@@ -1233,7 +1232,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeBluePositionBac
                                                                                        {81.81, -158.43, -120.06}}}}};
 
 // Assuming this is the 1
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeGreenPositionBack = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeGreenPositionBack = {{{{{0., 0., 0.},
                                                                                         {0., 0., 0.},
                                                                                         {0., 0., 0.},
                                                                                         {0., 0., 0.},
@@ -1388,7 +1387,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeGreenPositionBa
                                                                                         {90.56, -112.17, -159.45}}}}};
 
 // Assuming this is the 2
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeRedPositionBack = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeRedPositionBack = {{{{{0., 0., 0.},
                                                                                       {0., 0., 0.},
                                                                                       {0., 0., 0.},
                                                                                       {0., 0., 0.},
@@ -1543,7 +1542,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeRedPositionBack
                                                                                       {32.12, -116.65, -177.67}}}}};
 
 // Assuming this is the 3
-std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeWhitePositionBack = {{{{{0., 0., 0.},
+std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::fGeWhitePositionBack = {{{{{0., 0., 0.},
                                                                                         {0., 0., 0.},
                                                                                         {0., 0., 0.},
                                                                                         {0., 0., 0.},
@@ -1697,7 +1696,7 @@ std::array<std::array<std::array<double, 3>, 9>, 17> TTigress::GeWhitePositionBa
                                                                                         {47.34, -152.78, -138.43},
                                                                                         {23.38, -162.90, -138.29}}}}};
 
-std::array<std::array<std::array<bool, 5>, 4>, 4> TTigress::BGOSuppression = {{{{{true, true, true, true, true},
+std::array<std::array<std::array<bool, 5>, 4>, 4> TTigress::fBGOSuppression = {{{{{true, true, true, true, true},
                                                                                  {true, false, false, false, false},
                                                                                  {false, false, false, false, false},
                                                                                  {false, false, false, false, true}}},

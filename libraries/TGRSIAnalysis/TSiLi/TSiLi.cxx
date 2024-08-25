@@ -13,10 +13,10 @@ double TSiLi::fOuterDiameter  = 94.;
 double TSiLi::fInnerDiameter  = 16.;
 double TSiLi::fTargetDistance = -117.8;
 
-double TSiLi::sili_noise_fac        = 4;
-double TSiLi::sili_default_decay    = 4616.18;
-double TSiLi::sili_default_rise     = 20.90;
-double TSiLi::sili_default_baseline = -4300;
+double TSiLi::fSiLiNoiseFac        = 4;
+double TSiLi::fSiLiDefaultDecay    = 4616.18;
+double TSiLi::fSiLiDefaultRise     = 20.90;
+double TSiLi::fSiLiDefaultBaseline = -4300;
 double TSiLi::BaseFreq=4;
 
 double  TSiLi::fSiLiCoincidenceTime = 200;

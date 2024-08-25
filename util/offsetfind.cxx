@@ -99,18 +99,18 @@ public:
 
    int DigIndex() const { return digmap.find(digitizernum)->second; }
 
-   static std::map<int, int> digmap;
-   static unsigned long low_timemidas;
-   static int           best_dig;
-   static int64_t       lowest_time;
+   static std::map<int, int> digmap; // NOLINT(readability-identifier-naming)
+   static unsigned long low_timemidas; // NOLINT(readability-identifier-naming)
+   static int           best_dig; // NOLINT(readability-identifier-naming)
+   static int64_t       lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
-   int           timelow;
-   int           timehigh;
-   unsigned long timemidas;
-   int           dettype;
-   int           chanadd;
-   int           digitizernum{};
+   int           timelow; // NOLINT(readability-identifier-naming)
+   int           timehigh; // NOLINT(readability-identifier-naming)
+   unsigned long timemidas; // NOLINT(readability-identifier-naming)
+   int           dettype; // NOLINT(readability-identifier-naming)
+   int           chanadd; // NOLINT(readability-identifier-naming)
+   int           digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
 unsigned long TEventTime::low_timemidas = -1;

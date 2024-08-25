@@ -165,20 +165,20 @@ public:
 
    inline static uint64_t GetLowestTime() { return lowest_time; }
 
-   static std::map<uint32_t, int>     digmap;
-   static std::map<uint32_t, bool>    digset;
-   static std::map<uint32_t, int64_t> correctionmap;
-   static unsigned long low_timemidas;
-   static uint32_t      best_dig;
-   static uint64_t      lowest_time;
+   static std::map<uint32_t, int>     digmap; // NOLINT(readability-identifier-naming)
+   static std::map<uint32_t, bool>    digset; // NOLINT(readability-identifier-naming)
+   static std::map<uint32_t, int64_t> correctionmap; // NOLINT(readability-identifier-naming)
+   static unsigned long low_timemidas; // NOLINT(readability-identifier-naming)
+   static uint32_t      best_dig; // NOLINT(readability-identifier-naming)
+   static uint64_t      lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
-   unsigned int  timelow;
-   unsigned int  timehigh;
-   unsigned long timemidas;
-   int           dettype;
-   uint32_t      chanadd;
-   uint32_t      digitizernum{};
+   unsigned int  timelow; // NOLINT(readability-identifier-naming)
+   unsigned int  timehigh; // NOLINT(readability-identifier-naming)
+   unsigned long timemidas; // NOLINT(readability-identifier-naming)
+   int           dettype; // NOLINT(readability-identifier-naming)
+   uint32_t      chanadd; // NOLINT(readability-identifier-naming)
+   uint32_t      digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
 unsigned long TEventTime::low_timemidas = -1;

@@ -78,10 +78,10 @@ public:
 
    static std::vector<TGraph> UpstreamShapes();
 
-   static double sili_noise_fac;        // Sets the level of integration to remove noise during waveform fitting
-   static double sili_default_decay;    // Sets the waveform fit decay parameter
-   static double sili_default_rise;     // Sets the waveform fit rise parameter
-   static double sili_default_baseline; // Sets the waveform fit rise parameter
+   static double fSiLiNoiseFac;        // Sets the level of integration to remove noise during waveform fitting
+   static double fSiLiDefaultDecay;    // Sets the waveform fit decay parameter
+   static double fSiLiDefaultRise;     // Sets the waveform fit rise parameter
+   static double fSiLiDefaultBaseline; // Sets the waveform fit rise parameter
 
 	static Int_t GetRing(Int_t seg) {  return seg/12; }
 	static Int_t GetSector(Int_t seg) {  return seg%12; }

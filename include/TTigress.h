@@ -99,7 +99,7 @@ private:
    static std::function<bool(TDetectorHit*, TDetectorHit*)> fAddbackCriterion;
    static std::function<bool(TDetectorHit*, TBgoHit&)>      fSuppressionCriterion;
 #endif
-   static TTransientBits<UShort_t> fgTigressBits; //!
+   static TTransientBits<UShort_t>        fGlobalTigressBits; //!<!
    TTransientBits<UShort_t>        fTigressBits;
 
    static double fTargetOffset; //!<!
@@ -112,19 +112,19 @@ private:
    static std::array<std::array<TVector3, 2>, 17> fCloverCross;      	//!<!  clover perpendicular vectors, for smearing
 
    // These array contain the original data that is used
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeBluePosition;      //!<!  detector segment XYZ
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeGreenPosition;     //!<!
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeRedPosition;       //!<!
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeWhitePosition;     //!<!
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeBluePositionBack;  //!<!  detector segment XYZ
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeGreenPositionBack; //!<!
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeRedPositionBack;   //!<!
-   static std::array<std::array<std::array<double, 3>, 9>, 17> GeWhitePositionBack; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeBluePosition;      //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeGreenPosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPosition;       //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeBluePositionBack;  //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeGreenPositionBack; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPositionBack;   //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePositionBack; //!<!
 
    //    void ClearStatus();                      // WARNING: this will change the building behavior!
-   //		void ClearGlobalStatus() { fTigressBits = 0; }
-   static void SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fgTigressBits.SetBit(bit, set); }
-   static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fgTigressBits.TestBit(bit)); }
+   //		void ClearGlobalStatus() { fGlobalTigressBits = 0; }
+   static void SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fGlobalTigressBits.SetBit(bit, set); }
+   static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fGlobalTigressBits.TestBit(bit)); }
 
    std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
    std::vector<UShort_t>      fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
@@ -169,7 +169,7 @@ public:
    static bool GetArrayBackPos() { return TestGlobalBit(ETigressGlobalBits::kArrayBackPos); } //!<!
    static bool GetVectorsBuilt() { return TestGlobalBit(ETigressGlobalBits::kVectorsBuilt); } //!<!
 
-   static std::array<std::array<std::array<bool, 5>, 4>, 4> BGOSuppression; //!<!
+   static std::array<std::array<std::array<bool, 5>, 4>, 4> fBGOSuppression; //!<!
 
    static void SetTargetOffset(double offset) {
 	   fTargetOffset = offset; 

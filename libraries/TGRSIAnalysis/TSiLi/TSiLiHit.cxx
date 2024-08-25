@@ -77,7 +77,7 @@ TPulseAnalyzer* TSiLiHit::FitFrag(const TFragment& frag, int ShapeFit, int segme
 
 TPulseAnalyzer* TSiLiHit::FitFrag(const TFragment& frag, int ShapeFit, TChannel* channel)
 {
-   auto* pulse = new TPulseAnalyzer(frag, TSiLi::sili_noise_fac);
+   auto* pulse = new TPulseAnalyzer(frag, TSiLi::fSiLiNoiseFac);
    if(FitPulseAnalyzer(pulse, ShapeFit, channel) != 0) {
       return pulse;
    }
@@ -115,9 +115,9 @@ int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, TChannel* ch
 		}
 // 		std::cout<<std::endl<<Decay<<" "<<Rise<<" "<<Base;
 
-		if(Decay == 0.)Decay=TSiLi::sili_default_decay;
-		if(Rise == 0.)Rise=TSiLi::sili_default_rise;
-		if(Base == 0.)Base=TSiLi::sili_default_baseline;
+		if(Decay == 0.)Decay=TSiLi::fSiLiDefaultDecay;
+		if(Rise == 0.)Rise=TSiLi::fSiLiDefaultRise;
+		if(Base == 0.)Base=TSiLi::fSiLiDefaultBaseline;
 		
 		bool goodfit=false;
 		if(ShapeFit<2)goodfit=pulse->GetSiliShape(Decay,Rise);
