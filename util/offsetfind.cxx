@@ -62,14 +62,14 @@ public:
 
    int64_t GetTimeStamp() const
    {
-      long time = timehigh;
+      int64_t time = timehigh;
       time      = time<<28;
       time |= timelow & 0x0fffffff;
       return time;
    }
    int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() const { return timemidas; }
+   uint64_t MidasTime() const { return timemidas; }
 
    int Digitizer() const { return digitizernum; }
 
@@ -95,25 +95,25 @@ public:
 
    inline static int GetBestDigitizer() { return best_dig; }
 
-   static unsigned long GetLowestMidasTime() { return low_timemidas; }
+   static uint64_t GetLowestMidasTime() { return low_timemidas; }
 
    int DigIndex() const { return digmap.find(digitizernum)->second; }
 
    static std::map<int, int> digmap; // NOLINT(readability-identifier-naming)
-   static unsigned long low_timemidas; // NOLINT(readability-identifier-naming)
+   static uint64_t low_timemidas; // NOLINT(readability-identifier-naming)
    static int           best_dig; // NOLINT(readability-identifier-naming)
    static int64_t       lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
    int           timelow; // NOLINT(readability-identifier-naming)
    int           timehigh; // NOLINT(readability-identifier-naming)
-   unsigned long timemidas; // NOLINT(readability-identifier-naming)
+   uint64_t timemidas; // NOLINT(readability-identifier-naming)
    int           dettype; // NOLINT(readability-identifier-naming)
    int           chanadd; // NOLINT(readability-identifier-naming)
    int           digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
-unsigned long TEventTime::low_timemidas = -1;
+uint64_t TEventTime::low_timemidas = -1;
 int64_t       TEventTime::lowest_time   = -1;
 int           TEventTime::best_dig      = 0;
 std::map<int, int> TEventTime::digmap;
@@ -185,7 +185,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
    for(it = eventQ->begin(); it != eventQ->end(); it++) {
       // This makes the plot, might not be required
       int           hightime = (*it)->TimeStampHigh();
-      unsigned long midtime  = (*it)->MidasTime() - lowmidtime;
+      uint64_t midtime  = (*it)->MidasTime() - lowmidtime;
       if(midtime > 20) {
          break; // 20 seconds seems like plenty enough time
       }

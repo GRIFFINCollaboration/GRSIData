@@ -68,46 +68,46 @@ int main(int argc, char** argv)
          if(gotGriffin) {
             tree->SetBranchAddress("TGriffin", &grif);
          }
-         long numGriffin = 0;
+         int64_t numGriffin = 0;
 
          bool      gotDescant = (tree->FindBranch("TDescant") != nullptr);
          TDescant* desc       = nullptr;
          if(gotDescant) {
             tree->SetBranchAddress("TDescant", &desc);
          }
-         long numDescant = 0;
+         int64_t numDescant = 0;
 
          bool   gotLaBr = (tree->FindBranch("TLaBr") != nullptr);
          TLaBr* laBr    = nullptr;
          if(gotLaBr) {
             tree->SetBranchAddress("TLaBr", &laBr);
          }
-         long numLaBr = 0;
+         int64_t numLaBr = 0;
 
          bool         gotZeroDegree = (tree->FindBranch("TZeroDegree") != nullptr);
          TZeroDegree* zd            = nullptr;
          if(gotZeroDegree) {
             tree->SetBranchAddress("TZeroDegree", &zd);
          }
-         long numZeroDegree = 0;
+         int64_t numZeroDegree = 0;
 
          bool      gotSceptar = (tree->FindBranch("TSceptar") != nullptr);
          TSceptar* scep       = nullptr;
          if(gotSceptar) {
             tree->SetBranchAddress("TSceptar", &scep);
          }
-         long numSceptar = 0;
+         int64_t numSceptar = 0;
 
          bool    gotPaces = (tree->FindBranch("TPaces") != nullptr);
          TPaces* pace     = nullptr;
          if(gotPaces) {
             tree->SetBranchAddress("TPaces", &pace);
          }
-         long numPaces = 0;
+         int64_t numPaces = 0;
 
          // Tigress
 
-         for(long e = 0; e < tree->GetEntries(); ++e) {
+         for(int64_t e = 0; e < tree->GetEntries(); ++e) {
             tree->GetEntry(e);
 
             if(gotGriffin) {

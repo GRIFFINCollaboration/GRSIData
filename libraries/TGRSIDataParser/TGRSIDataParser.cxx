@@ -333,7 +333,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	}
 	// fragment_id_map[value]++;
 	// currentFrag->FragmentId = fragment_id_map[value];
-	LastTriggerId(static_cast<unsigned long>(currentFrag->GetTriggerId()));
+	LastTriggerId(static_cast<uint64_t>(currentFrag->GetTriggerId()));
 	return true;
 }
 
@@ -341,13 +341,13 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
 {
 	/// Sets the Timestamp of a Tigress Event
 	for(int x = 0; x < 10; x++) { // finds the timestamp.
-		data = data + 1;
+		++data;
 		if(((*data) >> 28) == 0xa) {
 			break;
 		}
 	}
-	long timestamplow  = -1;
-	long timestamphigh = -1;
+	int64_t timestamplow  = -1;
+	int64_t timestamphigh = -1;
 
 
 	if(!((*data & 0xf0000000) == 0xa0000000)) {

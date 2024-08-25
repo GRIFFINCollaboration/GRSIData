@@ -69,7 +69,7 @@ ________________________________________________________________________________
 
 #define MAXENTRIES 0 //Set to 0 for all entries. 
 
-TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w );
+TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w );
 
 int main(int argc, char **argv)
 {
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 // ********************* FUNCTION DEFINITIONS *********************** //
 // ****************************************************************** //
 
-TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
+TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 {
 	if(w == nullptr) {
 	  w = new TStopwatch;

@@ -167,7 +167,7 @@ Int_t TSiLi::GetAddbackMultiplicity()
 {
 	// Automatically builds the addback hits using the addback_criterion (if the size of the addback_hits vector is zero)
 	// and return the number of addback hits.
-	short basehits = GetMultiplicity();
+	int16_t basehits = GetMultiplicity();
 
 	// if the addback has been reset, clear the addback hits
 	if(fSiLiBits.TestBit(ESiLiBits::kAddbackSet)) {

@@ -853,7 +853,7 @@ void TMidasFile::SetGRIFFOdb()
    std::vector<int> tmpCodes = fOdb->ReadIntArray(node);
    // the codes are 32bit with the 16 high bits being the same as the 16 low bits
    // we check this and only keep the low 16 bits
-   std::vector<short> ppgCodes;
+   std::vector<int16_t> ppgCodes;
    for(auto& code : tmpCodes) {
       if(((code >> 16) & 0xffff) != (code & 0xffff)) {
          std::cout<<DRED<<"Found ppg code in the ODB with high bits (0x"<<std::hex<<(code >> 16)

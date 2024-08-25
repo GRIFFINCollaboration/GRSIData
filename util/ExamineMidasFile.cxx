@@ -16,7 +16,7 @@ void ExamineMidasFile(const char *filename) {
 		return;
 	}   
 	in.seekg(0, std::ifstream::end);
-	long long filesize = in.tellg();
+	int64_t filesize = in.tellg();
 	in.close();
 
 	TMidasFile  mfile; 
@@ -25,10 +25,10 @@ void ExamineMidasFile(const char *filename) {
 
 	mfile.Open(filename);
 
-	long long starttime    = 0;
-	long long stoptime     = 0;
+	int64_t starttime    = 0;
+	int64_t stoptime     = 0;
 	int currenteventnumber = 0;
-	long long bytesread = 0;
+	int64_t bytesread = 0;
 
 	bool loop = true;
 
@@ -72,7 +72,7 @@ void ExamineMidasFile(const char *filename) {
 		printf("\tEventId[0x%x]  =  %i\n",it.first,it.second);
 	}
 	printf("\n");
-	printf("Run length =  %lli  seconds\n",stoptime-starttime);
+	printf("Run length =  %lli  seconds\n",static_cast<long long int>(stoptime-starttime));
 	printf("\n");
 }
 

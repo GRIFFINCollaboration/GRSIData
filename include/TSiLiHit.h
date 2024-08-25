@@ -51,8 +51,7 @@ public:
    {
 	   double fitt=GetTimeFit();
       if(fitt != 0 && fitt < 1000 && fitt > -1000) {
-         long ts = GetTimeStamp()<<4 &
-                   0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
+         int64_t ts = GetTimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
          return ts + fitt * 16;
       }
       return 0;
@@ -115,7 +114,7 @@ public:
       }
       return 0;
    }
-   short GetAddbackSegment(unsigned int i)
+   int16_t GetAddbackSegment(unsigned int i)
    {
       if(i < GetAddbackSize()) {
          return fAddBackSegments[i];
@@ -126,7 +125,7 @@ public:
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
-   std::vector<short>      fAddBackSegments;   //!<!
+   std::vector<int16_t>      fAddBackSegments;   //!<!
    std::vector<double>     fAddBackEnergy;     //!<!
    // probably not needed after development finished
    TTransientBits<UChar_t> fSiLiHitBits;

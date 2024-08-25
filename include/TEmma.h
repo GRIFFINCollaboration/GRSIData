@@ -62,7 +62,7 @@ private:
    static double fYsum;
    static double fXlength;
    static double fYlength;
-   static short fFail;
+   static int16_t fFail;
 
 
 public:

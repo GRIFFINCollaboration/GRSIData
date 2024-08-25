@@ -133,11 +133,11 @@ int main(int argc, char** argv)
 
    std::ifstream in(file->GetFilename(), std::ifstream::in | std::ifstream::binary);
    in.seekg(0, std::ifstream::end);
-   long long filesize = in.tellg();
+   int64_t filesize = in.tellg();
    in.close();
 
    int       bytes     = 0;
-   long long bytesread = 0;
+   int64_t bytesread = 0;
 
    TStopwatch w;
    w.Start();

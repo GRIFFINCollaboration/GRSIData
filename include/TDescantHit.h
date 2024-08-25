@@ -29,7 +29,7 @@ private:
    Int_t              fZc;
    Int_t              fCcShort;
    Int_t              fCcLong;
-   std::vector<short> fCfdMonitor;
+   std::vector<int16_t> fCfdMonitor;
    std::vector<int>   fPartialSum;
 
 public:
@@ -49,7 +49,7 @@ public:
    inline Int_t               GetZc() const { return fZc; }                  //!<!
    inline Int_t               GetCcShort() const { return fCcShort; }        //!<!
    inline Int_t               GetCcLong() const { return fCcLong; }          //!<!
-   inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
+   inline std::vector<int16_t>& GetCfdMonitor() { return fCfdMonitor; }
    inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
 
    Float_t  GetCfd() const override;
@@ -84,7 +84,7 @@ private:
    Double_t GetDefaultDistance() const { return 222.; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TDescantHit, 6) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TDescantHit, 7) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

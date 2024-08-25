@@ -33,7 +33,7 @@ public:
 
 private:
    Int_t              fFilter{0};
-   std::vector<short> fCfdMonitor;
+   std::vector<int16_t> fCfdMonitor;
    std::vector<int>   fPartialSum;
 
 public:

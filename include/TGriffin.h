@@ -139,7 +139,7 @@ private:
    static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
    // static bool fSetBGOWave;                //!<!  Flag for BGO Waveforms ON/OFF
 
-   long                            fCycleStart; //!<!  The start of the cycle
+   int64_t                            fCycleStart; //!<!  The start of the cycle
    mutable TTransientBits<UChar_t> fGriffinBits;  // Transient member flags
 
    mutable std::vector<TDetectorHit*> fAddbackLowGainHits;  //!<! Used to create addback hits on the fly

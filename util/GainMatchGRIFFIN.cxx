@@ -221,7 +221,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 		if(skipChannel) continue;
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
-		long int address = chan->GetAddress();
+		unsigned int address = chan->GetAddress();
 		hst[i]->SetTitle(Form("%s-0x%08x", name, static_cast<unsigned int>(address)));
 	}
 
@@ -596,7 +596,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 		if(hst[i]->Integral()==0) continue;
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
-		long int address = chan->GetAddress();
+		unsigned int address = chan->GetAddress();
 		hst[i]->SetTitle(Form("%s-0x%08x",name,static_cast<unsigned int>(address)));
 	}
 	return list;

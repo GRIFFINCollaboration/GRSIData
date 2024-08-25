@@ -51,8 +51,7 @@ public:
    
    Double_t GetTimestampCfd() const
    { // ticks ->cfdunits
-      long ts =
-         TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
+      int64_t ts = TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
       return ts;
    }
 

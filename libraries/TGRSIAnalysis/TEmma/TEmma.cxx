@@ -25,7 +25,7 @@ double TEmma::fYdiff = 0;
 double TEmma::fYsum = 0;
 double TEmma::fXlength = 80.; //Size of X focal plane in mm
 double TEmma::fYlength = 30.; //Size of Y focal plane in mm
-short TEmma::fFail = 0;
+int16_t TEmma::fFail = 0;
 
 TEmma::TEmma()
 {

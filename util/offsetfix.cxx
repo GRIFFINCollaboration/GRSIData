@@ -123,7 +123,7 @@ public:
    }
    unsigned int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() const { return timemidas; }
+   uint64_t MidasTime() const { return timemidas; }
 
    uint32_t Digitizer() const { return digitizernum; }
 
@@ -159,7 +159,7 @@ public:
       return best_dig;
    }
 
-   static unsigned long GetLowestMidasTime() { return low_timemidas; }
+   static uint64_t GetLowestMidasTime() { return low_timemidas; }
 
    int DigIndex() const { return digmap.find(digitizernum)->second; }
 
@@ -168,20 +168,20 @@ public:
    static std::map<uint32_t, int>     digmap; // NOLINT(readability-identifier-naming)
    static std::map<uint32_t, bool>    digset; // NOLINT(readability-identifier-naming)
    static std::map<uint32_t, int64_t> correctionmap; // NOLINT(readability-identifier-naming)
-   static unsigned long low_timemidas; // NOLINT(readability-identifier-naming)
+   static uint64_t low_timemidas; // NOLINT(readability-identifier-naming)
    static uint32_t      best_dig; // NOLINT(readability-identifier-naming)
    static uint64_t      lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
    unsigned int  timelow; // NOLINT(readability-identifier-naming)
    unsigned int  timehigh; // NOLINT(readability-identifier-naming)
-   unsigned long timemidas; // NOLINT(readability-identifier-naming)
+   uint64_t timemidas; // NOLINT(readability-identifier-naming)
    int           dettype; // NOLINT(readability-identifier-naming)
    uint32_t      chanadd; // NOLINT(readability-identifier-naming)
    uint32_t      digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
-unsigned long TEventTime::low_timemidas = -1;
+uint64_t TEventTime::low_timemidas = -1;
 uint64_t      TEventTime::lowest_time   = 0xffffffffffffffff;
 uint32_t      TEventTime::best_dig      = 0;
 std::map<uint32_t, int>     TEventTime::digmap;
@@ -306,7 +306,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ)
    for(it = eventQ->begin(); it != eventQ->end(); it++) {
       // This makes the plot, might not be required
       int           hightime = (*it)->TimeStampHigh();
-      unsigned long midtime  = (*it)->MidasTime() - lowmidtime;
+      uint64_t midtime  = (*it)->MidasTime() - lowmidtime;
       if(midtime > 20) {
          break; // 20 seconds seems like plenty enough time
       }
@@ -725,11 +725,11 @@ void WriteEvents(TMidasFile * file)
 
 	std::ifstream in(file->GetFilename(), std::ifstream::in | std::ifstream::binary);
 	in.seekg(0, std::ifstream::end);
-	long long filesize = in.tellg();
+	int64_t filesize = in.tellg();
 	in.close();
 
 	int       bytes     = 0;
-	long long bytesread = 0;
+	int64_t bytesread = 0;
 
 	UInt_t num_evt = 0;
 
