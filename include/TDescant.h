@@ -44,7 +44,7 @@ public:
 public:
    static bool SetWave() { return fSetWave; }         //!<!
    void SetWave(bool flag) { fSetWave = flag; }       //!<!
-   bool              Hit() { return fHitFlag; }       //!<!
+   bool              Hit() const { return fHitFlag; }       //!<!
    void SetHit(bool flag = true) { fHitFlag = flag; } //!<!
 private:
    static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF

@@ -46,16 +46,16 @@ public:
    inline void SetPID(Double_t x) { fPID = x; }                //!<!
    inline void SetTipChannel(const int x) { fTipChannel = x; } //!<!
 
-   inline Int_t    GetFilterPattern() { return fFilter; }      //!<!
-   inline Double_t GetPID() { return fPID; }                 //!<!
-   inline Int_t    GetFitChiSq() { return fChiSq; }          //!<!
-   inline Double_t GetFitTime() { return fTimeFit; }         //!<!
-   inline Int_t    GetFitType() { return fFitType; }         //!<!
-   inline Double_t GetSignalToNoise() { return fSig2Noise; } //!<!
+   inline Int_t    GetFilterPattern() const { return fFilter; }      //!<!
+   inline Double_t GetPID() const { return fPID; }                 //!<!
+   inline Int_t    GetFitChiSq() const { return fChiSq; }          //!<!
+   inline Double_t GetFitTime() const { return fTimeFit; }         //!<!
+   inline Int_t    GetFitType() const { return fFitType; }         //!<!
+   inline Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
    inline Int_t    GetTipChannel() const { return fTipChannel; }   //!<!
 
-   inline bool IsCsI() { return csi_flag; }                    //!<!
-   inline void SetCsI(bool flag = true) { csi_flag = flag; } //!<!
+   inline bool IsCsI() const { return csi_flag; }              //!<!
+   inline void SetCsI(bool flag = true) { csi_flag = flag; }   //!<!
    inline void SetFitChiSq(int chisq) { fChiSq = chisq; }      //!<!
 
    bool InFilter(Int_t); //!<!

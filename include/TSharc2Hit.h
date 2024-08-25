@@ -96,7 +96,7 @@ public:
    {
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
    };                                                                          //!<!
-   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0); //!<!
+   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const; //!<!
 
    void SetFront(const TFragment& frag); //!<!
    void SetBack(const TFragment& frag);  //!<!

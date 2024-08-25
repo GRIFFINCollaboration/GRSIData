@@ -86,7 +86,7 @@ public:
    double GetEnergy(Option_t* opt = nullptr) const override;
 
    // Not strictly "doppler" but consistent
-   inline double GetDoppler(double beta, TVector3* vec = nullptr,double E=0)
+   inline double GetDoppler(double beta, TVector3* vec = nullptr,double E=0) const
    {
       if(vec == nullptr) {
          vec = GetBeamDirection();

@@ -81,7 +81,7 @@ TVector3 TSharcHit::GetPosition() const
 	return GetPosition(GetDefaultDistance());
 }
 
-Double_t TSharcHit::GetTheta(double Xoff, double Yoff, double Zoff)
+Double_t TSharcHit::GetTheta(double Xoff, double Yoff, double Zoff) const
 {
 	TVector3 posOff;
 	posOff.SetXYZ(Xoff, Yoff, Zoff);

@@ -62,8 +62,8 @@ private:
    TCSMHit* MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>&, std::vector<std::pair<TFragment, TGRSIMnemonic>>&);
    TCSMHit* CombineHits(TDetectorHit*, TDetectorHit*);
    void    RecoverHit(char, std::pair<TFragment, TGRSIMnemonic>&, std::vector<TDetectorHit*>&);
-   bool    AlmostEqual(int, int);
-   bool    AlmostEqual(double, double);
+   bool    AlmostEqual(int, int) const;
+   bool    AlmostEqual(double, double) const;
 
    /// \cond CLASSIMP
    ClassDefOverride(TCSM, 5) // NOLINT(readability-else-after-return)

@@ -60,7 +60,7 @@ private:
    UShort_t fDetectorNumber; //
 
 public:
-   bool IsEmpty();
+   bool IsEmpty() const;
 
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!

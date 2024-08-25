@@ -19,15 +19,15 @@ public:
 
    const char* what() const noexcept override;
 
-   int                                 GetFailedWord() { return fFailedWord; }
-   TGRSIDataParser::EDataParserState GetParserState() { return fParserState; }
-   bool                                GetMultipleErrors() { return fMultipleErrors; }
+   int                               GetFailedWord() const { return fFailedWord; }
+   TGRSIDataParser::EDataParserState GetParserState() const { return fParserState; }
+   bool                              GetMultipleErrors() const { return fMultipleErrors; }
 
 private:
    TGRSIDataParser::EDataParserState fParserState;
-   int                                 fFailedWord;
-   bool                                fMultipleErrors;
-   std::string                         fMessage;
+   int                               fFailedWord;
+   bool                              fMultipleErrors;
+   std::string                       fMessage;
 };
 /*! @} */
 #endif

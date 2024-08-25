@@ -39,8 +39,8 @@ public:
 	void Print(std::ostream& out) const override; //!<!
    void Clear(Option_t* opt = "") override;
 
-   inline Double_t GetFitTime() { return fTimeFit; }         //!<!
-   inline Double_t GetSignalToNoise() { return fSig2Noise; } //!<!
+   inline Double_t GetFitTime() const { return fTimeFit; }         //!<!
+   inline Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
 
    void SetRingNumber(Short_t rn) { fRing = rn; }
    void SetSectorNumber(Short_t sn) { fSector = sn; }
@@ -59,9 +59,9 @@ public:
 
    Bool_t SectorsDownstream() const;
    
-   Double_t GetPhi(double offset = 0) { return GetPosition(offset).Phi(); }
+   Double_t GetPhi(double offset = 0) const { return GetPosition(offset).Phi(); }
 
-   Double_t GetTheta(double offset = 0, TVector3* vec = nullptr)
+   Double_t GetTheta(double offset = 0, TVector3* vec = nullptr) const
    {
       if(vec == nullptr) {
          vec = new TVector3();

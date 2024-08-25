@@ -1137,7 +1137,7 @@ std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(st
 /// This function is called by GenerateGroupMaps()
 ///
 
-Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group)
+Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group) const
 {
 
    // get number of group entries
@@ -1158,7 +1158,7 @@ Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group)
 /// Returns the number of groups
 ///
 
-Int_t TAngularCorrelation::GetNumGroups()
+Int_t TAngularCorrelation::GetNumGroups() const
 {
    Int_t max = 0;
    for(int fGroup : fGroups) {
@@ -1173,7 +1173,7 @@ Int_t TAngularCorrelation::GetNumGroups()
 /// Returns the number of groups
 ///
 
-Int_t TAngularCorrelation::GetNumModIndices()
+Int_t TAngularCorrelation::GetNumModIndices() const
 {
    Int_t max = 0;
    for(int fModifiedIndice : fModifiedIndices) {
@@ -1192,7 +1192,7 @@ Int_t TAngularCorrelation::GetNumModIndices()
 /// This function is called by GenerateGroupMaps()
 ///
 
-Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles)
+Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles) const
 {
    std::vector<Double_t> groupangle; // vector to return
 
@@ -1776,7 +1776,7 @@ Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst)
 ////////////////////////////////////////////////////////////////////////////////
 /// Prints current folding and grouping settings
 ///
-void TAngularCorrelation::PrintModifiedConditions()
+void TAngularCorrelation::PrintModifiedConditions() const
 {
 	std::cout<<"Current modification conditions:"<<std::endl;
    if(fFolded) {

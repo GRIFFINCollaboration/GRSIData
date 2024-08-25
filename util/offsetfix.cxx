@@ -114,20 +114,20 @@ public:
 
    ~TEventTime() = default;
 
-   uint64_t GetTimeStamp()
+   uint64_t GetTimeStamp() const 
    {
       uint64_t time = timehigh;
       time          = time<<28;
       time |= timelow & 0x0fffffff;
       return time;
    }
-   unsigned int TimeStampHigh() { return timehigh; }
+   unsigned int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() { return timemidas; }
+   unsigned long MidasTime() const { return timemidas; }
 
-   uint32_t Digitizer() { return digitizernum; }
+   uint32_t Digitizer() const { return digitizernum; }
 
-   int DetectorType() { return dettype; }
+   int DetectorType() const { return dettype; }
 
    void SetDigitizer()
    {
@@ -161,7 +161,7 @@ public:
 
    static unsigned long GetLowestMidasTime() { return low_timemidas; }
 
-   int DigIndex() { return digmap.find(digitizernum)->second; }
+   int DigIndex() const { return digmap.find(digitizernum)->second; }
 
    inline static uint64_t GetLowestTime() { return lowest_time; }
 

@@ -44,11 +44,11 @@ public:
    // inline void SetCfd(const Int_t& x)           { fCfd    = (fCfd & 0x70000000) | (x & 0x1fffffff); } //!<!
 
    /////////////////////////		/////////////////////////////////////
-   inline Int_t               GetFilterPattern() { return fFilter; } //!<!
-   inline Int_t               GetPsd() { return fPsd; }              //!<!
-   inline Int_t               GetZc() { return fZc; }                //!<!
-   inline Int_t               GetCcShort() { return fCcShort; }      //!<!
-   inline Int_t               GetCcLong() { return fCcLong; }        //!<!
+   inline Int_t               GetFilterPattern() const { return fFilter; }   //!<!
+   inline Int_t               GetPsd() const { return fPsd; }                //!<!
+   inline Int_t               GetZc() const { return fZc; }                  //!<!
+   inline Int_t               GetCcShort() const { return fCcShort; }        //!<!
+   inline Int_t               GetCcLong() const { return fCcLong; }          //!<!
    inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
    inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
 

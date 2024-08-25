@@ -60,20 +60,20 @@ public:
 
    ~TEventTime() = default;
 
-   int64_t GetTimeStamp()
+   int64_t GetTimeStamp() const
    {
       long time = timehigh;
       time      = time<<28;
       time |= timelow & 0x0fffffff;
       return time;
    }
-   int TimeStampHigh() { return timehigh; }
+   int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() { return timemidas; }
+   unsigned long MidasTime() const { return timemidas; }
 
-   int Digitizer() { return digitizernum; }
+   int Digitizer() const { return digitizernum; }
 
-   int DetectorType() { return dettype; }
+   int DetectorType() const { return dettype; }
 
    void SetDigitizer()
    {
@@ -97,7 +97,7 @@ public:
 
    static unsigned long GetLowestMidasTime() { return low_timemidas; }
 
-   int DigIndex() { return digmap.find(digitizernum)->second; }
+   int DigIndex() const { return digmap.find(digitizernum)->second; }
 
    static std::map<int, int> digmap;
    static unsigned long low_timemidas;

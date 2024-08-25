@@ -91,9 +91,9 @@ public:
    {
       return fModifiedAngles[modindex];
    }                                                  // returns the angle from the modified index
-   Int_t GetNumGroups();                              // returns the number of groups assigned
-   Int_t GetNumModIndices();                          // returns the number of modified indices
-   Int_t GetWeightsSize() { return fWeights.size(); } // returns in the size of the fWeights array
+   Int_t GetNumGroups() const;                              // returns the number of groups assigned
+   Int_t GetNumModIndices() const;                          // returns the number of modified indices
+   Int_t GetWeightsSize() const { return fWeights.size(); } // returns in the size of the fWeights array
 
    //----------------- setters -----------------
    void SetIndexCorrelation(TH1D* hst) { fIndexCorrelation = hst; }
@@ -129,9 +129,9 @@ public:
    void   PrintModifiedIndexMap();   // prints a map between angular and modified indices
    void   PrintModifiedAngleMap();   // prints a map of angles for the modified indices
    void   PrintModifiedWeights();    // prints a map of modified weights
-   void   PrintModifiedConditions(); // prints the current folding and grouping conditions
-   Bool_t CheckGroups(std::vector<Int_t>& group);
-   Bool_t CheckGroupAngles(std::vector<Double_t>& groupangles);
+   void   PrintModifiedConditions() const; // prints the current folding and grouping conditions
+   Bool_t CheckGroups(std::vector<Int_t>& group) const;
+   Bool_t CheckGroupAngles(std::vector<Double_t>& groupangles) const;
    Bool_t CheckMaps(Bool_t fold, Bool_t group); // checks to make sure fIndexMap, fAngleMap, and fWeights are consistent
    Bool_t CheckModifiedHistogram(TH1* hst);     // checks to make sure histogram is consistent with current settings
 

@@ -625,7 +625,7 @@ TCSMHit* TCSM::CombineHits(TDetectorHit* d_hit, TDetectorHit* e_hit)
    return dHit;
 }
 
-bool TCSM::AlmostEqual(int val1, int val2)
+bool TCSM::AlmostEqual(int val1, int val2) const
 {
    auto   diff = static_cast<double>(std::abs(val1 - val2));
    double ave  = (val1 + val2) / 2.;
@@ -633,7 +633,7 @@ bool TCSM::AlmostEqual(int val1, int val2)
    return frac < fAlmostEqualWindow;
 }
 
-bool TCSM::AlmostEqual(double val1, double val2)
+bool TCSM::AlmostEqual(double val1, double val2) const
 {
    double frac = std::fabs(val1 - val2) / ((val1 + val2) / 2.);
    return frac < fAlmostEqualWindow;

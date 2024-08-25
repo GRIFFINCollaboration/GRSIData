@@ -228,7 +228,7 @@ void TCSMHit::Print(std::ostream& out) const
 	out<<str.str();
 }
 
-bool TCSMHit::IsEmpty()
+bool TCSMHit::IsEmpty() const
 {
    return (fHorDStrip == -1 && fHorDCharge < 1. && fHorDCfd == 0. && fVerDStrip == -1 && fVerDCharge < 1. &&
            fVerDCfd == 0. && fHorEStrip == -1 && fHorECharge < 1. && fHorECfd == 0. && fVerEStrip == -1 &&

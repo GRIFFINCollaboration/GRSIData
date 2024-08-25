@@ -28,13 +28,13 @@ public:
 	explicit TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
 	~TGriffinAngles() = default;
 
-	double Distance() { return fDistance; }
-	bool Folding() { return fFolding; }
-	bool Grouping() { return fGrouping; }
-	bool Addback() { return fAddback; }
-	double Rounding() { return fRounding; }
+   double Distance() const { return fDistance; }
+   bool   Folding() const { return fFolding; }
+   bool   Grouping() const { return fGrouping; }
+   bool   Addback() const { return fAddback; }
+   double Rounding() const { return fRounding; }
 
-	int Index(double angle);
+   int Index(double angle);
 	int NumberOfAngles() const { return fAngles.size(); }
 	double Angle(int index) const { auto it = fAngles.begin(); std::advance(it, index); return *it; }
 	double AverageAngle(int index) const;
