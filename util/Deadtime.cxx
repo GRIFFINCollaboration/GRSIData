@@ -202,7 +202,7 @@ void Printaddress(int* channel)
 }
 
 void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nsclr, int& ncycle, double*, int* channel,
-                 int& index, int* trun, double&)
+                 int& index, int* const trun, double&)
 {
    int nsc = nsclr;
 
@@ -859,9 +859,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
 		double erbm = 0.;
 		double erfp = 0.;
 		double erfm = 0.;
-      double frmin = 1e6.;
+      double frmin = 1e6;
 		double frmax = 0.;
-		double srmin = 1e6.;
+		double srmin = 1e6;
 		double srmax = 0.;
 
       for(i = 0; i < wsize; i++) {

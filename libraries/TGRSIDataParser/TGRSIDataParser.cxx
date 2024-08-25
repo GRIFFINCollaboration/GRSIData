@@ -1352,11 +1352,11 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 				return -1;
 			}
 			
-			if(dword & (1<<29) != 0x0){ 
+			if((dword & (1<<29)) != 0x0){ 
 				//parameter value is negative
 				//take two's complement
 				for(int j=0;j<30;j++){
-					if(dword & (1<<j) != 0x0){
+					if((dword & (1<<j)) != 0x0){
 						pos=j;
 						break;
 					}
@@ -2009,7 +2009,7 @@ static time_t   xfermidts;    // Midas time stamp of events, hopefully the same
 unsigned int    xfermidsn;    // Midas serial number
 
 
-int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
+int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* const data, int size, std::shared_ptr<TMidasEvent>& event)
 {
 	/// Converts a MIDAS File from the Emma DAQ into a TFragment.
 	int numFragsFound = 0;

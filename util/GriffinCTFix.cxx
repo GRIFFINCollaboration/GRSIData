@@ -14,7 +14,7 @@
 #include "TGriffin.h"
 #include "TUserSettings.h"
 
-double CrossTalkFit(double* x, double* par)
+double CrossTalkFit(double* x, double* par) // NOLINT(readability-non-const-parameter)
 {
    // This function is the linear fit function, but uses the CT coefficients as parameters instead of slope and
    // intercept

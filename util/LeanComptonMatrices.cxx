@@ -334,7 +334,7 @@ TList* ComptonHists(TTree* tree, long maxEntries, TStopwatch* w)
 			if(usetimestamps) tg1 = grif->GetGriffinHit(one)->GetTimeStamp();
 			else tg1 = grif->GetGriffinHit(one)->GetTime();
 
-			for(two = 0; two < static_cast<int<(grif->GetMultiplicity()); ++two) {
+			for(two = 0; two < static_cast<int>(grif->GetMultiplicity()); ++two) {
 				//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(two)->GetDetector() )) continue; //These could be added to gate out clovers.
 				if(two == one) continue;
 				//Two will be the second event in the scatter.  It must have lower energy and sum with g1 to

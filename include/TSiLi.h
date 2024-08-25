@@ -91,7 +91,7 @@ public:
 		int sec=GetSector(seg)%3;
 		int inv=(GetSector(seg)/3)%2;
 		int ret=10*(2-sec);
-		if((sec==1)^!(inv) != 0)ret+=9-ring;
+		if(((sec==1)^!(inv)) != 0)ret+=9-ring;
 		else ret+=ring;
 		return  (ret/2)+1;
 	}
