@@ -24,8 +24,9 @@ TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit(rhs)
    rhs.Copy(*this);
 }
 
-TGriffinHit::TGriffinHit(const TFragment& frag) : TDetectorHit(frag)
+TGriffinHit::TGriffinHit(const TFragment& frag)
 {
+	frag.Copy(*this);
    SetNPileUps(frag.GetNumberOfPileups());
 }
 

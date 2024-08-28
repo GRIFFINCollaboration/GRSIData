@@ -33,8 +33,9 @@ TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit(rhs)
 	rhs.Copy(*this);
 }
 
-TSceptarHit::TSceptarHit(const TFragment& frag) : TDetectorHit(frag)
+TSceptarHit::TSceptarHit(const TFragment& frag)
 {
+	frag.Copy(*this);
 	if(TSceptar::SetWave()) {
 		if(frag.GetWaveform()->empty()) {
 			std::cout<<"Warning, TSceptar::SetWave() set, but data waveform size is zero!"<<std::endl;

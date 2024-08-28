@@ -11,8 +11,9 @@ TSiLiHit::TSiLiHit()
 }
 
 TSiLiHit::TSiLiHit(const TFragment& frag)
-	: TDetectorHit(frag), fFitCharge(frag.GetCharge())
+	: fFitCharge(frag.GetCharge())
 {
+	frag.Copy(*this);
    SetWavefit(frag);
 }
 

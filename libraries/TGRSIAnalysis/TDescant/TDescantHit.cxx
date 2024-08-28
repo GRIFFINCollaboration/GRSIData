@@ -28,8 +28,10 @@ TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit(rhs)
    rhs.Copy(*this);
 }
 
-TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
+TDescantHit::TDescantHit(const TFragment& frag)
 {
+	frag.Copy(*this);
+
    SetZc(frag.GetZc());
    SetCcShort(frag.GetCcShort());
    SetCcLong(frag.GetCcLong());

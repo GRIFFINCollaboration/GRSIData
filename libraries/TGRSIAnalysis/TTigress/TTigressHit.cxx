@@ -20,8 +20,9 @@ TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit(rhs)
    rhs.Copy(*this);
 }
 
-TTigressHit::TTigressHit(const TFragment& frag) : TDetectorHit(frag)
+TTigressHit::TTigressHit(const TFragment& frag)
 {
+	frag.Copy(*this);
 }
 
 void TTigressHit::CopyFragment(const TFragment& frag)

@@ -23,8 +23,9 @@ TTipHit::TTipHit()
    Clear();
 }
 
-TTipHit::TTipHit(const TFragment& frag) : TDetectorHit(frag)
+TTipHit::TTipHit(const TFragment& frag)
 {
+	frag.Copy(*this);
    // SetVariables(frag);
    if(TGRSIOptions::AnalysisOptions()->IsWaveformFitting() && !IsCsI()) {
       SetWavefit(frag);

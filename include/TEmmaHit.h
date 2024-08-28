@@ -19,7 +19,7 @@ class TEmmaHit : public TDetectorHit {
 public:
    TEmmaHit();
    TEmmaHit(const TEmmaHit&);
-   explicit TEmmaHit(const TFragment& frag) : TDetectorHit(frag) {}
+   explicit TEmmaHit(const TFragment& frag) { frag.Copy(*this); }
    ~TEmmaHit() override;
 
    /////////////////////////  Setters	/////////////////////////////////////

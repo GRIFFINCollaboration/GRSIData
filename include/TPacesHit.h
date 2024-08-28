@@ -19,7 +19,7 @@ class TPacesHit : public TDetectorHit {
 public:
    TPacesHit();
    TPacesHit(const TPacesHit&);
-   explicit TPacesHit(const TFragment& frag) : TDetectorHit(frag) {}
+   explicit TPacesHit(const TFragment& frag) { frag.Copy(*this); }
    ~TPacesHit() override;
 
 private:

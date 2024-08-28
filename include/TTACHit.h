@@ -30,7 +30,7 @@ public:
    TTACHit();
    ~TTACHit() override;
    TTACHit(const TTACHit&);
-   explicit TTACHit(const TFragment& frag) : TDetectorHit(frag) {}
+   explicit TTACHit(const TFragment& frag) { frag.Copy(*this); }
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
