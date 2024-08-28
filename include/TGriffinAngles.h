@@ -34,13 +34,22 @@ public:
    bool   Addback() const { return fAddback; }
    double Rounding() const { return fRounding; }
 
-   int Index(double angle);
-	int NumberOfAngles() const { return fAngles.size(); }
-	double Angle(int index) const { auto it = fAngles.begin(); std::advance(it, index); return *it; }
-	double AverageAngle(int index) const;
-	int Count(double angle) { if(fAngleCount.count(std::round(angle/fRounding)) == 1) return fAngleCount.at(std::round(angle/fRounding)); return 0; }
+   int    Index(double angle);
+   int    NumberOfAngles() const { return fAngles.size(); }
+   double Angle(int index) const
+   {
+      auto it = fAngles.begin();
+      std::advance(it, index);
+      return *it;
+   }
+   double AverageAngle(int index) const;
+   int    Count(double angle)
+   {
+      if(fAngleCount.count(std::round(angle / fRounding)) == 1) { return fAngleCount.at(std::round(angle / fRounding)); }
+      return 0;
+   }
 
-	void FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose = false) const;
+   void FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose = false) const;
 	std::set<double>::iterator begin() const { return fAngles.begin(); }
 	std::set<double>::iterator end() const { return fAngles.end(); }
 

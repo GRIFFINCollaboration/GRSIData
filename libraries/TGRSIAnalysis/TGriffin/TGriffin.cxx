@@ -654,9 +654,9 @@ void TGriffin::FixHighGainCrossTalk()
 
 void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 {
-	if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
+   if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) { return; }
 
-	auto& hit_vec = GetHitVector(gain_type);
+   auto& hit_vec = GetHitVector(gain_type);
 	if(hit_vec.size() < 2) {
 		SetCrossTalk(gain_type, true);
 		return;

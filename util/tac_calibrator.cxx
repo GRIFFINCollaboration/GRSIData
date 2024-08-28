@@ -124,22 +124,22 @@ int main(int argc, char** argv) {
 
 			std::vector<double> vec;
 			vec.resize(nfound);//we make sure we have a vector with the right number of peaks
-			for(int i=0; i<nfound; i++) vec.at(i)=spec.GetPositionX()[i];
-			std::sort(vec.begin(),vec.end());
+         for(int i = 0; i < nfound; i++) { vec.at(i) = spec.GetPositionX()[i]; }
+         std::sort(vec.begin(),vec.end());
 
-			for(int k=0; k<nfound;k++){
-				raw_tac_calibrator[j]->GetXaxis()->SetRange((vec.at(k)-100)/ps_per_chan,(vec.at(k)+100)/ps_per_chan);
+         for(int k = 0; k < nfound; k++) {
+            raw_tac_calibrator[j]->GetXaxis()->SetRange((vec.at(k)-100)/ps_per_chan,(vec.at(k)+100)/ps_per_chan);
 				vec[k]=raw_tac_calibrator[j]->GetMean();
-			}
+         }
 
-			TGraph g;
-			for(int i=0;i<nfound;i++){
-				if(vec.at(i)>10){
+         TGraph g;
+         for(int i = 0; i < nfound; i++) {
+            if(vec.at(i)>10){
 					g.SetPoint(i,vec.at(i), i*calibrator_period);
 					calibration_hist[j]->SetBinContent(static_cast<int>(vec.at(i)+1),i*calibrator_period);
 				}
-			}
-			auto* fitfunc = new TF1("fitfunc","[0] + [1]*x");//linear polinomy
+         }
+         auto* fitfunc = new TF1("fitfunc","[0] + [1]*x");//linear polinomy
 
 			g.Fit(fitfunc,"Q");
 			calibration_hist[j]->Fit(fitfunc,"Q");

@@ -31,18 +31,18 @@ double GetYError(TGraphErrors* graph, const double& x)
 	for(int i = 0; i < graph->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		// exact match: return the error at this point
-		if(graph->GetPointX(i) == x) return graph->GetErrorY(i);
+		if(graph->GetPointX(i) == x) { return graph->GetErrorY(i); }
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		if(graph->GetPointX(i) > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(graph->GetPointX(i) > x) { return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i)); }
 #else
 		double px, py;
 		graph->GetPoint(i, px, py);
 		// exact match: return the error at this point
-		if(px == x) return graph->GetErrorY(i);
+		if(px == x) { return graph->GetErrorY(i); }
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		if(px > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(px > x) { return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i)); }
 #endif
 	}
 	return 0.;
@@ -129,12 +129,12 @@ int main(int argc, char** argv)
 	}
 
 	// set all variables from settings if they haven't been set from command line
-	if(projGateLow == -1.) projGateLow = settings->GetDouble("Projection.Low");
-	if(projGateHigh == -1.) projGateHigh = settings->GetDouble("Projection.High");
-	if(timeRandomNorm == -1.) timeRandomNorm = settings->GetDouble("TimeRandomNormalization");
-	if(peakPos == -1.) peakPos = settings->GetDouble("Peak.Position");
-	if(peakLow == -1.) peakLow = settings->GetDouble("Peak.Low");
-	if(peakHigh == -1.) peakHigh = settings->GetDouble("Peak.High");
+	if(projGateLow == -1.) { projGateLow = settings->GetDouble("Projection.Low"); }
+	if(projGateHigh == -1.) { projGateHigh = settings->GetDouble("Projection.High"); }
+	if(timeRandomNorm == -1.) { timeRandomNorm = settings->GetDouble("TimeRandomNormalization"); }
+	if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
+	if(peakLow == -1.) { peakLow = settings->GetDouble("Peak.Low"); }
+	if(peakHigh == -1.) { peakHigh = settings->GetDouble("Peak.High"); }
 	// for the background-peak positions and background gates we could have multiple, so we create vectors for them
 	std::vector<double> bgPeakPos;
 	std::vector<double> bgLow;
@@ -194,15 +194,15 @@ int main(int argc, char** argv)
 		// only output a warning that the parameter is changed if it's not the default value
 		if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
 			bool output = peakParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". peak parameter ("<<peakParameter[i]<<") is out of range "<<peakParameterLow[i]<<" - "<<peakParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". peak parameter ("<<peakParameter[i]<<") is out of range "<<peakParameterLow[i]<<" - "<<peakParameterHigh[i]<<", resetting it to "; }
 			peakParameter[i] = (peakParameterHigh[i] + peakParameterLow[i])/2.;
-			if(output) std::cout<<peakParameter[i]<<std::endl;
+			if(output) { std::cout<<peakParameter[i]<<std::endl; }
 		}
 		if(bgPeakParameterLow[i] <= bgPeakParameterHigh[i] && (bgPeakParameter[i] < bgPeakParameterLow[i] || bgPeakParameterHigh[i] < bgPeakParameter[i])) {
 			bool output = bgPeakParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". background peak parameter ("<<bgPeakParameter[i]<<") is out of range "<<bgPeakParameterLow[i]<<" - "<<bgPeakParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". background peak parameter ("<<bgPeakParameter[i]<<") is out of range "<<bgPeakParameterLow[i]<<" - "<<bgPeakParameterHigh[i]<<", resetting it to "; }
 			bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i])/2.;
-			if(output) std::cout<<bgPeakParameter[i]<<std::endl;
+			if(output) { std::cout<<bgPeakParameter[i]<<std::endl; }
 		}
 	}
 	// parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
@@ -225,9 +225,9 @@ int main(int argc, char** argv)
 	for(size_t i = 0; i < backgroundParameter.size(); ++i) {
 		if(backgroundParameterLow[i] <= backgroundParameterHigh[i] && (backgroundParameter[i] < backgroundParameterLow[i] || backgroundParameterHigh[i] < backgroundParameter[i])) {
 			bool output = backgroundParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". background parameter ("<<backgroundParameter[i]<<") is out of range "<<backgroundParameterLow[i]<<" - "<<backgroundParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". background parameter ("<<backgroundParameter[i]<<") is out of range "<<backgroundParameterLow[i]<<" - "<<backgroundParameterHigh[i]<<", resetting it to "; }
 			backgroundParameter[i] = (backgroundParameterHigh[i] + backgroundParameterLow[i])/2.;
-			if(output) std::cout<<backgroundParameter[i]<<std::endl;
+			if(output) { std::cout<<backgroundParameter[i]<<std::endl; }
 		}
 	}
 
@@ -543,7 +543,7 @@ int main(int argc, char** argv)
 					// find first graph with more than one data point
 					size_t first = 0;
 					for(first = 0; first < spin.size(); ++first) {
-						if(spin[first]->GetN() > 1) break;
+						if(spin[first]->GetN() > 1) { break; }
 					}
 
 					spin[first]->SetTitle("");
@@ -556,9 +556,9 @@ int main(int argc, char** argv)
 
 					spin[first]->Draw("ac");
 					for(size_t i = 0; i < spin.size(); ++i) {
-						if(i == first) continue;
-						if(spin[i]->GetN() > 1) spin[i]->Draw("c");
-						else                    spin[i]->Draw("*");
+						if(i == first) { continue; }
+						if(spin[i]->GetN() > 1) { spin[i]->Draw("c"); }
+						else                    { spin[i]->Draw("*"); }
 					}
 
 					auto* confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
@@ -710,13 +710,13 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
 	// a is the lowest allowed spin
 	// b is the mixing spin
 	int l1a = TMath::Abs(twoJhigh-twoJmid)/2;
-	if(l1a == 0) l1a = 1;
+	if(l1a == 0) { l1a = 1; }
 	int l1b = l1a + 1;
 	// l2 is the transition between j2 and j3
 	// a is the lowest allowed spin
 	// b is the mixing spin
 	int l2a = TMath::Abs(twoJmid-twoJlow)/2;
-	if(l2a == 0) l2a = 1;
+	if(l2a == 0) { l2a = 1; }
 	int l2b = l2a + 1;
 
 	// run some quick checks on the mixing ratios

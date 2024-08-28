@@ -108,8 +108,8 @@ int main(int argc, char **argv)
 		if(runInfo == nullptr) {
 			std::cout<<"Failed to find run information in file '"<<argv[f+1]<<"'!"<<std::endl
 				      <<"Trying to accomodate filenames"<<std::endl;
-			for(int pop = 0; pop < 5; pop++) inputname.pop_back();
-			while(inputname.size() > 9) inputname.erase(inputname.begin());
+			for(int pop = 0; pop < 5; pop++) { inputname.pop_back(); }
+			while(inputname.size() > 9) { inputname.erase(inputname.begin()); }
 			outputname = Form("test_%s.root", inputname.c_str());
 		} else {
 			int runnumber = TRunInfo::RunNumber();
@@ -246,15 +246,15 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 	//Xi/theta combination in the array.  This is useful to ensure the proper angles are being produced 
 	//in the main code. 
 	for(one = 0; one < 64; one++){
-		if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), one/4 + 1)) continue;
+		if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), one/4 + 1)) { continue; }
 		v1 = TGriffin::GetPosition( one/4+1, one%4, DetectorHeight );
 		d1 = TGriffin::GetPosition( one/4+1, 5, DetectorHeight );
 		for(two = (one/4)*4 ; two < (one/4 + 1)*4; two++){
-			if(one == two) continue;
+			if(one == two) { continue; }
 			v2 = TGriffin::GetPosition( two/4+1, two%4, DetectorHeight );
 			for(three = 0; three < 64; three++){
-				if(three/4 == one/4) continue;
-				if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), three/4 + 1)) continue;
+				if(three/4 == one/4) { continue; }
+				if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), three/4 + 1)) { continue; }
 				v3 = TGriffin::GetPosition( three/4+1, three%4, DetectorHeight );
 				d2 = TGriffin::GetPosition( three/4+1, 5, DetectorHeight );
 
@@ -331,31 +331,41 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 			//---------------------------------------End of list maintenance---------------------------------------// 
 
 			//one will be the first gamma ray of the scatter event
-			if(usetimestamps) tg1 = grif->GetGriffinHit(one)->GetTimeStamp();
-			else tg1 = grif->GetGriffinHit(one)->GetTime();
+         if(usetimestamps) {
+            tg1 = grif->GetGriffinHit(one)->GetTimeStamp();
+         } else {
+            tg1 = grif->GetGriffinHit(one)->GetTime();
+         }
 
-			for(two = 0; two < static_cast<int>(grif->GetMultiplicity()); ++two) {
+         for(two = 0; two < static_cast<int>(grif->GetMultiplicity()); ++two) {
 				//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(two)->GetDetector() )) continue; //These could be added to gate out clovers.
-				if(two == one) continue;
+				if(two == one) { continue; }
 				//Two will be the second event in the scatter.  It must have lower energy and sum with g1 to
 				//have energy within range of an expected gamma ray.  It must also be in true coincidence with
 				//gamma 1.  Further restrictions may be made.
-				if(usetimestamps) tg2 = grif->GetGriffinHit(two)->GetTimeStamp();
-				else tg2 = grif->GetGriffinHit(two)->GetTime();
+            if(usetimestamps) {
+               tg2 = grif->GetGriffinHit(two)->GetTimeStamp();
+            } else {
+               tg2 = grif->GetGriffinHit(two)->GetTime();
+            }
 
-				if(ggTlow > TMath::Abs(tg2-tg1) || TMath::Abs(tg2-tg1) > ggThigh) continue;
+            if(ggTlow > TMath::Abs(tg2 - tg1) || TMath::Abs(tg2 - tg1) > ggThigh) { continue; }
 
-				gammagammaAll->Fill(grif->GetGriffinHit(one)->GetEnergy(),grif->GetGriffinHit(two)->GetEnergy());
+            gammagammaAll->Fill(grif->GetGriffinHit(one)->GetEnergy(), grif->GetGriffinHit(two)->GetEnergy());
 
-				if(grif->GetGriffinHit(one)->GetDetector() != grif->GetGriffinHit(two)->GetDetector()) continue;
-				if(grif->GetGriffinHit(one)->GetCrystal() == grif->GetGriffinHit(two)->GetCrystal()) continue;
-				if(grif->GetGriffinHit(one)->GetEnergy() < grif->GetGriffinHit(two)->GetEnergy()) continue;
-				if( TMath::Abs(gEnergy[0] - (grif->GetGriffinHit(one)->GetEnergy() + grif->GetGriffinHit(two)->GetEnergy()) ) < gEnergySumErr ) gEnergyIndex1 = 0;
-				else if( (TMath::Abs(gEnergy[1] - (grif->GetGriffinHit(one)->GetEnergy() + grif->GetGriffinHit(two)->GetEnergy()) ) < gEnergySumErr ) ) gEnergyIndex1 = 1;
-				else continue;
-				if(ForceG1 && gEnergyIndex1 != 0) continue; //This gives the option of forcing which gamma is the scatter one.
+            if(grif->GetGriffinHit(one)->GetDetector() != grif->GetGriffinHit(two)->GetDetector()) { continue; }
+            if(grif->GetGriffinHit(one)->GetCrystal() == grif->GetGriffinHit(two)->GetCrystal()) { continue; }
+            if(grif->GetGriffinHit(one)->GetEnergy() < grif->GetGriffinHit(two)->GetEnergy()) { continue; }
+            if(TMath::Abs(gEnergy[0] - (grif->GetGriffinHit(one)->GetEnergy() + grif->GetGriffinHit(two)->GetEnergy())) < gEnergySumErr) {
+               gEnergyIndex1 = 0;
+            } else if((TMath::Abs(gEnergy[1] - (grif->GetGriffinHit(one)->GetEnergy() + grif->GetGriffinHit(two)->GetEnergy())) < gEnergySumErr)) {
+               gEnergyIndex1 = 1;
+            } else {
+               continue;
+            }
+            if(ForceG1 && gEnergyIndex1 != 0) { continue; }   //This gives the option of forcing which gamma is the scatter one.
 
-				//----------------------------------------------------------------------------------------//
+            //----------------------------------------------------------------------------------------//
 
 				//At this stage we have g1 and g2 being two coincident gammas which enter different crystals
 				//in the same detector, and g1 has higher energy than g2.  Togetehr they sum to one of the 
@@ -369,13 +379,16 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 				for(three = 0; three < static_cast<int>(grif->GetMultiplicity()); ++three){
 					//if(std::binary_search(MissingClovers.begin(),MissingClovers.end(), grif->GetGriffinHit(three)->GetDetector() )) continue; //These could be added to gate out clovers.
 
-					if(one == three || two == three) continue;
-					if(grif->GetGriffinHit(three)->GetDetector() == grif->GetGriffinHit(one)->GetDetector()) continue;
-					if( TMath::Abs(gEnergy[1-gEnergyIndex1] - grif->GetGriffinHit(three)->GetEnergy()) > gEnergyErr ) continue;
-					if(usetimestamps) tg3 = grif->GetGriffinHit(three)->GetTimeStamp();
-					else tg3 = grif->GetGriffinHit(three)->GetTime();
+               if(one == three || two == three) { continue; }
+               if(grif->GetGriffinHit(three)->GetDetector() == grif->GetGriffinHit(one)->GetDetector()) { continue; }
+               if(TMath::Abs(gEnergy[1 - gEnergyIndex1] - grif->GetGriffinHit(three)->GetEnergy()) > gEnergyErr) { continue; }
+               if(usetimestamps) {
+                  tg3 = grif->GetGriffinHit(three)->GetTimeStamp();
+               } else {
+                  tg3 = grif->GetGriffinHit(three)->GetTime();
+               }
 
-					bool TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;
+               bool TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;
 					ggTimeDiff_g1g2->Fill(TMath::Abs(tg2 - tg1));
 					ggTimeDiff_g1g3->Fill(TMath::Abs(tg3 - tg1));
 					ggTimeDiff_g2g3->Fill(TMath::Abs(tg3 - tg2));
@@ -390,8 +403,8 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 					Xi = n1.Angle(n2)*TMath::RadToDeg();
 					CoTheta = v3.Angle(v1)*TMath::RadToDeg();
 
-					if(TimeCoincident){
-						XiHist2D_DetDet->Fill( Xi, TMath::RadToDeg()*d1.Angle(d2) );
+               if(TimeCoincident) {
+                  XiHist2D_DetDet->Fill( Xi, TMath::RadToDeg()*d1.Angle(d2) );
 						XiHist2D_CryCry->Fill( Xi, CoTheta );
 						XiCrystalAll->Fill( Xi, 4*(grif->GetGriffinHit(one)->GetDetector() - 1) + grif->GetGriffinHit(one)->GetCrystal() );
 						thetaCrystalAll->Fill( CoTheta, 4*(grif->GetGriffinHit(one)->GetDetector() - 1) + grif->GetGriffinHit(one)->GetCrystal() );
@@ -401,8 +414,8 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 						gammaSingles_g1->Fill(grif->GetGriffinHit(one)->GetEnergy()); 
 						gammaSingles_g2->Fill(grif->GetGriffinHit(two)->GetEnergy());
 						gammaSingles_g3->Fill(grif->GetGriffinHit(three)->GetEnergy());
-					}
-				}//end of real event 3
+               }
+            }//end of real event 3
 
 				//----------------------------------------------------------------------------------------//
 

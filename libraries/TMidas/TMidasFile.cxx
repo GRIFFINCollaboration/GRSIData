@@ -215,7 +215,7 @@ bool TMidasFile::Open(const char* filename)
 	TChannel::SetMnemonicClass(TGRSIMnemonic::Class());
 
 	// read ODB from file
-	if(fOdbEvent == nullptr) fOdbEvent = std::make_shared<TMidasEvent>();
+	if(fOdbEvent == nullptr) { fOdbEvent = std::make_shared<TMidasEvent>(); }
    Read(fOdbEvent);
 
 	SetFileOdb();
@@ -1064,7 +1064,7 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
 
          tempChan->AddENGCoefficient(offsets.at(x));
          tempChan->AddENGCoefficient(gains.at(x));
-         if(x < quads.size()) tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+         if(x < quads.size()) { tempChan->AddENGCoefficient(quads.at(x)); } //Assuming this means quad terms won't be added if not there. 
       }
 		std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
    } else {

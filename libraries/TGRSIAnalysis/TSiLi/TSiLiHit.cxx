@@ -115,18 +115,18 @@ int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, TChannel* ch
 		}
 // 		std::cout<<std::endl<<Decay<<" "<<Rise<<" "<<Base;
 
-		if(Decay == 0.)Decay=TSiLi::fSiLiDefaultDecay;
-		if(Rise == 0.)Rise=TSiLi::fSiLiDefaultRise;
-		if(Base == 0.)Base=TSiLi::fSiLiDefaultBaseline;
-		
-		bool goodfit=false;
-		if(ShapeFit<2)goodfit=pulse->GetSiliShape(Decay,Rise);
-		if(ShapeFit==1&&!goodfit)ShapeFit++;//So currently it does a TF1 fit if initial fit fails, this might be a bad idea
-		if(ShapeFit==2)goodfit=pulse->GetSiliShapeTF1(Decay,Rise,Base);
-		if(ShapeFit==3)goodfit=pulse->GetSiliShapeTF1(Decay,Rise,Base,TSiLi::BaseFreq);
-		if(goodfit)return 1+ShapeFit;
-	}
-	return 0;
+      if(Decay == 0.) { Decay = TSiLi::fSiLiDefaultDecay; }
+      if(Rise == 0.) { Rise = TSiLi::fSiLiDefaultRise; }
+      if(Base == 0.) { Base = TSiLi::fSiLiDefaultBaseline; }
+
+      bool goodfit = false;
+      if(ShapeFit < 2) { goodfit = pulse->GetSiliShape(Decay, Rise); }
+      if(ShapeFit == 1 && !goodfit) { ShapeFit++; }   //So currently it does a TF1 fit if initial fit fails, this might be a bad idea
+      if(ShapeFit == 2) { goodfit = pulse->GetSiliShapeTF1(Decay, Rise, Base); }
+      if(ShapeFit == 3) { goodfit = pulse->GetSiliShapeTF1(Decay, Rise, Base, TSiLi::BaseFreq); }
+      if(goodfit) { return 1 + ShapeFit; }
+   }
+   return 0;
 }
 
 TVector3 TSiLiHit::GetPosition(Double_t, bool smear) const

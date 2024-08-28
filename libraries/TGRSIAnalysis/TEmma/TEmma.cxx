@@ -125,7 +125,7 @@ void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
 		}
 	} else if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kO) { // ORTEC SSBs at target position
 		fEmmaSSBHits.push_back(std::move(dethit));
-	} else return;
+	} else { return; }
 }
 
 TVector3 TEmma::GetPosition(double left, double right, double top, double bottom, double delayL, double delayR, double delayT, double delayB )
@@ -209,20 +209,20 @@ void TEmma::BuildHits()
 	// Build hits subtracts the trigger time (from an anode wire) and returns a left/right/up/down value which is used in GetPosition()
 
 	std::vector <double> tdcArray;
-	std::vector <double> icArray;
-	if(fEmmaTdcHits.size() > 4 ) {   // Require a Good hit to contain only the PGAC TDC signals
-		auto * hit = new TEmmaHit();
-		for(auto& emmaTdcHit : fEmmaTdcHits) {
-			hit->SetTimeStamp(emmaTdcHit.GetTimeStamp());
-			hit->SetAddress(emmaTdcHit.GetAddress());
-			if(emmaTdcHit.GetTdcNumber() < 10) tdcArray.push_back(emmaTdcHit.GetEnergy());
-			if(emmaTdcHit.GetTdcNumber() == 10) hit->SetLeft(emmaTdcHit.GetEnergy());
-			if(emmaTdcHit.GetTdcNumber() == 11) hit->SetRight(emmaTdcHit.GetEnergy());
-			if(emmaTdcHit.GetTdcNumber() == 12) hit->SetTop(emmaTdcHit.GetEnergy());
-			if(emmaTdcHit.GetTdcNumber() == 13) hit->SetBottom(emmaTdcHit.GetEnergy());
-		}
+   std::vector<double>  icArray;
+   if(fEmmaTdcHits.size() > 4) {   // Require a Good hit to contain only the PGAC TDC signals
+      auto* hit = new TEmmaHit();
+      for(auto& emmaTdcHit : fEmmaTdcHits) {
+         hit->SetTimeStamp(emmaTdcHit.GetTimeStamp());
+         hit->SetAddress(emmaTdcHit.GetAddress());
+         if(emmaTdcHit.GetTdcNumber() < 10) { tdcArray.push_back(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 10) { hit->SetLeft(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 11) { hit->SetRight(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 12) { hit->SetTop(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 13) { hit->SetBottom(emmaTdcHit.GetEnergy()); }
+      }
 
-		if(!tdcArray.empty()) {
+      if(!tdcArray.empty()) {
 			fAnodeTrigger = * std::min_element(tdcArray.begin(), tdcArray.end());
 			if(hit->GetLeft() != 0 && hit->GetRight() != 0 && hit->GetTop() != 0 && hit->GetBottom() != 0 && fAnodeTrigger != 0) {
 				hit->SetLeft((hit->GetLeft() - fAnodeTrigger));
@@ -234,17 +234,17 @@ void TEmma::BuildHits()
 			} else {
 				//std::cout<<"TDC Array Failed"<<std::endl;
 				fFail = 0;
-				if(hit->GetLeft() == 0) fFail++;
-				if(hit->GetRight() == 0) fFail++;
-				if(hit->GetTop() == 0) fFail++;
-				if(hit->GetBottom() == 0) fFail++;
-				hit->SetFailedFill(fFail);
-				AddHit(hit);
+            if(hit->GetLeft() == 0)   { fFail++; }
+            if(hit->GetRight() == 0)  { fFail++; }
+            if(hit->GetTop() == 0)    { fFail++; }
+            if(hit->GetBottom() == 0) { fFail++; }
+            hit->SetFailedFill(fFail);
+            AddHit(hit);
 			}
 		} else {
 			return;
 		}
-	}
+   }
 }
 void TEmma::Clear(Option_t* opt)
 {

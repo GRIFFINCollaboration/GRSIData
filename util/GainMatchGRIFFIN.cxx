@@ -98,10 +98,14 @@ double GetCentroidTPeak(TH1* hst, double xmin, double xmax)
 double GetCentroid(EType type, TH1* hst, double xmin, double xmax)
 {
 	double centroid = 0.;
-	if(type == EType::kMaxBin) centroid = GetCentroidMaxBin(hst,xmin,xmax);
-	else if(type == EType::kTSpectrum) centroid = GetCentroidTSpectrum(hst,xmin,xmax);
-	else if(type == EType::kTPeak) centroid = GetCentroidTPeak(hst,xmin,xmax);
-	return centroid;
+   if(type == EType::kMaxBin) {
+      centroid = GetCentroidMaxBin(hst, xmin, xmax);
+   } else if(type == EType::kTSpectrum) {
+      centroid = GetCentroidTSpectrum(hst, xmin, xmax);
+   } else if(type == EType::kTPeak) {
+      centroid = GetCentroidTPeak(hst, xmin, xmax);
+   }
+   return centroid;
 }
 
 double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=kFALSE, double largepeak2 = 0.0)
@@ -121,8 +125,8 @@ double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=
 			double mag1 = h->GetMaximum();
 			h->GetXaxis()->UnZoom();
 			posbigb = spec2->GetPositionX()[0];
-			if(mag1>mag0) posbigb = spec2->GetPositionX()[1];
-		} else {
+         if(mag1 > mag0) { posbigb = spec2->GetPositionX()[1]; }
+      } else {
 			posbigb = spec2->GetPositionX()[0];
 		}
 	} else {
@@ -186,9 +190,9 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -200,9 +204,9 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 		int dettype = currentFrag->GetDetectorType();
 		bool skipChannel=kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+         if(i == skip) { skipChannel = kTRUE; }
+      }
+		if(skipChannel) { continue; }
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
 			int charge = currentFrag->GetCharge();
 			int kvalue = currentFrag->GetKValue();
@@ -216,9 +220,9 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
 		unsigned int address = chan->GetAddress();
@@ -269,9 +273,9 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 		std::cout <<"\t" <<i <<std::endl;
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		std::cout <<"Creating graph for channel " <<i <<std::endl;
 		auto* h = static_cast<TH1F*>(f->Get(Form("hst%i",i))); // grab histogram
       if(h == nullptr) {
@@ -294,7 +298,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 
 		// check the first histogram and change the peak values if necessary
 		if(i==minchannel) {
-			if(roughenergy) g[i]->Fit("pol1","q","goff");
+			if(roughenergy) { g[i]->Fit("pol1","q","goff"); }
 			for(int j=0;j<g[i]->GetN();j++) {
 				double x = 0.;
 				double y = 0.;
@@ -309,12 +313,12 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 			}
 		}
 		// format graph
-		if((i)%4==1) g[i]->SetMarkerColor(kBlue);
-		if((i)%4==2) g[i]->SetMarkerColor(kGreen);
-		if((i)%4==3) g[i]->SetMarkerColor(kRed);
-		if((i)%4==4) g[i]->SetMarkerColor(kBlack);
-		g[i]->SetMarkerStyle(20+(i)/4);
-		const char* hsttitle = h->GetTitle();
+      if((i % 4) == 0) { g[i]->SetMarkerColor(kBlue); }
+      if((i % 4) == 1) { g[i]->SetMarkerColor(kGreen); }
+      if((i % 4) == 2) { g[i]->SetMarkerColor(kRed); }
+      if((i % 4) == 3) { g[i]->SetMarkerColor(kBlack); }
+      g[i]->SetMarkerStyle(20 + (i) / 4);
+      const char* hsttitle = h->GetTitle();
 		g[i]->SetTitle(hsttitle);
 		g[i]->SetName(Form("graph%i",i));
 		g[i]->Write();
@@ -409,8 +413,9 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 		slopes[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(1); // grab slope
 		offsets[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(0); // grab offset
 		int ndf = g[i]->GetFunction(Form("pol%i",order))->GetNDF();
-		if(ndf!=0) chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare()/ndf; // grab offset
-		else {
+		if(ndf!=0) {
+			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare()/ndf; // grab offset
+		} else {
 			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare(); // grab offset
 			if(chi2[i]==0) chi2[i] = 1e-24;
 		}
@@ -443,10 +448,10 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
-		if(chi2[i] == 0) continue;
+		if(skipChannel) { continue; }
+		if(chi2[i] == 0) { continue; }
 		std::cout <<i <<"\t" <<slopes[i] <<"\t" <<offsets[i] <<"\t" <<chi2[i] <<std::endl;
 	}
 
@@ -485,10 +490,10 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
-		if(chi2[i] == 0) continue;
+		if(skipChannel) { continue; }
+		if(chi2[i] == 0) { continue; }
 
 		// get name and address
 		std::string nameaddress = f->Get(Form("graph%i",i))->GetTitle();
@@ -502,7 +507,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 		outFile <<"Address:   " <<address.c_str() <<std::endl;
 		outFile <<"Digitizer: " <<std::endl;
 		outFile <<"EngCoeff:  ";
-		for(int j=0;j<=order;j++) outFile <<parameters[i][j] <<"\t";
+		for(int j=0;j<=order;j++) { outFile <<parameters[i][j] <<"\t"; }
 		outFile <<std::endl;
 		outFile <<std::endl;
 		outFile <<"}" <<std::endl;
@@ -562,9 +567,9 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel=kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -575,9 +580,9 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 		int chan = currentFrag->GetChannelNumber();
 		bool skipChannel=kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		int dettype = currentFrag->GetDetectorType();
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
 			double energy = currentFrag->GetEnergy();
@@ -590,10 +595,10 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		bool skipChannel = kFALSE;
 		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
+			if(i == skip) { skipChannel = kTRUE; }
 		}
-		if(skipChannel) continue;
-		if(hst[i]->Integral()==0) continue;
+		if(skipChannel) { continue; }
+		if(hst[i]->Integral()==0) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
 		unsigned int address = chan->GetAddress();
@@ -659,7 +664,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 				break;
 			}
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		hsts[i] = static_cast<TH1F*>(gFile->Get(Form("hst%i",i)));
 		if(hsts[i]==nullptr) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your newcal and calib_hst files and your inputs to GainMatchGRIFFIN." <<std::endl;
@@ -667,7 +672,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 			channelsToSkip.push_back(i);
 			continue;
 		}
-		if(i!=minchannel) hstall->Add(hsts[i]);
+		if(i!=minchannel) { hstall->Add(hsts[i]); }
 	}
 
 	// get peak values from summed spectrum for residual calculation
@@ -687,16 +692,16 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 				break;
 			}
 		}
-		if(skipChannel) continue;
+		if(skipChannel) { continue; }
 		hsts[i]->SetLineColor(i+1);
 		stack->Add(hsts[i]);
 		residuals[i] = new TGraph(peaks.size());
 		for(size_t j=0;j<peaks.size();j++) {
 			// calculate FWHM and FWTM
 			double myfwhm = FWHM(hsts[i],peaks[j]-width,peaks[j]+width);
-			if(myfwhm!=0.0) fwhm->Fill(peaks[j],myfwhm);
+			if(myfwhm!=0.0) { fwhm->Fill(peaks[j],myfwhm); }
 			double myfwtm = FWTM(hsts[i],peaks[j]-width,peaks[j]+width);
-			if(myfwtm!=0.0 && myfwhm!=0.0) fwratio->Fill(peaks[j],myfwtm/myfwhm);
+			if(myfwtm!=0.0 && myfwhm!=0.0) { fwratio->Fill(peaks[j],myfwtm/myfwhm); }
 
 			// calculate residuals
 			double centroid = GetCentroid(type,hsts[i],peaks[j]-width,peaks[j]+width);
@@ -717,9 +722,9 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	// fill 2D histograms for summed spectrum
 	for(auto& peak : peaks) {
 		double myfwhm = FWHM(hstall,peak-width,peak+width);
-		if(myfwhm!=0.0) fwhm_all->Fill(peak,myfwhm);
+		if(myfwhm!=0.0) { fwhm_all->Fill(peak,myfwhm); }
 		double myfwtm = FWTM(hstall,peak-width,peak+width);
-		if(myfwtm!=0.0 && myfwhm!=0.0) fwratio_all->Fill(peak,myfwtm/myfwhm);
+		if(myfwtm!=0.0 && myfwhm!=0.0) { fwratio_all->Fill(peak,myfwtm/myfwhm); }
 	}
 
 	// save histograms to file

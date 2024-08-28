@@ -561,7 +561,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 	if(fIgnoreMissingChannel && eventFrag->GetChannel() != nullptr) {
 		// find end of this event
 		for(; x < size; x++) {
-			if((data[x] >> 28) == 0xe) return x;
+			if((data[x] >> 28) == 0xe) { return x; }
 		}
 	}
 
@@ -1296,9 +1296,8 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 				break;
 		}
 		x++;
-		if(freqSet&&tsSet)
-			break;
-	}
+      if(freqSet && tsSet) { break; }
+   }
 
 	if(rfFreq < 0.0){
 		//std::cout << "Bad RF frequency." << std::endl;
@@ -1311,24 +1310,24 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 
 	frag->SetTimeStamp(ts);
 
-	if(!(x<size-3)){
-		//std::cout << "RF fragment does not contain all parameters." << std::endl;
+   if(!(x < size - 3)) {
+      //std::cout << "RF fragment does not contain all parameters." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
 		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
-	}
-	if((data[x]==data[x+1])&&(data[x]==data[x+2])&&(data[x]==data[x+3])){
-		//std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
+   }
+   if((data[x] == data[x + 1]) && (data[x] == data[x + 2]) && (data[x] == data[x + 3])) {
+      //std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
 		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
-	}
+   }
 
-	int pos=0;
+   int pos=0;
 	for(int i = 0; i < 4; i++) {
 
 		uint32_t dword  = data[x];
@@ -1674,7 +1673,7 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
 				return -w;
 			}
 			int eventSize = numSampleWords+2; // +2 = trigger time words and charge word
-			if(extras) ++eventSize;
+			if(extras) { ++eventSize; }
 			if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
 				if(!Options()->SuppressErrors()) {
 					std::cerr<<numWords<<" words in channel aggregate, event size is "<<eventSize<<" => "<<static_cast<double>(numWords-2.)/static_cast<double>(eventSize)<<" events?"<<std::endl;
@@ -1684,14 +1683,17 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
 
 			// read channel data
 			for(int ev = 0; ev < (numWords-2)/eventSize; ++ev) { // -2 = 2 header words for channel aggregate
-				eventFrag->SetDaqTimeStamp(boardTime);
-				eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w]>>31)); // highest bit indicates odd channel
-				if(eventFrag->GetAddress() == 0x8000) eventFrag->SetDetectorType(9); //ZDS will always be in channel 0
-				else                                  eventFrag->SetDetectorType(6);
-				// these timestamps are in 2ns units
-				eventFrag->SetTimeStamp(data[w] & 0x7fffffff);
-				++w;
-				if(waveform) {
+            eventFrag->SetDaqTimeStamp(boardTime);
+            eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w] >> 31));   // highest bit indicates odd channel
+            if(eventFrag->GetAddress() == 0x8000) {
+               eventFrag->SetDetectorType(9);   //ZDS will always be in channel 0
+            } else {
+               eventFrag->SetDetectorType(6);
+            }
+            // these timestamps are in 2ns units
+            eventFrag->SetTimeStamp(data[w] & 0x7fffffff);
+            ++w;
+            if(waveform) {
 					if(w + numSampleWords >= size) { // need to read at least the sample words plus the charge/extra word
 						if(!Options()->SuppressErrors()) {
 							std::cerr<<"3 - Missing "<<numSampleWords<<" waveform words, got only "<<w-1<<" words for channel "<<channel<<" (bank size "<<size<<")"<<std::endl;
@@ -1883,8 +1885,8 @@ int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr
 				return -w;
 			}
 			int eventSize = numSampleWords+2; // +2 = trigger time words and charge word
-			if(extras) ++eventSize;
-			if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
+         if(extras) { ++eventSize; }
+         if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
 				if(!Options()->SuppressErrors()) {
 					std::cerr<<numWords<<" words in channel aggregate, event size is "<<eventSize<<" ("<<numWords%eventSize<<") => "<<static_cast<double>(numWords-2.)/static_cast<double>(eventSize)<<" events?"<<std::endl;
 				}

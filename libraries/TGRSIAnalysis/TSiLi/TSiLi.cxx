@@ -211,7 +211,7 @@ Int_t TSiLi::GetAddbackMultiplicity()
 			for(int j = i + 1; j < basehits; j++) {
 				if(fAddbackCriterion(GetSiLiHit(i), GetSiLiHit(j))) {
 					Clusters[clus_id - 1].push_back(j);
-					if(fPreampRejectedHit[j])hasreject[clus_id - 1]=true;
+					if(fPreampRejectedHit[j]) { hasreject[clus_id - 1]=true; }
 					clusters_id[j] = clus_id;
 				}
 			}
@@ -237,12 +237,12 @@ bool TSiLi::fAddbackCriterion(TSiLiHit* one, TSiLiHit* two)
 		if(e > 0.05 && e < 50) { // very basic energy gate to suppress noise issues
 			int dring   = std::abs(one->GetRing() - two->GetRing());
 			int dsector = std::abs(one->GetSector() - two->GetSector());
-			if(dsector > 5)dsector =12-dsector;
+         if(dsector > 5) { dsector = 12 - dsector; }
 
-			//if(dsector+dring==1)return true;
+         //if(dsector+dring==1)return true;
 			//Changed to enable handing a missing middle pixel
-			if(dsector+dring<3)return true;
-		}
+         if(dsector + dring < 3) { return true; }
+      }
 	}
 
 	return false;
@@ -278,14 +278,14 @@ bool TSiLi::fCoincidenceTime(TSiLiHit* one, TSiLiHit* two)
 
 void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 {
-	if(cluster.empty())return;
-	if(!fRejectPossibleCrosstalk)ContainsReject=false;
+   if(cluster.empty()) { return; }
+   if(!fRejectPossibleCrosstalk) { ContainsReject = false; }
 
-	if(cluster.size()>3){
+   if(cluster.size()>3){
 		ContainsReject=true;
 	}
 
-	if(cluster.size()>1&&!ContainsReject){
+   if(cluster.size() > 1 && !ContainsReject) {
       TSiLiHit* A = static_cast<TSiLiHit*>(GetHit(cluster[0]));
       TSiLiHit* B = static_cast<TSiLiHit*>(GetHit(cluster[1]));
       int rA=A->GetRing();
@@ -294,11 +294,11 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 		int sB=B->GetSector();
 		int rAB=std::abs(rA-rB);
 		int sAB=std::abs(sA-sB);
-		if(sAB>5)sAB=12-sAB;
+      if(sAB > 5) { sAB = 12 - sAB; }
 
       if(cluster.size() == 2) {
          //Reject events with missing middle pixel
-         if(rAB + sAB > 1) ContainsReject = true;
+         if(rAB + sAB > 1) { ContainsReject = true; }
       } else {
          TSiLiHit* C   = static_cast<TSiLiHit*>(GetHit(cluster[2]));
          int       rC  = C->GetRing();
@@ -308,8 +308,8 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
          int       sAC = std::abs(sA - sC);
          int       sBC = std::abs(sB - sC);
 
-         if(sAC > 5) sAC = 12 - sAC;
-         if(sBC > 5) sBC = 12 - sBC;
+         if(sAC > 5) { sAC = 12 - sAC; }
+         if(sBC > 5) { sBC = 12 - sBC; }
 
          if(rA == rB && rB == rC) {
             //Reject events that cross 3 sectors
@@ -331,14 +331,13 @@ void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
                }
 
                //Minimum possible energy
-					if(midE<1400)ContainsReject=true;
+               if(midE < 1400) { ContainsReject = true; }
             }
          }
       }
    }
 
-
-	if(ContainsReject){
+   if(ContainsReject){
 		for(unsigned int j : cluster) {
 			fRejectHits.push_back(j);
 		}

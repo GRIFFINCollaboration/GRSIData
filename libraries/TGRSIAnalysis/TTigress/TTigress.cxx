@@ -338,21 +338,21 @@ TVector3 TTigress::GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist, 
 	int BackPos=0;
 
 	// Would be good to get rid of "dist" and just use SetArrayBackPos, but leaving in for old codes.
-	if(dist>0){
-		if(dist > 140.)BackPos=1;
-	}else if(GetArrayBackPos()){
-		BackPos=1;
-	}
+   if(dist > 0) {
+      if(dist > 140.) { BackPos = 1; }
+   } else if(GetArrayBackPos()) {
+      BackPos = 1;
+   }
 
-	if(smear && SegNbr==0){
+   if(smear && SegNbr == 0) {
       double x = 0.;
       double y = 0.;
       double r = sqrt(gRandom->Uniform(0, 400));
       gRandom->Circle(x, y, r);
-      return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr] + fCloverCross[DetNbr][0]*x + fCloverCross[DetNbr][1]*y;
-	}
+      return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr] + fCloverCross[DetNbr][0] * x + fCloverCross[DetNbr][1] * y;
+   }
 
-	return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr];
+   return fPositionVectors[BackPos][DetNbr][CryNbr][SegNbr];
 }	
 
 void TTigress::BuildVectors(){

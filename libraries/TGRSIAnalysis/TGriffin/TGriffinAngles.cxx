@@ -28,15 +28,15 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 	
    // loop over all possible detector/crystal combinations
    for(int firstDet = 1; firstDet <= 16; ++firstDet) {
-		if(ExcludeDetector(firstDet)) continue;
+		if(ExcludeDetector(firstDet)) { continue; }
       for(int firstCry = 0; firstCry < 4; ++firstCry) {
-			if(ExcludeCrystal(firstDet, firstCry)) continue;
+			if(ExcludeCrystal(firstDet, firstCry)) { continue; }
          for(int secondDet = 1; secondDet <= 16; ++secondDet) {
-				if(ExcludeDetector(secondDet)) continue;
+				if(ExcludeDetector(secondDet)) { continue; }
             for(int secondCry = 0; secondCry < 4; ++secondCry) {
-					if(ExcludeCrystal(secondDet, secondCry)) continue;
+					if(ExcludeCrystal(secondDet, secondCry)) { continue; }
                // exclude hits in the same crystal or, if addback is enabled, in the same detector
-               if(firstDet == secondDet && (firstCry == secondCry || fAddback)) continue;
+               if(firstDet == secondDet && (firstCry == secondCry || fAddback)) { continue; }
                double angle = TGriffin::GetPosition(firstDet, firstCry, fDistance).Angle(TGriffin::GetPosition(secondDet, secondCry, fDistance)) *180./TMath::Pi();
                // if folding is enable we fold the distribution at 90 degree and only use angles between 0 and 90 degree
                if(fFolding && angle > 90.) {

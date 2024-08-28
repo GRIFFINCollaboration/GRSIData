@@ -35,7 +35,7 @@ public:
    bool     MagnetShadow() const;
    Double_t GetTimeFit() const {// In ns tstamp units
       TChannel* channel = GetChannel();
-      if(channel != nullptr) return fTimeFit+channel->GetTZero(GetEnergy());
+      if(channel != nullptr) { return fTimeFit+channel->GetTZero(GetEnergy()); }
       return fTimeFit;
    }
    
@@ -93,7 +93,7 @@ public:
       TVector3 pos = GetPosition();
       pos.SetTheta(130. * TMath::Pi() / 180.);
       double costhe = TMath::Cos(pos.Angle(*vec));
-      if(E>0) E= this->GetEnergy();
+      if(E > 0) { E = this->GetEnergy(); }
       double gamma  = 1 / (sqrt(1 - pow(beta, 2)));
 
       return ((E + 511 - beta * costhe * sqrt(E * (E + 1022))) * gamma) - 511;
