@@ -463,6 +463,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
 using BYTE = uint8_t;
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage, cppcoreguidelines-pro-type-cstyle-cast)
 /// Byte swapping routine.
 ///
 #define QWORD_SWAP(x)                            \
@@ -504,6 +505,7 @@ using BYTE = uint8_t;
       *((BYTE*)(x))       = *(((BYTE*)(x)) + 1); \
       *(((BYTE*)(x)) + 1) = _tmp;                \
    }
+// NOLINTEND(cppcoreguidelines-macro-usage, cppcoreguidelines-pro-type-cstyle-cast)
 
 void TMidasEvent::SwapBytesEventHeader()
 {
