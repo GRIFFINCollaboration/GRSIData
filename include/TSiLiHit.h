@@ -20,8 +20,11 @@ public:
 
    TSiLiHit();
    TSiLiHit(const TFragment&);
-   ~TSiLiHit() override;
    TSiLiHit(const TSiLiHit&);
+	TSiLiHit(TSiLiHit&&) noexcept = default;
+	TSiLiHit& operator=(const TSiLiHit&) = default;
+	TSiLiHit& operator=(TSiLiHit&&) noexcept = default;
+   ~TSiLiHit() override;
 
    void Copy(TObject&, bool = false) const override; //!
    void Clear(Option_t* opt = "") override;

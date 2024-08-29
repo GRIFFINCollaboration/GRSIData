@@ -28,6 +28,9 @@ class TZeroDegree : public TDetector {
 public:
    TZeroDegree();
    TZeroDegree(const TZeroDegree& rhs);
+	TZeroDegree(TZeroDegree&&) noexcept = default;
+   TZeroDegree& operator=(const TZeroDegree&); //!<!
+	TZeroDegree& operator=(TZeroDegree&&) = default;
    ~TZeroDegree() override = default;
 
    TZeroDegreeHit* GetZeroDegreeHit(const int& i) const { return static_cast<TZeroDegreeHit*>(GetHit(i)); }
@@ -38,8 +41,6 @@ public:
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TZeroDegree& operator=(const TZeroDegree&); //!<!
 
 private:
    static bool fSetWave; ///<  Flag for Waveforms ON/OFF

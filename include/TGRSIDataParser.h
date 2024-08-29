@@ -44,6 +44,10 @@
 class TGRSIDataParser : public TDataParser {
 public:
    TGRSIDataParser();
+   TGRSIDataParser(const TGRSIDataParser&) = default;
+	TGRSIDataParser(TGRSIDataParser&&) noexcept = default;
+	TGRSIDataParser& operator=(const TGRSIDataParser&) = default;
+	TGRSIDataParser& operator=(TGRSIDataParser&&) noexcept = default;
    ~TGRSIDataParser() override = default;
 
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);

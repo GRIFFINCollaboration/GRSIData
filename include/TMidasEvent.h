@@ -39,8 +39,10 @@ public:
    // houskeeping functions
    TMidasEvent();                                      ///< default constructor
    TMidasEvent(const TMidasEvent&);                    ///< copy constructor
-   ~TMidasEvent() override;                            ///< destructor
+	TMidasEvent(TMidasEvent&&) noexcept = default;
    TMidasEvent& operator=(const TMidasEvent&);         ///< assignement operator
+	TMidasEvent& operator=(TMidasEvent&&) noexcept = default;
+   ~TMidasEvent() override;                            ///< destructor
    void Clear(Option_t* opt = "") override;            ///< clear event for reuse
    void Copy(TObject&) const override;                 ///< copy helper
    void Print(const char* option = "") const override; ///< show all event information

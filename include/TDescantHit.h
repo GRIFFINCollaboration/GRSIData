@@ -19,9 +19,12 @@
 class TDescantHit : public TDetectorHit {
 public:
    TDescantHit();
-   ~TDescantHit() override;
    TDescantHit(const TDescantHit&);
+	TDescantHit(TDescantHit&&) noexcept = default;
+	TDescantHit& operator=(const TDescantHit&) = default;
+	TDescantHit& operator=(TDescantHit&&) noexcept = default;
    explicit TDescantHit(const TFragment& frag);
+   ~TDescantHit() override;
 
 private:
    Int_t              fFilter;

@@ -15,8 +15,11 @@
 class TTriFoil : public TDetector {
 public:
    TTriFoil();
-   ~TTriFoil() override;
    TTriFoil(const TTriFoil& rhs);
+	TTriFoil(TTriFoil&&) noexcept = default;
+	TTriFoil& operator=(const TTriFoil&) = default;
+	TTriFoil& operator=(TTriFoil&&) noexcept = default;
+   ~TTriFoil() override;
 
    std::vector<Short_t> GetWave() { return fTfWave; }
    bool                 Beam() const { return fBeam; }

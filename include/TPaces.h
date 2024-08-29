@@ -19,6 +19,9 @@ class TPaces : public TDetector {
 public:
    TPaces();
    TPaces(const TPaces&);
+	TPaces(TPaces&&) noexcept = default;
+   TPaces& operator=(const TPaces&); //!<!
+	TPaces& operator=(TPaces&&) noexcept = default;
    ~TPaces() override = default;
 
    TPacesHit* GetPacesHit(const int& i) const { return static_cast<TPacesHit*>(GetHit(i)); }
@@ -29,8 +32,6 @@ public:
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
    static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fDetectorPosition[DetNbr]; } //!<!
-
-   TPaces& operator=(const TPaces&); //!<!
 
 private:
    static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF

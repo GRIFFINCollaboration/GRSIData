@@ -20,8 +20,11 @@ class TTipHit : public TDetectorHit {
 public:
    TTipHit();
    explicit TTipHit(const TFragment&);
-   ~TTipHit() override;
    TTipHit(const TTipHit&);
+	TTipHit(TTipHit&&) noexcept = default;
+	TTipHit& operator=(const TTipHit&) = default;
+	TTipHit& operator=(TTipHit&&) noexcept = default;
+   ~TTipHit() override;
 
 private:
    Int_t    fFilter{0}; //

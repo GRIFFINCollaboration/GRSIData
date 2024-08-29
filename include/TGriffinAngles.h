@@ -26,6 +26,10 @@
 class TGriffinAngles : public TNamed {
 public:
 	explicit TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
+	TGriffinAngles(const TGriffinAngles&) = default;
+	TGriffinAngles(TGriffinAngles&&) noexcept = default;
+	TGriffinAngles& operator=(const TGriffinAngles&) = default;
+	TGriffinAngles& operator=(TGriffinAngles&&) noexcept = default;
 	~TGriffinAngles() = default;
 
    double Distance() const { return fDistance; }

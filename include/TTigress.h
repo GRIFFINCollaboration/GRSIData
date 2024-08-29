@@ -47,6 +47,9 @@ public:
 
    TTigress();
    TTigress(const TTigress&);
+	TTigress(TTigress&&) noexcept = default;
+   TTigress& operator=(const TTigress&); //!<!
+	TTigress& operator=(TTigress&&) noexcept = default;
    ~TTigress() override;
 
    // Dont know why these were changes to return by reference rather than pointer
@@ -76,8 +79,6 @@ public:
       fTigressBits = 0;
 		TDetector::ClearTransients();
    }
-
-   TTigress& operator=(const TTigress&); //!<!
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetAddbackCriterion(std::function<bool(TDetectorHit*, TDetectorHit*)> criterion)

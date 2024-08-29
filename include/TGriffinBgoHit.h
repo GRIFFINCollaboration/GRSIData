@@ -25,6 +25,9 @@ class TGriffinBgoHit : public TBgoHit {
 public:
    TGriffinBgoHit();
    TGriffinBgoHit(const TGriffinBgoHit& hit) : TBgoHit(static_cast<const TBgoHit&>(hit)) {}
+	TGriffinBgoHit(TGriffinBgoHit&&) noexcept = default;
+	TGriffinBgoHit& operator=(const TGriffinBgoHit&) = default;
+	TGriffinBgoHit& operator=(TGriffinBgoHit&&) noexcept = default;
    explicit TGriffinBgoHit(const TFragment& frag) : TBgoHit(frag) {}
    ~TGriffinBgoHit() override;
 

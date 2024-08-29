@@ -19,6 +19,9 @@ class TRF : public TDetector {
 public:
    TRF();
    TRF(const TRF&);
+	TRF(TRF&&) noexcept = default;
+	TRF& operator=(const TRF&) = default;
+	TRF& operator=(TRF&&) noexcept = default;
    ~TRF() override;
 
    Double_t Phase() const 

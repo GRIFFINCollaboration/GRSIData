@@ -39,8 +39,11 @@ public:
    };
 
    TLaBr();
-   ~TLaBr() override;
    TLaBr(const TLaBr& rhs);
+	TLaBr(TLaBr&&) noexcept = default;
+   TLaBr& operator=(const TLaBr&); //!<!
+	TLaBr& operator=(TLaBr&&) noexcept = default;
+   ~TLaBr() override;
 
    void Copy(TObject& rhs) const override;
    TLaBrHit* GetLaBrHit(const int& i) const { return static_cast<TLaBrHit*>(GetHit(i)); }
@@ -67,8 +70,6 @@ public:
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
    static TVector3 GetPosition(int DetNbr) { return fPosition[DetNbr]; } //!<!
-
-   TLaBr& operator=(const TLaBr&); //!<!
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)

@@ -34,6 +34,9 @@ public:
 
    TS3();
    TS3(const TS3&);
+	TS3(TS3&&) noexcept = default;
+   TS3& operator=(const TS3&);
+	TS3& operator=(TS3&&) noexcept = default;
    ~TS3() override;
 
 #ifndef __CINT__
@@ -112,7 +115,6 @@ public:
    }
 
    void Copy(TObject&) const override;
-   TS3& operator=(const TS3&);                    //
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!

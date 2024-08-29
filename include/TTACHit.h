@@ -28,9 +28,12 @@
 class TTACHit : public TDetectorHit {
 public:
    TTACHit();
-   ~TTACHit() override;
    TTACHit(const TTACHit&);
+	TTACHit(TTACHit&&) noexcept = default;
+	TTACHit& operator=(const TTACHit&) = default;
+	TTACHit& operator=(TTACHit&&) noexcept = default;
    explicit TTACHit(const TFragment& frag) { frag.Copy(*this); }
+   ~TTACHit() override;
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

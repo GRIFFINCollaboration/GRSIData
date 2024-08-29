@@ -27,8 +27,11 @@
 class TSceptar : public TDetector {
 public:
    TSceptar();
-   ~TSceptar() override = default;
    TSceptar(const TSceptar& rhs);
+	TSceptar(TSceptar&&) noexcept = default;
+   TSceptar& operator=(const TSceptar&); //!<!
+	TSceptar& operator=(TSceptar&&) noexcept = default;
+   ~TSceptar() override = default;
 
    TSceptarHit* GetSceptarHit(const int& i) const { return static_cast<TSceptarHit*>(GetHit(i)); }
 #ifndef __CINT__
@@ -37,8 +40,6 @@ public:
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
    static TVector3 GetPosition(int DetNbr) { return fPaddlePosition[DetNbr]; } //!<!
-
-   TSceptar& operator=(const TSceptar&); //!<!
 
    static bool SetWave() { return fSetWave; } //!<!
 

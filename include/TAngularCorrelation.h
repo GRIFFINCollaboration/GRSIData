@@ -46,8 +46,12 @@ private:
    std::vector<Double_t> fModifiedAngles;  // array correlating modified index with angles
 
 public:
-   ~TAngularCorrelation() override;
    TAngularCorrelation();
+	TAngularCorrelation(const TAngularCorrelation&) = default;
+	TAngularCorrelation(TAngularCorrelation&&) noexcept = default;
+	TAngularCorrelation& operator=(const TAngularCorrelation&) = default;
+	TAngularCorrelation& operator=(TAngularCorrelation&&) noexcept = default;
+   ~TAngularCorrelation() override;
 
    //----------------- getters -----------------
    TH1D* GetIndexCorrelation() { return fIndexCorrelation; }

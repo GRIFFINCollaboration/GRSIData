@@ -33,6 +33,10 @@ class TMidasFile : public TRawFile {
 public:
    TMidasFile(); ///< default constructor
    explicit TMidasFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
+   TMidasFile(const TMidasFile&) = default;
+	TMidasFile(TMidasFile&&) noexcept = default;
+   TMidasFile& operator=(const TMidasFile&) = default;
+	TMidasFile& operator=(TMidasFile&&) noexcept = default;
    ~TMidasFile() override; ///< destructor
 
    bool Open(const char* filename) override; ///< Open input file

@@ -13,9 +13,11 @@
 
 class TGenericDetector : public TDetector {
 public:
-
    TGenericDetector();
    TGenericDetector(const TGenericDetector&);
+	TGenericDetector(TGenericDetector&&) noexcept = default;
+	TGenericDetector& operator=(const TGenericDetector&);
+	TGenericDetector& operator=(TGenericDetector&&) noexcept = default;
    ~TGenericDetector() override;
 
 #ifndef __CINT__
@@ -25,7 +27,6 @@ public:
 
    TDetectorHit* GetGenericDetectorHit(const int& i) const { return GetHit(i); }
 
-   TGenericDetector& operator=(const TGenericDetector&);                    //
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 

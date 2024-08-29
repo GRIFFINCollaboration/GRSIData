@@ -27,9 +27,12 @@
 class TZeroDegreeHit : public TDetectorHit {
 public:
    TZeroDegreeHit();
-   ~TZeroDegreeHit() override;
    TZeroDegreeHit(const TZeroDegreeHit&);
+	TZeroDegreeHit(TZeroDegreeHit&&) noexcept = default;
+	TZeroDegreeHit& operator=(const TZeroDegreeHit&) = default;
+	TZeroDegreeHit& operator=(TZeroDegreeHit&&) noexcept = default;
    explicit TZeroDegreeHit(const TFragment& frag);
+   ~TZeroDegreeHit() override;
 
 private:
    Int_t              fFilter{0};

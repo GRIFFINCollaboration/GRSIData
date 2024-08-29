@@ -20,8 +20,17 @@
 class TSharc2 : public TDetector {
 public:
    TSharc2();
-   ~TSharc2() override;
    TSharc2(const TSharc2& rhs);
+	TSharc2(TSharc2&&) noexcept = default;
+	TSharc2& operator=(TSharc2&&) noexcept = default;
+   TSharc2& operator=(const TSharc2& rhs)
+   {
+      if(this != &rhs) {
+         rhs.Copy(*this);
+      }
+      return *this;
+   } //!<!
+   ~TSharc2() override;
 
    TSharc2Hit* GetSharc2Hit(const int& i) const { return static_cast<TSharc2Hit*>(GetHit(i)); }
    static TVector3 GetPosition(int detector, int frontstrip, int backstrip, double X = 0.00, double Y = 0.00,
@@ -43,14 +52,6 @@ public:
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
-
-   TSharc2& operator=(const TSharc2& rhs)
-   {
-      if(this != &rhs) {
-         rhs.Copy(*this);
-      }
-      return *this;
-   } //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

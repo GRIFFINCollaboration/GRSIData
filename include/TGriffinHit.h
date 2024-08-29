@@ -31,6 +31,9 @@ public:
 
    TGriffinHit();
    TGriffinHit(const TGriffinHit&);
+	TGriffinHit(TGriffinHit&&) noexcept = default;
+	TGriffinHit& operator=(const TGriffinHit&) = default;
+	TGriffinHit& operator=(TGriffinHit&&) noexcept = default;
    explicit TGriffinHit(const TFragment&);
    ~TGriffinHit() override;
 

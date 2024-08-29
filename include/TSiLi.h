@@ -27,14 +27,15 @@ public:
 
    TSiLi();
    TSiLi(const TSiLi&);
+	TSiLi(TSiLi&&) noexcept = default;
+   TSiLi& operator=(const TSiLi&); //
+	TSiLi& operator=(TSiLi&&) noexcept = default;
    ~TSiLi() override;
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TSiLi& operator=(const TSiLi&); //
 
    void Copy(TObject&) const override;
    void Clear(Option_t* opt = "") override;

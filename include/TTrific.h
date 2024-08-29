@@ -41,8 +41,10 @@ public:
 
 	TTrific();
 	TTrific(const TTrific&);
+	TTrific(TTrific&&) noexcept = default;
+	TTrific& operator=(const TTrific&); //!<!
+	TTrific& operator=(TTrific&&) noexcept = default;
 	~TTrific() override = default;
-
 
 	TTrificHit* GetTrificHit(const int& i) const {return static_cast<TTrificHit*>(GetHit(i));}
 	TTrificHit* GetTrificXHit(const int& i) const {return fXFragments.at(i);}
@@ -82,9 +84,6 @@ public:
 
 	void GetXYGrid(); //!<!
 
-	TTrific& operator=(const TTrific&); //!<!
-
-public:
 	static bool SetCoreWave() { return fSetCoreWave; } //!<!
 
 	void Copy(TObject&) const override;            //!<!

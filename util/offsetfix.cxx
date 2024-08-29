@@ -112,6 +112,10 @@ public:
       }
    }
 
+	TEventTime(const TEventTime&) = default;
+	TEventTime(TEventTime&&) noexcept = default;
+	TEventTime& operator=(const TEventTime&) = default;
+	TEventTime& operator=(TEventTime&&) noexcept = default;
    ~TEventTime() = default;
 
    uint64_t GetTimeStamp() const 

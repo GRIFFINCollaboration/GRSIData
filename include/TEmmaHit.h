@@ -19,6 +19,9 @@ class TEmmaHit : public TDetectorHit {
 public:
    TEmmaHit();
    TEmmaHit(const TEmmaHit&);
+	TEmmaHit(TEmmaHit&&) noexcept = default;
+	TEmmaHit& operator=(const TEmmaHit&) = default;
+	TEmmaHit& operator=(TEmmaHit&&) noexcept = default;
    explicit TEmmaHit(const TFragment& frag) { frag.Copy(*this); }
    ~TEmmaHit() override;
 

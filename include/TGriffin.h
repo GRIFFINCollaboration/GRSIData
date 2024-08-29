@@ -36,6 +36,9 @@ public:
 
    TGriffin();
    TGriffin(const TGriffin&);
+	TGriffin(TGriffin&&) noexcept = default;
+   TGriffin& operator=(const TGriffin&); //!<!
+	TGriffin& operator=(TGriffin&&) noexcept = default;
    ~TGriffin() override;
 
    TGriffinHit* GetGriffinLowGainHit(const int& i);                                              //!<!
@@ -64,8 +67,6 @@ public:
       }
    }
    void ResetFlags() const;
-
-   TGriffin& operator=(const TGriffin&); //!<!
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetAddbackCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)

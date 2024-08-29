@@ -25,6 +25,10 @@
 class TCSMHit : public TDetectorHit {
 public:
    TCSMHit();
+	TCSMHit(const TCSMHit&) = default;
+	TCSMHit(TCSMHit&&) noexcept = default;
+	TCSMHit& operator=(const TCSMHit&) = default;
+	TCSMHit& operator=(TCSMHit&&) noexcept = default;
    ~TCSMHit() override;
 
 private:

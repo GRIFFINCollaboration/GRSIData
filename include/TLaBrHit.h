@@ -29,6 +29,9 @@ public:
    TLaBrHit();
    ~TLaBrHit() override;
    TLaBrHit(const TLaBrHit&);
+	TLaBrHit(TLaBrHit&&) noexcept = default;
+	TLaBrHit& operator=(const TLaBrHit&) = default;
+	TLaBrHit& operator=(TLaBrHit&&) noexcept = default;
    explicit TLaBrHit(const TFragment& frag) { frag.Copy(*this); }
 
    /////////////////////////		/////////////////////////////////////

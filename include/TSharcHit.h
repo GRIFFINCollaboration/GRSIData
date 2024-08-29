@@ -36,6 +36,9 @@ class TSharcHit : public TDetectorHit {
 public:
    TSharcHit();
    TSharcHit(const TSharcHit&);
+	TSharcHit(TSharcHit&&) noexcept = default;
+	TSharcHit& operator=(const TSharcHit&) = default;
+	TSharcHit& operator=(TSharcHit&&) noexcept = default;
    ~TSharcHit() override;
 
 private:

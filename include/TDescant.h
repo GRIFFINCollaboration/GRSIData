@@ -28,6 +28,9 @@ class TDescant : public TDetector {
 public:
    TDescant();
    TDescant(const TDescant&);
+	TDescant(TDescant&&) noexcept = default;
+   TDescant& operator=(const TDescant&); //
+	TDescant& operator=(TDescant&&) noexcept = default;
    ~TDescant() override = default;
 
    TDescantHit* GetDescantHit(const Int_t& i = 0) const { return static_cast<TDescantHit*>(GetHit(i)); }
@@ -38,8 +41,6 @@ public:
    void              AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TDescant& operator=(const TDescant&); //
 
 public:
    static bool SetWave() { return fSetWave; }         //!<!

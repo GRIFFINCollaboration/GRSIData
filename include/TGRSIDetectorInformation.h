@@ -23,6 +23,10 @@
 class TGRSIDetectorInformation : public TDetectorInformation {
 public:
    TGRSIDetectorInformation();
+   TGRSIDetectorInformation(const TGRSIDetectorInformation&) = default;
+	TGRSIDetectorInformation(TGRSIDetectorInformation&&) noexcept = default;
+	TGRSIDetectorInformation& operator=(const TGRSIDetectorInformation&) = default;
+	TGRSIDetectorInformation& operator=(TGRSIDetectorInformation&&) noexcept = default;
    ~TGRSIDetectorInformation() override;
    
    TEventBuildingLoop::EBuildMode BuildMode() const override;

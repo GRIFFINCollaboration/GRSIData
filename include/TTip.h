@@ -24,6 +24,9 @@ public:
 
    TTip();
    TTip(const TTip& rhs);
+	TTip(TTip&&) noexcept = default;
+   TTip& operator=(const TTip&); //!<!
+	TTip& operator=(TTip&&) noexcept = default;
    ~TTip() override = default;
 
    static TVector3 GetPosition(int DetNbr); //!<!
@@ -35,8 +38,6 @@ public:
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TTip& operator=(const TTip&); //!<!
 
 private:
 

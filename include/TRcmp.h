@@ -51,6 +51,9 @@ public:
    // constructors and destructors
    TRcmp();               ///< default constructor
    TRcmp(const TRcmp&);   ///< copy constructor
+	TRcmp(TRcmp&&) noexcept = default;
+   TRcmp& operator=(const TRcmp&);
+	TRcmp& operator=(TRcmp&&) noexcept = default;
    ~TRcmp() override;     ///< destructor
 
 #ifndef __CINT__
@@ -67,7 +70,6 @@ public:
    inline TRcmpHit* GetRcmpBackHit(const int& i)  const { return fBackNMulVector.at(i); }    ///< returns a back strip hit in RCMP  (this hit can be used to fill histograms when looping over back  multiplicity)
    inline TRcmpHit* GetRcmpHit(const int& i)      const { return fPixelMulVector.at(i); }    ///< returns a pixel hit in RCMP       (this hit can be used to fill histograms when looping over pixel multiplicity)
 
-   TRcmp& operator=(const TRcmp&);
    void   Copy(TObject&) const override;              //!<!
    void   Clear(Option_t* opt = "all") override;      //!<!
    void   Print(Option_t* opt = "") const override;   //!<!

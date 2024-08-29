@@ -19,6 +19,9 @@ class TPacesHit : public TDetectorHit {
 public:
    TPacesHit();
    TPacesHit(const TPacesHit&);
+	TPacesHit(TPacesHit&&) noexcept = default;
+	TPacesHit& operator=(const TPacesHit&) = default;
+	TPacesHit& operator=(TPacesHit&&) noexcept = default;
    explicit TPacesHit(const TFragment& frag) { frag.Copy(*this); }
    ~TPacesHit() override;
 

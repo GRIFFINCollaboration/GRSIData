@@ -13,11 +13,12 @@ class TLaBrBgo : public TBgo {
 public:
    TLaBrBgo();
    TLaBrBgo(const TLaBrBgo&);
+	TLaBrBgo(TLaBrBgo&&) noexcept = default;
+   TLaBrBgo& operator=(const TLaBrBgo&); //!<!
+	TLaBrBgo& operator=(TLaBrBgo&&) noexcept = default;
    virtual ~TLaBrBgo() = default;
 
    TLaBrBgoHit* GetLaBrBgoHit(const int& i) const { return static_cast<TLaBrBgoHit*>(GetHit(i)); }
-
-   TLaBrBgo& operator=(const TLaBrBgo&); //!<!
 
    /// \cond CLASSIMP
    ClassDef(TLaBrBgo, 1) // LaBrBgo Physics structure // NOLINT(readability-else-after-return)

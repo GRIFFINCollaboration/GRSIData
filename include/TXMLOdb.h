@@ -31,6 +31,10 @@
 class TXMLOdb {
 public:
    explicit TXMLOdb(char* buffer, int size = 0);
+   TXMLOdb(const TXMLOdb& rhs);
+	TXMLOdb(TXMLOdb&&) noexcept = default;
+	TXMLOdb& operator=(const TXMLOdb&) = default;
+	TXMLOdb& operator=(TXMLOdb&&) noexcept = default;
    virtual ~TXMLOdb();
 
    TXMLDocument* fDoc;

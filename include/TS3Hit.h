@@ -13,8 +13,11 @@ class TS3Hit : public TDetectorHit {
 public:
    TS3Hit();
    explicit TS3Hit(const TFragment&);
-   ~TS3Hit() override;
    TS3Hit(const TS3Hit&);
+	TS3Hit(TS3Hit&&) noexcept = default;
+	TS3Hit& operator=(const TS3Hit&) = default;
+	TS3Hit& operator=(TS3Hit&&) noexcept = default;
+   ~TS3Hit() override;
 
    Short_t GetRing() const { return fRing; }
    Short_t GetSector() const { return fSector; }

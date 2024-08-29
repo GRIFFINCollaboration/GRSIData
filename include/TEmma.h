@@ -20,6 +20,9 @@ class TEmma : public TDetector {
 public:
    TEmma();
    TEmma(const TEmma&);
+	TEmma(TEmma&&) noexcept = default;
+   TEmma& operator=(const TEmma&); //!<!
+	TEmma& operator=(TEmma&&) noexcept = default;
    ~TEmma() override = default;
 
    TEmmaHit* GetEmmaHit(const int& i) const { return static_cast<TEmmaHit*>(GetHit(i)); }
@@ -44,7 +47,6 @@ public:
 
   // static TVector3 GetPosition(double delayL, double delayR, double delayT, double delayB); //!<!
    static TVector3 GetPosition(double left, double right, double top, double bottom, double delayL, double delayR, double delayT, double delayB );
-   TEmma& operator=(const TEmma&); //!<!
 
 private:
    std::vector<TEmmaHit> fEmmaICHits;

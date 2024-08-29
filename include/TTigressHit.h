@@ -24,6 +24,9 @@ class TTigressHit : public TDetectorHit {
 public:
    TTigressHit();
    TTigressHit(const TTigressHit&);
+	TTigressHit(TTigressHit&&) noexcept = default;
+	TTigressHit& operator=(const TTigressHit&) = default;
+	TTigressHit& operator=(TTigressHit&&) noexcept = default;
    explicit TTigressHit(const TFragment& frag);
    void CopyFragment(const TFragment& frag);
    ~TTigressHit() override;

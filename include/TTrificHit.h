@@ -19,6 +19,9 @@ class TTrificHit : public TDetectorHit {
 public:
    TTrificHit();
    TTrificHit(const TTrificHit&);
+	TTrificHit(TTrificHit&&) noexcept = default;
+	TTrificHit& operator=(const TTrificHit&) = default;
+	TTrificHit& operator=(TTrificHit&&) noexcept = default;
    explicit TTrificHit(const TFragment& frag) { frag.Copy(*this); }
    ~TTrificHit() override;
 

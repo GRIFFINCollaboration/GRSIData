@@ -28,9 +28,12 @@
 class TSceptarHit : public TDetectorHit {
 public:
    TSceptarHit();
-   ~TSceptarHit() override;
    TSceptarHit(const TSceptarHit&);
+	TSceptarHit(TSceptarHit&&) noexcept = default;
+	TSceptarHit& operator=(const TSceptarHit&) = default;
+	TSceptarHit& operator=(TSceptarHit&&) noexcept = default;
    explicit TSceptarHit(const TFragment& frag);
+   ~TSceptarHit() override;
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
