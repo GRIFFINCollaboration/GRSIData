@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 	UInt_t labr2 = 0;
 	UInt_t tac1 = 0; //counters
 
-	Double_t  progress;
+	Double_t  progress = 0.;
 	Int_t  multi_labr = 0;
 	Int_t multi_tac = 0;
 	Int_t multi_grif = 0;
