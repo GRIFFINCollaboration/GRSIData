@@ -623,7 +623,7 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
 		return hit_to_correct->GetEnergy();
 	}
-	static bool been_warned[256] = {false};
+	static std::array<bool, 256> been_warned = {false};
 	double      fixed_energy     = hit_to_correct->GetEnergy();
 	try {
 		if(hit_to_correct->GetChannel() != nullptr) {
