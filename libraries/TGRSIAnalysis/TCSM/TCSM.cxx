@@ -1,7 +1,8 @@
 #include "TCSM.h"
 #include "TMath.h"
-#define RECOVERHITS 1
-#define SUMHITS 0
+
+constexpr bool RecoverHits = true;
+constexpr bool SumHits = false;
 
 /// \cond CLASSIMP
 ClassImp(TCSM)
@@ -145,7 +146,7 @@ void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>
       int he1 = strips[0][0].first.GetEnergy();
       int he2 = strips[0][1].first.GetEnergy();
       int ve1 = strips[1][0].first.GetEnergy();
-      if(AlmostEqual(ve1, he1 + he2) && SUMHITS) {
+      if(AlmostEqual(ve1, he1 + he2) && SumHits) {
          hitVector.push_back(MakeHit(strips[0], strips[1]));
       } else if(AlmostEqual(ve1, he1)) {
          hitVector.push_back(MakeHit(strips[0][0], strips[1][0]));
@@ -158,7 +159,7 @@ void TCSM::BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>
       int he1 = strips[0][0].first.GetEnergy();
       int ve1 = strips[1][0].first.GetEnergy();
       int ve2 = strips[1][1].first.GetEnergy();
-      if(AlmostEqual(ve1 + ve2, he1) && SUMHITS) {
+      if(AlmostEqual(ve1 + ve2, he1) && SumHits) {
          hitVector.push_back(MakeHit(strips[0], strips[1]));
       } else if(AlmostEqual(ve1, he1)) {
          hitVector.push_back(MakeHit(strips[0][0], strips[1][0]));
@@ -521,7 +522,7 @@ void TCSM::OldBuilddEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetecto
 
 void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit, std::vector<TDetectorHit*>& hits)
 {
-   if(!RECOVERHITS) {
+   if(!RecoverHits) {
       return;
    }
 

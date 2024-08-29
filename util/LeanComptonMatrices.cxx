@@ -67,7 +67,8 @@ ________________________________________________________________________________
 #include "TGRSISortInfo.h"
 #include "TGriffin.h"
 
-#define MAXENTRIES 0 //Set to 0 for all entries. 
+//Set to 0 for all entries. 
+constexpr int MaxEntries = 0;
 
 TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w );
 
@@ -121,7 +122,7 @@ int main(int argc, char **argv)
 		outfile = new TFile(outputname.c_str(), "recreate");
 		std::cout<<argv[0]<<": starting Analysis on "<<argv[f+1]<<" after "<<w.RealTime()<<" seconds"<<std::endl; w.Continue();
 		
-		outlist = ComptonHists(tree, MAXENTRIES, &w);
+		outlist = ComptonHists(tree, MaxEntries, &w);
 		if(outlist == nullptr) {
 		  std::cout<<"ComptonHists returned TList* nullptr!"<<std::endl;
 		  continue;

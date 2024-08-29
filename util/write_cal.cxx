@@ -27,8 +27,9 @@
 #include <vector>
 #include <string>
 
-#define FIRST_CHANNEL 84
-#define LAST_CHANNEL 91
+constexpr int FirstChannel = 84;
+constexpr int  LastChannel = 91;
+
 int main(int argc, char** argv) {
 	if(argc == 1) {
 		std::cout<<"Usage: "<<argv[0]<<" <analysis tree file(s)>"<<std::endl;
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
 	}
 
 	std::cout<<std::endl
-	         <<"WARNING: This script assumes that the TACs are in channels FIRST_CHANNEL-LAST_CHANNEL (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly"<<std::endl
+	         <<"WARNING: This script assumes that the TACs are in channels "<<FirstChannel<<" - "<<LastChannel<<" (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly"<<std::endl
 	         <<std::endl;
 
 	auto* file = new TFile(argv[1]);
@@ -49,10 +50,10 @@ int main(int argc, char** argv) {
 
 	std::array<double, 8> offset;
 
-	for(int n = FIRST_CHANNEL; n <= LAST_CHANNEL; n++) {
+	for(int n = FirstChannel; n <= LastChannel; n++) {
 		channel = TChannel::GetChannelByNumber(n);
-		offset[n-FIRST_CHANNEL] = channel->GetTimeOffset();
-		std::cout<<"Current TAC offset in the calfile:  "<<offset[n-FIRST_CHANNEL]<<" for channel #"<<n<<std::endl;
+		offset[n-FirstChannel] = channel->GetTimeOffset();
+		std::cout<<"Current TAC offset in the calfile:  "<<offset[n-FirstChannel]<<" for channel #"<<n<<std::endl;
 	}
 
 
