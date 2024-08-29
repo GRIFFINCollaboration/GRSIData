@@ -5,6 +5,8 @@
 #ifndef INCLUDE_TMidasBanksH
 #define INCLUDE_TMidasBanksH
 
+#include <cstdint>
+
 /** \addtogroup Sorting
  *  @{
  */

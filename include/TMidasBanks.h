@@ -5,6 +5,8 @@
 #ifndef INCLUDE_TMidasBanksH
 #define INCLUDE_TMidasBanksH
 
+#include "RtypesCore.h"
+
 /** \addtogroup Sorting
  *  @{
  */
