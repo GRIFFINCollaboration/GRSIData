@@ -110,14 +110,14 @@ int main(int argc, char** argv)
 			subString = line.substr(start, underscore-start);
 			runNumber = std::stoi(subString);
 			std::cout<<"got run number "<<runNumber<<" from substring '"<<subString<<"' from line "<<line<<std::endl;
-			if(runNumber != runInfo->RunNumber()) {
-				std::cerr<<"Mismatch between the run number of this file ("<<runNumber<<") and the run number in the ODB ("<<runInfo->RunNumber()<<"), skipping "<<line<<std::endl;
+			if(runNumber != TRunInfo::RunNumber()) {
+				std::cerr<<"Mismatch between the run number of this file ("<<runNumber<<") and the run number in the ODB ("<<TRunInfo::RunNumber()<<"), skipping "<<line<<std::endl;
 				continue;
 			}
 			subString = line.substr(underscore+1, dot-underscore-1);
 			subRunNumber = std::stoi(subString);
 			std::cout<<"got sub run number "<<runNumber<<" from substring '"<<subString<<"' from line "<<line<<std::endl;
-			runInfo->SetSubRunNumber(subRunNumber);
+			TRunInfo::SetSubRunNumber(subRunNumber);
 			std::cout<<"new run info:"<<std::endl;
 			runInfo->Print();
 			TFile f(argv[i]);
