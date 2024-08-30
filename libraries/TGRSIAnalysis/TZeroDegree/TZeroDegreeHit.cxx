@@ -81,7 +81,7 @@ Float_t TZeroDegreeHit::GetCfd() const
 {
    /// special function for TZeroDegreeHit to return CFD after mapping out the high bits
    /// which are the remainder between the 125 MHz data and the 100 MHz timestamp clock
-   return (static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + static_cast<Float_t>(gRandom->Uniform());
+   return static_cast<Float_t>(static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + static_cast<Float_t>(gRandom->Uniform());
 }
 
 Int_t TZeroDegreeHit::GetRemainder() const
