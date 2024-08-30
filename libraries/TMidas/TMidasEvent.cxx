@@ -47,7 +47,7 @@ void TMidasEvent::Copy(TObject& rhs) const
    // assert(static_cast<TMidasEvent&>(rhs).fBankList);
 }
 
-TMidasEvent::TMidasEvent(const TMidasEvent& rhs) : TRawEvent()
+TMidasEvent::TMidasEvent(const TMidasEvent& rhs)
 {
    // Copy ctor.
    rhs.Copy(*this);

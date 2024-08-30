@@ -10,7 +10,7 @@ enum class EDigitizer : char { kDefault, kGRF16, kGRF4G, kTIG10, kTIG64, kCaen, 
 
 class TGRSIMnemonic : public TMnemonic {
 public:
-   TGRSIMnemonic() : TMnemonic() { Clear(); }
+   TGRSIMnemonic() { Clear(); }
    TGRSIMnemonic(const TGRSIMnemonic&) = default;
 	TGRSIMnemonic(TGRSIMnemonic&&) noexcept = default;
 	TGRSIMnemonic& operator=(const TGRSIMnemonic&) = default;

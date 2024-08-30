@@ -12,7 +12,7 @@
 ClassImp(TGRSIDetectorInformation)
 /// \endcond
 
-TGRSIDetectorInformation::TGRSIDetectorInformation() : TDetectorInformation()
+TGRSIDetectorInformation::TGRSIDetectorInformation()
 {
    /// Default ctor for TGRSIDetectorInformation.
    Clear();
