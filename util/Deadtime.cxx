@@ -948,13 +948,13 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       if(cnt % (nsc) == 0 && cnt % (nsc * nscaler) == 0) {
          cflag++;
          if(cflag == 1) {
-            lowrtau = &rp2[0];
+            lowrtau = &rp2[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp2[1];
          } else if(cflag == 2) {
-            lowrtau = &rp3[0];
+            lowrtau = &rp3[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp3[1];
          } else if(cflag == 3) {
-            lowrtau = &rp4[0];
+            lowrtau = &rp4[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp4[1];
          }
       }
