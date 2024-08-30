@@ -150,9 +150,9 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 	//---------------------------- Parameter Setup -----------------------------------//
 	////////////////////////////////////////////////////////////////////////////////////
 	//Energy Spectrum Paramaters
-	Double_t low = 0;
-	Double_t high = 5000;
-	Double_t nofBins = 10000;
+	Double_t low = 0.;
+	Double_t high = 5000.;
+	Int_t nofBins = 10000;
 	//Coincidence Parameters 
 	bool usetimestamps = true; // Will use timestamps instead of time.
 	Double_t ggTlow = 0.0;   //Ensure the units here match with the units of GetTimeStamps, or if 
@@ -298,7 +298,7 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
 
 	for(int entry = 1; entry < maxEntries; ++entry) {
 		if(entry == 1 || entry == maxEntries-1 || entry%(maxEntries/PrintRate) == 0) {
-			std::cout<<"\r\t\t\t\t\t\t\t\t "<<"\rOn entry: "<<std::setw(10)<<std::right<<entry + 1<<"/"<<std::setw(10)<<std::left<<maxEntries<<"  ("<<std::setw(3)<<std::right<<(int)((100.0*(entry+1.0))/maxEntries)<<"%)";
+			std::cout<<"\r\t\t\t\t\t\t\t\t "<<"\rOn entry: "<<std::setw(10)<<std::right<<entry + 1<<"/"<<std::setw(10)<<std::left<<maxEntries<<"  ("<<std::setw(3)<<std::right<<static_cast<int>(static_cast<double>(100*(entry+1))/static_cast<double>(maxEntries))<<"%)";
 		}
 		tree->GetEntry(entry);
 		grif->ResetAddback();
@@ -335,7 +335,7 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
          if(usetimestamps) {
             tg1 = grif->GetGriffinHit(one)->GetTimeStamp();
          } else {
-            tg1 = grif->GetGriffinHit(one)->GetTime();
+            tg1 = static_cast<int>(grif->GetGriffinHit(one)->GetTime());
          }
 
          for(two = 0; two < static_cast<int>(grif->GetMultiplicity()); ++two) {
@@ -347,7 +347,7 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
             if(usetimestamps) {
                tg2 = grif->GetGriffinHit(two)->GetTimeStamp();
             } else {
-               tg2 = grif->GetGriffinHit(two)->GetTime();
+               tg2 = static_cast<int>(grif->GetGriffinHit(two)->GetTime());
             }
 
             if(ggTlow > TMath::Abs(tg2 - tg1) || TMath::Abs(tg2 - tg1) > ggThigh) { continue; }
@@ -386,7 +386,7 @@ TList* ComptonHists(TTree* tree, int64_t maxEntries, TStopwatch* w)
                if(usetimestamps) {
                   tg3 = grif->GetGriffinHit(three)->GetTimeStamp();
                } else {
-                  tg3 = grif->GetGriffinHit(three)->GetTime();
+                  tg3 = static_cast<int>(grif->GetGriffinHit(three)->GetTime());
                }
 
                bool TimeCoincident = ggTlow < TMath::Abs(tg3-tg1) && TMath::Abs(tg3-tg1) < ggThigh && ggTlow < TMath::Abs(tg3-tg2) && TMath::Abs(tg3-tg2) < ggThigh;

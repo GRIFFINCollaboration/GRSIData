@@ -209,7 +209,7 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 {
    if(channel == nullptr) {
       Error("GetTime", "No TChannel provided");
-		return static_cast<Double_t>((timestamp) + gRandom->Uniform());
+		return static_cast<double>(timestamp) + gRandom->Uniform();
    }
 	
 	Double_t dTime = 0.;
@@ -218,22 +218,22 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 		case EDigitizer::kFMC32:
 			// we need to zero the lowest 18 bits of the timestamp as those are included in the CFD value
 			// TODO: what happens close to the wrap-around of those 18 bits??? This only happens every 2^18 * 10e-8 so 2.5 ms so 400 Hz
-			dTime = (timestamp & (~0x3ffff)) * channel->GetTimeStampUnit() + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>((timestamp & (~0x3ffff)) * channel->GetTimeStampUnit()) + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		case EDigitizer::kGRF4G:
-			dTime = timestamp*channel->GetTimeStampUnit() + channel->CalibrateCFD((static_cast<Int_t>(cfd) >> 22) + ((static_cast<Int_t>(cfd) & 0x3fffff) + gRandom->Uniform()) / 256.);
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>(timestamp*channel->GetTimeStampUnit()) + channel->CalibrateCFD((static_cast<Int_t>(cfd) >> 22) + ((static_cast<Int_t>(cfd) & 0x3fffff) + gRandom->Uniform()) / 256.);
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		case EDigitizer::kTIG10:
-			dTime = (timestamp & (~0x7fffff))*channel->GetTimeStampUnit() +	channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
+			dTime = static_cast<Double_t>((timestamp & (~0x7fffff))*channel->GetTimeStampUnit()) +	channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
 			//channel->CalibrateCFD((cfd & (~0xf) + gRandom->Uniform()) / 1.6); // PBender suggests this.
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
       case EDigitizer::kCaen:
 			//10 bit CFD for 0-2ns => divide by 512
-			dTime = timestamp*channel->GetTimeStampUnit() + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 512.);
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>(timestamp*channel->GetTimeStampUnit()) + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 512.);
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		default:
 			dTime = static_cast<Double_t>(((timestamp) + gRandom->Uniform())*channel->GetTimeStampUnit());
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 	}
    return 0.;
 }

@@ -254,7 +254,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
       for(Long64_t e = 0; e < nentries; e++) {
          maple->GetEntry(e);
          if(scaler->GetAddress() == static_cast<UInt_t>(*channel)) {
-            xaxis = (scaler->GetTimeStamp() / 1e9);
+            xaxis = static_cast<double>(scaler->GetTimeStamp()) / 1e9;
             // we check both the value of the scaler and the timestamp (ts difference should be = readout time)
             if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= static_cast<double>(ncycle) + clk) {
                yaxis = (scaler->GetScaler(index) - prev);
@@ -519,7 +519,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                break;
             } 
 				bnd[nt - 1][0] = i;
-				bnd[nt - 1][1] = trans[i][2];
+				bnd[nt - 1][1] = static_cast<int>(trans[i][2]);
          }
       }
       if(nt == numpat) {
@@ -565,8 +565,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       }
       rrand = (wrand / nrand); // mean
       // diagnostic spectrum (dspec) parameters
-      int    lim1  = rrand - (0.5 * dlim * rrand);
-      int    lim2  = rrand + (0.5 * dlim * rrand);
+      int    lim1  = static_cast<int>(rrand - (0.5 * dlim * rrand));
+      int    lim2  = static_cast<int>(rrand + (0.5 * dlim * rrand));
       int    dsbin = (lim2 - lim1) / 20;
       auto** dspec = new int*[dsbin];
       for(int i = 0; i < dsbin; ++i) {
@@ -654,8 +654,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
          }
       }
       // diagnostic spectrum (dspec) parameters (re-define for source+pulser)
-      lim1 = lbd - (2.0 * abs(rcmin - lbd));
-      lim2 = ubd + (2.0 * abs(rcmin - ubd));
+      lim1 = static_cast<int>(lbd - (2.0 * abs(rcmin - lbd)));
+      lim2 = static_cast<int>(ubd + (2.0 * abs(rcmin - ubd)));
       // std::cout<<lim1<<"\t"<<lim2<<"\t"<<rcmin<<std::endl;
       dsbin = (lim2 - lim1) / 20; // dspec[dsbin][2]; What was this statement supposed to do? It has no effect; VB
       for(int i = 0; i < dsbin; i++) {

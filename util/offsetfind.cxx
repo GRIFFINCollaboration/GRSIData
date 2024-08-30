@@ -195,7 +195,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
       }
 
       if((*it)->DetectorType() == 1) {
-         (dynamic_cast<TH2D*>(midvshigh->At((*it)->DigIndex())))->Fill(midtime, hightime);
+         dynamic_cast<TH2D*>(midvshigh->At((*it)->DigIndex()))->Fill(static_cast<double>(midtime), hightime);
          if(hightime < lowest_hightime[(*it)->DigIndex()]) {
             lowest_hightime[TEventTime::digmap.at((*it)->DigIndex())] = hightime;
          }

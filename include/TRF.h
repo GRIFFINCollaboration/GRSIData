@@ -47,7 +47,7 @@ public:
    Double_t GetTimeFitns() const
    {
       if(fTime != 0 && fTime < 1000 && fTime > -1000) {
-         return TimeStamp() + fTime; // 
+         return static_cast<Double_t>(TimeStamp()) + fTime; // 
       }
       return 0;
    }
@@ -55,7 +55,7 @@ public:
    Double_t GetTimestampCfd() const
    { // ticks ->cfdunits
       int64_t ts = TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
-      return ts;
+      return static_cast<Double_t>(ts);
    }
 
 #ifndef __CINT__

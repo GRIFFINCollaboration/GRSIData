@@ -49,7 +49,8 @@ public:
    double AverageAngle(int index) const;
    int    Count(double angle)
    {
-      if(fAngleCount.count(std::round(angle / fRounding)) == 1) { return fAngleCount.at(std::round(angle / fRounding)); }
+		/// If the angle is in our map, report how often it exists, otherwise return zero.
+      if(fAngleCount.count(static_cast<int>(std::round(angle / fRounding))) == 1) { return fAngleCount.at(static_cast<int>(std::round(angle / fRounding))); }
       return 0;
    }
 

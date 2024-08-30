@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 
 		std::array<TH1F*, 8> calibration_hist;
 		for(int i=0; i<8; i++){
-			calibration_hist[i] = new TH1F(Form("calibration_hist%d",i),Form("calibration_hist%d",i),(tac_range/ps_per_chan),0,tac_range); list.Add(calibration_hist[i]);
+			calibration_hist[i] = new TH1F(Form("calibration_hist%d",i),Form("calibration_hist%d",i),static_cast<Int_t>(tac_range/ps_per_chan),0,tac_range); list.Add(calibration_hist[i]);
 		}
 
 		for(int j=0; j<=7; j++){
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
          std::sort(vec.begin(),vec.end());
 
          for(int k = 0; k < nfound; k++) {
-            raw_tac_calibrator[j]->GetXaxis()->SetRange((vec.at(k)-100)/ps_per_chan,(vec.at(k)+100)/ps_per_chan);
+            raw_tac_calibrator[j]->GetXaxis()->SetRangeUser((vec.at(k)-100)/ps_per_chan,(vec.at(k)+100)/ps_per_chan);
 				vec[k]=raw_tac_calibrator[j]->GetMean();
          }
 

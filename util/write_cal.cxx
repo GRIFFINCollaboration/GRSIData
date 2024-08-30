@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
 	for(int n = FirstChannel; n <= LastChannel; n++) {
 		channel = TChannel::GetChannelByNumber(n);
-		offset[n-FirstChannel] = channel->GetTimeOffset();
+		offset[n-FirstChannel] = static_cast<double>(channel->GetTimeOffset());
 		std::cout<<"Current TAC offset in the calfile:  "<<offset[n-FirstChannel]<<" for channel #"<<n<<std::endl;
 	}
 
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 		if(multi_labr==2) {
 			labr1=labr->GetLaBrHit(0)->GetDetector()-1;//GetDetector goes from 1-8, while the counter goes from 0-7, hence the -1
 			labr2=labr->GetLaBrHit(1)->GetDetector()-1;//GetDetector goes from 1-8, while the counter goes from 0-7, hence the -1
-			timestamp_diff_noTACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+			timestamp_diff_noTACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 			time_diff_noTAC[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
 		}
 
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
 					if(multi_grif>0) {
 						for(int i=0; i<multi_grif;i++) {
 							time_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-							timestamp_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+							timestamp_diff_hpge->Fill(static_cast<Double_t>(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 						}
 					}
 				}
@@ -161,11 +161,11 @@ int main(int argc, char** argv) {
 					TAC_offset[tac1]->Fill(labr->GetLaBrHit(1)->GetTime()-tac->GetTACHit(0)->GetTime()+offset[tac1]*10);
 					TAC_offset_corrected[tac1]->Fill(labr->GetLaBrHit(1)->GetTime()-tac->GetTACHit(0)->GetTime());
 					time_diff[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-					timestamp_diff_TACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+					timestamp_diff_TACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 					if(multi_grif>0) {
 						for(int i=0; i<multi_grif;i++) {
 							time_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-							timestamp_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+							timestamp_diff_hpge->Fill(static_cast<Double_t>(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 						}
 					}
 				}

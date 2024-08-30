@@ -318,8 +318,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ)
          continue;
       }
       // The next few lines are probably unnecessary
-      (dynamic_cast<TH2D*>(midvshigh->FindObject(Form("midvshigh_0x%04x", (*it)->Digitizer()))))
-         ->Fill(midtime, hightime);
+      dynamic_cast<TH2D*>(midvshigh->FindObject(Form("midvshigh_0x%04x", (*it)->Digitizer())))->Fill(static_cast<double>(midtime), hightime);
       if(lowest_hightime.find((*it)->Digitizer()) == lowest_hightime.end()) {
          lowest_hightime[(*it)->Digitizer()] = hightime; // initialize this as the first time that is seen.
       } else if(hightime < lowest_hightime.find((*it)->Digitizer())->second) {
@@ -775,9 +774,10 @@ void WriteEvents(TMidasFile * file)
 		};
 		if(num_evt % 5000 == 0) {
 			gSystem->ProcessEvents();
-			printf(HIDE_CURSOR " Events %d have processed %.2fMB/%.2f MB => %.1f MB/s              " SHOW_CURSOR
-					"\r",
-					num_evt, (bytesread / 1000000.0), (filesize / 1000000.0), (bytesread / 1000000.0) / w.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<HIDE_CURSOR<<" Events "<<num_evt<<" have processed "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/w.RealTime()<<" MB/s              "<<SHOW_CURSOR<<"\r";
+			std::cout.precision(precision);
 			w.Continue();
 		}
 	}

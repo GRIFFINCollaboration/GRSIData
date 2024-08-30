@@ -154,8 +154,8 @@ void TTigressHit::SetWavefit(const TFragment& frag)
 {
    TPulseAnalyzer pulse(frag);
    if(pulse.IsSet()) {
-      fTimeFit   = pulse.fit_newT0();
-      fSig2Noise = pulse.get_sig2noise();
+      fTimeFit   = static_cast<Float_t>(pulse.fit_newT0());
+      fSig2Noise = static_cast<Float_t>(pulse.get_sig2noise());
    }
 }
 
@@ -163,7 +163,7 @@ void TTigressHit::SetWavefit()
 {
    TPulseAnalyzer pulse(*GetWaveform(), 0, GetName());
    if(pulse.IsSet()) {
-      fTimeFit   = pulse.fit_newT0();
-      fSig2Noise = pulse.get_sig2noise();
+      fTimeFit   = static_cast<Float_t>(pulse.fit_newT0());
+      fSig2Noise = static_cast<Float_t>(pulse.get_sig2noise());
    }
 }

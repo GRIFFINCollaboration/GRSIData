@@ -50,7 +50,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 					// or we increment the existing counter
 					// the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
 					// factor 2 to include that the "normal" rounding is +- fRounding
-					fAngleCount[std::round(angle/fRounding)]++;
+					fAngleCount[static_cast<int>(std::round(angle/fRounding))]++;
             } // second crystal loop
          } //second detector loop
       } // first crystal loop

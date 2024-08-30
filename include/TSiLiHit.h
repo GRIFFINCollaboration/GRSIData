@@ -48,14 +48,14 @@ public:
    Int_t    GetTimeStampLow() { return GetTimeStamp() & 0x0fffffff; }
    Double_t GetTimeFitns() const
    {
-      return GetTimeStamp()+GetTimeFit();
+      return static_cast<Double_t>(GetTimeStamp())+GetTimeFit();
    }   
    Double_t GetTimeFitCfd() const
    {
 	   double fitt=GetTimeFit();
       if(fitt != 0 && fitt < 1000 && fitt > -1000) {
          int64_t ts = GetTimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
-         return ts + fitt * 16;
+         return static_cast<Double_t>(ts) + fitt * 16;
       }
       return 0;
    }

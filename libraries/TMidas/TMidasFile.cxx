@@ -811,10 +811,10 @@ void TMidasFile::SetGRIFFOdb()
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->AddENGCoefficient(offsets.at(x));
-         tempChan->AddENGCoefficient(gains.at(x));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
 			if(x < quads.size()) {
-				tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+				tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); //Assuming this means quad terms won't be added if not there. 
 			}
 			if(x < digitizer.size()) {
 				tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
@@ -980,8 +980,8 @@ void TMidasFile::SetTIGOdb()
          }
       }
       tempChan->SetIntegration(TPriorityValue<int>(temp_integration, EPriority::kRootFile));
-      tempChan->AddENGCoefficient(offsets.at(x));
-      tempChan->AddENGCoefficient(gains.at(x));
+      tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+      tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
 
       TChannel::AddChannel(tempChan, "overwrite");
    }
@@ -1062,9 +1062,9 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->AddENGCoefficient(offsets.at(x));
-         tempChan->AddENGCoefficient(gains.at(x));
-         if(x < quads.size()) { tempChan->AddENGCoefficient(quads.at(x)); } //Assuming this means quad terms won't be added if not there. 
+         tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
+         if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); } //Assuming this means quad terms won't be added if not there. 
       }
 		std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
    } else {

@@ -150,8 +150,8 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    // get axis properties
    Int_t         elements = hstarray->GetEntries();
    Int_t         bins     = 0;
-   Int_t         xmin     = 0;
-   Int_t         xmax     = 0;
+   Double_t      xmin     = 0;
+   Double_t      xmax     = 0;
    const Char_t* name     = nullptr;
    const Char_t* title    = nullptr;
    if(sparse) {
@@ -280,8 +280,8 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
 
    // get x-axis parameters
    Int_t bins = hst->GetNbinsX();
-   Int_t xmin = hst->GetXaxis()->GetBinLowEdge(1);
-   Int_t xmax = hst->GetXaxis()->GetBinUpEdge(bins);
+   Double_t xmin = hst->GetXaxis()->GetBinLowEdge(1);
+   Double_t xmax = hst->GetXaxis()->GetBinUpEdge(bins);
 
    // get histogram name and title
    const Char_t* hst2dname  = hst->GetName();
@@ -464,7 +464,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    // loop over the indices
    auto* file = new TFile("Fit_singles.root", "recreate");
    for(Int_t i = 1; i <= indexmax - indexmin; i++) {
-      Int_t index = hst->GetYaxis()->GetBinLowEdge(i);
+      auto index = static_cast<Int_t>(hst->GetYaxis()->GetBinLowEdge(i));
       if(visualization) {
          // find the correct pad
          Int_t canvas = (i - 1) / 16;
@@ -635,7 +635,7 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
    for(Int_t i = 1; i <= n; i++) { // bin number loop
 
       // get index number
-      Int_t index = hst->GetXaxis()->GetBinLowEdge(i);
+      auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
 
       // get associated angle
       Double_t angle = 0;
@@ -1815,7 +1815,7 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
       }
       // this loop is just for checking to make sure all indices are in the weight vector
       for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
-         Int_t index = hst->GetBinLowEdge(i);
+			auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
          if(index >= size) {
 				std::cout<<"Indices in histogram "<<hst->GetName()<<" go beyond size of weights array. Aborting."<<std::endl;
             return nullptr;
@@ -1848,8 +1848,8 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
    // now that we're satisified everything is kosher, divide the bins.
    for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
 		std::cout<<"\t"<<i<<std::endl;
-      Int_t index        = hst->GetBinLowEdge(i);
-      Int_t found_weight = 0;
+		auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
+      Double_t found_weight = 0;
       if(!fold && !group) {
          found_weight = GetWeightFromIndex(index);
       } else {

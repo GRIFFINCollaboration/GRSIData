@@ -178,14 +178,14 @@ Int_t TSceptarHit::CalculateCfdAndMonitor(double attenuation, unsigned int delay
 		}
 
 		monitor.resize(smoothedWaveform.size() - delay);
-		monitor[0] = attenuation * smoothedWaveform[delay] - smoothedWaveform[0];
+		monitor[0] = static_cast<Short_t>(attenuation * smoothedWaveform[delay] - smoothedWaveform[0]);
 		if(monitor[0] > monitormax) {
 			armed      = true;
 			monitormax = monitor[0];
 		}
 
 		for(unsigned int i = delay + 1; i < smoothedWaveform.size(); ++i) {
-			monitor[i - delay] = attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay];
+			monitor[i - delay] = static_cast<Short_t>(attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay]);
 			if(monitor[i - delay] > monitormax) {
 				armed      = true;
 				monitormax = monitor[i - delay];
@@ -249,7 +249,7 @@ std::vector<Short_t> TSceptarHit::CalculateCfdMonitor(double attenuation, int de
 	std::vector<Short_t> monitor(std::max(static_cast<size_t>(0), smoothedWaveform.size() - delay), 0);
 
 	for(size_t i = delay; i < smoothedWaveform.size(); ++i) {
-		monitor[i - delay] = attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay];
+		monitor[i - delay] = static_cast<Short_t>(attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay]);
 	}
 
 	return monitor;

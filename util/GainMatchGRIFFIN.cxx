@@ -208,7 +208,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
       }
 		if(skipChannel) { continue; }
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
-			int charge = currentFrag->GetCharge();
+			int charge = static_cast<int>(currentFrag->GetCharge());
 			int kvalue = currentFrag->GetKValue();
 			hst[chan]->Fill(static_cast<double>(charge)/kvalue); // this may not be (is probably not) the best way to do this...
 			// suggestions welcome. -JKS

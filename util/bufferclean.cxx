@@ -187,10 +187,10 @@ int main(int argc, char** argv)
 
       if(num_evt % 5000 == 0) {
          gSystem->ProcessEvents();
-         printf(HIDE_CURSOR " bad events %u/%u have processed %.2fMB/%.2f MB => %.1f MB/s              " SHOW_CURSOR
-                            "\r",
-                num_bad_evt, num_evt, (bytesread / 1000000.0), (filesize / 1000000.0),
-                (bytesread / 1000000.0) / w.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<HIDE_CURSOR<<" bad events "<<num_bad_evt<<"/"<<num_evt<<" have processed "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/w.RealTime()<<" MB/s              "<<SHOW_CURSOR<<"\r";
+			std::cout.precision(precision);
          w.Continue();
       }
    }

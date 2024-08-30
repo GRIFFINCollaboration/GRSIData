@@ -59,13 +59,17 @@ void ExamineMidasFile(const char *filename) {
 				break;
 		}
 		if((++currenteventnumber%15000)== 0) {
-			printf( " Looping over event %i have looped %.2fMB/%.2f MB => %.1f MB/s              "  "\r",
-					currenteventnumber,(bytesread/1000000.0),(filesize/1000000.0),(bytesread/1000000.0)/sw.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<" Looping over event "<<currenteventnumber<<" have looped "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/sw.RealTime()<<" MB/s              \r";
+			std::cout.precision(precision);
 			sw.Continue();
 		}
 	}
-	printf( " Looping over event %i have looped %.2fMB/%.2f MB => %.1f MB/s              "  "\r",
-			currenteventnumber,(bytesread/1000000.0),(filesize/1000000.0),(bytesread/1000000.0)/sw.RealTime());
+	std::streamsize precision = std::cout.precision();
+	std::cout.precision(2);
+	std::cout<<" Looping over event "<<currenteventnumber<<" have looped "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/sw.RealTime()<<" MB/s              \r";
+	std::cout.precision(precision);
 	printf("\n\n");
 	printf("EventTypes Seen: \n");
 	for(auto& it : type_counter) {
