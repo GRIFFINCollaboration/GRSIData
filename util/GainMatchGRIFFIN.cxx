@@ -188,11 +188,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 	// initialize histograms
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -202,11 +198,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 		tree->GetEntry(i);
 		int chan = currentFrag->GetChannelNumber();
 		int dettype = currentFrag->GetDetectorType();
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-         if(i == skip) { skipChannel = kTRUE; }
-      }
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
 			int charge = static_cast<int>(currentFrag->GetCharge());
 			int kvalue = currentFrag->GetKValue();
@@ -218,11 +210,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const 
 	std::cout <<"titling histograms." <<std::endl;
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
 		unsigned int address = chan->GetAddress();
@@ -271,11 +259,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 	// create and save the graphs
 	for(int i=minchannel;i<=maxchannel;i++) {
 		std::cout <<"\t" <<i <<std::endl;
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		std::cout <<"Creating graph for channel " <<i <<std::endl;
 		auto* h = static_cast<TH1F*>(f->Get(Form("hst%i",i))); // grab histogram
       if(h == nullptr) {
@@ -552,11 +536,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 	// initialize histograms
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -565,11 +545,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 	for(int i=0;i<fEntries;i++) {
 		tree->GetEntry(i);
 		int chan = currentFrag->GetChannelNumber();
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		int dettype = currentFrag->GetDetectorType();
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
 			double energy = currentFrag->GetEnergy();
@@ -580,11 +556,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const 
 	std::cout <<"titling histograms." <<std::endl;
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		if(hst[i]->Integral()==0) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
@@ -644,14 +616,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 
 	// create hstall
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) {
-				skipChannel = kTRUE;
-				break;
-			}
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hsts[i] = static_cast<TH1F*>(gFile->Get(Form("hst%i",i)));
 		if(hsts[i]==nullptr) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your newcal and calib_hst files and your inputs to GainMatchGRIFFIN." <<std::endl;
@@ -672,14 +637,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	// formatting, FWHM, residuals, etc.
 	auto** residuals = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) {
-				skipChannel = kTRUE;
-				break;
-			}
-		}
-		if(skipChannel) { continue; }
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hsts[i]->SetLineColor(i+1);
 		stack->Add(hsts[i]);
 		residuals[i] = new TGraph(peaks.size());

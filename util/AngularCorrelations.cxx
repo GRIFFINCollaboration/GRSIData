@@ -845,7 +845,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	// MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
 	std::cout<<"Reduced chi^2: "<<fitResult.MinFcnValue()/(ac.Np()-fitResult.NFreeParameters())<<std::endl;
 	std::vector<double> parameters(fitResult.GetParams(), fitResult.GetParams()+nPar);
-	auto* errors = fitResult.GetErrors();
+	const auto* errors = fitResult.GetErrors();
 	std::cout<<"Parameters a_0: "<<parameters[0]<<" +- "<<errors[0]<<", a_2: "<<parameters[1]<<" +- "<<errors[1]<<", a_4: "<<parameters[2]<<" +- "<<errors[2]<<std::endl;
 	TMatrixD covariance(nPar, nPar);
 	fitResult.GetCovarianceMatrix(covariance);

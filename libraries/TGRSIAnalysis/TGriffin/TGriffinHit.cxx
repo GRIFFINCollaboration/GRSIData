@@ -99,7 +99,7 @@ bool TGriffinHit::CompareEnergy(const TGriffinHit* lhs, const TGriffinHit* rhs)
 
 void TGriffinHit::Add(const TDetectorHit* hit)
 {
-	auto* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
+	const auto* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
 	if(griffinHit == nullptr) {
 		throw std::runtime_error("trying to add non-griffin hit to griffin hit!");
 	}
