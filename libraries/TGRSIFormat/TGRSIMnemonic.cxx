@@ -232,7 +232,7 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 			dTime = static_cast<Double_t>(timestamp*channel->GetTimeStampUnit()) + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 512.);
 			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		default:
-			dTime = static_cast<Double_t>(((timestamp) + gRandom->Uniform())*channel->GetTimeStampUnit());
+			dTime = (static_cast<Double_t>(timestamp) + gRandom->Uniform())*channel->GetTimeStampUnit();
 			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 	}
    return 0.;

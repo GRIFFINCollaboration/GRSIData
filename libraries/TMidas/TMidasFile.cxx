@@ -59,8 +59,9 @@ TMidasFile::~TMidasFile()
 
 std::string TMidasFile::Status(bool)
 {
-   return Form(HIDE_CURSOR " Processing event %i have processed %.2fMB/%.2f MB              " SHOW_CURSOR "\r",
-               fCurrentEventNumber, (BytesRead() / 1000000.0), (FileSize() / 1000000.0));
+	std::stringstream str;
+	str<<HIDE_CURSOR<<" Processing event "<<fCurrentEventNumber<<" have processed "<<std::setprecision(2)<<static_cast<double>(BytesRead())/1000000.<<"MB/"<<static_cast<double>(FileSize())/1000000.<<" MB               "<<SHOW_CURSOR<<"\r";
+	return str.str();
 }
 
 static int hasSuffix(const char* name, const char* suffix)
