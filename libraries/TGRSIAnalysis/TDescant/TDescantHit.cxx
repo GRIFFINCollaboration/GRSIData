@@ -97,7 +97,7 @@ Float_t TDescantHit::GetCfd() const
 {
    /// special function for TDescantHit to return CFD after mapping out the high bits
    /// which are the remainder between the 125 MHz data and the 100 MHz timestamp clock
-   return (static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + static_cast<Float_t>(gRandom->Uniform());
+   return static_cast<Float_t>(static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + static_cast<Float_t>(gRandom->Uniform());
 }
 
 Int_t TDescantHit::GetRemainder() const
@@ -335,7 +335,7 @@ Int_t TDescantHit::CalculatePsdAndPartialSums(double fraction, unsigned int inte
    if(partialSums[0] < fraction * totalSum) {
       for(size_t i = 1; i < partialSums.size(); ++i) {
          if(partialSums[i] >= fraction * totalSum) {
-            psd = static_cast<Int_t>(i * interpolationSteps - ((partialSums[i] - fraction * totalSum) * interpolationSteps) / GetWaveform()->at(i));
+            psd = static_cast<Int_t>(static_cast<double>(i * interpolationSteps) - ((partialSums[i] - fraction * totalSum) * interpolationSteps) / GetWaveform()->at(i));
             break;
          }
       }
