@@ -137,7 +137,7 @@ public:
    Bool_t CheckGroups(std::vector<Int_t>& group) const;
    Bool_t CheckGroupAngles(std::vector<Double_t>& groupangles) const;
    Bool_t CheckMaps(Bool_t fold, Bool_t group); // checks to make sure fIndexMap, fAngleMap, and fWeights are consistent
-   Bool_t CheckModifiedHistogram(TH1* hst);     // checks to make sure histogram is consistent with current settings
+   Bool_t CheckModifiedHistogram(TH1* hst) const;     // checks to make sure histogram is consistent with current settings
 
    //----------------- functions for generating the mapping
    // original maps

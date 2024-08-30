@@ -95,7 +95,7 @@ public:
       return TDetectorHit::GetEnergy();
    }
 
-   Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0)
+   Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const
    {
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
    };                                                                          //!<!

@@ -1754,7 +1754,7 @@ TPeak* TAngularCorrelation::GetPeak(Int_t index)
 ///
 /// \param[in] hst histogram
 ///
-Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst)
+Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst) const
 {
    Int_t hstbins    = hst->GetNbinsX();
    Int_t modindices = GetNumModIndices();
