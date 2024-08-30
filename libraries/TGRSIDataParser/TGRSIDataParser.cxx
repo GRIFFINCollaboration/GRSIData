@@ -316,7 +316,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	unsigned int LastTriggerIdLoBits = LastTriggerId() & 0x00FFFFFF; // determined by the reported value
 	if(value < MaxTriggerId() / 10) {                                // the trigger id has wrapped around
 		if(LastTriggerIdLoBits > MaxTriggerId() * 9 / 10) {
-			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value + MaxTriggerId()));
+			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value + MaxTriggerId()));
 			std::cout<<DBLUE<<"We are looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
