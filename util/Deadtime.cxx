@@ -772,7 +772,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // which chooses a value within these boundaries - the resulting tau is plotted and the range gives the error in
       // tau
 
-      int    iter = 1e4, bin = 10;
+      int    iter = 10000;
+		int    bin = 10;
       double tempa = 0.;
 		double tempb = 0.;
       double var1 = 0.;
