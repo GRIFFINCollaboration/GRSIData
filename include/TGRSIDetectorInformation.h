@@ -119,7 +119,7 @@ private:
    bool fSortByTriggerId{false}; ///< flag to sort by trigger ID instead of time stamp
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGRSIDetectorInformation, 1); // Contains the run-dependent information.
+   ClassDefOverride(TGRSIDetectorInformation, 1); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

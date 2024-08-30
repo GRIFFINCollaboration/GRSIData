@@ -133,21 +133,22 @@ Double_t TCSMHit::GetDEnergy() const
 
    if(trustVertical && trustHoriztonal) {
       // if(debug) std::cout<<"  Returning: "<<(GetDVerticalEnergy() + GetDHorizontalEnergy())/2.<<std::endl;
-      return ((GetDVerticalEnergy() + GetDHorizontalEnergy()) / 2.);
+      return (GetDVerticalEnergy() + GetDHorizontalEnergy()) / 2.;
    }
    if(trustVertical && !trustHoriztonal) {
       if(debug) {
          std::cout<<"**Returning: "<<GetDVerticalEnergy()<<std::endl;
       }
-      return (GetDVerticalEnergy());
+      return GetDVerticalEnergy();
    }
    if(!trustVertical && trustHoriztonal) {
       if(debug) {
          std::cout<<"**Returning: "<<GetDHorizontalEnergy()<<std::endl;
       }
-      return (GetDHorizontalEnergy());
-   } else if(!trustVertical && !trustVertical) { // Are these correct??? RD
-      return (0.);
+      return GetDHorizontalEnergy();
+   } 
+	if(!trustVertical && !trustHorizontal) { // Are these correct??? RD
+      return 0.;
 	}
 	std::cerr<<"  ERROR, I don't know who to trust in GetDEnergy()"<<std::endl;
 	return -1; // I added this here so that there is guaranteed a return at the end of the function RD
@@ -186,15 +187,16 @@ Double_t TCSMHit::GetEEnergy() const
    }
 
    if(trustVertical && trustHoriztonal) {
-      return ((GetEVerticalEnergy() + GetEHorizontalEnergy()) / 2.);
+      return (GetEVerticalEnergy() + GetEHorizontalEnergy()) / 2.;
    }
    if(trustVertical && !trustHoriztonal) {
-      return (GetEVerticalEnergy());
+      return GetEVerticalEnergy();
    }
    if(!trustVertical && trustHoriztonal) {
-      return (GetEHorizontalEnergy());
-   } else if(!trustVertical && !trustVertical) { // Are these correct? RD
-      return (0.);
+      return GetEHorizontalEnergy();
+   } 
+	if(!trustVertical && !trustHorizontal) { // Are these correct? RD
+      return 0.;
    }
 	std::cerr<<"  ERROR, I don't know who to trust in GetEEnergy()"<<std::endl;
 	return -1; // I added this here so that there is guaranteed a return at the end of the function RD

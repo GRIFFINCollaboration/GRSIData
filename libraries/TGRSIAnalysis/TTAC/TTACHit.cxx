@@ -77,7 +77,8 @@ Double_t TTACHit::GetTempCorrectedEnergy(TGraph* correction_graph) const {
 	}
 	if(GetKValue() > 0) {
 		return channel->CalibrateENG(TempCorrectedCharge(correction_graph), static_cast<int>(GetKValue()));
-	} else if(channel->UseCalFileIntegration()) {
+	} 
+	if(channel->UseCalFileIntegration()) {
 		return channel->CalibrateENG(TempCorrectedCharge(correction_graph), 0);
 	}
 	return channel->CalibrateENG(TempCorrectedCharge(correction_graph));

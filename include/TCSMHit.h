@@ -158,7 +158,7 @@ public:
    inline void SetEVerticalEnergy(const Double_t tempd) { fVerEEnergy = tempd; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TCSMHit, 4)
+   ClassDefOverride(TCSMHit, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

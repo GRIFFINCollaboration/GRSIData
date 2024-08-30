@@ -91,7 +91,7 @@ private:
    Double_t fSig2Noise{0.};
 
    /// \cond CLASSIMP
-   ClassDefOverride(TS3Hit, 4);
+   ClassDefOverride(TS3Hit, 4);   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */
