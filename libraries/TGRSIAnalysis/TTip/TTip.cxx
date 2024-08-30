@@ -142,15 +142,8 @@ std::array<TVector3, 128> TTip::fPositionVectors = {
    TVector3(0.0000,-29.8869,-48.771),
    TVector3(21.1332,-21.1332,-48.771)};
 
-TTip::TTip()
-{
-}
-
 TTip::TTip(const TTip& rhs) : TDetector(rhs)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    rhs.Copy(*this);
 }
 

@@ -21,8 +21,7 @@
 
 class TTip : public TDetector {
 public:
-
-   TTip();
+   TTip() = default;
    TTip(const TTip& rhs);
 	TTip(TTip&&) noexcept = default;
    TTip& operator=(const TTip&); //!<!

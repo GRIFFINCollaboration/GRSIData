@@ -10,14 +10,6 @@
 
 // function implementations are below
 
-TRcmpHit::TRcmpHit()
-{
-/// this is the default constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
-}
-
 TRcmpHit::TRcmpHit(const TRcmpHit& rhs) : TDetectorHit(rhs)
 {
 /// this is the copy constructor for a single TRcmpHit parameter
@@ -40,9 +32,6 @@ TRcmpHit::TRcmpHit(const TFragment& fragFront, const TFragment& fragBack)
    /// this is the constructor that builds RCMP hits out of a front and a back fragment (energy, time, etc. is taken from the front-strip)
    fragFront.Copy(*this);                // we want to use the information from the front (P-side) strip such as energy, time, etc.
 }
-
-// this is the destructor
-TRcmpHit::~TRcmpHit() = default;
 
 void TRcmpHit::Copy(TObject& rhs) const
 {
