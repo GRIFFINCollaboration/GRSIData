@@ -90,13 +90,13 @@ Double_t TCSMHit::GetDEnergy() const
 {
    bool debug           = false;
    bool trustVertical   = true;
-   bool trustHoriztonal = true;
+   bool trustHorizontal = true;
 
    switch(GetDetectorNumber()) {
    case 1:
       switch(GetDHorizontalStrip()) {
       case 6:
-      case 9: trustHoriztonal = false; break;
+      case 9: trustHorizontal = false; break;
       }
       break;
 
@@ -104,7 +104,7 @@ Double_t TCSMHit::GetDEnergy() const
       switch(GetDHorizontalStrip()) {
       // case 8:
       case 9:
-      case 10: trustHoriztonal = false; break;
+      case 10: trustHorizontal = false; break;
       }
       switch(GetDVerticalStrip()) {
       case 5: trustVertical = false; break;
@@ -114,7 +114,7 @@ Double_t TCSMHit::GetDEnergy() const
    case 3:
       switch(GetDHorizontalStrip()) {
       case 12:
-      case 15: trustHoriztonal = false; break;
+      case 15: trustHorizontal = false; break;
       }
       break;
 
@@ -123,25 +123,25 @@ Double_t TCSMHit::GetDEnergy() const
    default: std::cerr<<"  ERROR, Trying to get energy from a D detector that doesn't exist!"<<std::endl;
    }
 
-   if((!trustVertical || !trustHoriztonal) && debug) {
+   if((!trustVertical || !trustHorizontal) && debug) {
       std::cout<<std::endl<<"  GetDEnergy() output: (V,H)"<<std::endl;
       std::cout<<"  Detector: "<<GetDetectorNumber()<<std::endl;
       std::cout<<"  Strip: "<<GetDVerticalStrip()<<" "<<GetDHorizontalStrip()<<std::endl;
-      std::cout<<"  Trustworthy: "<<trustVertical<<" "<<trustHoriztonal<<std::endl;
+      std::cout<<"  Trustworthy: "<<trustVertical<<" "<<trustHorizontal<<std::endl;
       std::cout<<"  Energy: "<<GetDVerticalEnergy()<<" "<<GetDHorizontalEnergy()<<std::endl;
    }
 
-   if(trustVertical && trustHoriztonal) {
+   if(trustVertical && trustHorizontal) {
       // if(debug) std::cout<<"  Returning: "<<(GetDVerticalEnergy() + GetDHorizontalEnergy())/2.<<std::endl;
       return (GetDVerticalEnergy() + GetDHorizontalEnergy()) / 2.;
    }
-   if(trustVertical && !trustHoriztonal) {
+   if(trustVertical && !trustHorizontal) {
       if(debug) {
          std::cout<<"**Returning: "<<GetDVerticalEnergy()<<std::endl;
       }
       return GetDVerticalEnergy();
    }
-   if(!trustVertical && trustHoriztonal) {
+   if(!trustVertical && trustHorizontal) {
       if(debug) {
          std::cout<<"**Returning: "<<GetDHorizontalEnergy()<<std::endl;
       }
@@ -157,7 +157,7 @@ Double_t TCSMHit::GetDEnergy() const
 Double_t TCSMHit::GetEEnergy() const
 {
    bool trustVertical   = true;
-   bool trustHoriztonal = true;
+   bool trustHorizontal = true;
 
    switch(GetDetectorNumber()) {
    case 1: break;
@@ -171,7 +171,7 @@ Double_t TCSMHit::GetEEnergy() const
       // case 8:
       case 12:
          // case 15:
-         trustHoriztonal = false;
+         trustHorizontal = false;
          break;
       }
       switch(GetEVerticalStrip()) {
@@ -186,13 +186,13 @@ Double_t TCSMHit::GetEEnergy() const
    default: std::cerr<<"  ERROR, Trying to get energy from a E detector that doesn't exist!"<<std::endl;
    }
 
-   if(trustVertical && trustHoriztonal) {
+   if(trustVertical && trustHorizontal) {
       return (GetEVerticalEnergy() + GetEHorizontalEnergy()) / 2.;
    }
-   if(trustVertical && !trustHoriztonal) {
+   if(trustVertical && !trustHorizontal) {
       return GetEVerticalEnergy();
    }
-   if(!trustVertical && trustHoriztonal) {
+   if(!trustVertical && trustHorizontal) {
       return GetEHorizontalEnergy();
    } 
 	if(!trustVertical && !trustHorizontal) { // Are these correct? RD

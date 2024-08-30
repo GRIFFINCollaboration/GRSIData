@@ -59,7 +59,7 @@ void TSiLiHit::Clear(Option_t* opt)
 
 void TSiLiHit::SetWavefit(const TFragment& frag)
 {
-   TPulseAnalyzer* pulse = FitFrag(frag, TSiLi::FitSiLiShape, GetChannel());
+   TPulseAnalyzer* pulse = FitFrag(frag, TSiLi::fFitSiLiShape, GetChannel());
    if(pulse != nullptr) {
       fTimeFit   = pulse->Get_wpar_T0();
       fFitBase   = pulse->Get_wpar_baselinefin();
@@ -124,7 +124,7 @@ int TSiLiHit::FitPulseAnalyzer(TPulseAnalyzer* pulse, int ShapeFit, TChannel* ch
       if(ShapeFit < 2) { goodfit = pulse->GetSiliShape(Decay, Rise); }
       if(ShapeFit == 1 && !goodfit) { ShapeFit++; }   //So currently it does a TF1 fit if initial fit fails, this might be a bad idea
       if(ShapeFit == 2) { goodfit = pulse->GetSiliShapeTF1(Decay, Rise, Base); }
-      if(ShapeFit == 3) { goodfit = pulse->GetSiliShapeTF1(Decay, Rise, Base, TSiLi::BaseFreq); }
+      if(ShapeFit == 3) { goodfit = pulse->GetSiliShapeTF1(Decay, Rise, Base, TSiLi::fBaseFreq); }
       if(goodfit) { return 1 + ShapeFit; }
    }
    return 0;
