@@ -380,8 +380,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
 
    // pull angular index limits from hst
    // assumes that angular index is y-axis and energy is x-axis
-   Int_t       indexmin  = static_cast<Int_t>(hst->GetYaxis()->GetXmin());
-   Int_t       indexmax  = static_cast<Int_t>(hst->GetYaxis()->GetXmax());
+   auto        indexmin  = static_cast<Int_t>(hst->GetYaxis()->GetXmin());
+   auto        indexmax  = static_cast<Int_t>(hst->GetYaxis()->GetXmax());
    const Int_t indexbins = indexmax - indexmin;
 
    // pull name from hst, modify for 1D hst
