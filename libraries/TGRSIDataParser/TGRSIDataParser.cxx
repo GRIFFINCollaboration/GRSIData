@@ -18,7 +18,7 @@
 #include "TBadFragment.h"
 
 TGRSIDataParser::TGRSIDataParser()
-   : TDataParser(), fState(EDataParserState::kGood), fIgnoreMissingChannel(TGRSIOptions::Get()->IgnoreMissingChannel())
+   : fState(EDataParserState::kGood), fIgnoreMissingChannel(TGRSIOptions::Get()->IgnoreMissingChannel())
 {
 }
 
@@ -2011,7 +2011,7 @@ static time_t   xfermidts;    // Midas time stamp of events, hopefully the same
 unsigned int    xfermidsn;    // Midas serial number
 
 
-int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* const data, int size, std::shared_ptr<TMidasEvent>& event)
+int TGRSIDataParser::EmmaMadcDataToFragment(const uint32_t* const data, int size, std::shared_ptr<TMidasEvent>& event)
 {
 	/// Converts a MIDAS File from the Emma DAQ into a TFragment.
 	int numFragsFound = 0;

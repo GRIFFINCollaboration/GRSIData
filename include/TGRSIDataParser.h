@@ -86,7 +86,7 @@ public:
         int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaMadcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaMadcDataToFragment(const uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
