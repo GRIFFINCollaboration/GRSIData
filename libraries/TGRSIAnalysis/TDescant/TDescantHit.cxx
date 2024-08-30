@@ -255,7 +255,7 @@ std::vector<Short_t> TDescantHit::CalculateSmoothedWaveform(unsigned int halfSmo
 {
 
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
 
    std::vector<Short_t> smoothedWaveform(std::max((static_cast<size_t>(0)), WaveSize() - 2 * halfSmoothingWindow),
