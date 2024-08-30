@@ -19,6 +19,7 @@ ROOT_PYTHON_VERSION=$(shell root-config --python-version)
 
 MATHMORE_INSTALLED:=$(shell root-config --has-mathmore)
 XML_INSTALLED:=$(shell root-config --has-xml)
+PROOF_INSTALLED:=$(shell root-config --has-proof)
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -85,7 +86,10 @@ INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdi
 CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lTMVA
+ifeq ($(PROOF_INSTALLED),yes)
+	LINKFLAGS += -lProof
+endif
 LINKFLAGS += $(shell grsi-config --all-libs)
 #LINKFLAGS += $(shell grsi-config --GRSIData-libs)
 
