@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 					TAC_offset[tac1]->Fill(labr->GetLaBrHit(0)->GetTime()-tac->GetTACHit(0)->GetTime()+offset[tac1]*10);
 					TAC_offset_corrected[tac1]->Fill(labr->GetLaBrHit(0)->GetTime()-tac->GetTACHit(0)->GetTime());
 					time_diff[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-					timestamp_diff_TACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+					timestamp_diff_TACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 					if(multi_grif>0) {
 						for(int i=0; i<multi_grif;i++) {
 							time_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTime()-labr->GetLaBrHit(0)->GetTime());
