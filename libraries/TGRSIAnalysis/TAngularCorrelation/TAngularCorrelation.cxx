@@ -1233,10 +1233,7 @@ std::vector<Double_t> TAngularCorrelation::GenerateFoldedAngles(std::vector<Doub
    }
 
    // declare fold array and fill with zeros
-   std::vector<Double_t> foldArray;
-   for(Int_t i = 0; i < size; i++) {
-      foldArray.push_back(0);
-   }
+   std::vector<Double_t> foldArray(size);
 
    // fill fold array with angle values
    for(Int_t i = 0; i < size; i++) {

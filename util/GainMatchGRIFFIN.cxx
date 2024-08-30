@@ -288,9 +288,10 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 		//		std::cout <<"Rough gain for channel " <<i <<" is " <<gain <<std::endl;
 
 		// calculate rough positions of peaks
-		std::vector<double> peakguesses;
+		std::vector<double> peakguesses(peaks.size());
+		int p = 0;
 		for(auto& peak : peaks) {
-			peakguesses.push_back(gain*peak);
+			peakguesses[p++] = gain*peak;
 		}
 
 		// gainmatch
