@@ -17,12 +17,12 @@ double TSiLi::fSiLiNoiseFac        = 4;
 double TSiLi::fSiLiDefaultDecay    = 4616.18;
 double TSiLi::fSiLiDefaultRise     = 20.90;
 double TSiLi::fSiLiDefaultBaseline = -4300;
-double TSiLi::BaseFreq=4;
+double TSiLi::fBaseFreq=4;
 
 double  TSiLi::fSiLiCoincidenceTime = 200;
 bool  TSiLi::fRejectPossibleCrosstalk = false;
 
-int TSiLi::FitSiLiShape = 0; // 0 no. 1 try if normal fit fail. 2 yes
+int TSiLi::fFitSiLiShape = 0; // 0 no. 1 try if normal fit fail. 2 yes
 
 TSiLi::TSiLi()
 {

@@ -93,7 +93,7 @@ public:
       int sec  = GetSector(seg) % 3;
       int inv  = (GetSector(seg) / 3) % 2;
       int ret  = 10 * (2 - sec);
-      if(((sec == 1) ^ !(inv)) != 0) {
+      if(((sec == 1) ^ (inv == 0)) != 0) {
          ret += 9 - ring;
       } else {
          ret += ring;
@@ -113,8 +113,8 @@ public:
 // 1 use slow TF1 fit if quick linear eq. method fails
 // 2 use slow TF1 method exclusively
 // 3 use slow TF1 with experimental oscillation
-   static int FitSiLiShape;     //!<!
-   static double BaseFreq;     //!<!
+   static int fFitSiLiShape;     //!<!
+   static double fBaseFreq;     //!<!
 	
 private:
    std::vector<TSiLiHit> fAddbackHits;     //!<!
