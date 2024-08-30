@@ -272,9 +272,9 @@ TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
       EnergyH += hhV[i].first.GetEnergy();
    }
 
-   int    StripH  = hhV[biggestH].second.Segment();
-   int    ConFraH = hhV[biggestH].first.GetCfd();
-   double TimeH   = static_cast<double>(hhV[biggestH].first.GetTimeStamp());
+   int  StripH  = hhV[biggestH].second.Segment();
+   auto ConFraH = static_cast<int>(hhV[biggestH].first.GetCfd());
+   auto TimeH   = static_cast<double>(hhV[biggestH].first.GetTimeStamp());
 
    //-------------------- vertical strips
    int    DetNumV  = vvV[0].second.ArrayPosition();
