@@ -372,11 +372,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 
 	auto** g = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) { // channel number
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		g[i] = static_cast<TGraph*>(f->Get(Form("graph%i",i)));
 		if(g[i] == nullptr) {
 			std::cout <<"Error: graph" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
@@ -390,7 +386,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::vector<double> slopes(maxchannel+1);
 	std::vector<double> offsets(maxchannel+1);
 	std::vector<double> chi2(maxchannel+1);
-	for(int i=0;i<=maxchannel;i++) chi2[i] = 0; // initialize array
+	for(int i=0;i<=maxchannel;i++) { chi2[i] = 0; } // initialize array
 	auto* slopeg = new TGraphErrors();
 	auto* offsetg = new TGraphErrors();
 	auto* chi2g = new TGraphErrors();
@@ -400,17 +396,13 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	// fit graphs 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		// check for skipped channel
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 
 		// fit graphs
 		g[i]->Fit(Form("pol%i",order),"q");
 
 		// grab linear fitting parameters and chi^2
-		for(int j=0;j<=order;j++) parameters[i][j] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(j);
+		for(int j=0;j<=order;j++) { parameters[i][j] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(j); }
 		slopes[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(1); // grab slope
 		offsets[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(0); // grab offset
 		int ndf = g[i]->GetFunction(Form("pol%i",order))->GetNDF();
@@ -418,7 +410,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare()/ndf; // grab offset
 		} else {
 			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare(); // grab offset
-			if(chi2[i]==0) chi2[i] = 1e-24;
+			if(chi2[i]==0) { chi2[i] = 1e-24; }
 		}
 
 		// fill TGraphErrors
@@ -447,11 +439,8 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	// print slopes, offsets, chi2
 	std::cout <<"Channel\tSlope\t\tOffset\t\tChi^2" <<std::endl;
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		// check for skipped channel
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		if(chi2[i] == 0) { continue; }
 		std::cout <<i <<"\t" <<slopes[i] <<"\t" <<offsets[i] <<"\t" <<chi2[i] <<std::endl;
 	}
@@ -489,11 +478,8 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::ofstream outFile;
 	outFile.open(outFileName);
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) { skipChannel = kTRUE; }
-		}
-		if(skipChannel) { continue; }
+		// check for skipped channel
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		if(chi2[i] == 0) { continue; }
 
 		// get name and address
