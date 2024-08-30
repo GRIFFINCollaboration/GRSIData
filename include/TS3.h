@@ -129,9 +129,9 @@ private:
    void SetBitNumber(ES3Bits bit, Bool_t set = true);
    Bool_t TestBitNumber(ES3Bits bit) const { return (fS3Bits.TestBit(bit)); }
 
-   static TTransientBits<UShort_t> fgS3Bits; ///< Global Bit
-   static void SetGlobalBit(ES3GlobalBits bit, Bool_t set = true) { fgS3Bits.SetBit(bit, set); }
-   static Bool_t TestGlobalBit(ES3GlobalBits bit) { return (fgS3Bits.TestBit(bit)); }
+   static TTransientBits<UShort_t> fGlobalS3Bits; ///< Global Bit
+   static void SetGlobalBit(ES3GlobalBits bit, Bool_t set = true) { fGlobalS3Bits.SetBit(bit, set); }
+   static Bool_t TestGlobalBit(ES3GlobalBits bit) { return (fGlobalS3Bits.TestBit(bit)); }
 
    /// for geometery
    static int fRingNumber;   //!<!
