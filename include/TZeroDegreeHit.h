@@ -44,9 +44,9 @@ public:
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
 
    /////////////////////////		/////////////////////////////////////
-   inline Int_t               GetFilterPattern() const { return fFilter; } //!<!
-   inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
-   inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
+   inline Int_t                 GetFilterPattern() const { return fFilter; }   //!<!
+   inline std::vector<int16_t>& GetCfdMonitor() { return fCfdMonitor; }
+   inline std::vector<int>&     GetPartialSum() { return fPartialSum; }
 
    Float_t  GetCfd() const override;
    Int_t    GetRemainder() const;
