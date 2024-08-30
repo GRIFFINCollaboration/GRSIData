@@ -19,11 +19,11 @@ public:
    enum class ESiLiHitBits { kUseFitCharge = BIT(0), kSiLiHitBit1 = BIT(1) };
 
    TSiLiHit();
-   TSiLiHit(const TFragment&);
    TSiLiHit(const TSiLiHit&);
 	TSiLiHit(TSiLiHit&&) noexcept = default;
 	TSiLiHit& operator=(const TSiLiHit&) = default;
 	TSiLiHit& operator=(TSiLiHit&&) noexcept = default;
+   explicit TSiLiHit(const TFragment&);
    ~TSiLiHit() override;
 
    void Copy(TObject&, bool = false) const override; //!
