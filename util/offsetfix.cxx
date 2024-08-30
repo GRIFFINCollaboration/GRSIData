@@ -30,11 +30,11 @@ Bool_t SplitMezz = false;
 
 class TEventTime {
 public:
-   explicit TEventTime(std::shared_ptr<TMidasEvent> event)
+   explicit TEventTime(const std::shared_ptr<TMidasEvent>& event)
    {
       event->SetBankList();
 
-      void* ptr;
+      void* ptr = nullptr;
       int   banksize = event->LocateBank(nullptr, "GRF2", &ptr);
       int   bank     = 2;
 
@@ -112,22 +112,26 @@ public:
       }
    }
 
+	TEventTime(const TEventTime&) = default;
+	TEventTime(TEventTime&&) noexcept = default;
+	TEventTime& operator=(const TEventTime&) = default;
+	TEventTime& operator=(TEventTime&&) noexcept = default;
    ~TEventTime() = default;
 
-   uint64_t GetTimeStamp()
+   uint64_t GetTimeStamp() const 
    {
       uint64_t time = timehigh;
       time          = time<<28;
       time |= timelow & 0x0fffffff;
       return time;
    }
-   unsigned int TimeStampHigh() { return timehigh; }
+   unsigned int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() { return timemidas; }
+   uint64_t MidasTime() const { return timemidas; }
 
-   uint32_t Digitizer() { return digitizernum; }
+   uint32_t Digitizer() const { return digitizernum; }
 
-   int DetectorType() { return dettype; }
+   int DetectorType() const { return dettype; }
 
    void SetDigitizer()
    {
@@ -159,29 +163,29 @@ public:
       return best_dig;
    }
 
-   static unsigned long GetLowestMidasTime() { return low_timemidas; }
+   static uint64_t GetLowestMidasTime() { return low_timemidas; }
 
-   int DigIndex() { return digmap.find(digitizernum)->second; }
+   int DigIndex() const { return digmap.find(digitizernum)->second; }
 
    inline static uint64_t GetLowestTime() { return lowest_time; }
 
-   static std::map<uint32_t, int>     digmap;
-   static std::map<uint32_t, bool>    digset;
-   static std::map<uint32_t, int64_t> correctionmap;
-   static unsigned long low_timemidas;
-   static uint32_t      best_dig;
-   static uint64_t      lowest_time;
+   static std::map<uint32_t, int>     digmap; // NOLINT(readability-identifier-naming)
+   static std::map<uint32_t, bool>    digset; // NOLINT(readability-identifier-naming)
+   static std::map<uint32_t, int64_t> correctionmap; // NOLINT(readability-identifier-naming)
+   static uint64_t low_timemidas; // NOLINT(readability-identifier-naming)
+   static uint32_t      best_dig; // NOLINT(readability-identifier-naming)
+   static uint64_t      lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
-   unsigned int  timelow;
-   unsigned int  timehigh;
-   unsigned long timemidas;
-   int           dettype;
-   uint32_t      chanadd;
-   uint32_t      digitizernum{};
+   unsigned int  timelow; // NOLINT(readability-identifier-naming)
+   unsigned int  timehigh; // NOLINT(readability-identifier-naming)
+   uint64_t timemidas; // NOLINT(readability-identifier-naming)
+   int           dettype; // NOLINT(readability-identifier-naming)
+   uint32_t      chanadd; // NOLINT(readability-identifier-naming)
+   uint32_t      digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
-unsigned long TEventTime::low_timemidas = -1;
+uint64_t TEventTime::low_timemidas = -1;
 uint64_t      TEventTime::lowest_time   = 0xffffffffffffffff;
 uint32_t      TEventTime::best_dig      = 0;
 std::map<uint32_t, int>     TEventTime::digmap;
@@ -208,8 +212,8 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
    const int                    event_start = 1E5;
    std::shared_ptr<TMidasEvent> event       = std::make_shared<TMidasEvent>();
    eventQ->reserve(total_events);
-   void* ptr;
-   int   banksize;
+   void* ptr = nullptr;
+   int   banksize = 0;
 
    int subrun = infile->GetSubRunNumber();
 
@@ -221,7 +225,7 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
    // Do checks on the event
    unsigned int mserial = 0;
    if(event) {
-      mserial = (unsigned int)(event->GetSerialNumber());
+      mserial = static_cast<unsigned int>(event->GetSerialNumber());
    }
    unsigned int mtime = 0;
    if(event) {
@@ -252,7 +256,7 @@ int QueueEvents(TMidasFile* infile, std::vector<TEventTime*>* eventQ)
          }
 
          if(banksize > 0) {
-            int frags;
+            int frags = 0;
             try {
                frags = parser.GriffinDataToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, TGRSIDataParser::EBank::kGRF2,
                                                     mserial, mtime);
@@ -306,7 +310,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ)
    for(it = eventQ->begin(); it != eventQ->end(); it++) {
       // This makes the plot, might not be required
       int           hightime = (*it)->TimeStampHigh();
-      unsigned long midtime  = (*it)->MidasTime() - lowmidtime;
+      uint64_t midtime  = (*it)->MidasTime() - lowmidtime;
       if(midtime > 20) {
          break; // 20 seconds seems like plenty enough time
       }
@@ -314,8 +318,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ)
          continue;
       }
       // The next few lines are probably unnecessary
-      (dynamic_cast<TH2D*>(midvshigh->FindObject(Form("midvshigh_0x%04x", (*it)->Digitizer()))))
-         ->Fill(midtime, hightime);
+      dynamic_cast<TH2D*>(midvshigh->FindObject(Form("midvshigh_0x%04x", (*it)->Digitizer())))->Fill(static_cast<double>(midtime), hightime);
       if(lowest_hightime.find((*it)->Digitizer()) == lowest_hightime.end()) {
          lowest_hightime[(*it)->Digitizer()] = hightime; // initialize this as the first time that is seen.
       } else if(hightime < lowest_hightime.find((*it)->Digitizer())->second) {
@@ -378,7 +381,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -400,7 +403,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
          continue;
       }
 
-      int64_t time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
+      auto time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
 
       if(event1count > range) {
          hit2 = hit1 - range;
@@ -426,7 +429,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
                dynamic_cast<TH1D*>(roughlist->At((*hit2)->DigIndex())); // This is where that pointer comes in handy
             int64_t time2 = static_cast<int64_t>((*hit2)->GetTimeStamp()) -
                             TEventTime::correctionmap.find((*hit2)->Digitizer())->second;
-            Int_t bin = static_cast<Int_t>(time2 - time1);
+            auto bin = static_cast<Int_t>(time2 - time1);
 
 				if((fillhist->FindBin(bin) > 0) && (fillhist->FindBin(bin) < fillhist->GetNbinsX())) {
 					fillhist->Fill(bin);
@@ -486,7 +489,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 	// The "best digitizer" is set when we fill the event Q
 	printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-	TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+	TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
 	std::vector<TEventTime*>::iterator hit1;
 	std::vector<TEventTime*>::iterator hit2;
@@ -509,7 +512,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 			continue;
 		}
 
-		int64_t time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
+		auto time1 = static_cast<int64_t>((*hit1)->GetTimeStamp());
 
 		if(event1count > range) {
 			hit2 = hit1 - range;
@@ -534,7 +537,7 @@ void GetTimeDiff(std::vector<TEventTime*> * eventQ)
 					TEventTime::correctionmap.find((*hit2)->Digitizer())->second;
 				if((time2 - time1 < 2147483647) &&
 						(time2 - time1 > -2147483647)) { // Make sure we are casting this to 32 bit properly
-					Int_t bin = static_cast<Int_t>(time2 - time1);
+					auto bin = static_cast<Int_t>(time2 - time1);
 					fillhist->Fill(bin);
 				}
 			}
@@ -585,7 +588,7 @@ bool ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
 	// int size;
 	// int data[1024];
 
-	void* ptr;
+	void* ptr = nullptr;
 
 	int banksize = event->LocateBank(nullptr, "GRF2", &ptr);
 	int bank     = 2;
@@ -725,11 +728,11 @@ void WriteEvents(TMidasFile * file)
 
 	std::ifstream in(file->GetFilename(), std::ifstream::in | std::ifstream::binary);
 	in.seekg(0, std::ifstream::end);
-	long long filesize = in.tellg();
+	int64_t filesize = in.tellg();
 	in.close();
 
 	int       bytes     = 0;
-	long long bytesread = 0;
+	int64_t bytesread = 0;
 
 	UInt_t num_evt = 0;
 
@@ -771,9 +774,10 @@ void WriteEvents(TMidasFile * file)
 		};
 		if(num_evt % 5000 == 0) {
 			gSystem->ProcessEvents();
-			printf(HIDE_CURSOR " Events %d have processed %.2fMB/%.2f MB => %.1f MB/s              " SHOW_CURSOR
-					"\r",
-					num_evt, (bytesread / 1000000.0), (filesize / 1000000.0), (bytesread / 1000000.0) / w.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<HIDE_CURSOR<<" Events "<<num_evt<<" have processed "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/w.RealTime()<<" MB/s              "<<SHOW_CURSOR<<"\r";
+			std::cout.precision(precision);
 			w.Continue();
 		}
 	}
@@ -785,14 +789,14 @@ void WriteEvents(TMidasFile * file)
 void WriteCorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
-	char filename[64];
-	snprintf(filename, 64, "corrections%05i.root", runnumber);
-	auto* corrfile = new TFile(filename, "RECREATE");
+	std::array<char, 64> filename;
+	snprintf(filename.data(), filename.size(), "corrections%05i.root", runnumber);
+	auto* corrfile = new TFile(filename.data(), "RECREATE");
 
 	// Just going to make a corrections map for now...it should be a map throughout....
 
-	uint32_t address;
-	Long64_t correction;
+	uint32_t address = 0;
+	Long64_t correction = 0;
 	auto*    t = new TTree("correctiontree", "Tree with map");
 	t->Branch("address", &address);
 	t->Branch("correction", &correction);
@@ -812,22 +816,22 @@ void WriteCorrectionFile(int runnumber)
 int CorrectionFile(int runnumber)
 {
 	// I think I can directly write the map, but I was having a bit of trouble, so I'm using this Tree hack
-	char filename[64];
-	snprintf(filename, 64, "corrections%05i.root", runnumber);
-	auto* corrfile = new TFile(filename, "READ");
+	std::array<char, 64> filename;
+	snprintf(filename.data(), filename.size(), "corrections%05i.root", runnumber);
+	auto* corrfile = new TFile(filename.data(), "READ");
 	if(!(corrfile->IsOpen())) {
 		delete corrfile;
 		return 0;
 	}
 
-	printf(DGREEN "Found Correction File %s\n" RESET_COLOR, filename);
+	printf(DGREEN "Found Correction File %s\n" RESET_COLOR, filename.data());
 
-	TTree* t;
+	TTree* t = nullptr;
 	corrfile->GetObject("correctiontree", t);
 	TBranch* baddress    = nullptr;
 	TBranch* bcorrection = nullptr;
-	uint32_t address;
-	Long64_t correction;
+	uint32_t address = 0;
+	Long64_t correction = 0;
 	t->SetBranchAddress("address", &address, &baddress);
 	t->SetBranchAddress("correction", &correction, &bcorrection);
 
@@ -872,13 +876,13 @@ int main(int argc, char** argv)
 	} else {
 		midfile->OutOpen(argv[2]);
 	}
-	char filename[64];
+	std::array<char, 64> filename;
 	if(subrunnumber > -1) {
-		snprintf(filename, 64, "time_diffs%05i_%03i.root", runnumber, subrunnumber);
+		snprintf(filename.data(), filename.size(), "time_diffs%05i_%03i.root", runnumber, subrunnumber);
 	} else {
-		snprintf(filename, 64, "time_diffs%05i.root", runnumber);
+		snprintf(filename.data(), filename.size(), "time_diffs%05i.root", runnumber);
 	}
-	printf("Creating root outfile: %s\n", filename);
+	printf("Creating root outfile: %s\n", filename.data());
 
 	int nDigitizers = 0;
 	if(argc > 3) {
@@ -894,7 +898,7 @@ int main(int argc, char** argv)
 	TGRSIOptions::Get()->SuppressErrors(true);
 
 	if(nDigitizers == 0) {
-		auto* outfile = new TFile(filename, "RECREATE");
+		auto* outfile = new TFile(filename.data(), "RECREATE");
 		auto* eventQ  = new std::vector<TEventTime*>;
 		QueueEvents(midfile, eventQ);
 		std::cout<<"Number of Digitizers Found: "<<TEventTime::digmap.size()<<std::endl;

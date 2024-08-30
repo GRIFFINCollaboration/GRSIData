@@ -18,7 +18,7 @@ ClassImp(TPaces)
 
 bool TPaces::fSetCoreWave = false;
 
-ROOT::Math::Polar3DVector TPaces::gDetectorPosition[6] = {
+std::array<ROOT::Math::Polar3DVector, 6> TPaces::fDetectorPosition = {
 	ROOT::Math::Polar3DVector(1., 0., 0.),
 	ROOT::Math::Polar3DVector(1., 120.178/180.*TMath::Pi(),  21./180.*TMath::Pi()),
 	ROOT::Math::Polar3DVector(1., 120.827/180.*TMath::Pi(),  94./180.*TMath::Pi()),
@@ -26,7 +26,7 @@ ROOT::Math::Polar3DVector TPaces::gDetectorPosition[6] = {
 	ROOT::Math::Polar3DVector(1., 120.299/180.*TMath::Pi(), 237./180.*TMath::Pi()),
 	ROOT::Math::Polar3DVector(1., 120.193/180.*TMath::Pi(), 313./180.*TMath::Pi())};
 
-TPaces::TPaces() : TDetector()
+TPaces::TPaces()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -34,7 +34,7 @@ TPaces::TPaces() : TDetector()
 	Clear();
 }
 
-TPaces::TPaces(const TPaces& rhs) : TDetector()
+TPaces::TPaces(const TPaces& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -45,13 +45,6 @@ TPaces::TPaces(const TPaces& rhs) : TDetector()
 void TPaces::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
-
-	static_cast<TPaces&>(rhs).fSetCoreWave = fSetCoreWave;
-}
-
-TPaces::~TPaces()
-{
-	// Default Destructor
 }
 
 void TPaces::Print(Option_t*) const
@@ -75,7 +68,7 @@ TPaces& TPaces::operator=(const TPaces& rhs)
 
 void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TPacesHit* hit = new TPacesHit(*frag);
+	auto* hit = new TPacesHit(*frag);
 	AddHit(hit);
 }
 

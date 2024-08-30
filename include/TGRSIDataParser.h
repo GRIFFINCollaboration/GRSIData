@@ -44,7 +44,11 @@
 class TGRSIDataParser : public TDataParser {
 public:
    TGRSIDataParser();
-   ~TGRSIDataParser();
+   TGRSIDataParser(const TGRSIDataParser&) = default;
+	TGRSIDataParser(TGRSIDataParser&&) noexcept = default;
+	TGRSIDataParser& operator=(const TGRSIDataParser&) = default;
+	TGRSIDataParser& operator=(TGRSIDataParser&&) noexcept = default;
+   ~TGRSIDataParser() override = default;
 
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);
    enum class EBank { kWFDN = 0, kGRF1 = 1, kGRF2 = 2, kGRF3 = 3, kGRF4 = 4, kFME0 = 5, kFME1 = 6, kFME2 = 7, kFME3 = 8, kMADC = 9, kEMMT = 10};
@@ -82,24 +86,21 @@ public:
         int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 	int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaMadcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaTdcDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaRawDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaSumDataToFragment(uint32_t* data, const int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaMadcDataToFragment(const uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+	int EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 #endif
 
-public:
-   int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0,
-                             time_t midasTime = 0);
+   int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToPPGEvent(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int GriffinDataToScalerEvent(uint32_t* data, int address);
 
-   int RFScalerToFragment(uint32_t* data, const int size, const std::shared_ptr<TFragment>& frag);
+   int RFScalerToFragment(uint32_t* data, int size, const std::shared_ptr<TFragment>& frag);
 
    int EPIXToScalar(float* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
    int SCLRToScalar(uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
-   int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0,
-                             time_t midasTime = 0);
+   int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
 
 private:
 	EDataParserState fState;

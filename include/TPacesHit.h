@@ -19,7 +19,10 @@ class TPacesHit : public TDetectorHit {
 public:
    TPacesHit();
    TPacesHit(const TPacesHit&);
-   TPacesHit(const TFragment& frag) : TDetectorHit(frag) {}
+	TPacesHit(TPacesHit&&) noexcept = default;
+	TPacesHit& operator=(const TPacesHit&) = default;
+	TPacesHit& operator=(TPacesHit&&) noexcept = default;
+   explicit TPacesHit(const TFragment& frag) { frag.Copy(*this); }
    ~TPacesHit() override;
 
 private:
@@ -36,7 +39,6 @@ public:
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -49,7 +51,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TPacesHit, 4);
+   ClassDefOverride(TPacesHit, 4); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

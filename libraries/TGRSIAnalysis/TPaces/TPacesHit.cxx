@@ -6,7 +6,7 @@
 ClassImp(TPacesHit)
 /// \endcond
 
-TPacesHit::TPacesHit() : TDetectorHit()
+TPacesHit::TPacesHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -14,7 +14,7 @@ TPacesHit::TPacesHit() : TDetectorHit()
    Clear();
 }
 
-TPacesHit::TPacesHit(const TPacesHit& rhs) : TDetectorHit()
+TPacesHit::TPacesHit(const TPacesHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
@@ -69,7 +69,7 @@ void TPacesHit::Print(std::ostream& out) const
 TVector3 TPacesHit::GetPosition(Double_t) const
 {
 	auto vec = TPaces::GetPosition(GetDetector());
-   return TVector3(vec.X(), vec.Y(), vec.Z());
+   return {vec.X(), vec.Y(), vec.Z()};
 }
 
 TVector3 TPacesHit::GetPosition() const

@@ -32,7 +32,11 @@
 class TMidasFile : public TRawFile {
 public:
    TMidasFile(); ///< default constructor
-   TMidasFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
+   explicit TMidasFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
+   TMidasFile(const TMidasFile&) = default;
+	TMidasFile(TMidasFile&&) noexcept = default;
+   TMidasFile& operator=(const TMidasFile&) = default;
+	TMidasFile& operator=(TMidasFile&&) noexcept = default;
    ~TMidasFile() override; ///< destructor
 
    bool Open(const char* filename) override; ///< Open input file
@@ -84,34 +88,34 @@ private:
    void SetGRIFFOdb();
    void SetTIGDAQOdb();
 
-#ifdef HAS_XML
-   TXMLOdb* fOdb;
-#endif
-
 #ifndef __CINT__
    std::shared_ptr<TMidasEvent> fOdbEvent;
+#endif
+
+#ifdef HAS_XML
+   TXMLOdb* fOdb;
 #endif
 
    std::string fOutFilename; ///< name of the currently open file
 
    std::vector<char> fWriteBuffer;
-   uint32_t          fCurrentBufferSize;
-   uint32_t          fMaxBufferSize;
+   uint32_t          fCurrentBufferSize{0};
+   uint32_t          fMaxBufferSize{1000000};
 
-   int         fLastErrno; ///< errno from the last operation
+   int         fLastErrno{0}; ///< errno from the last operation
    std::string fLastError; ///< error string from last errno
-   int fCurrentEventNumber;
+   int fCurrentEventNumber{0};
 
-   bool fDoByteSwap; ///< "true" if file has to be byteswapped
+   bool fDoByteSwap{false}; ///< "true" if file has to be byteswapped
 
-   int   fFile;      ///< open input file descriptor
-   void* fGzFile;    ///< zlib compressed input file reader
-   void* fPoFile;    ///< popen() input file reader
-   int   fOutFile;   ///< open output file descriptor
-   void* fOutGzFile; ///< zlib compressed output file reader
+   int   fFile{-1};      ///< open input file descriptor
+   void* fGzFile{nullptr};    ///< zlib compressed input file reader
+   void* fPoFile{nullptr};    ///< popen() input file reader
+   int   fOutFile{-1};   ///< open output file descriptor
+   void* fOutGzFile{nullptr}; ///< zlib compressed output file reader
 
    /// \cond CLASSIMP
-   ClassDefOverride(TMidasFile, 0) // Used to open and write Midas Files
+   ClassDefOverride(TMidasFile, 0) // Used to open and write Midas Files // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

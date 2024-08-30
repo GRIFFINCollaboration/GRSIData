@@ -25,17 +25,17 @@ public:
       kSiLiBit7   = BIT(7)
    };
 
-public:
    TSiLi();
    TSiLi(const TSiLi&);
+	TSiLi(TSiLi&&) noexcept = default;
+   TSiLi& operator=(const TSiLi&); //
+	TSiLi& operator=(TSiLi&&) noexcept = default;
    ~TSiLi() override;
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TSiLi& operator=(const TSiLi&); //
 
    void Copy(TObject&) const override;
    void Clear(Option_t* opt = "") override;
@@ -79,24 +79,28 @@ public:
 
    static std::vector<TGraph> UpstreamShapes();
 
-   static double sili_noise_fac;        // Sets the level of integration to remove noise during waveform fitting
-   static double sili_default_decay;    // Sets the waveform fit decay parameter
-   static double sili_default_rise;     // Sets the waveform fit rise parameter
-   static double sili_default_baseline; // Sets the waveform fit rise parameter
+   static double fSiLiNoiseFac;        // Sets the level of integration to remove noise during waveform fitting
+   static double fSiLiDefaultDecay;    // Sets the waveform fit decay parameter
+   static double fSiLiDefaultRise;     // Sets the waveform fit rise parameter
+   static double fSiLiDefaultBaseline; // Sets the waveform fit rise parameter
 
 	static Int_t GetRing(Int_t seg) {  return seg/12; }
 	static Int_t GetSector(Int_t seg) {  return seg%12; }
 	static Int_t GetPreamp(Int_t seg) {  return  ((GetSector(seg)/3)*2)+(((GetSector(seg)%3)+GetRing(seg))%2); }
-	static Int_t GetPin(Int_t seg) {//stupid chequerboard pattern that inverts
-		int ring=GetRing(seg);
-		int sec=GetSector(seg)%3;
-		int inv=(GetSector(seg)/3)%2;
-		int ret=10*(2-sec);
-		if((sec==1)^!(inv))ret+=9-ring;
-		else ret+=ring;
-		return  (ret/2)+1;
-	}
-	static bool MagnetShadow(Int_t seg) { return ((seg%3)==1); }
+   static Int_t GetPin(Int_t seg)
+   {   //stupid chequerboard pattern that inverts
+      int ring = GetRing(seg);
+      int sec  = GetSector(seg) % 3;
+      int inv  = (GetSector(seg) / 3) % 2;
+      int ret  = 10 * (2 - sec);
+      if(((sec == 1) ^ (inv == 0)) != 0) {
+         ret += 9 - ring;
+      } else {
+         ret += ring;
+      }
+      return (ret / 2) + 1;
+   }
+   static bool MagnetShadow(Int_t seg) { return ((seg%3)==1); }
 	
    static double GetSegmentArea(Int_t seg);
 
@@ -109,8 +113,8 @@ public:
 // 1 use slow TF1 fit if quick linear eq. method fails
 // 2 use slow TF1 method exclusively
 // 3 use slow TF1 with experimental oscillation
-   static int FitSiLiShape;     //!<!
-   static double BaseFreq;     //!<!
+   static int fFitSiLiShape;     //!<!
+   static double fBaseFreq;     //!<!
 	
 private:
    std::vector<TSiLiHit> fAddbackHits;     //!<!
@@ -133,7 +137,7 @@ public:
    static bool  fRejectPossibleCrosstalk; //!<!
    
    /// \cond CLASSIMP
-   ClassDefOverride(TSiLi, 6);
+   ClassDefOverride(TSiLi, 6); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

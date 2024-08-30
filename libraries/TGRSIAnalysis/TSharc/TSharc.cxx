@@ -85,7 +85,7 @@ TSharc::TSharc()
 
 TSharc::~TSharc() = default;
 
-TSharc::TSharc(const TSharc& rhs) : TDetector()
+TSharc::TSharc(const TSharc& rhs) : TDetector(rhs)
 {
 	Class()->IgnoreTObjectStreamer(kTRUE);
 	Clear("ALL");
@@ -130,7 +130,7 @@ void TSharc::BuildHits()
 			}
 		}
 		if(front_used && back_used) {
-			TSharcHit* hit = new TSharcHit;
+			auto* hit = new TSharcHit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
 			AddHit(hit);
@@ -175,7 +175,6 @@ void TSharc::Clear(Option_t* option)
 		fYoffset = 0.00;
 		fZoffset = 0.00;
 	}
-	return;
 }
 
 void TSharc::Print(Option_t*) const
@@ -195,10 +194,6 @@ void TSharc::Copy(TObject& rhs) const
 	// if(!rhs.InheritsFrom("TSharc"))
 	//  return;
 	TDetector::Copy(rhs);
-
-	static_cast<TSharc&>(rhs).fXoffset   = fXoffset;
-	static_cast<TSharc&>(rhs).fYoffset   = fYoffset;
-	static_cast<TSharc&>(rhs).fZoffset   = fZoffset;
 }
 
 TVector3 TSharc::GetPosition(int detector, int frontstrip, int backstrip, double X, double Y, double Z)
@@ -246,7 +241,7 @@ TVector3 TSharc::GetPosition(int detector, int frontstrip, int backstrip, double
 
 double TSharc::GetDetectorThickness(TSharcHit& hit, double dist)
 {
-	static double fDetectorThickness[16] = {998., 998.,  998.,  1001., 141., 142., 133., 143.,
+	static std::array<double, 16> fDetectorThickness = {998., 998.,  998.,  1001., 141., 142., 133., 143.,
 		999., 1001., 1001., 1002., 390., 390., 383., 385.};
 	if(dist < 0.0) {
 		dist = fDetectorThickness[hit.GetDetector()];
@@ -266,21 +261,21 @@ double TSharc::GetDetectorThickness(TSharcHit& hit, double dist)
 
 double TSharc::GetDeadLayerThickness(TSharcHit& hit)
 {
-	static double fDeadLayerThickness[16] = {0.7, 0.7, 0.7, 0.7, 0.1, 0.1, 0.1, 0.1,
+	static std::array<double, 16> fDeadLayerThickness = {0.7, 0.7, 0.7, 0.7, 0.1, 0.1, 0.1, 0.1,
 		0.1, 0.1, 0.1, 0.1, 0.7, 0.7, 0.7, 0.7};
 	return GetDetectorThickness(hit, fDeadLayerThickness[hit.GetDetector()]);
 }
 
 double TSharc::GetPadThickness(TSharcHit& hit)
 {
-	static double fPadThickness[16] = {0.0, 0.0, 0.0, 0.0, 1534, 1535, 1535, 1539,
+	static std::array<double, 16> fPadThickness = {0.0, 0.0, 0.0, 0.0, 1534, 1535, 1535, 1539,
 		0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0};
 	return GetDetectorThickness(hit, fPadThickness[hit.GetDetector()]);
 }
 
 double TSharc::GetPadDeadLayerThickness(TSharcHit& hit)
 {
-	static double fPadDeadLayerThickness[16] = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+	static std::array<double, 16> fPadDeadLayerThickness = {0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
 		0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	return GetDetectorThickness(hit, fPadDeadLayerThickness[hit.GetDetector()]);
 }

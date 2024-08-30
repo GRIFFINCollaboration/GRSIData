@@ -22,14 +22,16 @@ TDescantHit::TDescantHit()
    Clear();
 }
 
-TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit()
+TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit(rhs)
 {
    Clear();
    rhs.Copy(*this);
 }
 
-TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
+TDescantHit::TDescantHit(const TFragment& frag)
 {
+	frag.Copy(*this);
+
    SetZc(frag.GetZc());
    SetCcShort(frag.GetCcShort());
    SetCcLong(frag.GetCcLong());
@@ -38,36 +40,7 @@ TDescantHit::TDescantHit(const TFragment& frag) : TDetectorHit(frag)
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
       }
-      if(false) {
-         std::vector<Short_t> x;
-         // Need to reorder waveform data for S1507 data from December 2014
-         // All pairs of samples are swapped.
-         // The first two samples are also delayed by 8.
-         // We choose to throw out the first 2 samples (junk) and the last 6 samples (convience)
-         x              = *(frag.GetWaveform());
-         size_t  length = x.size() - (x.size() % 8);
-         Short_t temp;
-
-         if(length > 8) {
-            for(size_t i = 0; i < length - 8; i += 8) {
-               x[i]     = x[i + 9];
-               x[i + 1] = x[i + 8];
-               temp     = x[i + 2];
-               x[i + 2] = x[i + 3];
-               x[i + 3] = temp;
-               temp     = x[i + 4];
-               x[i + 4] = x[i + 5];
-               x[i + 5] = temp;
-               temp     = x[i + 6];
-               x[i + 6] = x[i + 7];
-               x[i + 7] = temp;
-            }
-            x.resize(length - 8);
-         }
-         SetWaveform(x);
-      } else {
-         frag.CopyWave(*this);
-      }
+		frag.CopyWave(*this);
       if(!GetWaveform()->empty()) {
          AnalyzeWaveform();
       }
@@ -124,7 +97,7 @@ Float_t TDescantHit::GetCfd() const
 {
    /// special function for TDescantHit to return CFD after mapping out the high bits
    /// which are the remainder between the 125 MHz data and the 100 MHz timestamp clock
-   return (static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + gRandom->Uniform();
+   return static_cast<Float_t>(static_cast<Int_t>(TDetectorHit::GetCfd()) & 0x3fffff) + static_cast<Float_t>(gRandom->Uniform());
 }
 
 Int_t TDescantHit::GetRemainder() const
@@ -238,14 +211,14 @@ Int_t TDescantHit::CalculateCfdAndMonitor(double attenuation, unsigned int delay
 
       monitor.clear();
       monitor.resize(smoothedWaveform.size() - delay);
-      monitor[0] = attenuation * smoothedWaveform[delay] - smoothedWaveform[0];
+      monitor[0] = static_cast<Short_t>(attenuation * smoothedWaveform[delay] - smoothedWaveform[0]);
       if(monitor[0] > monitormax) {
          armed      = true;
          monitormax = monitor[0];
       }
 
       for(size_t i = delay + 1; i < smoothedWaveform.size(); ++i) {
-         monitor[i - delay] = attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay];
+         monitor[i - delay] = static_cast<Short_t>(attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay]);
          if(monitor[i - delay] > monitormax) {
             armed      = true;
             monitormax = monitor[i - delay];
@@ -282,7 +255,7 @@ std::vector<Short_t> TDescantHit::CalculateSmoothedWaveform(unsigned int halfSmo
 {
 
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
 
    std::vector<Short_t> smoothedWaveform(std::max((static_cast<size_t>(0)), WaveSize() - 2 * halfSmoothingWindow),
@@ -301,7 +274,7 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
                                                       unsigned int halfSmoothingWindow)
 {
    if(!HasWave()) {
-      return std::vector<Short_t>(); // Error!
+      return {}; // Error!
    }
    std::vector<Short_t> smoothedWaveform;
 
@@ -314,7 +287,7 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
    std::vector<Short_t> monitor(std::max((static_cast<size_t>(0)), smoothedWaveform.size() - delay), 0);
 
    for(size_t i = delay; i < WaveSize(); ++i) {
-      monitor[i - delay] = attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay];
+      monitor[i - delay] = static_cast<Short_t>(attenuation * smoothedWaveform[i] - smoothedWaveform[i - delay]);
    }
 
    return monitor;
@@ -362,7 +335,7 @@ Int_t TDescantHit::CalculatePsdAndPartialSums(double fraction, unsigned int inte
    if(partialSums[0] < fraction * totalSum) {
       for(size_t i = 1; i < partialSums.size(); ++i) {
          if(partialSums[i] >= fraction * totalSum) {
-            psd = i * interpolationSteps - ((partialSums[i] - fraction * totalSum) * interpolationSteps) / GetWaveform()->at(i);
+            psd = static_cast<Int_t>(static_cast<double>(i * interpolationSteps) - ((partialSums[i] - fraction * totalSum) * interpolationSteps) / GetWaveform()->at(i));
             break;
          }
       }

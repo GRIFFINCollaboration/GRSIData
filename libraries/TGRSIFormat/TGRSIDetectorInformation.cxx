@@ -12,7 +12,7 @@
 ClassImp(TGRSIDetectorInformation)
 /// \endcond
 
-TGRSIDetectorInformation::TGRSIDetectorInformation() : TDetectorInformation()
+TGRSIDetectorInformation::TGRSIDetectorInformation()
 {
    /// Default ctor for TGRSIDetectorInformation.
    Clear();
@@ -26,7 +26,7 @@ TEventBuildingLoop::EBuildMode TGRSIDetectorInformation::BuildMode() const
 	if(fSortByTriggerId) {
 		return TEventBuildingLoop::EBuildMode::kTriggerId;
 	}
-	if(TGRSIOptions::Get()->AnalysisOptions()->BuildEventsByTimeStamp()) {
+	if(TGRSIOptions::AnalysisOptions()->BuildEventsByTimeStamp()) {
 		return TEventBuildingLoop::EBuildMode::kTimestamp;
 	}
 	return TEventBuildingLoop::EBuildMode::kTime;
@@ -106,17 +106,17 @@ void TGRSIDetectorInformation::Set()
 		std::cerr<<RED<<"TGRSIDetectorInformation::Set(): Failed to get channel map!"<<RESET_COLOR<<std::endl;
 		return;
 	}
-   for(auto iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
-      std::string channelname = iter->second->GetName();
+   for(auto& iter : *(TChannel::GetChannelMap())) {
+      std::string channelname = iter.second->GetName();
 
 		// check if we have an old TIG digitizer, in that case sort by trigger ID (instead of time stamp)
 		// don't need to check again if we already found one, so include check for fSortByTriggerId being true
-		if(!fSortByTriggerId && (iter->second->GetDigitizerType() == EDigitizer::kTIG10 || iter->second->GetDigitizerType() == EDigitizer::kTIG64)) {
+		if(!fSortByTriggerId && (iter.second->GetDigitizerType() == EDigitizer::kTIG10 || iter.second->GetDigitizerType() == EDigitizer::kTIG64)) {
 			fSortByTriggerId = true;
 		}
       //  detector system type.
       //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
-      switch(static_cast<const TGRSIMnemonic*>(iter->second->GetMnemonic())->System()) {
+      switch(static_cast<const TGRSIMnemonic*>(iter.second->GetMnemonic())->System()) {
 			case TGRSIMnemonic::ESystem::kTigress:
 				SetTigress();
 				break;
@@ -172,11 +172,11 @@ void TGRSIDetectorInformation::Set()
 				SetGeneric();
 				break;
 			default:
-				std::string system = iter->second->GetMnemonic()->SystemString();
-				if(system.compare("SP") == 0) {
+				std::string system = iter.second->GetMnemonic()->SystemString();
+				if(system == "SP") {
 					SetSpice();
 					SetS3();
-				} else if(system.compare("BA") == 0) {
+				} else if(system == "BA") {
 					SetBambino();
 				}
 		};

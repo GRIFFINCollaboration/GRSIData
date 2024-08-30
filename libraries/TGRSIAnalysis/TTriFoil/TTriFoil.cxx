@@ -30,7 +30,7 @@ void TTriFoil::Copy(TObject& rhs) const
 	static_cast<TTriFoil&>(rhs).fTBeam     = fTBeam;
 }
 
-TTriFoil::TTriFoil(const TTriFoil& rhs) : TDetector()
+TTriFoil::TTriFoil(const TTriFoil& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);

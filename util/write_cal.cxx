@@ -27,8 +27,9 @@
 #include <vector>
 #include <string>
 
-#define FIRST_CHANNEL 84
-#define LAST_CHANNEL 91
+constexpr int FirstChannel = 84;
+constexpr int  LastChannel = 91;
+
 int main(int argc, char** argv) {
 	if(argc == 1) {
 		std::cout<<"Usage: "<<argv[0]<<" <analysis tree file(s)>"<<std::endl;
@@ -36,23 +37,23 @@ int main(int argc, char** argv) {
 	}
 
 	std::cout<<std::endl
-	         <<"WARNING: This script assumes that the TACs are in channels FIRST_CHANNEL-LAST_CHANNEL (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly"<<std::endl
+	         <<"WARNING: This script assumes that the TACs are in channels "<<FirstChannel<<" - "<<LastChannel<<" (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly"<<std::endl
 	         <<std::endl;
 
-	TFile* file = new TFile(argv[1]);
+	auto* file = new TFile(argv[1]);
 
-	TTree* AnalysisTree = static_cast<TTree*>(file->Get("AnalysisTree"));
+	auto* AnalysisTree = static_cast<TTree*>(file->Get("AnalysisTree"));
 
 	TChannel::ReadCalFromTree(AnalysisTree);
 
 	TChannel* channel = nullptr;
 
-	double offset[8];
+	std::array<double, 8> offset;
 
-	for(int n = FIRST_CHANNEL; n <= LAST_CHANNEL; n++) {
+	for(int n = FirstChannel; n <= LastChannel; n++) {
 		channel = TChannel::GetChannelByNumber(n);
-		offset[n-FIRST_CHANNEL] = channel->GetTimeOffset();
-		std::cout<<"Current TAC offset in the calfile:  "<<offset[n-FIRST_CHANNEL]<<" for channel #"<<n<<std::endl;
+		offset[n-FirstChannel] = static_cast<double>(channel->GetTimeOffset());
+		std::cout<<"Current TAC offset in the calfile:  "<<offset[n-FirstChannel]<<" for channel #"<<n<<std::endl;
 	}
 
 
@@ -80,36 +81,42 @@ int main(int argc, char** argv) {
 
 	TList list;
 
-	UInt_t labr1,labr2,tac1; //counters
+	UInt_t labr1 = 0;
+	UInt_t labr2 = 0;
+	UInt_t tac1 = 0; //counters
 
-	Double_t  progress;
-	Int_t  multi_labr, multi_tac, multi_grif;
+	Double_t  progress = 0.;
+	Int_t  multi_labr = 0;
+	Int_t multi_tac = 0;
+	Int_t multi_grif = 0;
 
 	//TAC offset histograms
-	TH1D* TAC_offset[8];
+	std::array<TH1D*, 8> TAC_offset;
 	for(int i = 0; i < 8; ++i) {
 		TAC_offset[i] = new TH1D(Form("TAC_offset_%d",i), Form("TAC_offset_%d; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(TAC_offset[i]); 
 	}
 
-	TH1D* TAC_offset_corrected[8];
+	std::array<TH1D*, 8> TAC_offset_corrected;
 	for(int i = 0; i < 8; ++i) {
 		TAC_offset_corrected[i] = new TH1D(Form("TAC_offset_corrected_%d",i), Form("TAC_offset_corrected_%d; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(TAC_offset_corrected[i]); 
 	}
 
-	TH1D* time_diff[8];
+	std::array<TH1D*, 8> time_diff;
 	for(int i = 0; i < 8; ++i) {
 		time_diff[i] = new TH1D(Form("time_diff%d",i), Form("Time difference for LaBr_%d - LaBr with TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(time_diff[i]); 
 	}
-	TH1D* time_diff_noTAC[8];
+
+	std::array<TH1D*, 8> time_diff_noTAC;
 	for(int i = 0; i < 8; ++i) {
 		time_diff_noTAC[i] = new TH1D(Form("time_diff_noTAC%d",i), Form("Time difference for LaBr_%d - LaBr with no TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(time_diff_noTAC[i]); 
 	}
 
-	TH1D* timestamp_diff_noTACcoinc[8];
+	std::array<TH1D*, 8> timestamp_diff_noTACcoinc;
 	for(int i = 0; i < 8; ++i) {
 		timestamp_diff_noTACcoinc[i] = new TH1D(Form("timestamp_diff_noTACcoinc%d",i), Form("Timestamp difference for LaBr_%d - LaBr, no TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(timestamp_diff_noTACcoinc[i]); 
 	}
-	TH1D* timestamp_diff_TACcoinc[8];
+
+	std::array<TH1D*, 8> timestamp_diff_TACcoinc;
 	for(int i = 0; i < 8; ++i) {
 		timestamp_diff_TACcoinc[i] = new TH1D(Form("timestamp_diff_TACcoinc%d",i), Form("Timestamp difference for LaBr_%d - LaBr, with TAC coincidence; time (ns); counts/ns",i), 10000,-5000.,5000.); list.Add(timestamp_diff_TACcoinc[i]); 
 	}
@@ -128,7 +135,7 @@ int main(int argc, char** argv) {
 		if(multi_labr==2) {
 			labr1=labr->GetLaBrHit(0)->GetDetector()-1;//GetDetector goes from 1-8, while the counter goes from 0-7, hence the -1
 			labr2=labr->GetLaBrHit(1)->GetDetector()-1;//GetDetector goes from 1-8, while the counter goes from 0-7, hence the -1
-			timestamp_diff_noTACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+			timestamp_diff_noTACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 			time_diff_noTAC[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
 		}
 
@@ -141,11 +148,11 @@ int main(int argc, char** argv) {
 					TAC_offset[tac1]->Fill(labr->GetLaBrHit(0)->GetTime()-tac->GetTACHit(0)->GetTime()+offset[tac1]*10);
 					TAC_offset_corrected[tac1]->Fill(labr->GetLaBrHit(0)->GetTime()-tac->GetTACHit(0)->GetTime());
 					time_diff[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-					timestamp_diff_TACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+					timestamp_diff_TACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 					if(multi_grif>0) {
 						for(int i=0; i<multi_grif;i++) {
 							time_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-							timestamp_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+							timestamp_diff_hpge->Fill(static_cast<Double_t>(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 						}
 					}
 				}
@@ -154,11 +161,11 @@ int main(int argc, char** argv) {
 					TAC_offset[tac1]->Fill(labr->GetLaBrHit(1)->GetTime()-tac->GetTACHit(0)->GetTime()+offset[tac1]*10);
 					TAC_offset_corrected[tac1]->Fill(labr->GetLaBrHit(1)->GetTime()-tac->GetTACHit(0)->GetTime());
 					time_diff[labr2]->Fill(labr->GetLaBrHit(1)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-					timestamp_diff_TACcoinc[labr2]->Fill(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+					timestamp_diff_TACcoinc[labr2]->Fill(static_cast<Double_t>(labr->GetLaBrHit(1)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 					if(multi_grif>0) {
 						for(int i=0; i<multi_grif;i++) {
 							time_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTime()-labr->GetLaBrHit(0)->GetTime());
-							timestamp_diff_hpge->Fill(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp());
+							timestamp_diff_hpge->Fill(static_cast<Double_t>(grif->GetGriffinHit(i)->GetTimeStamp()-labr->GetLaBrHit(0)->GetTimeStamp()));
 						}
 					}
 				}
@@ -166,7 +173,7 @@ int main(int argc, char** argv) {
 		}
 
 		if(n%10000 == 0) {
-			progress = ((double_t) n)/((double_t) nEntries);
+			progress = (static_cast<double>(n))/(static_cast<double>(nEntries));
 			std::cout<<std::setw(4)<<100*progress<<"% done\r"<<std::flush;
 		}
 

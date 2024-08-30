@@ -30,7 +30,11 @@
 
 class TXMLOdb {
 public:
-   TXMLOdb(char* buffer, int size = 0);
+   explicit TXMLOdb(char* buffer, int size = 0);
+   TXMLOdb(const TXMLOdb& rhs);
+	TXMLOdb(TXMLOdb&&) noexcept = default;
+	TXMLOdb& operator=(const TXMLOdb&) = default;
+	TXMLOdb& operator=(TXMLOdb&&) noexcept = default;
    virtual ~TXMLOdb();
 
    TXMLDocument* fDoc;
@@ -47,10 +51,10 @@ public:
    std::vector<std::string> ReadStringArray(TXMLNode* node);
 
 private:
-   static char fTextBuffer[256];
+   static std::array<char, 256> fTextBuffer;
 
    /// \cond CLASSIMP
-   ClassDef(TXMLOdb, 0)
+   ClassDef(TXMLOdb, 0) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 #endif

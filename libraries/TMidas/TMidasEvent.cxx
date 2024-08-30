@@ -21,14 +21,9 @@ ClassImp(TMidasEvent)
 /// \endcond
 
 TMidasEvent::TMidasEvent()
+	: fData(nullptr), fBanksN(0), fBankList(nullptr), fAllocatedByUs(false)
 {
    // Default constructor
-   fData          = nullptr;
-   fAllocatedByUs = false;
-
-   fBanksN   = 0;
-   fBankList = nullptr;
-
    fEventHeader.fEventId      = 0;
    fEventHeader.fTriggerMask  = 0;
    fEventHeader.fSerialNumber = 0;
@@ -41,8 +36,7 @@ void TMidasEvent::Copy(TObject& rhs) const
    // Copies the entire TMidasEvent. This includes the bank information.
    static_cast<TMidasEvent&>(rhs).fEventHeader = fEventHeader;
 
-   static_cast<TMidasEvent&>(rhs).fData =
-      static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize));
+   static_cast<TMidasEvent&>(rhs).fData = static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
    assert(static_cast<TMidasEvent&>(rhs).fData);
    memcpy(static_cast<TMidasEvent&>(rhs).fData, fData, static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize);
    static_cast<TMidasEvent&>(rhs).fAllocatedByUs = true;
@@ -53,7 +47,7 @@ void TMidasEvent::Copy(TObject& rhs) const
    // assert(static_cast<TMidasEvent&>(rhs).fBankList);
 }
 
-TMidasEvent::TMidasEvent(const TMidasEvent& rhs) : TRawEvent()
+TMidasEvent::TMidasEvent(const TMidasEvent& rhs) : TRawEvent(rhs)
 {
    // Copy ctor.
    rhs.Copy(*this);
@@ -77,13 +71,11 @@ TMidasEvent& TMidasEvent::operator=(const TMidasEvent& rhs)
 void TMidasEvent::Clear(Option_t*)
 {
    // Clears the TMidasEvent.
-   if(fBankList != nullptr) {
-      free(fBankList);
-   }
+	delete fBankList;
    fBankList = nullptr;
 
-   if((fData != nullptr) && fAllocatedByUs) {
-      free(fData);
+   if(fAllocatedByUs) {
+      delete fData;
    }
    fData = nullptr;
 
@@ -165,7 +157,8 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
 {
    /// See FindBank()
 
-   int bktype, bklen;
+   int bktype = 0;
+	int bklen = 0;
 
    int status = FindBank(name, &bklen, &bktype, pdata);
 
@@ -177,9 +170,6 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
    return bklen;
 }
 
-static const unsigned TID_SIZE[] = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
-static const unsigned TID_MAX    = (sizeof(TID_SIZE) / sizeof(TID_SIZE[0]));
-
 /// Find a data bank.
 /// \param [in] name Name of the data bank to look for.
 /// \param [out] bklen Number of array elements in this bank.
@@ -189,31 +179,12 @@ static const unsigned TID_MAX    = (sizeof(TID_SIZE) / sizeof(TID_SIZE[0]));
 ///
 int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdata) const
 {
-   const TMidas_BANK_HEADER* pbkh = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
-   TMidas_BANK*              pbk;
-   // uint32_t dname;
+   auto*        pbkh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
+   TMidas_BANK* pbk  = nullptr;
+
+   std::array<unsigned, 17> TID_SIZE = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
 
    if(((pbkh->fFlags & (1<<4)) > 0)) {
-#if 0
-		TMidas_BANK32 *pbk32;
-		pbk32 = (TMidas_BANK32 *) (pbkh + 1);
-		memcpy(&dname, name, 4);
-		do {
-			if(*((uint32_t *) pbk32->fName) == dname) {
-				*pdata = pbk32 + 1;
-				if(TID_SIZE[pbk32->fType & 0xFF] == 0)
-					*bklen = pbk32->fDataSize;
-				else
-					*bklen = pbk32->fDataSize / TID_SIZE[pbk32->fType & 0xFF];
-
-				*bktype = pbk32->fType;
-				return 1;
-			}
-			pbk32 = (TMidas_BANK32 *) ((char*) (pbk32 + 1) +
-					(((pbk32->fDataSize)+7) & ~7));
-		} while ((char*) pbk32 < (char*) pbkh + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
-#endif
-
       TMidas_BANK32* pbk32 = nullptr;
 
       while(true) {
@@ -236,7 +207,7 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
          }
       }
    } else {
-      pbk = (TMidas_BANK*)(pbkh + 1);
+      pbk = reinterpret_cast<TMidas_BANK*>(pbkh + 1);
       do {
          if(name[0] == pbk->fName[0] && name[1] == pbk->fName[1] && name[2] == pbk->fName[2] &&
             name[3] == pbk->fName[3]) {
@@ -251,7 +222,7 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
             return 1;
          }
          pbk = reinterpret_cast<TMidas_BANK*>(reinterpret_cast<char*>(pbk + 1) + (((pbk->fDataSize) + 7) & ~7));
-      } while(reinterpret_cast<char*>(pbk) < (char*)pbkh + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
+      } while(reinterpret_cast<char*>(pbk) < reinterpret_cast<char*>(pbkh) + pbkh->fDataSize + sizeof(TMidas_BANK_HEADER));
    }
    //
    // bank not found
@@ -267,7 +238,7 @@ void TMidasEvent::Print(const char* option) const
    /// printed out too.
    ///
 
-   time_t t = static_cast<time_t>(fEventHeader.fTimeStamp);
+   auto t = static_cast<time_t>(fEventHeader.fTimeStamp);
 
 	std::cout<<"Event start:"<<std::endl;
    std::cout<<"  event id:       "<<hex(fEventHeader.fEventId,4)<<std::endl;
@@ -366,7 +337,7 @@ void TMidasEvent::AllocateData()
    // Allocates space for the data from the event header if it is a good size
    assert(!fAllocatedByUs);
    assert(IsGoodSize());
-   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize));
+   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
    assert(fData);
    fAllocatedByUs = true;
 }
@@ -399,7 +370,7 @@ int TMidasEvent::SetBankList()
    while(true) {
       if(fBanksN * 4 >= listSize) {
          listSize += 400;
-         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize));
+         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize)); // NOLINT(cppcoreguidelines-no-malloc)
       }
 
       if(IsBank32()) {
@@ -407,14 +378,14 @@ int TMidasEvent::SetBankList()
          if(pmbk32 == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4);
+         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       } else {
          IterateBank(&pmbk, &pdata);
          if(pmbk == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4);
+         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       }
    }
@@ -433,10 +404,10 @@ int TMidasEvent::IterateBank(TMidas_BANK** pbk, char** pdata) const
    /// \param [in] pdata Pointer to data area of bank. Returns nullptr if no more banks
    /// \returns Size of bank in bytes or 0 if no more banks.
    ///
-   const TMidas_BANK_HEADER* event = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
+   auto* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
 
    if(*pbk == nullptr) {
-      *pbk = const_cast<TMidas_BANK*>(reinterpret_cast<const TMidas_BANK*>(event + 1));
+      *pbk = reinterpret_cast<TMidas_BANK*>(event + 1);
    } else {
       *pbk = reinterpret_cast<TMidas_BANK*>(reinterpret_cast<char*>(*pbk + 1) + ((((*pbk)->fDataSize) + 7) & ~7));
    }
@@ -444,7 +415,7 @@ int TMidasEvent::IterateBank(TMidas_BANK** pbk, char** pdata) const
    *pdata = reinterpret_cast<char*>((*pbk) + 1);
 
    if(reinterpret_cast<char*>(*pbk) >=
-      const_cast<char*>(reinterpret_cast<const char*>(event)) + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
+      reinterpret_cast<char*>(event) + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
       *pbk   = nullptr;
       *pdata = nullptr;
       return 0;
@@ -457,19 +428,19 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 {
    /// See IterateBank()
 
-   const TMidas_BANK_HEADER* event = reinterpret_cast<const TMidas_BANK_HEADER*>(fData);
+   auto* event = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
    if(*pbk == nullptr) {
-      *pbk = (TMidas_BANK32*)(event + 1);
+      *pbk = reinterpret_cast<TMidas_BANK32*>(event + 1);
    } else {
       uint32_t length          = (*pbk)->fDataSize;
       uint32_t length_adjusted = (length + 7) & ~7;
       *pbk = reinterpret_cast<TMidas_BANK32*>(reinterpret_cast<char*>(*pbk + 1) + length_adjusted);
    }
 
-   TMidas_BANK32* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
+   auto* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
 
-   if((*pbk)->fType > TID_MAX) {// bad - unknown bank type - it's invalid MIDAS file?
-      if(bk4->fType <= TID_MAX) {// okey, this is a malformed T2K/ND280 data file
+   if((*pbk)->fType > 17) {// bad - unknown bank type - it's invalid MIDAS file?
+      if(bk4->fType <= 17) {// okey, this is a malformed T2K/ND280 data file
          *pbk = bk4;
       } else {
          // truncate invalid data
@@ -481,7 +452,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
    *pdata = reinterpret_cast<char*>((*pbk) + 1);
 
-   if(reinterpret_cast<char*>(*pbk) >= (char*)event + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
+   if(reinterpret_cast<char*>(*pbk) >= reinterpret_cast<char*>(event) + event->fDataSize + sizeof(TMidas_BANK_HEADER)) {
       *pbk   = nullptr;
       *pdata = nullptr;
       return 0;
@@ -492,6 +463,7 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
 
 using BYTE = uint8_t;
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage, cppcoreguidelines-pro-type-cstyle-cast)
 /// Byte swapping routine.
 ///
 #define QWORD_SWAP(x)                            \
@@ -533,6 +505,7 @@ using BYTE = uint8_t;
       *((BYTE*)(x))       = *(((BYTE*)(x)) + 1); \
       *(((BYTE*)(x)) + 1) = _tmp;                \
    }
+// NOLINTEND(cppcoreguidelines-macro-usage, cppcoreguidelines-pro-type-cstyle-cast)
 
 void TMidasEvent::SwapBytesEventHeader()
 {
@@ -547,11 +520,11 @@ void TMidasEvent::SwapBytesEventHeader()
 int TMidasEvent::SwapBytes(bool force)
 {
    // Swaps bytes for endian-ness reasons
-   TMidas_BANK_HEADER* pbh;
-   TMidas_BANK*        pbk;
-   TMidas_BANK32*      pbk32;
-   void*               pdata;
-   uint16_t            type;
+   TMidas_BANK_HEADER* pbh = nullptr;
+   TMidas_BANK*        pbk = nullptr;
+   TMidas_BANK32*      pbk32 = nullptr;
+   void*               pdata = nullptr;
+   uint16_t            type = 0;
 
    pbh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
 

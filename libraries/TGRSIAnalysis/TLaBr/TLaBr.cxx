@@ -18,7 +18,7 @@ bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TLaBr::fSuppressionCriterion = DefaultLaBrSuppression;
 
-TVector3 TLaBr::gPosition[9] = {
+std::array<TVector3, 9> TLaBr::fPosition = {
 	// These positions should be updated (they are currently SCEPTAR-ish)
 	TVector3(0, 0, 1),
 	TVector3(14.3025, 4.6472, 22.8096),
@@ -48,7 +48,7 @@ TLaBr::~TLaBr()
 	}
 }
 
-TLaBr::TLaBr(const TLaBr& rhs) : TSuppressed()
+TLaBr::TLaBr(const TLaBr& rhs) : TSuppressed(rhs)
 {
 	// Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -152,6 +152,6 @@ TLaBrHit* TLaBr::GetSuppressedHit(const int& i)
 
 void TLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TLaBrHit* hit = new TLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
+	auto* hit = new TLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
 	AddHit(hit);
 }

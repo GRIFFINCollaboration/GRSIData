@@ -6,7 +6,7 @@
 ClassImp(TTrificHit)
 /// \endcond
 
-TTrificHit::TTrificHit() : TDetectorHit()
+TTrificHit::TTrificHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -14,7 +14,7 @@ TTrificHit::TTrificHit() : TDetectorHit()
 	Clear();
 }
 
-TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit()
+TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -64,6 +64,6 @@ TVector3 TTrificHit::GetPosition() const
 	//calling GetPosition() on a TRIFIC hit will return the position vector to the centre of the grid
 	//calling TTrific::GetPosition(det) will give the vector to the position itself.
 
-	return TVector3(0,0,TTrific::fTargetToWindowCart+TTrific::fInitialSpacingCart+TTrific::fSpacingCart*GetDetector());
+	return {0,0,TTrific::fTargetToWindowCart+TTrific::fInitialSpacingCart+TTrific::fSpacingCart*GetDetector()};
 }
 

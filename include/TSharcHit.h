@@ -36,6 +36,9 @@ class TSharcHit : public TDetectorHit {
 public:
    TSharcHit();
    TSharcHit(const TSharcHit&);
+	TSharcHit(TSharcHit&&) noexcept = default;
+	TSharcHit& operator=(const TSharcHit&) = default;
+	TSharcHit& operator=(TSharcHit&&) noexcept = default;
    ~TSharcHit() override;
 
 private:
@@ -98,11 +101,11 @@ public:
       return TDetectorHit::GetEnergy();
    }
 
-   Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0)
+   Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const
    {
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
    };                                                                          //!<!
-   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0); //!<!
+   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const; //!<!
 
    ///////////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////
@@ -122,7 +125,7 @@ private:
    Double_t GetDefaultDistance() const { return 0.; };
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSharcHit, 6)
+   ClassDefOverride(TSharcHit, 6) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

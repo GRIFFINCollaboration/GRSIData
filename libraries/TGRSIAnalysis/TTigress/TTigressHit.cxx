@@ -15,13 +15,14 @@ TTigressHit::TTigressHit()
 
 TTigressHit::~TTigressHit() = default;
 
-TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit()
+TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit(rhs)
 {
    rhs.Copy(*this);
 }
 
-TTigressHit::TTigressHit(const TFragment& frag) : TDetectorHit(frag)
+TTigressHit::TTigressHit(const TFragment& frag)
 {
+	frag.Copy(*this);
 }
 
 void TTigressHit::CopyFragment(const TFragment& frag)
@@ -64,7 +65,7 @@ TVector3 TTigressHit::GetPosition(Double_t dist) const
 
 TVector3 TTigressHit::GetLastPosition(Double_t dist) const
 {
-   const TDetectorHit* seg;
+   const TDetectorHit* seg = nullptr;
    if(GetNSegments() > 0) {
       seg = &GetSegmentHit(GetNSegments() - 1); // returns the last segment in the segment vector.
    } else {
@@ -153,8 +154,8 @@ void TTigressHit::SetWavefit(const TFragment& frag)
 {
    TPulseAnalyzer pulse(frag);
    if(pulse.IsSet()) {
-      fTimeFit   = pulse.fit_newT0();
-      fSig2Noise = pulse.get_sig2noise();
+      fTimeFit   = static_cast<Float_t>(pulse.fit_newT0());
+      fSig2Noise = static_cast<Float_t>(pulse.get_sig2noise());
    }
 }
 
@@ -162,7 +163,7 @@ void TTigressHit::SetWavefit()
 {
    TPulseAnalyzer pulse(*GetWaveform(), 0, GetName());
    if(pulse.IsSet()) {
-      fTimeFit   = pulse.fit_newT0();
-      fSig2Noise = pulse.get_sig2noise();
+      fTimeFit   = static_cast<Float_t>(pulse.fit_newT0());
+      fSig2Noise = static_cast<Float_t>(pulse.get_sig2noise());
    }
 }

@@ -25,6 +25,10 @@
 class TCSMHit : public TDetectorHit {
 public:
    TCSMHit();
+	TCSMHit(const TCSMHit&) = default;
+	TCSMHit(TCSMHit&&) noexcept = default;
+	TCSMHit& operator=(const TCSMHit&) = default;
+	TCSMHit& operator=(TCSMHit&&) noexcept = default;
    ~TCSMHit() override;
 
 private:
@@ -60,7 +64,7 @@ private:
    UShort_t fDetectorNumber; //
 
 public:
-   bool IsEmpty();
+   bool IsEmpty() const;
 
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!
@@ -154,7 +158,7 @@ public:
    inline void SetEVerticalEnergy(const Double_t tempd) { fVerEEnergy = tempd; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TCSMHit, 4)
+   ClassDefOverride(TCSMHit, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

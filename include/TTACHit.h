@@ -28,14 +28,13 @@
 class TTACHit : public TDetectorHit {
 public:
    TTACHit();
-   ~TTACHit() override;
    TTACHit(const TTACHit&);
-   TTACHit(const TFragment& frag) : TDetectorHit(frag) {}
+	TTACHit(TTACHit&&) noexcept = default;
+	TTACHit& operator=(const TTACHit&) = default;
+	TTACHit& operator=(TTACHit&&) noexcept = default;
+   explicit TTACHit(const TFragment& frag) { frag.Copy(*this); }
+   ~TTACHit() override;
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
 
@@ -48,15 +47,17 @@ public:
    Double_t TempCorrectedCharge(TGraph* correction_graph) const;
    Double_t GetTempCorrectedEnergy(TGraph* correction_graph) const;
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
    void Copy(TObject&) const override;            //!<!
    void Copy(TObject&, bool) const override;      //!<!
 
+private:
+   Int_t fFilter{0};
+
    /// \cond CLASSIMP
-   ClassDefOverride(TTACHit, 2) // Stores the information for a TACrHit
+   ClassDefOverride(TTACHit, 2) // Stores the information for a TACrHit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

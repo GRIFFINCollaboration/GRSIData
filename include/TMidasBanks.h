@@ -5,6 +5,8 @@
 #ifndef INCLUDE_TMidasBanksH
 #define INCLUDE_TMidasBanksH
 
+#include "RtypesCore.h"
+
 /** \addtogroup Sorting
  *  @{
  */
@@ -33,7 +35,7 @@ struct TMidas_BANK_HEADER {
 /// 16-bit data bank
 
 struct TMidas_BANK {
-   char     fName[4];  ///< bank name
+   char     fName[4];  ///< bank name // NOLINT(*-avoid-c-arrays)
    UShort_t fType;     // uint16_t ///< type of data (see midas.h TID_xxx)
    UShort_t fDataSize; // uint16_t
 };
@@ -41,7 +43,7 @@ struct TMidas_BANK {
 /// 32-bit data bank
 
 struct TMidas_BANK32 {
-   char   fName[4];  ///< bank name
+   char   fName[4];  ///< bank name // NOLINT(*-avoid-c-arrays)
    UInt_t fType;     // uint32_t  ///< type of data (see midas.h TID_xxx)
    UInt_t fDataSize; // uint32_t
 };

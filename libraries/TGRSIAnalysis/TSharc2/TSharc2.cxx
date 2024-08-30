@@ -67,7 +67,7 @@ TSharc2::TSharc2()
 
 TSharc2::~TSharc2() = default;
 
-TSharc2::TSharc2(const TSharc2& rhs) : TDetector()
+TSharc2::TSharc2(const TSharc2& rhs) : TDetector(rhs)
 {
 	Class()->IgnoreTObjectStreamer(kTRUE);
 	Clear("ALL");
@@ -109,7 +109,7 @@ void TSharc2::BuildHits()
 			}
 		}
 		if(front_used && back_used) {
-			TSharc2Hit* hit = new TSharc2Hit;
+			auto* hit = new TSharc2Hit;
 			hit->SetFront(*front);
 			hit->SetBack(*back);
 			AddHit(hit);
@@ -143,7 +143,6 @@ void TSharc2::Clear(Option_t* option)
 		fYoffset = 0.00;
 		fZoffset = 0.00;
 	}
-	return;
 }
 
 void TSharc2::Print(Option_t*) const
@@ -161,10 +160,6 @@ void TSharc2::Print(std::ostream& out) const
 void TSharc2::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
-
-	static_cast<TSharc2&>(rhs).fXoffset   = fXoffset;
-	static_cast<TSharc2&>(rhs).fYoffset   = fYoffset;
-	static_cast<TSharc2&>(rhs).fZoffset   = fZoffset;
 }
 
 TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, double X, double Y, double Z)

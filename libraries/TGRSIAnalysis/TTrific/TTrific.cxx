@@ -14,13 +14,8 @@ Int_t TTrific::fGridY = 0;
 //declaration of constant variables
 
 //grid parameters for TRIFIC
-//double TTrific::fXmm[12]={-42,-27,-21,-15,-9,-3,3,9,15,21,27,42};
-const double TTrific::fXmm[12]={-33,-27,-21,-15,-9,-3,3,9,15,21,27,33}; //mm distance to the middle of each wire set readout from centre of grid
-//double TTrific::xW[12]={12,3,3,3,3,3,3,3,3,3,3,12}; //number of wires in eachreadout set
-
-//double TTrific::fYmm[12]={48,36,28,20,12,4,-4,-12,-20,-28,-36,-48};
-const double TTrific::fYmm[12]={42,36,28,20,12,4,-4,-12,-20,-28,-36,-42};
-//double TTrific::yW[12]={8,4,4,4,4,4,4,4,4,4,4,8};//number of wires, 2 mm spacing
+const std::array<double, 12> TTrific::fXmm={-33,-27,-21,-15,-9,-3,3,9,15,21,27,33}; //mm distance to the middle of each wire set readout from centre of grid
+const std::array<double, 12> TTrific::fYmm={42,36,28,20,12,4,-4,-12,-20,-28,-36,-42};
 
 //angle that grids are offset by (in rads)
 const double TTrific::fAngle = (60./180.)*TMath::Pi();
@@ -38,7 +33,7 @@ double TTrific::fTargetToWindowCart = 700.0; //mm. Non-constant static that repr
 
 bool TTrific::fSetCoreWave = false;
 
-TTrific::TTrific() : TDetector()
+TTrific::TTrific()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -46,7 +41,7 @@ TTrific::TTrific() : TDetector()
 	Clear();
 }
 
-TTrific::TTrific(const TTrific& rhs) : TDetector()
+TTrific::TTrific(const TTrific& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -58,19 +53,12 @@ void TTrific::Copy(TObject& rhs) const
 {
 	TDetector::Copy(rhs);
 
-	static_cast<TTrific&>(rhs).fSetCoreWave = fSetCoreWave;
-	
 	static_cast<TTrific&>(rhs).fXFragments = fXFragments;
 	static_cast<TTrific&>(rhs).fYFragments = fYFragments;
 	static_cast<TTrific&>(rhs).fSingFragments = fSingFragments;
 
 	static_cast<TTrific&>(rhs).fTrificBits = 0;
 	
-}
-
-TTrific::~TTrific()
-{
-	// Default Destructor
 }
 
 void TTrific::Print(Option_t*) const
@@ -97,8 +85,7 @@ TTrific& TTrific::operator=(const TTrific& rhs)
 
 void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-	//TDetectorHit* hit = new TDetectorHit(*frag);
-	TTrificHit* hit = new TTrificHit(*frag);
+	auto* hit = new TTrificHit(*frag);
 	
 	//separate the fragments depending on if they are x, y, or single readout grids.
 	//this is based on the ArraySubPosition value of the hit. 
@@ -115,8 +102,6 @@ void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 	};
 
 	AddHit(hit);
-	
-	return;
 }
 
 void TTrific::Clear(Option_t* option)
@@ -133,28 +118,24 @@ void TTrific::Clear(Option_t* option)
 	//clear the static event variables
 	//fParticle.SetXYZ(0,0,0); //!
 	//fRange = 0; //!
-	
-	return;
 }
 
 void TTrific::GetXYGrid()
 {
-	//check if we have already found the X grid location yet. If so, we don't need to do it again.
-	if (!fGridX){ //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet	
-		if (fXFragments.size()){ //we have to have an x-grid hit in this event to determine the x-grid number
-			 TTrificHit *hit = fXFragments.at(0);
-			 fGridX = hit->GetDetector();
-		}
-	}
-	//check if we have already found the Y grid location yet. If so, we don't need to do it again.
-	if (!fGridY){ //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
-		if (fYFragments.size()){//we have to have an y-grid hit in this event to determine the y-grid number
-			 TTrificHit *hit = fYFragments.at(0);
-			 fGridY = hit->GetDetector();
-		}	
-	}
-
-	return;
+   //check if we have already found the X grid location yet. If so, we don't need to do it again.
+   if(fGridX == 0) {                   //if fGridX == 0, then this will trigger indicating that we haven't found the X grid number yet
+      if(!fXFragments.empty()) {   //we have to have an x-grid hit in this event to determine the x-grid number
+         TTrificHit* hit = fXFragments.at(0);
+         fGridX          = hit->GetDetector();
+      }
+   }
+   //check if we have already found the Y grid location yet. If so, we don't need to do it again.
+   if(fGridY == 0) {                   //if fGridY == 0, then this will trigger indicating that we haven't found the Y grid number yet
+      if(!fYFragments.empty()) {   //we have to have an y-grid hit in this event to determine the y-grid number
+         TTrificHit* hit = fYFragments.at(0);
+         fGridY          = hit->GetDetector();
+      }
+   }
 }
 
 TVector3 TTrific::GetPosition(Int_t detectorNumber)
@@ -167,25 +148,22 @@ TVector3 TTrific::GetPosition(Int_t detectorNumber)
 	//detectorNumber is indexed at 1. 
 
 	//TRIFIC only holds 24 detectors, so doesn't make sense to get the position for detectors 25+. Also doesn't make sense to get the position for grid numbers <1.
-	if (24 < detectorNumber || 1 > detectorNumber) return TVector3(-1,-1,-1*abs(detectorNumber));
-	//-1*abs(detNum) ensures we return a value of (-1,-1,-#), which indicates a problem
+   if(24 < detectorNumber || 1 > detectorNumber) { return {1., -1., -1. * abs(detectorNumber)}; }
+   //-1*abs(detNum) ensures we return a value of (-1,-1,-#), which indicates a problem
 
 	TVector3 vec = TTrific::GetPosition();
 
 	//check if TTrific::GetPosition() returned an error vector for bad reconstruction. If so, we don't need to do anything more and can return an error vector
-	if (TVector3(-100,-100,-100) == vec) return vec; //this vector should be well outside expected XY coordinates
+   if(TVector3(-100, -100, -100) == vec) { return vec; }   //this vector should be well outside expected XY coordinates
 
-	double zCart = fTargetToWindowCart + fInitialSpacingCart + fSpacingCart*detectorNumber; //cartesian distance to the grid of choice in the z-direction
+   double zCart = fTargetToWindowCart + fInitialSpacingCart + fSpacingCart*detectorNumber; //cartesian distance to the grid of choice in the z-direction
 	//this ignores the extra (or lack of) Z due to the tilt of the grids
 	//this includes the target-to-window distance. This can be set via SetSharc() or SetTip() (or via other yet-defined functions)
 
 	zCart += zCart*vec.Y()/(TMath::Sqrt(3)-vec.Y()); //this adds (or subtracts) the extra Z distance (Z') due to the offset in Y (which are tilted at 30 degs. from vertical)
 	//notes on geometry: 30-60-90 triangle, so Y=sqrt(3)*Z', and Y/(Z+Z') = tan(theta)
 	
-	TVector3 particleCart(zCart*vec.X(),zCart*vec.Y(),zCart);
-	
-	//return TVector3(0,0,detectorNumber);
-	return particleCart;
+	return {zCart*vec.X(),zCart*vec.Y(),zCart};
 }
 
 TVector3 TTrific::GetPosition()
@@ -194,16 +172,16 @@ TVector3 TTrific::GetPosition()
 	//that represents the TRIFIC event
 
 	//check if we've already calculated the position for this event. If so, just return it. If not, then reset the position variable.
-	if (fTrificBits.TestBit(ETrificBits::kPositionCalculated)) return fParticle;
-	else fParticle.SetXYZ(0,0,0);
+   if(fTrificBits.TestBit(ETrificBits::kPositionCalculated)) { return fParticle; }
+   fParticle.SetXYZ(0,0,0);
 	//flag that we're going to (try to at least) calculate the position vector for this event
-	fTrificBits.SetBit(ETrificBits::kPositionCalculated,true);
+   fTrificBits.SetBit(ETrificBits::kPositionCalculated, true);
 
-	//Get the grids that are the X and Y grids in this setup
+   //Get the grids that are the X and Y grids in this setup
 	GetXYGrid();
 
 	//if we don't have both an x and y grid hit in this event, position reconstruction won't be possible.
-	if(0 == fXFragments.size() || 0 == fYFragments.size()){
+	if(fXFragments.empty() || fYFragments.empty()){
 		//return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
@@ -214,14 +192,12 @@ TVector3 TTrific::GetPosition()
 
 	std::vector<int> hitXDets; //vector to hold the x-segments that have a nonzero hit in them
 
-	for (auto hit: fXFragments){
-		//TDetectorHit *hit = fXFragments.at(i);
-		//TDetectorHit *hit = i;
+	for(auto* hit: fXFragments){
 		Int_t seg = hit->GetSegment();
-		
-		if (3 > hit->GetEnergy()) continue; //arbitrary threshold to avoid weird E<0 events
-		
-		xMean += fXmm[seg]*hit->GetEnergy();
+
+      if(3 > hit->GetEnergy()) { continue; }   //arbitrary threshold to avoid weird E<0 events
+
+      xMean += fXmm[seg]*hit->GetEnergy();
 		xEngTotal += hit->GetEnergy();
 		
 		hitXDets.push_back(seg);
@@ -229,13 +205,13 @@ TVector3 TTrific::GetPosition()
 
 	//check if hitXDets.size() is zero. This happens when we have an x-grid hit or hits, but the energy for all hits is below our arbitrary "noise" threshold.
 	//without this, the function will seg-fault when it tries to check for the continuity
-	if (!hitXDets.size()){
-		//return an error vector
+   if(hitXDets.empty()) {
+      //return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
-	}
+   }
 
-	//to check for hit continuity in the grids, we need to sort the vector of segments and then check that every segment
+   //to check for hit continuity in the grids, we need to sort the vector of segments and then check that every segment
 	//between the first and last segment with a nonzero energy in the array is present. If not, we have a discontinuous hit 
 	//and will return an error vector for now. in the future we might instead flag this event
 	//Ex: we want hits that like this: [0,0,4,3,5,6,5,3] not [0,0,5,0,0,2,3,0]
@@ -243,14 +219,14 @@ TVector3 TTrific::GetPosition()
 
 	std::sort(hitXDets.begin(),hitXDets.end());
 
-	for (unsigned int i = 1; i< hitXDets.size(); i++){ //note: this currently just rejects pileup events outright. The class will be modified later to deal with pileup properly
-    	if(hitXDets[i] != hitXDets[i-1]+1){
-        	fParticle.SetXYZ(-100,-100,-100);
+   for(unsigned int i = 1; i < hitXDets.size(); i++) {   //note: this currently just rejects pileup events outright. The class will be modified later to deal with pileup properly
+      if(hitXDets[i] != hitXDets[i - 1] + 1) {
+         fParticle.SetXYZ(-100,-100,-100);
         	return fParticle;
-   		}
-	} 
+      }
+   }
 
-	//divide weighted mean by total energy
+   //divide weighted mean by total energy
 	xMean /= xEngTotal;
 
 	//now we do the same for the y-hits
@@ -258,41 +234,41 @@ TVector3 TTrific::GetPosition()
 	double yMean = 0.0;
 	double yEngTotal = 0.0;
 
-	std::vector<int> hitYDets; //vector to hold the y-segments that have a nonzero hit in them
+   std::vector<int> hitYDets;   //vector to hold the y-segments that have a nonzero hit in them
 
-	for (auto hit: fYFragments){
-		//TDetectorHit *hit = i;
+   for(auto* hit : fYFragments) {
+      //TDetectorHit *hit = i;
 		Int_t seg = hit->GetSegment();
-		
-		if (3 > hit->GetEnergy()) continue; //arbitrary threshold to avoid weird E<0 events
-		
-		yMean += fYmm[seg]*hit->GetEnergy();
+
+      if(3 > hit->GetEnergy()) { continue; }   //arbitrary threshold to avoid weird E<0 events
+
+      yMean += fYmm[seg]*hit->GetEnergy();
 		yEngTotal += hit->GetEnergy();
 		
 		hitYDets.push_back(seg);
-	}
+   }
 
-	//check if hitYDets.size() is zero. This happens when we have an y-grid hit or hits, but the energy for all hits is below our arbitrary "noise" threshold.
+   //check if hitYDets.size() is zero. This happens when we have an y-grid hit or hits, but the energy for all hits is below our arbitrary "noise" threshold.
 	//without this, the function will seg-fault when it tries to check for the continuity
-	if (!hitYDets.size()){
-		//return an error vector
+   if(hitYDets.empty()) {
+      //return an error vector
 		fParticle.SetXYZ(-100,-100,-100);
 		return fParticle;
-	}
+   }
 
-	//check again for continuity
+   //check again for continuity
 
 	std::sort(hitYDets.begin(),hitYDets.end());
 
 	//this will search through the sorted vector to ensure continuity
-	for (unsigned int i = 1; i< hitYDets.size(); i++){
-    	if(hitYDets[i] != hitYDets[i-1]+1){ //again, this rejects pileup events
-        	fParticle.SetXYZ(-100,-100,-100);
-        	return fParticle;
-   		}
-	} 
+   for(unsigned int i = 1; i < hitYDets.size(); i++) {
+      if(hitYDets[i] != hitYDets[i - 1] + 1) {   //again, this rejects pileup events
+         fParticle.SetXYZ(-100, -100, -100);
+         return fParticle;
+      }
+   }
 
-	//divide weighted mean by total energy
+   //divide weighted mean by total energy
 	yMean /= yEngTotal;
 
 	//convert them into cartesion coordinates 
@@ -326,28 +302,27 @@ Int_t TTrific::GetRange()
 	//grid gets an event, plus the XY position grids may have multiplicity>1
 
 	//check if we've already calculated the fRange for this event. If so, return it. If not, we need to reset the range.
-	if (fTrificBits.TestBit(ETrificBits::kRangeCalculated)) return fRange;
-	else fRange=0;
+   if(fTrificBits.TestBit(ETrificBits::kRangeCalculated)) { return fRange; }
+   fRange = 0;
 
-	//first we'll check the single grid fragment, since there are more of them and they extend further
-	for (auto hit: fSingFragments){
-		if(hit->GetDetector() > fRange) fRange = hit->GetDetector();		
-	}
-	//check if the range is less than the furthest position grid. If so, we need to check that the range isn't at the x or y grid
+   //first we'll check the single grid fragment, since there are more of them and they extend further
+   for(auto* hit : fSingFragments) {
+      if(hit->GetDetector() > fRange) { fRange = hit->GetDetector(); }
+   }
+   //check if the range is less than the furthest position grid. If so, we need to check that the range isn't at the x or y grid
 	//this was changed because there is no guarantee that the x and y grids will stay at positions 3 and 5, so this is generic
 
 	//determine the x and y grid locations
 	GetXYGrid();
 
 	//check if the range is less than the max of the grid numbers+1. The +1 is because the higher grid number will be at std::max(xGrid,yGrid) by default
-	if (fRange < std::max(fGridX,fGridY)+1){
+   if(fRange < std::max(fGridX, fGridY) + 1) {
+      if(fRange < fGridX && !fXFragments.empty()) { fRange = fGridX; }   //we need to check if the current range is less than the x grid AND that there is an x-grid hit in this event
+      if(fRange < fGridY && !fYFragments.empty()) { fRange = fGridY; }   //we need to check if the current range is less than the y grid AND that there is a y-grid hit in this event
+   }                                                                     //there may be a problem here if fXFragments.size() != 0 (or Y frags too) but all the fragments have E<arb cutoff. However, GetRange() isn't referenced in any other function currently,
+                                                                         //and the likelihood of that occuring is very small I think.
 
-		if (fRange < fGridX && fXFragments.size()) fRange = fGridX; //we need to check if the current range is less than the x grid AND that there is an x-grid hit in this event
-		if (fRange < fGridY && fYFragments.size()) fRange = fGridY; //we need to check if the current range is less than the y grid AND that there is a y-grid hit in this event
-	} //there may be a problem here if fXFragments.size() != 0 (or Y frags too) but all the fragments have E<arb cutoff. However, GetRange() isn't referenced in any other function currently,
-	//and the likelihood of that occuring is very small I think.
-
-	//flag that we've calculated the range for this event
+   //flag that we've calculated the range for this event
 	fTrificBits.SetBit(ETrificBits::kRangeCalculated,true);
 
 	return fRange;

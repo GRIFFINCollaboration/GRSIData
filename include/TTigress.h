@@ -45,12 +45,11 @@ public:
       kVectorsBuilt = BIT(6) // 110 or 145
    };
 
-#ifndef __CINT__
-   std::vector<std::vector<std::shared_ptr<const TFragment>>> SegmentFragments;
-#endif
-
    TTigress();
    TTigress(const TTigress&);
+	TTigress(TTigress&&) noexcept = default;
+   TTigress& operator=(const TTigress&); //!<!
+	TTigress& operator=(TTigress&&) noexcept = default;
    ~TTigress() override;
 
    // Dont know why these were changes to return by reference rather than pointer
@@ -59,7 +58,6 @@ public:
    static TVector3         GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 0., bool smear = false); //!<!
    static TVector3         GetPosition(const TTigressHit&, double dist = 0., bool smear = false);                 //!<!
 
-   std::vector<TBgoHit> fBgos;
    void AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }                      //!<!
    Short_t                  GetBGOMultiplicity() const { return fBgos.size(); } //!<!
    int                  GetNBGOs() const { return fBgos.size(); }           //!<!
@@ -82,8 +80,6 @@ public:
 		TDetector::ClearTransients();
    }
 
-   TTigress& operator=(const TTigress&); //!<!
-
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetAddbackCriterion(std::function<bool(TDetectorHit*, TDetectorHit*)> criterion)
    {
@@ -100,38 +96,40 @@ public:
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
+   std::vector<std::vector<std::shared_ptr<const TFragment>>> SegmentFragments;
    static std::function<bool(TDetectorHit*, TDetectorHit*)> fAddbackCriterion;
    static std::function<bool(TDetectorHit*, TBgoHit&)>      fSuppressionCriterion;
 #endif
-   static TTransientBits<UShort_t> fgTigressBits; //!
+   static TTransientBits<UShort_t>        fGlobalTigressBits; //!<!
    TTransientBits<UShort_t>        fTigressBits;
 
    static double fTargetOffset; //!<!
    static double fRadialOffset; //!<!
    
    // Vectors constructed from segment array and manual adjustments once at start of sort
-   static TVector3 fPositionVectors[2][17][4][9];     //!<!
+   static std::array<std::array<std::array<std::array<TVector3, 9>, 4>, 17>, 2> fPositionVectors;     //!<!
    
-   static TVector3 fCloverRadial[17];      	//!<!  clover direction vectors
-   static TVector3 fCloverCross[17][2];      	//!<!  clover perpendicular vectors, for smearing
+   static std::array<TVector3, 17> fCloverRadial;      	//!<!  clover direction vectors
+   static std::array<std::array<TVector3, 2>, 17> fCloverCross;      	//!<!  clover perpendicular vectors, for smearing
 
    // These array contain the original data that is used
-   static double GeBluePosition[17][9][3];      //!<!  detector segment XYZ
-   static double GeGreenPosition[17][9][3];     //!<!
-   static double GeRedPosition[17][9][3];       //!<!
-   static double GeWhitePosition[17][9][3];     //!<!
-   static double GeBluePositionBack[17][9][3];  //!<!  detector segment XYZ
-   static double GeGreenPositionBack[17][9][3]; //!<!
-   static double GeRedPositionBack[17][9][3];   //!<!
-   static double GeWhitePositionBack[17][9][3]; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeBluePosition;      //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeGreenPosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPosition;       //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePosition;     //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeBluePositionBack;  //!<!  detector segment XYZ
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeGreenPositionBack; //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPositionBack;   //!<!
+   static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePositionBack; //!<!
 
    //    void ClearStatus();                      // WARNING: this will change the building behavior!
-   //		void ClearGlobalStatus() { fTigressBits = 0; }
-   static void SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fgTigressBits.SetBit(bit, set); }
-   static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fgTigressBits.TestBit(bit)); }
+   //		void ClearGlobalStatus() { fGlobalTigressBits = 0; }
+   static void SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fGlobalTigressBits.SetBit(bit, set); }
+   static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fGlobalTigressBits.TestBit(bit)); }
 
    std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
    std::vector<UShort_t>      fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
+   std::vector<TBgoHit> fBgos;
 
    static void BuildVectors();  //!<!
    
@@ -172,7 +170,7 @@ public:
    static bool GetArrayBackPos() { return TestGlobalBit(ETigressGlobalBits::kArrayBackPos); } //!<!
    static bool GetVectorsBuilt() { return TestGlobalBit(ETigressGlobalBits::kVectorsBuilt); } //!<!
 
-   static bool BGOSuppression[4][4][5]; //!<!
+   static std::array<std::array<std::array<bool, 5>, 4>, 4> fBGOSuppression; //!<!
 
    static void SetTargetOffset(double offset) {
 	   fTargetOffset = offset; 
@@ -191,14 +189,13 @@ public:
       return 110;
    }
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
    void Copy(TObject&) const override;            //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTigress, 7) // Tigress Physics structure
+   ClassDefOverride(TTigress, 7) // Tigress Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 

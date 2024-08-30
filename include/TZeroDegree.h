@@ -27,20 +27,20 @@
 class TZeroDegree : public TDetector {
 public:
    TZeroDegree();
-   ~TZeroDegree() override;
    TZeroDegree(const TZeroDegree& rhs);
+	TZeroDegree(TZeroDegree&&) noexcept = default;
+   TZeroDegree& operator=(const TZeroDegree&); //!<!
+	TZeroDegree& operator=(TZeroDegree&&) = default;
+   ~TZeroDegree() override = default;
 
-public:
    TZeroDegreeHit* GetZeroDegreeHit(const int& i) const { return static_cast<TZeroDegreeHit*>(GetHit(i)); }
 
-   static TVector3 GetPosition(double dist) { return TVector3(0, 0, dist); } //!<!
+   static TVector3 GetPosition(double dist) { return {0, 0, dist}; } //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
-
-   TZeroDegree& operator=(const TZeroDegree&); //!<!
 
 private:
    static bool fSetWave; ///<  Flag for Waveforms ON/OFF
@@ -48,12 +48,11 @@ private:
 public:
    static bool SetWave() { return fSetWave; } //!<!
 
-public:
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TZeroDegree, 2) // ZeroDegree Physics structure
+   ClassDefOverride(TZeroDegree, 2) // ZeroDegree Physics structure // NOLINT(readability-else-after-return)
                                     /// \endcond
 };
 /*! @} */

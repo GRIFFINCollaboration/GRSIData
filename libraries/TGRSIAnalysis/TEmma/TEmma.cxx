@@ -25,9 +25,9 @@ double TEmma::fYdiff = 0;
 double TEmma::fYsum = 0;
 double TEmma::fXlength = 80.; //Size of X focal plane in mm
 double TEmma::fYlength = 30.; //Size of Y focal plane in mm
-short TEmma::fFail = 0;
+int16_t TEmma::fFail = 0;
 
-TEmma::TEmma() : TDetector()
+TEmma::TEmma()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -35,7 +35,7 @@ TEmma::TEmma() : TDetector()
 	Clear();
 }
 
-TEmma::TEmma(const TEmma& rhs) : TDetector()
+TEmma::TEmma(const TEmma& rhs) : TDetector(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -52,11 +52,6 @@ void TEmma::Copy(TObject& rhs) const
 	static_cast<TEmma&>(rhs).fEmmaTdcHits   = fEmmaTdcHits;
 	static_cast<TEmma&>(rhs).fEmmaAnodeHits   = fEmmaAnodeHits;
 	static_cast<TEmma&>(rhs).fEmmaTriggerHits   = fEmmaTriggerHits;
-}
-
-TEmma::~TEmma()
-{
-	// Default Destructor
 }
 
 void TEmma::Print(Option_t*) const
@@ -130,7 +125,7 @@ void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
 		}
 	} else if(chan->GetMnemonic()->SubSystem() == TMnemonic::EMnemonic::kO) { // ORTEC SSBs at target position
 		fEmmaSSBHits.push_back(std::move(dethit));
-	} else return;
+	} else { return; }
 }
 
 TVector3 TEmma::GetPosition(double left, double right, double top, double bottom, double delayL, double delayR, double delayT, double delayB )
@@ -144,7 +139,7 @@ TVector3 TEmma::GetPosition(double left, double right, double top, double bottom
 	double Xpos = ( Xdiff / Xsum )*fXlength;
 	double Ypos = ( Ydiff / Ysum )*fYlength;
 
-	return TVector3(Xpos, Ypos, 1);
+	return {Xpos, Ypos, 1};
 }
 
 TEmmaHit* TEmma::GetICHit(const int& i)
@@ -214,20 +209,20 @@ void TEmma::BuildHits()
 	// Build hits subtracts the trigger time (from an anode wire) and returns a left/right/up/down value which is used in GetPosition()
 
 	std::vector <double> tdcArray;
-	std::vector <double> icArray;
-	if(fEmmaTdcHits.size() > 4 ) {   // Require a Good hit to contain only the PGAC TDC signals
-		TEmmaHit * hit = new TEmmaHit();
-		for(size_t i = 0; i < fEmmaTdcHits.size(); ++i) { 
-			hit->SetTimeStamp(fEmmaTdcHits[i].GetTimeStamp());
-			hit->SetAddress(fEmmaTdcHits[i].GetAddress());
-			if(fEmmaTdcHits[i].GetTdcNumber() < 10) tdcArray.push_back(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 10) hit->SetLeft(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 11) hit->SetRight(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 12) hit->SetTop(fEmmaTdcHits[i].GetEnergy());
-			if(fEmmaTdcHits[i].GetTdcNumber() == 13) hit->SetBottom(fEmmaTdcHits[i].GetEnergy());
-		}
+   std::vector<double>  icArray;
+   if(fEmmaTdcHits.size() > 4) {   // Require a Good hit to contain only the PGAC TDC signals
+      auto* hit = new TEmmaHit();
+      for(auto& emmaTdcHit : fEmmaTdcHits) {
+         hit->SetTimeStamp(emmaTdcHit.GetTimeStamp());
+         hit->SetAddress(emmaTdcHit.GetAddress());
+         if(emmaTdcHit.GetTdcNumber() < 10) { tdcArray.push_back(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 10) { hit->SetLeft(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 11) { hit->SetRight(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 12) { hit->SetTop(emmaTdcHit.GetEnergy()); }
+         if(emmaTdcHit.GetTdcNumber() == 13) { hit->SetBottom(emmaTdcHit.GetEnergy()); }
+      }
 
-		if(tdcArray.size() != 0) {
+      if(!tdcArray.empty()) {
 			fAnodeTrigger = * std::min_element(tdcArray.begin(), tdcArray.end());
 			if(hit->GetLeft() != 0 && hit->GetRight() != 0 && hit->GetTop() != 0 && hit->GetBottom() != 0 && fAnodeTrigger != 0) {
 				hit->SetLeft((hit->GetLeft() - fAnodeTrigger));
@@ -239,18 +234,17 @@ void TEmma::BuildHits()
 			} else {
 				//std::cout<<"TDC Array Failed"<<std::endl;
 				fFail = 0;
-				if(hit->GetLeft() == 0) fFail++;
-				if(hit->GetRight() == 0) fFail++;
-				if(hit->GetTop() == 0) fFail++;
-				if(hit->GetBottom() == 0) fFail++;
-				hit->SetFailedFill(fFail);
-				AddHit(hit);
+            if(hit->GetLeft() == 0)   { fFail++; }
+            if(hit->GetRight() == 0)  { fFail++; }
+            if(hit->GetTop() == 0)    { fFail++; }
+            if(hit->GetBottom() == 0) { fFail++; }
+            hit->SetFailedFill(fFail);
+            AddHit(hit);
 			}
 		} else {
 			return;
 		}
-	}
-	return;
+   }
 }
 void TEmma::Clear(Option_t* opt)
 {

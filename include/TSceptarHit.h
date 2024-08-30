@@ -28,14 +28,13 @@
 class TSceptarHit : public TDetectorHit {
 public:
    TSceptarHit();
-   ~TSceptarHit() override;
    TSceptarHit(const TSceptarHit&);
-   TSceptarHit(const TFragment& frag);
+	TSceptarHit(TSceptarHit&&) noexcept = default;
+	TSceptarHit& operator=(const TSceptarHit&) = default;
+	TSceptarHit& operator=(TSceptarHit&&) noexcept = default;
+   explicit TSceptarHit(const TFragment& frag);
+   ~TSceptarHit() override;
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
 
@@ -55,7 +54,6 @@ public:
    TVector3 GetPosition(Double_t dist) const override; //!<!
    TVector3 GetPosition() const override;              //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -63,10 +61,12 @@ public:
    void Copy(TObject&, bool) const override;      //!<!
 
 private:
+   Int_t fFilter{0};
+
    Double_t GetDefaultDistance() const { return 0.0; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSceptarHit, 4) // Stores the information for a SceptarHit
+   ClassDefOverride(TSceptarHit, 4) // Stores the information for a SceptarHit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

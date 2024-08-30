@@ -22,7 +22,7 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    evt->SetBankList();
 
    // Need to put something in that says "if not a Griffin fragment (ie epics) return true"
-   void* ptr;
+   void* ptr      = nullptr;
    int   banksize = evt->LocateBank(nullptr, "GRF2", &ptr);
    int   bank     = 2;
 
@@ -99,23 +99,13 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    if(trigId < chanId_threshold) {
       triggermap.find(chanadd)->second = true;
       return true;
-   } else {
-      return false;
-   }
+	}
+	return false;
 }
 
-/*void AddToQueue(std::shared_ptr<TMidasEvent> evt){
-   evtQ.push(evt);
-}
-*/
-
-void Write(std::shared_ptr<TMidasEvent> evt, TMidasFile* outfile)
+void Write(const std::shared_ptr<TMidasEvent>& evt, TMidasFile* outfile)
 {
-   outfile->FillBuffer(std::move(evt));
-
-   // if(outfile->GetBufferSize() > 100000){
-   //    outfile->WriteBuffer();
-   // }
+   outfile->FillBuffer(evt);
 }
 
 int main(int argc, char** argv)
@@ -143,11 +133,11 @@ int main(int argc, char** argv)
 
    std::ifstream in(file->GetFilename(), std::ifstream::in | std::ifstream::binary);
    in.seekg(0, std::ifstream::end);
-   long long filesize = in.tellg();
+   int64_t filesize = in.tellg();
    in.close();
 
    int       bytes     = 0;
-   long long bytesread = 0;
+   int64_t bytesread = 0;
 
    TStopwatch w;
    w.Start();
@@ -170,7 +160,6 @@ int main(int argc, char** argv)
       switch(event->GetEventId()) {
       case 0x8000:
          printf("start of run\n");
-         // file->Write(event,"q");
          Write(event, file);
          printf(DGREEN);
          event->Print();
@@ -181,13 +170,11 @@ int main(int argc, char** argv)
          printf(DRED);
          event->Print();
          printf(RESET_COLOR);
-         //  file->Write(event,"q");
          Write(event, file);
          break;
       case 0x0001: // This is a GRIFFIN digitizer event
          if(CheckEvent(event)) {
             Write(event, file);
-            // file->Write(event,"q");
          } else {
             num_bad_evt++;
          }
@@ -195,16 +182,15 @@ int main(int argc, char** argv)
          break;
       default: // Probably epics
          Write(event, file);
-         //  file->Write(event,"q");
          break;
       };
 
       if(num_evt % 5000 == 0) {
          gSystem->ProcessEvents();
-         printf(HIDE_CURSOR " bad events %u/%u have processed %.2fMB/%.2f MB => %.1f MB/s              " SHOW_CURSOR
-                            "\r",
-                num_bad_evt, num_evt, (bytesread / 1000000.0), (filesize / 1000000.0),
-                (bytesread / 1000000.0) / w.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<HIDE_CURSOR<<" bad events "<<num_bad_evt<<"/"<<num_evt<<" have processed "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/w.RealTime()<<" MB/s              "<<SHOW_CURSOR<<"\r";
+			std::cout.precision(precision);
          w.Continue();
       }
    }

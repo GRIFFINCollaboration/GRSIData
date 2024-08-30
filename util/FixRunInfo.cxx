@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 		// [/Experiment/Run parameters]
 		// Comment = STRING : [256] 
 		// Run Title = STRING : [256]
-		if(line.compare("[/Experiment/Run parameters]") == 0) {
+		if(line == "[/Experiment/Run parameters]") {
 			std::cout<<"found line "<<line<<std::endl;
 			std::getline(odbFile, line);
 			runComment = line.substr(25, std::string::npos);
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 		// Start time binary = DWORD : 1637963612
 		// Stop time = STRING : [32] Fri Nov 26 14:56:26 2021
 		// Stop time binary = DWORD : 1637967386
-		if(line.compare("[/Runinfo]") == 0) {
+		if(line == "[/Runinfo]") {
 			std::cout<<"found line "<<line<<std::endl;
 			std::getline(odbFile, line); // skipping state
 			std::getline(odbFile, line); // skipping online mode
@@ -80,12 +80,12 @@ int main(int argc, char** argv)
 	TRunInfo* runInfo = TRunInfo::Get();
 	std::cout<<"old run info:"<<std::endl;
 	runInfo->Print();
-	runInfo->SetRunNumber(runNumber);
-	runInfo->SetRunTitle(runTitle.c_str());
-	runInfo->SetRunComment(runComment.c_str());
-	runInfo->SetRunStart(runStart);
-	runInfo->SetRunStop(runStop);
-	runInfo->SetRunLength();
+	TRunInfo::SetRunNumber(runNumber);
+	TRunInfo::SetRunTitle(runTitle.c_str());
+	TRunInfo::SetRunComment(runComment.c_str());
+	TRunInfo::SetRunStart(runStart);
+	TRunInfo::SetRunStop(runStop);
+	TRunInfo::SetRunLength();
 
 	for(int i = 2; i < argc; ++i) {
 		// parse file name to get run number and sub-run number
@@ -110,18 +110,18 @@ int main(int argc, char** argv)
 			subString = line.substr(start, underscore-start);
 			runNumber = std::stoi(subString);
 			std::cout<<"got run number "<<runNumber<<" from substring '"<<subString<<"' from line "<<line<<std::endl;
-			if(runNumber != runInfo->RunNumber()) {
-				std::cerr<<"Mismatch between the run number of this file ("<<runNumber<<") and the run number in the ODB ("<<runInfo->RunNumber()<<"), skipping "<<line<<std::endl;
+			if(runNumber != TRunInfo::RunNumber()) {
+				std::cerr<<"Mismatch between the run number of this file ("<<runNumber<<") and the run number in the ODB ("<<TRunInfo::RunNumber()<<"), skipping "<<line<<std::endl;
 				continue;
 			}
 			subString = line.substr(underscore+1, dot-underscore-1);
 			subRunNumber = std::stoi(subString);
 			std::cout<<"got sub run number "<<runNumber<<" from substring '"<<subString<<"' from line "<<line<<std::endl;
-			runInfo->SetSubRunNumber(subRunNumber);
+			TRunInfo::SetSubRunNumber(subRunNumber);
 			std::cout<<"new run info:"<<std::endl;
 			runInfo->Print();
 			TFile f(argv[i]);
-			TRunInfo* fileRunInfo = static_cast<TRunInfo*>(f.Get("RunInfo"));
+			auto* fileRunInfo = static_cast<TRunInfo*>(f.Get("RunInfo"));
 			if(fileRunInfo == nullptr) {
 				std::cout<<"no run info found in "<<line<<std::endl;
 			} else {

@@ -21,7 +21,7 @@ double TS3::fInnerDiameter  = 22.;
 double TS3::fTargetDistance = 31.;
 
 // Default tigress unpacking settings
-TTransientBits<UShort_t> TS3::fgS3Bits = TTransientBits<UShort_t>(static_cast<std::underlying_type<TS3::ES3GlobalBits>::type>(TS3::ES3GlobalBits::kMultHit));
+TTransientBits<UShort_t> TS3::fGlobalS3Bits = TTransientBits<UShort_t>(static_cast<std::underlying_type<TS3::ES3GlobalBits>::type>(TS3::ES3GlobalBits::kMultHit));
 
 Int_t  TS3::fFrontBackTime = 75;
 double TS3::fFrontBackEnergy = 0.9;
@@ -40,7 +40,7 @@ TS3& TS3::operator=(const TS3& rhs)
    return *this;
 }
 
-TS3::TS3(const TS3& rhs) : TDetector()
+TS3::TS3(const TS3& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }
@@ -119,8 +119,10 @@ void TS3::BuildPixels()
 
       // We are going to want energies several times
       // So build a quick vector
-      std::vector<double> EneR, EneS;
-      std::vector<bool>   UsedRing, UsedSector;
+      std::vector<double> EneR;
+      std::vector<double> EneS;
+      std::vector<bool>   UsedRing;
+      std::vector<bool>   UsedSector;
       for(auto& fS3RingHit : fS3RingHits) {
          EneR.push_back(fS3RingHit.GetEnergy());
          UsedRing.push_back(false);
@@ -134,7 +136,7 @@ void TS3::BuildPixels()
       /// Loop over two vectors and build energy+time matching hits
       for(size_t i = 0; i < fS3RingHits.size(); ++i) {
          for(size_t j = 0; j < fS3SectorHits.size(); ++j) {
-	    if(fS3RingHits[i].GetArrayPosition()!=fS3SectorHits[j].GetArrayPosition())continue;
+            if(fS3RingHits[i].GetArrayPosition() != fS3SectorHits[j].GetArrayPosition()) { continue; }
 
             if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime())*1.6 < fFrontBackTime) { // check time
                if((EneR[i] - fFrontBackOffset) * fFrontBackEnergy < EneS[j] &&
@@ -189,13 +191,13 @@ void TS3::BuildPixels()
                   if(UsedSector.at(j)) {
                      continue;
                   }
-                  if(fS3RingHits[i].GetArrayPosition()!=fS3SectorHits[j].GetArrayPosition())continue;
-                  
+                  if(fS3RingHits[i].GetArrayPosition() != fS3SectorHits[j].GetArrayPosition()) { continue; }
+
                   for(size_t k = j + 1; k < fS3SectorHits.size(); ++k) {
                      if(UsedSector.at(k)) {
                         continue;
                      }
-                     if(fS3SectorHits[j].GetArrayPosition()!=fS3SectorHits[k].GetArrayPosition())continue;
+                     if(fS3SectorHits[j].GetArrayPosition()!=fS3SectorHits[k].GetArrayPosition()) { continue; }
 
                      if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime())*1.6 < fFrontBackTime &&
                         abs(fS3RingHits[i].GetTime() - fS3SectorHits[k].GetTime())*1.6 < fFrontBackTime) { // check time
@@ -268,13 +270,13 @@ void TS3::BuildPixels()
                   if(UsedRing.at(j)) {
                      continue;
                   }
-                  if(fS3SectorHits[i].GetArrayPosition()!=fS3RingHits[j].GetArrayPosition())continue;
+                  if(fS3SectorHits[i].GetArrayPosition()!=fS3RingHits[j].GetArrayPosition()) { continue; }
 		  
                   for(size_t k = j + 1; k < fS3RingHits.size(); ++k) {
                      if(UsedRing.at(k)) {
                         continue;
                      }
-                     if(fS3RingHits[j].GetArrayPosition()!=fS3RingHits[k].GetArrayPosition())continue;
+                     if(fS3RingHits[j].GetArrayPosition()!=fS3RingHits[k].GetArrayPosition()) { continue; }
 
                      if(abs(fS3SectorHits[i].GetTime() - fS3RingHits[j].GetTime())*1.6 < fFrontBackTime &&
                         abs(fS3SectorHits[i].GetTime() - fS3RingHits[k].GetTime())*1.6 < fFrontBackTime) { // first check time
@@ -355,22 +357,23 @@ TVector3 TS3::GetPosition(int ring, int sector, double offsetphi, double offsetZ
    //This produces a uniform distribution over the area of a pixel
    if(smear) {
       double sep = ring_width * 0.025;
-      double r1 = radius - ring_width * 0.5 + sep, r2 = radius + ring_width * 0.5 - sep;
+      double r1 = radius - ring_width * 0.5 + sep;
+		double r2 = radius + ring_width * 0.5 - sep;
       radius        = sqrt(gRandom->Uniform(r1 * r1, r2 * r2));
       double sepphi = sep / radius;
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);
    }
 
-   return TVector3(cos(phi) * radius, sin(phi) * radius, offsetZ);
+   return {cos(phi) * radius, sin(phi) * radius, offsetZ};
 }
 
 void TS3::ResetRingsSectors(){
 	// This is necessary if you want mnemonics in a cal file to override those used during frag sort.
-	for(size_t i = 0; i < fS3SectorHits.size(); ++i) {
-		fS3SectorHits.at(i).SetSectorNumber();
+	for(auto& hit : fS3SectorHits) {
+		hit.SetSectorNumber();
 	}
-	for(size_t i = 0; i < fS3RingHits.size(); ++i) {
-		fS3RingHits.at(i).SetRingNumber();
+	for(auto& hit : fS3RingHits) {
+		hit.SetRingNumber();
 	}
 }
 
@@ -413,7 +416,7 @@ void TS3::Print(Option_t*) const
 void TS3::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 	out<<str.str();
 }
 

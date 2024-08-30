@@ -36,12 +36,13 @@ class TMidasEvent : public TRawEvent {
 public:
 #include "TMidasBanks.h"
 
-public:
    // houskeeping functions
    TMidasEvent();                                      ///< default constructor
    TMidasEvent(const TMidasEvent&);                    ///< copy constructor
-   ~TMidasEvent() override;                            ///< destructor
+	TMidasEvent(TMidasEvent&&) noexcept = default;
    TMidasEvent& operator=(const TMidasEvent&);         ///< assignement operator
+	TMidasEvent& operator=(TMidasEvent&&) noexcept = default;
+   ~TMidasEvent() override;                            ///< destructor
    void Clear(Option_t* opt = "") override;            ///< clear event for reuse
    void Copy(TObject&) const override;                 ///< copy helper
    void Print(const char* option = "") const override; ///< show all event information
@@ -78,7 +79,7 @@ public:
    void SwapBytesEventHeader();   ///< convert event header between little-endian (Linux-x86) and big endian (MacOS-PPC)
    int  SwapBytes(bool) override; ///< convert event data between little-endian (Linux-x86) and big endian (MacOS-PPC)
 
-protected:
+private:
    TMidas_EVENT_HEADER fEventHeader;   ///< event header
    char*               fData;          ///< event data buffer
    int                 fBanksN;        ///< number of banks in this event
@@ -86,7 +87,7 @@ protected:
    bool                fAllocatedByUs; ///< "true" if we own the data buffer
 
    /// \cond CLASSIMP
-   ClassDefOverride(TMidasEvent, 0) // All of the data contained in a Midas Event
+   ClassDefOverride(TMidasEvent, 0) // All of the data contained in a Midas Event // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

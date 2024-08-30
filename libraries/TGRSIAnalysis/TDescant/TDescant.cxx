@@ -15,7 +15,7 @@ ClassImp(TDescant)
 
 bool TDescant::fSetWave = false;
 
-TVector3 TDescant::gPosition[71] = {
+std::array<TVector3, 71> TDescant::fPosition = {
    // Descant positions from James' Thesis
    TVector3(0.0, 0.0, 1.0),         TVector3(98.6, 0.0, 490.2),      TVector3(30.5, 93.8, 490.2),
    TVector3(-79.8, 57.9, 490.2),    TVector3(-79.8, -57.9, 490.2),   TVector3(30.5, -93.8, 490.2),
@@ -41,7 +41,7 @@ TVector3 TDescant::gPosition[71] = {
    TVector3(-288.6, -325.6, 246.5), TVector3(-188.8, -382.5, 260.9), TVector3(-72.1, -420.4, 260.9),
    TVector3(42.1, -433.0, 246.5),   TVector3(220.4, -375.0, 246.5),  TVector3(305.4, -297.7, 260.9),
    TVector3(377.5, -198.5, 260.9),  TVector3(424.8, -93.8, 246.5)};
-TVector3 TDescant::gAncillaryPosition[9] = {
+std::array<TVector3, 9> TDescant::fAncillaryPosition = {
    // Ancillary detector locations from Evan.
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
@@ -83,22 +83,15 @@ TDescant::TDescant()
    Clear();
 }
 
-TDescant::~TDescant()
-{
-   /// Default Destructor
-}
-
 void TDescant::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-
-   static_cast<TDescant&>(rhs).fSetWave     = fSetWave;
 }
 
-TDescant::TDescant(const TDescant& rhs) : TDetector()
+TDescant::TDescant(const TDescant& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }
@@ -138,7 +131,7 @@ void TDescant::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
       return;
    }
 
-   TDescantHit* hit = new TDescantHit(*frag);
+   auto* hit = new TDescantHit(*frag);
    AddHit(hit);
 }
 
@@ -149,14 +142,14 @@ TVector3 TDescant::GetPosition(int DetNbr, double dist)
 
    if(TRunInfo::GetDetectorInformation() != nullptr && static_cast<TGRSIDetectorInformation*>(TRunInfo::GetDetectorInformation())->DescantAncillary()) {
       if(DetNbr > 8) {
-         return TVector3(0, 0, 1);
+         return {0, 0, 1};
       }
-      TVector3 temp_pos(gAncillaryPosition[DetNbr]);
+      TVector3 temp_pos(fAncillaryPosition[DetNbr]);
       temp_pos.SetMag(dist);
       return temp_pos;
    }
    if(DetNbr > 70) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
-   return gPosition[DetNbr];
+   return fPosition[DetNbr];
 }

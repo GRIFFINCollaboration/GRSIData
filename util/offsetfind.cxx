@@ -20,11 +20,11 @@
 
 class TEventTime {
 public:
-   explicit TEventTime(std::shared_ptr<TMidasEvent> event)
+   explicit TEventTime(const std::shared_ptr<TMidasEvent>& event)
    {
       event->SetBankList();
 
-      void* ptr;
+      void* ptr = nullptr;
       int   banksize = event->LocateBank(nullptr, "GRF1", &ptr);
 
       uint32_t type  = 0xffffffff;
@@ -45,7 +45,7 @@ public:
          case 0xb0000000: timehigh = value & 0x00003fff; break;
          };
       }
-      timemidas = (unsigned int)(event->GetTimeStamp());
+      timemidas = static_cast<unsigned int>(event->GetTimeStamp());
       if(timemidas < low_timemidas) {
          low_timemidas = timemidas;
       }
@@ -58,22 +58,26 @@ public:
       }
    }
 
+	TEventTime(const TEventTime&) = default;
+	TEventTime(TEventTime&&) noexcept = default;
+	TEventTime& operator=(const TEventTime&) = default;
+	TEventTime& operator=(TEventTime&&) noexcept = default;
    ~TEventTime() = default;
 
-   int64_t GetTimeStamp()
+   int64_t GetTimeStamp() const
    {
-      long time = timehigh;
+      int64_t time = timehigh;
       time      = time<<28;
       time |= timelow & 0x0fffffff;
       return time;
    }
-   int TimeStampHigh() { return timehigh; }
+   int TimeStampHigh() const { return timehigh; }
 
-   unsigned long MidasTime() { return timemidas; }
+   uint64_t MidasTime() const { return timemidas; }
 
-   int Digitizer() { return digitizernum; }
+   int Digitizer() const { return digitizernum; }
 
-   int DetectorType() { return dettype; }
+   int DetectorType() const { return dettype; }
 
    void SetDigitizer()
    {
@@ -95,25 +99,25 @@ public:
 
    inline static int GetBestDigitizer() { return best_dig; }
 
-   static unsigned long GetLowestMidasTime() { return low_timemidas; }
+   static uint64_t GetLowestMidasTime() { return low_timemidas; }
 
-   int DigIndex() { return digmap.find(digitizernum)->second; }
+   int DigIndex() const { return digmap.find(digitizernum)->second; }
 
-   static std::map<int, int> digmap;
-   static unsigned long low_timemidas;
-   static int           best_dig;
-   static int64_t       lowest_time;
+   static std::map<int, int> digmap; // NOLINT(readability-identifier-naming)
+   static uint64_t low_timemidas; // NOLINT(readability-identifier-naming)
+   static int           best_dig; // NOLINT(readability-identifier-naming)
+   static int64_t       lowest_time; // NOLINT(readability-identifier-naming)
 
 private:
-   int           timelow;
-   int           timehigh;
-   unsigned long timemidas;
-   int           dettype;
-   int           chanadd;
-   int           digitizernum{};
+   int           timelow; // NOLINT(readability-identifier-naming)
+   int           timehigh; // NOLINT(readability-identifier-naming)
+   uint64_t timemidas; // NOLINT(readability-identifier-naming)
+   int           dettype; // NOLINT(readability-identifier-naming)
+   int           chanadd; // NOLINT(readability-identifier-naming)
+   int           digitizernum{}; // NOLINT(readability-identifier-naming)
 };
 
-unsigned long TEventTime::low_timemidas = -1;
+uint64_t TEventTime::low_timemidas = -1;
 int64_t       TEventTime::lowest_time   = -1;
 int           TEventTime::best_dig      = 0;
 std::map<int, int> TEventTime::digmap;
@@ -174,8 +178,7 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
 
    // MidasTimeStamp is the only time we can trust at this level.
 
-   int* lowest_hightime;
-   lowest_hightime = new int[TEventTime::NDigitizers()];
+   auto* lowest_hightime = new int[TEventTime::NDigitizers()];
    // Clear lowest hightime
    for(int i = 0; i < TEventTime::NDigitizers(); i++) {
       lowest_hightime[i] = 0;
@@ -186,13 +189,13 @@ void CheckHighTimeStamp(std::vector<TEventTime*>* eventQ, int64_t* correction)
    for(it = eventQ->begin(); it != eventQ->end(); it++) {
       // This makes the plot, might not be required
       int           hightime = (*it)->TimeStampHigh();
-      unsigned long midtime  = (*it)->MidasTime() - lowmidtime;
+      uint64_t midtime  = (*it)->MidasTime() - lowmidtime;
       if(midtime > 20) {
          break; // 20 seconds seems like plenty enough time
       }
 
       if((*it)->DetectorType() == 1) {
-         (dynamic_cast<TH2D*>(midvshigh->At((*it)->DigIndex())))->Fill(midtime, hightime);
+         dynamic_cast<TH2D*>(midvshigh->At((*it)->DigIndex()))->Fill(static_cast<double>(midtime), hightime);
          if(hightime < lowest_hightime[(*it)->DigIndex()]) {
             lowest_hightime[TEventTime::digmap.at((*it)->DigIndex())] = hightime;
          }
@@ -243,7 +246,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1C* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1C* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -277,10 +280,9 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
          }
          int digitizer = (*hit2)->Digitizer();
          if(keep_filling[digitizer]) {
-            fillhist =
-               dynamic_cast<TH1C*>(roughlist->At((*hit2)->DigIndex())); // This is where that pointer comes in handy
+            fillhist = dynamic_cast<TH1C*>(roughlist->At((*hit2)->DigIndex())); // This is where that pointer comes in handy
             int64_t time2 = (*hit2)->GetTimeStamp() - correction[(*hit2)->DigIndex()];
-            Int_t   bin   = static_cast<Int_t>(time2 - time1);
+            auto    bin   = static_cast<Int_t>(time2 - time1);
 
             if(fillhist->FindBin(bin) > 0 && fillhist->FindBin(bin) < fillhist->GetNbinsX()) {
                if(fillhist->GetBinContent(fillhist->Fill(bin)) > 126) {
@@ -333,7 +335,7 @@ void GetTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
    // The "best digitizer" is set when we fill the event Q
    printf(DYELLOW "Using the best digitizer 0x%04x\n" RESET_COLOR, TEventTime::GetBestDigitizer());
 
-   TH1D* fillhist; // This pointer is useful later to clean up a lot of messiness
+   TH1D* fillhist = nullptr; // This pointer is useful later to clean up a lot of messiness
 
    std::vector<TEventTime*>::iterator hit1;
    std::vector<TEventTime*>::iterator hit2;
@@ -379,7 +381,7 @@ void GetTimeDiff(std::vector<TEventTime*>* eventQ, int64_t* correction)
             int64_t time2 = (*hit2)->GetTimeStamp() - correction[(*hit2)->DigIndex()];
             if(time2 - time1 < 2147483647 &&
                time2 - time1 > -2147483647) { // Make sure we are casting this to 32 bit properly
-               Int_t bin = static_cast<Int_t>(time2 - time1);
+               auto bin = static_cast<Int_t>(time2 - time1);
 
                fillhist->Fill(bin);
             }
@@ -433,8 +435,7 @@ int main(int argc, char** argv)
    QueueEvents(infile, eventQ);
    std::cout<<"SIZE: "<<TEventTime::digmap.size()<<std::endl;
 
-   int64_t* correction;
-   correction = new int64_t[TEventTime::NDigitizers()];
+   auto* correction = new int64_t[TEventTime::NDigitizers()];
    CheckHighTimeStamp(eventQ, correction);
    GetRoughTimeDiff(eventQ, correction);
    GetTimeDiff(eventQ, correction);

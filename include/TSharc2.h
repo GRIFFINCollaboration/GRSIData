@@ -20,17 +20,25 @@
 class TSharc2 : public TDetector {
 public:
    TSharc2();
-   ~TSharc2() override;
    TSharc2(const TSharc2& rhs);
+	TSharc2(TSharc2&&) noexcept = default;
+	TSharc2& operator=(TSharc2&&) noexcept = default;
+   TSharc2& operator=(const TSharc2& rhs)
+   {
+      if(this != &rhs) {
+         rhs.Copy(*this);
+      }
+      return *this;
+   } //!<!
+   ~TSharc2() override;
 
-public:
    TSharc2Hit* GetSharc2Hit(const int& i) const { return static_cast<TSharc2Hit*>(GetHit(i)); }
    static TVector3 GetPosition(int detector, int frontstrip, int backstrip, double X = 0.00, double Y = 0.00,
                                double Z = 0.00); //!<!
    static double   GetXOffset() { return fXoffset; }
    static double   GetYOffset() { return fYoffset; }
    static double   GetZOffset() { return fZoffset; }
-   static TVector3 GetOffset() { return TVector3(fXoffset, fYoffset, fZoffset); }
+   static TVector3 GetOffset() { return {fXoffset, fYoffset, fZoffset}; }
    static void SetXYZOffset(const double x, const double y, const double z)
    {
       fXoffset = x;
@@ -44,14 +52,6 @@ public:
    void Clear(Option_t* = "") override;       //!<!
    void Print(Option_t* = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
-
-   TSharc2& operator=(const TSharc2& rhs)
-   {
-      if(this != &rhs) {
-         rhs.Copy(*this);
-      }
-      return *this;
-   } //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
@@ -105,7 +105,7 @@ private:
    static double fSegmentPitch; //! angular pitch, degrees
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSharc2, 7)
+   ClassDefOverride(TSharc2, 7) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

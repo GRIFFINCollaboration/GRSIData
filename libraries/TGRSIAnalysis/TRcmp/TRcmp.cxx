@@ -141,10 +141,8 @@ Short_t TRcmp::GetFrontMultiplicity()
    }
 
    if(fFrontPMulVector.empty()) {                                             // only add hits to the transient vector if the vector is cleared and empty
-      for(UInt_t i = 0; i < fFrontPFragVector.size(); i++) {
-         // if(threshold condition) {                                         // software threshold can be enabled here
-         fFrontPMulVector.push_back(new TRcmpHit(fFrontPFragVector.at(i)));   // building an RCMP hit out of the fragment and adding it to the front multiplicity vector
-         // }
+      for(const TFragment& frag : fFrontPFragVector) {
+         fFrontPMulVector.push_back(new TRcmpHit(frag));   // building an RCMP hit out of the fragment and adding it to the front multiplicity vector
       }
    }
 
@@ -170,10 +168,8 @@ Short_t TRcmp::GetBackMultiplicity()
    }
 
    if(fBackNMulVector.empty()) {                                            // only add hits to the transient vector if the vector is cleared and empty
-      for(UInt_t i = 0; i < fBackNFragVector.size(); i++) {
-         // if(threshold condition) {                                       // software threshold can be enabled here
-         fBackNMulVector.push_back(new TRcmpHit(fBackNFragVector.at(i)));   // building an RCMP hit out of the fragment and adding it to the back multiplicity vector
-         // }
+      for(auto& frag : fBackNFragVector) {
+         fBackNMulVector.push_back(new TRcmpHit(frag));   // building an RCMP hit out of the fragment and adding it to the front multiplicity vector
       }
    }
 

@@ -78,11 +78,6 @@ TGRSIDataParserException::TGRSIDataParserException(TGRSIDataParser::EDataParserS
    fMessage = stream.str();
 }
 
-TGRSIDataParserException::~TGRSIDataParserException()
-{
-   /// default destructor
-}
-
 const char* TGRSIDataParserException::what() const noexcept
 {
    /// return message string built in default constructor

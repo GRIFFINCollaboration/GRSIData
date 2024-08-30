@@ -25,22 +25,36 @@
 
 class TGriffinAngles : public TNamed {
 public:
-	TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
-	~TGriffinAngles() {}
+	explicit TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
+	TGriffinAngles(const TGriffinAngles&) = default;
+	TGriffinAngles(TGriffinAngles&&) noexcept = default;
+	TGriffinAngles& operator=(const TGriffinAngles&) = default;
+	TGriffinAngles& operator=(TGriffinAngles&&) noexcept = default;
+	~TGriffinAngles() = default;
 
-	double Distance() { return fDistance; }
-	bool Folding() { return fFolding; }
-	bool Grouping() { return fGrouping; }
-	bool Addback() { return fAddback; }
-	double Rounding() { return fRounding; }
+   double Distance() const { return fDistance; }
+   bool   Folding() const { return fFolding; }
+   bool   Grouping() const { return fGrouping; }
+   bool   Addback() const { return fAddback; }
+   double Rounding() const { return fRounding; }
 
-	int Index(double angle);
-	int NumberOfAngles() const { return fAngles.size(); }
-	double Angle(int index) const { auto it = fAngles.begin(); std::advance(it, index); return *it; }
-	double AverageAngle(int index) const;
-	int Count(double angle) { if(fAngleCount.count(std::round(angle/fRounding)) == 1) return fAngleCount.at(std::round(angle/fRounding)); return 0; }
+   int    Index(double angle);
+   int    NumberOfAngles() const { return fAngles.size(); }
+   double Angle(int index) const
+   {
+      auto it = fAngles.begin();
+      std::advance(it, index);
+      return *it;
+   }
+   double AverageAngle(int index) const;
+   int    Count(double angle)
+   {
+		/// If the angle is in our map, report how often it exists, otherwise return zero.
+      if(fAngleCount.count(static_cast<int>(std::round(angle / fRounding))) == 1) { return fAngleCount.at(static_cast<int>(std::round(angle / fRounding))); }
+      return 0;
+   }
 
-	void FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose = false) const;
+   void FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose = false) const;
 	std::set<double>::iterator begin() const { return fAngles.begin(); }
 	std::set<double>::iterator end() const { return fAngles.end(); }
 
@@ -62,7 +76,7 @@ private:
 	std::map<int, int> fAngleCount; ///< Maps angles (divided by rounding and cast to integers) to number of combinations contributing to it.
 
 	/// \cond CLASSIMP
-	ClassDefOverride(TGriffinAngles, 4)
+	ClassDefOverride(TGriffinAngles, 4) // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

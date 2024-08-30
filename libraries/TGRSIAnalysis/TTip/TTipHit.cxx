@@ -23,8 +23,9 @@ TTipHit::TTipHit()
    Clear();
 }
 
-TTipHit::TTipHit(const TFragment& frag) : TDetectorHit(frag)
+TTipHit::TTipHit(const TFragment& frag)
 {
+	frag.Copy(*this);
    // SetVariables(frag);
    if(TGRSIOptions::AnalysisOptions()->IsWaveformFitting() && !IsCsI()) {
       SetWavefit(frag);
@@ -35,7 +36,7 @@ TTipHit::TTipHit(const TFragment& frag) : TDetectorHit(frag)
 
 TTipHit::~TTipHit() = default;
 
-TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit()
+TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);

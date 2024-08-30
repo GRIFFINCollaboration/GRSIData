@@ -28,9 +28,11 @@ class TDescant : public TDetector {
 public:
    TDescant();
    TDescant(const TDescant&);
-   ~TDescant() override;
+	TDescant(TDescant&&) noexcept = default;
+   TDescant& operator=(const TDescant&); //
+	TDescant& operator=(TDescant&&) noexcept = default;
+   ~TDescant() override = default;
 
-public:
    TDescantHit* GetDescantHit(const Int_t& i = 0) const { return static_cast<TDescantHit*>(GetHit(i)); }
 
    static TVector3 GetPosition(int DetNbr, double dist = 222); //!<!
@@ -40,28 +42,25 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   TDescant& operator=(const TDescant&); //
-
-private:
-   static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF
-   bool                     fHitFlag;   ///<   Is there a Descant hit?
-
-public:
    static bool SetWave() { return fSetWave; }         //!<!
    void SetWave(bool flag) { fSetWave = flag; }       //!<!
-   bool              Hit() { return fHitFlag; }       //!<!
+   bool              Hit() const { return fHitFlag; }       //!<!
    void SetHit(bool flag = true) { fHitFlag = flag; } //!<!
-private:
-   static TVector3 gPosition[71];         //!<!
-   static TVector3 gAncillaryPosition[9]; //!<!
-public:
+
    void Copy(TObject&) const override;            //!<!
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 
+private:
+   static bool              fSetWave;     ///<  Flag for Waveforms ON/OFF
+   bool                     fHitFlag;   ///<   Is there a Descant hit?
+
+   static std::array<TVector3, 71> fPosition;          //!<!
+   static std::array<TVector3, 9>  fAncillaryPosition; //!<!
+
    /// \cond CLASSIMP
-   ClassDefOverride(TDescant, 1) // Descant Physics structure
+   ClassDefOverride(TDescant, 1) // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

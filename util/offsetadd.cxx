@@ -63,7 +63,7 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
    // int size;
    // int data[1024];
 
-   void* ptr;
+   void* ptr = nullptr;
    int   banksize = event->LocateBank(nullptr, "GRF1", &ptr);
 
    uint32_t type  = 0xffffffff;

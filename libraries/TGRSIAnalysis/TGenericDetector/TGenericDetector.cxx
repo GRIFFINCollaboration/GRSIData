@@ -24,7 +24,7 @@ TGenericDetector& TGenericDetector::operator=(const TGenericDetector& rhs)
    return *this;
 }
 
-TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector()
+TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }
@@ -37,7 +37,7 @@ void TGenericDetector::AddFragment(const std::shared_ptr<const TFragment>& frag,
       return;
    }
 
-   TDetectorHit* hit = new TDetectorHit(*frag);
+   auto* hit = new TDetectorHit(*frag);
    AddHit(hit);
 }
 
@@ -49,6 +49,6 @@ void TGenericDetector::Print(Option_t*) const
 void TGenericDetector::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 	out<<str.str();
 }

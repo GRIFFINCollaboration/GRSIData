@@ -13,16 +13,16 @@ double TSiLi::fOuterDiameter  = 94.;
 double TSiLi::fInnerDiameter  = 16.;
 double TSiLi::fTargetDistance = -117.8;
 
-double TSiLi::sili_noise_fac        = 4;
-double TSiLi::sili_default_decay    = 4616.18;
-double TSiLi::sili_default_rise     = 20.90;
-double TSiLi::sili_default_baseline = -4300;
-double TSiLi::BaseFreq=4;
+double TSiLi::fSiLiNoiseFac        = 4;
+double TSiLi::fSiLiDefaultDecay    = 4616.18;
+double TSiLi::fSiLiDefaultRise     = 20.90;
+double TSiLi::fSiLiDefaultBaseline = -4300;
+double TSiLi::fBaseFreq=4;
 
 double  TSiLi::fSiLiCoincidenceTime = 200;
 bool  TSiLi::fRejectPossibleCrosstalk = false;
 
-int TSiLi::FitSiLiShape = 0; // 0 no. 1 try if normal fit fail. 2 yes
+int TSiLi::fFitSiLiShape = 0; // 0 no. 1 try if normal fit fail. 2 yes
 
 TSiLi::TSiLi()
 {
@@ -38,7 +38,7 @@ void TSiLi::Copy(TObject& rhs) const
    static_cast<TSiLi&>(rhs).fSiLiBits    = 0;
 }
 
-TSiLi::TSiLi(const TSiLi& rhs) : TDetector()
+TSiLi::TSiLi(const TSiLi& rhs) : TDetector(rhs)
 {
    rhs.Copy(*this);
 }
@@ -75,7 +75,7 @@ void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
       return;
    }
 
-   TSiLiHit* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
+   auto* hit = new TSiLiHit(*frag); // Waveform fitting happens in ctor now
    AddHit(hit);
 }
 
@@ -93,13 +93,14 @@ TVector3 TSiLi::GetPosition(int ring, int sector, bool smear)
    double radius = inner_radius + ring_width * (ring + 0.5);
    if(smear) {
       double sep = ring_width * 0.025;
-      double r1 = radius - ring_width * 0.5 + sep, r2 = radius + ring_width * 0.5 - sep;
+      double r1 = radius - ring_width * 0.5 + sep;
+		double r2 = radius + ring_width * 0.5 - sep;
       radius        = sqrt(gRandom->Uniform(r1 * r1, r2 * r2));
       double sepphi = sep / radius;
       phi           = gRandom->Uniform(phi - phi_width * 0.5 + sepphi, phi + phi_width * 0.5 - sepphi);
    }
 
-   return TVector3(cos(phi) * radius, sin(phi) * radius, dist);
+   return {cos(phi) * radius, sin(phi) * radius, dist};
 }
 
 double TSiLi::GetSegmentArea(Int_t seg)
@@ -166,7 +167,7 @@ Int_t TSiLi::GetAddbackMultiplicity()
 {
 	// Automatically builds the addback hits using the addback_criterion (if the size of the addback_hits vector is zero)
 	// and return the number of addback hits.
-	short basehits = GetMultiplicity();
+	int16_t basehits = GetMultiplicity();
 
 	// if the addback has been reset, clear the addback hits
 	if(fSiLiBits.TestBit(ESiLiBits::kAddbackSet)) {
@@ -210,7 +211,7 @@ Int_t TSiLi::GetAddbackMultiplicity()
 			for(int j = i + 1; j < basehits; j++) {
 				if(fAddbackCriterion(GetSiLiHit(i), GetSiLiHit(j))) {
 					Clusters[clus_id - 1].push_back(j);
-					if(fPreampRejectedHit[j])hasreject[clus_id - 1]=true;
+					if(fPreampRejectedHit[j]) { hasreject[clus_id - 1]=true; }
 					clusters_id[j] = clus_id;
 				}
 			}
@@ -236,12 +237,12 @@ bool TSiLi::fAddbackCriterion(TSiLiHit* one, TSiLiHit* two)
 		if(e > 0.05 && e < 50) { // very basic energy gate to suppress noise issues
 			int dring   = std::abs(one->GetRing() - two->GetRing());
 			int dsector = std::abs(one->GetSector() - two->GetSector());
-			if(dsector > 5)dsector =12-dsector;
+         if(dsector > 5) { dsector = 12 - dsector; }
 
-			//if(dsector+dring==1)return true;
+         //if(dsector+dring==1)return true;
 			//Changed to enable handing a missing middle pixel
-			if(dsector+dring<3)return true;
-		}
+         if(dsector + dring < 3) { return true; }
+      }
 	}
 
 	return false;
@@ -264,76 +265,79 @@ bool TSiLi::fRejectCriterion(TSiLiHit* one, TSiLiHit* two)
 
 bool TSiLi::fCoincidenceTime(TSiLiHit* one, TSiLiHit* two)
 {
-	double T;
+	double time = 0.;
 	if(one->GetTimeFit() > 0 && two->GetTimeFit() > 0) {
-		T = (one->GetTimeFit() - two->GetTimeFit()) * 10;
+		time = (one->GetTimeFit() - two->GetTimeFit()) * 10;
 	} else {
-		T = one->GetTime() - two->GetTime();
+		time = one->GetTime() - two->GetTime();
 	}
 
-	return (std::abs(T) < fSiLiCoincidenceTime);
+	return std::abs(time) < fSiLiCoincidenceTime;
 }
 
 
 void TSiLi::AddCluster(std::vector<unsigned>& cluster,bool ContainsReject)
 {
-	if(cluster.empty())return;
-	if(!fRejectPossibleCrosstalk)ContainsReject=false;
+   if(cluster.empty()) { return; }
+   if(!fRejectPossibleCrosstalk) { ContainsReject = false; }
 
-	if(cluster.size()>3){
+   if(cluster.size()>3){
 		ContainsReject=true;
 	}
 
-	if(cluster.size()>1&&!ContainsReject){
+   if(cluster.size() > 1 && !ContainsReject) {
       TSiLiHit* A = static_cast<TSiLiHit*>(GetHit(cluster[0]));
       TSiLiHit* B = static_cast<TSiLiHit*>(GetHit(cluster[1]));
-      int rA=A->GetRing(),rB=B->GetRing();
-		int sA=A->GetSector(),sB=B->GetSector();
+      int rA=A->GetRing();
+		int rB=B->GetRing();
+		int sA=A->GetSector();
+		int sB=B->GetSector();
 		int rAB=std::abs(rA-rB);
 		int sAB=std::abs(sA-sB);
-		if(sAB>5)sAB=12-sAB;
+      if(sAB > 5) { sAB = 12 - sAB; }
 
-		if(cluster.size()==2){
-			//Reject events with missing middle pixel
-         if(rAB + sAB > 1) ContainsReject = true;
-      }else{
-         TSiLiHit* C  = static_cast<TSiLiHit*>(GetHit(cluster[2]));
-         int rC=C->GetRing();
-			int sC=C->GetSector();
-			int rAC=std::abs(rA-rC),rBC=std::abs(rB-rC);
-			int sAC=std::abs(sA-sC),sBC=std::abs(sB-sC);
+      if(cluster.size() == 2) {
+         //Reject events with missing middle pixel
+         if(rAB + sAB > 1) { ContainsReject = true; }
+      } else {
+         TSiLiHit* C   = static_cast<TSiLiHit*>(GetHit(cluster[2]));
+         int       rC  = C->GetRing();
+         int       sC  = C->GetSector();
+         int       rAC = std::abs(rA - rC);
+         int       rBC = std::abs(rB - rC);
+         int       sAC = std::abs(sA - sC);
+         int       sBC = std::abs(sB - sC);
 
-			if(sAC>5)sAC=12-sAC;
-			if(sBC>5)sBC=12-sBC;
+         if(sAC > 5) { sAC = 12 - sAC; }
+         if(sBC > 5) { sBC = 12 - sBC; }
 
-			if(rA==rB&&rB==rC){
-				//Reject events that cross 3 sectors
-				ContainsReject=true;
-			}else if(rAB+sAB>2||rAC+sAC>2||rBC+sBC>2){
-				//Reject events that are too far apart (1 or more missing middles)
-				ContainsReject=true;
-			}else{
-				//Must be an allowed L OR 3 rings same sector
-				if(sA==sB&&sB==sC){
-					//if event crosses 3 rings
-					double midE;
-					if(((rA-rB)*(rA-rC))<0){
-						midE=A->GetEnergy();
-					}else if(((rB-rA)*(rB-rC))<0){
-						midE=B->GetEnergy();
-					}else{
-						midE=C->GetEnergy();
-					}
+         if(rA == rB && rB == rC) {
+            //Reject events that cross 3 sectors
+            ContainsReject = true;
+         } else if(rAB + sAB > 2 || rAC + sAC > 2 || rBC + sBC > 2) {
+            //Reject events that are too far apart (1 or more missing middles)
+            ContainsReject = true;
+         } else {
+            //Must be an allowed L OR 3 rings same sector
+            if(sA == sB && sB == sC) {
+               //if event crosses 3 rings
+               double midE = 0.;
+               if(((rA - rB) * (rA - rC)) < 0) {
+                  midE = A->GetEnergy();
+               } else if(((rB - rA) * (rB - rC)) < 0) {
+                  midE = B->GetEnergy();
+               } else {
+                  midE = C->GetEnergy();
+               }
 
-					//Minimum possible energy
-					if(midE<1400)ContainsReject=true;
-				}
-			}
-		}
-	}
+               //Minimum possible energy
+               if(midE < 1400) { ContainsReject = true; }
+            }
+         }
+      }
+   }
 
-
-	if(ContainsReject){
+   if(ContainsReject){
 		for(unsigned int j : cluster) {
 			fRejectHits.push_back(j);
 		}

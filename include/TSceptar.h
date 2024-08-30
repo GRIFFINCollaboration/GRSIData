@@ -27,36 +27,33 @@
 class TSceptar : public TDetector {
 public:
    TSceptar();
-   ~TSceptar() override;
    TSceptar(const TSceptar& rhs);
+	TSceptar(TSceptar&&) noexcept = default;
+   TSceptar& operator=(const TSceptar&); //!<!
+	TSceptar& operator=(TSceptar&&) noexcept = default;
+   ~TSceptar() override = default;
 
-public:
    TSceptarHit* GetSceptarHit(const int& i) const { return static_cast<TSceptarHit*>(GetHit(i)); }
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr) { return gPaddlePosition[DetNbr]; } //!<!
+   static TVector3 GetPosition(int DetNbr) { return fPaddlePosition[DetNbr]; } //!<!
 
-   TSceptar& operator=(const TSceptar&); //!<!
-
-private:
-   static bool fSetWave; //  Flag for Waveforms ON/OFF
-
-public:
    static bool SetWave() { return fSetWave; } //!<!
 
 private:
-   static TVector3 gPaddlePosition[21]; //!<!  Position of each Paddle
+   static bool fSetWave; //  Flag for Waveforms ON/OFF
+   static std::array<TVector3, 21> fPaddlePosition; //!<!  Position of each Paddle
 
 public:
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSceptar, 2) // Sceptar Physics structure
-                                 /// \endcond
+   ClassDefOverride(TSceptar, 2) // Sceptar Physics structure // NOLINT(readability-else-after-return)
+	/// \endcond
 };
 /*! @} */
 #endif

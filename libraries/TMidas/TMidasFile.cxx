@@ -27,35 +27,13 @@ ClassImp(TMidasFile)
 /// \endcond
 
 TMidasFile::TMidasFile()
+#ifdef HAS_XML
+	: fOdb(nullptr)
+#endif
 {
    // Default Constructor
    uint32_t endian = 0x12345678;
-
-   fFile              = -1;
-   fGzFile            = nullptr;
-   fPoFile            = nullptr;
-   fLastErrno         = 0;
-   fCurrentBufferSize = 0;
-
-   fFile              = -1;
-   fGzFile            = nullptr;
-   fPoFile            = nullptr;
-   fLastErrno         = 0;
-   fCurrentBufferSize = 0;
-
-   fOutFile   = -1;
-   fOutGzFile = nullptr;
-
-   fMaxBufferSize = 1E6;
-
-   fCurrentEventNumber = 0;
-
    fDoByteSwap = *reinterpret_cast<char*>(&endian) != 0x78;
-
-#ifdef HAS_XML
-	fOdb = nullptr;
-#endif
-   fOdbEvent = nullptr;//std::make_shared<TMidasEvent>();
 }
 
 TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TMidasFile()
@@ -81,8 +59,9 @@ TMidasFile::~TMidasFile()
 
 std::string TMidasFile::Status(bool)
 {
-   return Form(HIDE_CURSOR " Processing event %i have processed %.2fMB/%.2f MB              " SHOW_CURSOR "\r",
-               fCurrentEventNumber, (BytesRead() / 1000000.0), (FileSize() / 1000000.0));
+	std::stringstream str;
+	str<<HIDE_CURSOR<<" Processing event "<<fCurrentEventNumber<<" have processed "<<std::setprecision(2)<<static_cast<double>(BytesRead())/1000000.<<"MB/"<<static_cast<double>(FileSize())/1000000.<<" MB               "<<SHOW_CURSOR<<"\r";
+	return str.str();
 }
 
 static int hasSuffix(const char* name, const char* suffix)
@@ -237,7 +216,7 @@ bool TMidasFile::Open(const char* filename)
 	TChannel::SetMnemonicClass(TGRSIMnemonic::Class());
 
 	// read ODB from file
-	if(fOdbEvent == nullptr) fOdbEvent = std::make_shared<TMidasEvent>();
+	if(fOdbEvent == nullptr) { fOdbEvent = std::make_shared<TMidasEvent>(); }
    Read(fOdbEvent);
 
 	SetFileOdb();
@@ -245,7 +224,7 @@ bool TMidasFile::Open(const char* filename)
 	TRunInfo::ClearLibraryVersion();
 	TRunInfo::SetLibraryVersion(GRSIDATA_RELEASE);
 
-	TGRSIDetectorInformation* detInfo = new TGRSIDetectorInformation();
+	auto* detInfo = new TGRSIDetectorInformation();
 	TRunInfo::SetDetectorInformation(detInfo);
 
    return true;
@@ -700,7 +679,7 @@ void TMidasFile::SetFileOdb()
    std::string expt;
    while(true) {
       std::string key = fOdb->GetNodeName(node);
-      if(key.compare("Name") == 0) {
+      if(key == "Name") {
          expt = node->GetText();
          break;
       }
@@ -709,12 +688,12 @@ void TMidasFile::SetFileOdb()
       }
       node = node->GetNextNode();
    }
-   if(expt.compare("tigress") == 0) {
+   if(expt == "tigress") {
       SetTIGOdb();
    } else if(expt.find("grif") != std::string::npos) {
 		// for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
-   } else if(expt.compare("tigdaq") == 0) { //New TIGRESS DAQ
+   } else if(expt == "tigdaq") { //New TIGRESS DAQ
       SetTIGDAQOdb();
    } else {
 		std::cerr<<RED<<"Unknown experiment name \""<<expt<<"\", ODB won't be read!"<<RESET_COLOR<<std::endl;
@@ -725,27 +704,26 @@ void TMidasFile::SetFileOdb()
 void TMidasFile::SetRunInfo(uint32_t time)
 {
 #ifdef HAS_XML
-   TRunInfo* runInfo = TRunInfo::Get();
    TXMLNode*     node    = fOdb->FindPath("/Runinfo/Start time binary");
    if(node != nullptr) {
 		std::stringstream str(node->GetText());
-		unsigned int odbTime;
+		unsigned int odbTime = 0;
 		str>>odbTime;
-		if(runInfo->SubRunNumber() == 0 && time != odbTime) {
+		if(TRunInfo::SubRunNumber() == 0 && time != odbTime) {
 			std::cout<<"Warning, ODB start time of first subrun ("<<odbTime<<") does not match midas time of first event in this subrun ("<<time<<")!"<<std::endl;
 		}
-      runInfo->SetRunStart(time);
+		TRunInfo::SetRunStart(time);
    }
 
    node = fOdb->FindPath("/Experiment/Run parameters/Run Title");
    if(node != nullptr) {
-      runInfo->SetRunTitle(node->GetText());
+		TRunInfo::SetRunTitle(node->GetText());
       std::cout<<"Title: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
    }
 
    if(node != nullptr) {
       node = fOdb->FindPath("/Experiment/Run parameters/Comment");
-      runInfo->SetRunComment(node->GetText());
+		TRunInfo::SetRunComment(node->GetText());
       std::cout<<"Comment: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
    }
 #endif
@@ -834,10 +812,10 @@ void TMidasFile::SetGRIFFOdb()
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->AddENGCoefficient(offsets.at(x));
-         tempChan->AddENGCoefficient(gains.at(x));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
 			if(x < quads.size()) {
-				tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+				tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); //Assuming this means quad terms won't be added if not there. 
 			}
 			if(x < digitizer.size()) {
 				tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
@@ -876,7 +854,7 @@ void TMidasFile::SetGRIFFOdb()
    std::vector<int> tmpCodes = fOdb->ReadIntArray(node);
    // the codes are 32bit with the 16 high bits being the same as the 16 low bits
    // we check this and only keep the low 16 bits
-   std::vector<short> ppgCodes;
+   std::vector<int16_t> ppgCodes;
    for(auto& code : tmpCodes) {
       if(((code >> 16) & 0xffff) != (code & 0xffff)) {
          std::cout<<DRED<<"Found ppg code in the ODB with high bits (0x"<<std::hex<<(code >> 16)
@@ -994,7 +972,7 @@ void TMidasFile::SetTIGOdb()
       tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
       int temp_integration = 0;
       if(type.at(x) != 0) {
-         tempChan->SetDigitizerType(TPriorityValue<std::string>(typemap[type.at(x)].second.c_str(), EPriority::kRootFile));
+         tempChan->SetDigitizerType(TPriorityValue<std::string>(typemap[type.at(x)].second, EPriority::kRootFile));
          if(strcmp(tempChan->GetDigitizerTypeString(), "Tig64") ==
             0) { // TODO: maybe use enumerations via GetDigitizerType()
             temp_integration = 25;
@@ -1003,8 +981,8 @@ void TMidasFile::SetTIGOdb()
          }
       }
       tempChan->SetIntegration(TPriorityValue<int>(temp_integration, EPriority::kRootFile));
-      tempChan->AddENGCoefficient(offsets.at(x));
-      tempChan->AddENGCoefficient(gains.at(x));
+      tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+      tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
 
       TChannel::AddChannel(tempChan, "overwrite");
    }
@@ -1085,9 +1063,9 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
          tempChan->SetAddress(address.at(x));
          tempChan->SetNumber(TPriorityValue<int>(x, EPriority::kRootFile));
 
-         tempChan->AddENGCoefficient(offsets.at(x));
-         tempChan->AddENGCoefficient(gains.at(x));
-         if(x < quads.size()) tempChan->AddENGCoefficient(quads.at(x)); //Assuming this means quad terms won't be added if not there. 
+         tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
+         tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
+         if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); } //Assuming this means quad terms won't be added if not there. 
       }
 		std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
    } else {

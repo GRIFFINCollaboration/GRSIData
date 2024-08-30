@@ -58,7 +58,7 @@ TGriffin::EGainBits TGriffin::fDefaultGainType = TGriffin::EGainBits::kLowGain;
 //                                                                             theta                                 phi
 //                                                                             theta                                phi
 //                                                                             theta
-TVector3 TGriffin::gCloverPosition[17] = {
+std::array<TVector3, 17> TGriffin::fCloverPosition = {
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
             TMath::Cos(TMath::DegToRad() * (0.0))),
@@ -114,18 +114,18 @@ TVector3 TGriffin::gCloverPosition[17] = {
             TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
             TMath::Cos(TMath::DegToRad() * (135.0)))};
 
-TGriffin::TGriffin() : TSuppressed()
+TGriffin::TGriffin()
 {
-// Default ctor. Ignores TObjectStreamer in ROOT < 6
+	/// Default ctor. Ignores TObjectStreamer in ROOT < 6
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed()
+TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed(rhs)
 {
-// Copy ctor. Ignores TObjectStreamer in ROOT < 6
+	/// Copy ctor. Ignores TObjectStreamer in ROOT < 6
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
@@ -173,7 +173,6 @@ void TGriffin::Copy(TObject& rhs) const
    static_cast<TGriffin&>(rhs).fSuppressedAddbackLowGainFrags.clear();
    static_cast<TGriffin&>(rhs).fSuppressedAddbackHighGainFrags.clear();
 
-   static_cast<TGriffin&>(rhs).fSetCoreWave          = fSetCoreWave;
    static_cast<TGriffin&>(rhs).fCycleStart           = fCycleStart;
 }
 
@@ -257,13 +256,13 @@ void TGriffin::Print(std::ostream& out) const
    str<<"Griffin Contains: "<<std::endl;
    str<<std::setw(6)<<GetLowGainMultiplicity()<<" Low gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto& hit : Hits()) {
+		for(const auto& hit : Hits()) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
    str<<std::setw(6)<<GetHighGainMultiplicity()<<" High gain hits"<<std::endl;
 	//if(TString(opt).Contains("all", TString::ECaseCompare::kIgnoreCase)) {
-		for(auto& hit : fGriffinHighGainHits) {
+		for(const auto& hit : fGriffinHighGainHits) {
 			static_cast<TGriffinHit*>(hit)->Print(str);
 		}
 	//}
@@ -487,7 +486,7 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 	}
 
 	if(mnemonic->SubSystem() != TMnemonic::EMnemonic::kG) {
-		std::cerr<<__PRETTY_FUNCTION__<<": not a GRIFFIN detector: "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem())<<std::endl;
+		std::cerr<<__PRETTY_FUNCTION__<<": not a GRIFFIN detector: "<<static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem())<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 		return;
 	}
 
@@ -495,13 +494,13 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
 	switch(mnemonic->OutputSensor()) {
 		case TMnemonic::EMnemonic::kA:
 			{
-				TGriffinHit* hit = new TGriffinHit(*frag);
+				auto* hit = new TGriffinHit(*frag);
 				GetHitVector(EGainBits::kLowGain).push_back(hit);
 			}
 			break;
 		case TMnemonic::EMnemonic::kB:
 			{
-				TGriffinHit* hit = new TGriffinHit(*frag);
+				auto* hit = new TGriffinHit(*frag);
 				GetHitVector(EGainBits::kHighGain).push_back(hit);
 			}
 			break;
@@ -516,10 +515,10 @@ TVector3 TGriffin::GetPosition(int DetNbr, int CryNbr, double dist)
    // Gets the position vector for a crystal specified by CryNbr within Clover DetNbr at a distance of dist mm away.
    // This is calculated to the most likely interaction point within the crystal.
    if(DetNbr > 16) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
 
-   TVector3 temp_pos(gCloverPosition[DetNbr]);
+   TVector3 temp_pos(fCloverPosition[DetNbr]);
 
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
@@ -547,10 +546,10 @@ TVector3 TGriffin::GetDetectorPosition(int DetNbr)
 {
    // Gets the position vector for a Clover DetNbr.
    if(DetNbr > 16) {
-      return TVector3(0, 0, 1);
+      return {0, 0, 1};
    }
 
-   return gCloverPosition[DetNbr];
+   return fCloverPosition[DetNbr];
 }
 
 void TGriffin::ResetFlags() const
@@ -624,7 +623,7 @@ Double_t TGriffin::CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, co
 	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
 		return hit_to_correct->GetEnergy();
 	}
-	static bool been_warned[256] = {false};
+	static std::array<bool, 256> been_warned = {false};
 	double      fixed_energy     = hit_to_correct->GetEnergy();
 	try {
 		if(hit_to_correct->GetChannel() != nullptr) {
@@ -655,9 +654,9 @@ void TGriffin::FixHighGainCrossTalk()
 
 void TGriffin::FixCrossTalk(const EGainBits& gain_type)
 {
-	if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
+   if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) { return; }
 
-	auto& hit_vec = GetHitVector(gain_type);
+   auto& hit_vec = GetHitVector(gain_type);
 	if(hit_vec.size() < 2) {
 		SetCrossTalk(gain_type, true);
 		return;

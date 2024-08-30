@@ -5,6 +5,8 @@
 #ifndef INCLUDE_TMidasEventHeader_H
 #define INCLUDE_TMidasEventHeader_H
 
+#include <cstdint>
+
 /** \addtogroup Sorting
  *  @{
  */

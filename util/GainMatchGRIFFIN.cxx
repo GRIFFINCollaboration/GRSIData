@@ -27,23 +27,23 @@
 
 enum class EType { kMaxBin, kTPeak, kTSpectrum };
 
-void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, int bins, int xmin, int xmax);
+void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, int bins, int xmin, int xmax);
 void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, int bins, int xmin, int xmax);
 TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, int bins, double xmin, double xmax);
-TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelstoskip, int bins, double xmin, double xmax);
+TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, int bins, double xmin, double xmax);
 void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, double largepeak, std::vector<double> peaks, EType type, double mindistance, bool roughenergy, bool twopeaks, double largepeak2);
-void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, double largepeak, std::vector<double> peaks,EType type, double mindistance, bool roughenergy, bool twopeaks, double largepeak2);
+void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, double largepeak, std::vector<double> peaks,EType type, double mindistance, bool roughenergy, bool twopeaks, double largepeak2);
 TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<double> peaklocations, double windowsize, EType type);
 void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int minchannel, int maxchannel, const char* paramImgName, const char* graphImgName, int order);
 void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, const char* paramImgName, const char* graphImgName, int order);
-void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, std::vector<int> channelstoskip, int xbins, double xmin, double xmax);
+void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, int xbins, double xmin, double xmax);
 void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, int xbins, double xmin, double xmax);
 TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, int bins, double xmin, double xmax, const char* calfile);
-TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelstoskip, int bins, double xmin, double xmax, const char* calfile);
+TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, int bins, double xmin, double xmax, const char* calfile);
 void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, std::vector<double> peaks, EType type, double width, bool UseMyList, const char* fwhmImgName, const char* fwratioImgName);
 void check_calibration(const char* testFileName, int minchannel, int maxchannel, EType type, double width, const char* fwhmImgName,const char* fwratioImgName);
-void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, EType type, double width, const char* fwhmImgName,const char* fwratioImgName);
-void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<double> peaks, EType type, double width, bool UseMyList, const char* fwhmImgName, const char* fwratioImgName);
+void check_calibration(const char* testFileName, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, EType type, double width, const char* fwhmImgName,const char* fwratioImgName);
+void check_calibration(const char* testFileName, int minchannel, int maxchannel, const std::vector<double>& peaks, EType type, double width, bool UseMyList, const char* fwhmImgName, const char* fwratioImgName);
 double FWXM(TH1* h, double xmin, double xmax, double percent);
 double FWHM(TH1* h, double xmin, double xmax);
 double FWTM(TH1* h, double xmin, double xmax);
@@ -67,7 +67,7 @@ double GetCentroidMaxBin(TH1* hst, double xmin, double xmax)
 double GetCentroidTSpectrum(TH1* hst, double xmin, double xmax)
 {
 	hst->GetXaxis()->SetRangeUser(xmin,xmax);
-	TSpectrum* spec = new TSpectrum(1);
+	auto* spec = new TSpectrum(1);
 	spec->Search(hst);
 	double centroid = spec->GetPositionX()[0];
 	hst->GetXaxis()->UnZoom();
@@ -82,8 +82,8 @@ double GetCentroidTPeak(TH1* hst, double xmin, double xmax)
 	double fwhm = FWHM(hst,xmin,xmax);
 
 	// initial fit
-	TPeak* peak;
 	hst->GetXaxis()->SetRangeUser(xmin,xmax);
+	TPeak* peak = nullptr;
 	if(guesscentroid-1.5*fwhm>xmin && guesscentroid+1.5*fwhm<xmax) {
 		peak = new TPeak(guesscentroid,guesscentroid-1.5*fwhm,guesscentroid+1.5*fwhm);
 	} else {
@@ -98,19 +98,23 @@ double GetCentroidTPeak(TH1* hst, double xmin, double xmax)
 double GetCentroid(EType type, TH1* hst, double xmin, double xmax)
 {
 	double centroid = 0.;
-	if(type == EType::kMaxBin) centroid = GetCentroidMaxBin(hst,xmin,xmax);
-	else if(type == EType::kTSpectrum) centroid = GetCentroidTSpectrum(hst,xmin,xmax);
-	else if(type == EType::kTPeak) centroid = GetCentroidTPeak(hst,xmin,xmax);
-	return centroid;
+   if(type == EType::kMaxBin) {
+      centroid = GetCentroidMaxBin(hst, xmin, xmax);
+   } else if(type == EType::kTSpectrum) {
+      centroid = GetCentroidTSpectrum(hst, xmin, xmax);
+   } else if(type == EType::kTPeak) {
+      centroid = GetCentroidTPeak(hst, xmin, xmax);
+   }
+   return centroid;
 }
 
 double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=kFALSE, double largepeak2 = 0.0)
 {
-	TSpectrum* spec2 = new TSpectrum(2);
+	auto* spec2 = new TSpectrum(2);
 
 	// search for big keV peak (or peaks)
 	spec2->Search(h);
-	double posbigb;
+	double posbigb = 0.;
 	if(!twopeaks) {
 		if(spec2->GetNPeaks()==2) {
 			// if we get two peaks, check the height of the peaks to find the actual tallest one
@@ -121,8 +125,8 @@ double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=
 			double mag1 = h->GetMaximum();
 			h->GetXaxis()->UnZoom();
 			posbigb = spec2->GetPositionX()[0];
-			if(mag1>mag0) posbigb = spec2->GetPositionX()[1];
-		} else {
+         if(mag1 > mag0) { posbigb = spec2->GetPositionX()[1]; }
+      } else {
 			posbigb = spec2->GetPositionX()[0];
 		}
 	} else {
@@ -142,10 +146,10 @@ double GetRoughGain(TH1* h, double largepeak, double mindistance, bool twopeaks=
 	return gain;
 }
 
-void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, std::vector<int> channelstoskip, int bins = 40e3, int xmin = 0, int xmax = 4000)
+void make_calibration_histograms(const char* fragFileName, const char* histFileName, int minchannel, int maxchannel, const std::vector<int>& channelstoskip, int bins = 40e3, int xmin = 0, int xmax = 4000)
 {
 	// create histograms
-	TFile* f = new TFile(fragFileName);
+	auto* f = new TFile(fragFileName);
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",fragFileName);
 		return;
@@ -154,10 +158,10 @@ void make_calibration_histograms(const char* fragFileName, const char* histFileN
 		printf("Failed to open file '%s'!\n",fragFileName);
 		return;
 	}
-	TTree* FragmentTree = (TTree*) f->Get("FragmentTree");
+	auto* FragmentTree = static_cast<TTree*>(f->Get("FragmentTree"));
 	TChannel::ReadCalFromTree(FragmentTree);
 	TList* hstlist = MakeGRIFFINChargeHsts(FragmentTree,minchannel,maxchannel,channelstoskip,bins,xmin,xmax);
-	TFile* outfile = new TFile(histFileName,"recreate");
+	auto* outfile = new TFile(histFileName,"recreate");
 	hstlist->Write();
 	outfile->Close();
 	f->Close();
@@ -169,12 +173,12 @@ void make_calibration_histograms(const char* fragFileName, const char* histFileN
 	make_calibration_histograms(fragFileName,histFileName,minchannel,maxchannel,dummy,bins,xmin,xmax);
 }
 
-TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int bins, double xmin, double xmax)
+TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, const std::vector<int>& channelsToSkip, int bins, double xmin, double xmax)
 {
 	// initialization stuff
-	TList* list = new TList;
-	TFragment *currentFrag = 0;
-	TChannel::ReadCalFromTree(tree);
+	auto* list = new TList;
+   TFragment* currentFrag = nullptr;
+   TChannel::ReadCalFromTree(tree);
 	TBranch *branch = tree->GetBranch("TFragment");
 	branch->SetAddress(&currentFrag);
 
@@ -184,11 +188,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	// initialize histograms
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -198,15 +198,11 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 		tree->GetEntry(i);
 		int chan = currentFrag->GetChannelNumber();
 		int dettype = currentFrag->GetDetectorType();
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
-			int charge = currentFrag->GetCharge();
+			int charge = static_cast<int>(currentFrag->GetCharge());
 			int kvalue = currentFrag->GetKValue();
-			hst[chan]->Fill(double(charge)/kvalue); // this may not be (is probably not) the best way to do this...
+			hst[chan]->Fill(static_cast<double>(charge)/kvalue); // this may not be (is probably not) the best way to do this...
 			// suggestions welcome. -JKS
 		}
 	}
@@ -214,14 +210,10 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	std::cout <<"titling histograms." <<std::endl;
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
-		long int address = chan->GetAddress();
+		unsigned int address = chan->GetAddress();
 		hst[i]->SetTitle(Form("%s-0x%08x", name, static_cast<unsigned int>(address)));
 	}
 
@@ -234,7 +226,7 @@ TList* MakeGRIFFINChargeHsts(TTree* tree, int minchannel, int maxchannel, int bi
 	return list;
 }
 
-void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, double largepeak, std::vector<double> peaks, EType type = EType::kTSpectrum, double mindistance=20e3, bool roughenergy=kTRUE, bool twopeaks=kFALSE, double largepeak2 = 0.0)
+void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, const std::vector<int>& channelsToSkip, double largepeak, std::vector<double> peaks, EType type = EType::kTSpectrum, double mindistance=20e3, bool roughenergy=kTRUE, bool twopeaks=kFALSE, double largepeak2 = 0.0)
 {
 	// minchannel and max channel are inclusive values. most loops go from i=min to i<=maxchannel
 
@@ -251,7 +243,7 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 
 	/*---------------------------------------------------------------*/
 
-	TFile* f = new TFile(histFileName,"update");
+	auto* f = new TFile(histFileName,"update");
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",histFileName);
 		return;
@@ -262,31 +254,28 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 	}
 
 	// fit histograms, create graphs, save slopes and offsets
-	TGraph** g = new TGraph*[maxchannel+1];
+	auto** g = new TGraph*[maxchannel+1];
 
 	// create and save the graphs
 	for(int i=minchannel;i<=maxchannel;i++) {
 		std::cout <<"\t" <<i <<std::endl;
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		std::cout <<"Creating graph for channel " <<i <<std::endl;
-		TH1F* h = (TH1F*) f->Get(Form("hst%i",i)); // grab histogram
-		if(h==0) {
-			std::cout <<"Error: hst" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
+		auto* h = static_cast<TH1F*>(f->Get(Form("hst%i",i))); // grab histogram
+      if(h == nullptr) {
+         std::cout <<"Error: hst" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
 			continue;
-		}
+      }
 
-		// calculate rough gain
+      // calculate rough gain
 		double gain = GetRoughGain(h,largepeak,mindistance,twopeaks,largepeak2);
 		//		std::cout <<"Rough gain for channel " <<i <<" is " <<gain <<std::endl;
 
 		// calculate rough positions of peaks
-		std::vector<double> peakguesses;
+		std::vector<double> peakguesses(peaks.size());
+		int p = 0;
 		for(auto& peak : peaks) {
-			peakguesses.push_back(gain*peak);
+			peakguesses[p++] = gain*peak;
 		}
 
 		// gainmatch
@@ -294,9 +283,10 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 
 		// check the first histogram and change the peak values if necessary
 		if(i==minchannel) {
-			if(roughenergy) g[i]->Fit("pol1","q","goff");
+			if(roughenergy) { g[i]->Fit("pol1","q","goff"); }
 			for(int j=0;j<g[i]->GetN();j++) {
-				double x,y;
+				double x = 0.;
+				double y = 0.;
 				g[i]->GetPoint(j,x,y);
 				if(!roughenergy) {
 					peaks[j] = x;
@@ -308,12 +298,12 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 			}
 		}
 		// format graph
-		if((i)%4==1) g[i]->SetMarkerColor(kBlue);
-		if((i)%4==2) g[i]->SetMarkerColor(kGreen);
-		if((i)%4==3) g[i]->SetMarkerColor(kRed);
-		if((i)%4==4) g[i]->SetMarkerColor(kBlack);
-		g[i]->SetMarkerStyle(20+(i)/4);
-		const char* hsttitle = h->GetTitle();
+      if((i % 4) == 0) { g[i]->SetMarkerColor(kBlue); }
+      if((i % 4) == 1) { g[i]->SetMarkerColor(kGreen); }
+      if((i % 4) == 2) { g[i]->SetMarkerColor(kRed); }
+      if((i % 4) == 3) { g[i]->SetMarkerColor(kBlack); }
+      g[i]->SetMarkerStyle(20 + (i) / 4);
+      const char* hsttitle = h->GetTitle();
 		g[i]->SetTitle(hsttitle);
 		g[i]->SetName(Form("graph%i",i));
 		g[i]->Write();
@@ -322,11 +312,10 @@ void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxch
 	f->Close();
 }
 
-void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, double largepeak, std::vector<double> peaks, EType type = EType::kTSpectrum, double mindistance=20e3, bool roughenergy=kTRUE, bool twopeaks=kFALSE, double largepeak2 = 0.0)
+void create_gainmatch_graphs(const char* histFileName, int minchannel, int maxchannel, double largepeak, const std::vector<double>& peaks, EType type = EType::kTSpectrum, double mindistance=20e3, bool roughenergy=kTRUE, bool twopeaks=kFALSE, double largepeak2 = 0.0)
 {
 	std::vector<int> dummy;
 	create_gainmatch_graphs(histFileName,minchannel,maxchannel,dummy,largepeak,peaks,type,mindistance,roughenergy,twopeaks,largepeak2);
-	return;
 }
 
 TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<double> peaklocations, double windowsize, EType type = EType::kTSpectrum)
@@ -334,10 +323,10 @@ TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<do
 	size_t n = peakvalues.size();
 	if(peaklocations.size()!=n) {
 		std::cout <<"Error: input vectors are not the same size." <<std::endl;
-		return 0;
+		return nullptr;
 	}
 
-	TGraph* graph = new TGraph();
+	auto* graph = new TGraph();
 
 	std::cout <<"Peaks for " <<hst->GetName() <<std::endl;
 	for(size_t i=0;i<n;i++)	{
@@ -355,7 +344,7 @@ TGraph* gainmatch_peaks(TH1* hst, std::vector<double> peakvalues, std::vector<do
 // i imagine a lot of this function could be rewritten with the TGainMatch class
 void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, const char* paramImgName = "GRIFFIN_fitting_params.png", const char* graphImgName="GRIFFIN_calgraph.png", int order = 1)
 {
-	TFile* f = new TFile(ROOTFileName);
+	auto* f = new TFile(ROOTFileName);
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",ROOTFileName);
 		return;
@@ -365,14 +354,10 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 		return;
 	}
 
-	TGraph** g = new TGraph*[maxchannel+1];
+	auto** g = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) { // channel number
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
-		g[i] = (TGraph*) f->Get(Form("graph%i",i));
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
+		g[i] = static_cast<TGraph*>(f->Get(Form("graph%i",i)));
 		if(g[i] == nullptr) {
 			std::cout <<"Error: graph" <<i <<" does not exist. Please check your calib_hst file and your inputs to GainMatchGRIFFIN." <<std::endl;
 			std::cout <<"Function create_GRIFFIN_cal will continue, but will skip this channel." <<std::endl;
@@ -385,34 +370,31 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::vector<double> slopes(maxchannel+1);
 	std::vector<double> offsets(maxchannel+1);
 	std::vector<double> chi2(maxchannel+1);
-	for(int i=0;i<=maxchannel;i++) chi2[i] = 0; // initialize array
-	TGraphErrors* slopeg = new TGraphErrors();
-	TGraphErrors* offsetg = new TGraphErrors();
-	TGraphErrors* chi2g = new TGraphErrors();
-	TMultiGraph* allgraphs = new TMultiGraph();
+	for(int i=0;i<=maxchannel;i++) { chi2[i] = 0; } // initialize array
+	auto* slopeg = new TGraphErrors();
+	auto* offsetg = new TGraphErrors();
+	auto* chi2g = new TGraphErrors();
+	auto* allgraphs = new TMultiGraph();
 	std::vector<std::vector<double> > parameters(maxchannel+1, std::vector<double>(order+1));
 
 	// fit graphs 
 	for(int i=minchannel;i<=maxchannel;i++) {
 		// check for skipped channel
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 
 		// fit graphs
 		g[i]->Fit(Form("pol%i",order),"q");
 
 		// grab linear fitting parameters and chi^2
-		for(int j=0;j<=order;j++) parameters[i][j] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(j);
+		for(int j=0;j<=order;j++) { parameters[i][j] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(j); }
 		slopes[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(1); // grab slope
 		offsets[i] = g[i]->GetFunction(Form("pol%i",order))->GetParameter(0); // grab offset
 		int ndf = g[i]->GetFunction(Form("pol%i",order))->GetNDF();
-		if(ndf!=0) chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare()/ndf; // grab offset
-		else {
+		if(ndf!=0) {
+			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare()/ndf; // grab offset
+		} else {
 			chi2[i] = g[i]->GetFunction(Form("pol%i",order))->GetChisquare(); // grab offset
-			if(chi2[i]==0) chi2[i] = 1e-24;
+			if(chi2[i]==0) { chi2[i] = 1e-24; }
 		}
 
 		// fill TGraphErrors
@@ -431,7 +413,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	}
 
 	// draw graphs
-	TCanvas* c1 = new TCanvas("c1","c1",800,600);
+	auto* c1 = new TCanvas("c1","c1",800,600);
 	allgraphs->Draw("ap");
 	allgraphs->SetTitle("GRIFFIN calibration curves;ADC channel;Energy (keV)");
 	allgraphs->GetXaxis()->CenterTitle(kTRUE);
@@ -441,12 +423,9 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	// print slopes, offsets, chi2
 	std::cout <<"Channel\tSlope\t\tOffset\t\tChi^2" <<std::endl;
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
-		if(chi2[i] == 0) continue;
+		// check for skipped channel
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
+		if(chi2[i] == 0) { continue; }
 		std::cout <<i <<"\t" <<slopes[i] <<"\t" <<offsets[i] <<"\t" <<chi2[i] <<std::endl;
 	}
 
@@ -469,7 +448,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 
 	// display slopes and offsets and chi2 values
 	TGaxis::SetMaxDigits(3);
-	TCanvas *c3 = new TCanvas("c3","c3",1200,400);
+	auto *c3 = new TCanvas("c3","c3",1200,400);
 	c3->Divide(3,1);
 	c3->cd(1);
 	slopeg->Draw("pe1a");
@@ -483,12 +462,9 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	std::ofstream outFile;
 	outFile.open(outFileName);
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
-		if(chi2[i] == 0) continue;
+		// check for skipped channel
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
+		if(chi2[i] == 0) { continue; }
 
 		// get name and address
 		std::string nameaddress = f->Get(Form("graph%i",i))->GetTitle();
@@ -502,7 +478,7 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 		outFile <<"Address:   " <<address.c_str() <<std::endl;
 		outFile <<"Digitizer: " <<std::endl;
 		outFile <<"EngCoeff:  ";
-		for(int j=0;j<=order;j++) outFile <<parameters[i][j] <<"\t";
+		for(int j=0;j<=order;j++) { outFile <<parameters[i][j] <<"\t"; }
 		outFile <<std::endl;
 		outFile <<std::endl;
 		outFile <<"}" <<std::endl;
@@ -518,9 +494,9 @@ void create_GRIFFIN_cal(const char* ROOTFileName, const char* outFileName, int m
 	create_GRIFFIN_cal(ROOTFileName,outFileName,minchannel,maxchannel,dummy,paramImgName,graphImgName,order);
 }
 
-void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int xbins = 40e3, double xmin = 0, double xmax = 4000)
+void recalibrate_spectra(const char* fragFile, const char* newFile, const char* calFile, int minchannel, int maxchannel, const std::vector<int>& channelsToSkip, int xbins = 40e3, double xmin = 0, double xmax = 4000)
 {
-	TFile* fdata = new TFile(fragFile);
+	auto* fdata = new TFile(fragFile);
 	if(fdata == nullptr) {
 		printf("Failed to open file '%s'!\n",fragFile);
 		return;
@@ -530,10 +506,10 @@ void recalibrate_spectra(const char* fragFile, const char* newFile, const char* 
 		return;
 	}
 
-	TTree* FragmentTree = (TTree*) fdata->Get("FragmentTree");
+	auto* FragmentTree = static_cast<TTree*>(fdata->Get("FragmentTree"));
 	TChannel::ReadCalFile(calFile);
 	TList *list = MakeGRIFFINEnergyHsts(FragmentTree,minchannel,maxchannel,channelsToSkip,xbins,xmin,xmax,"GRIFFINcal.cal");
-	TFile* f = new TFile(newFile,"recreate");
+	auto* f = new TFile(newFile,"recreate");
 	list->Write();
 	f->Close();
 	fdata->Close();
@@ -545,11 +521,11 @@ void recalibrate_spectra(const char* fragFile, const char* newFile, const char* 
 	recalibrate_spectra(fragFile,newFile,calFile,minchannel,maxchannel,dummy,xbins,xmin,xmax);	
 }
 
-TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::vector<int> channelsToSkip, int bins, double xmin, double xmax, const char* calfile)
+TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, const std::vector<int>& channelsToSkip, int bins, double xmin, double xmax, const char* calfile)
 {
 	// initialization stuff
-	TList* list = new TList;
-	TFragment *currentFrag = 0;
+	auto* list = new TList;
+	TFragment *currentFrag = nullptr;
 	TChannel::ReadCalFile(calfile);
 	TBranch *branch = tree->GetBranch("TFragment");
 	branch->SetAddress(&currentFrag);
@@ -560,11 +536,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	// initialize histograms
 	TH1F** hst = new TH1F*[maxchannel+1]; // min channel and max channel are inclusive
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hst[i] = new TH1F(Form("hst%i",i),Form("hst%i",i),bins,xmin,xmax); list->Add(hst[i]);
 	}
 
@@ -573,11 +545,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	for(int i=0;i<fEntries;i++) {
 		tree->GetEntry(i);
 		int chan = currentFrag->GetChannelNumber();
-		bool skipChannel=kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		int dettype = currentFrag->GetDetectorType();
 		if(chan>=minchannel && chan<=maxchannel && (dettype==0 || dettype==1)) {
 			double energy = currentFrag->GetEnergy();
@@ -588,15 +556,11 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, std::v
 	std::cout <<"titling histograms." <<std::endl;
 	// title histograms appropriately
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) skipChannel = kTRUE;
-		}
-		if(skipChannel) continue;
-		if(hst[i]->Integral()==0) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
+		if(hst[i]->Integral()==0) { continue; }
 		TChannel* chan = TChannel::GetChannelByNumber(i);
 		const char* name = chan->GetName();
-		long int address = chan->GetAddress();
+		unsigned int address = chan->GetAddress();
 		hst[i]->SetTitle(Form("%s-0x%08x",name,static_cast<unsigned int>(address)));
 	}
 	return list;
@@ -611,7 +575,7 @@ TList* MakeGRIFFINEnergyHsts(TTree* tree, int minchannel, int maxchannel, int bi
 
 void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, std::vector<double> peaks, EType type = EType::kTSpectrum, double width = 10, bool UseMyList = kFALSE, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png", const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
 {
-	TFile* f = new TFile(testFileName,"update");
+	auto* f = new TFile(testFileName,"update");
 	if(f == nullptr) {
 		printf("Failed to open file '%s'!\n",testFileName);
 		return;
@@ -622,8 +586,8 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}
 
 	TH1F** hsts = new TH1F*[maxchannel+1];
-	TH1F* temphst = (TH1F*) gFile->Get(Form("hst%i",minchannel));
-	TH1F* hstall = (TH1F*) temphst->Clone("hstall");
+	auto* temphst = static_cast<TH1F*>(gFile->Get(Form("hst%i",minchannel)));
+	auto* hstall = static_cast<TH1F*>(temphst->Clone("hstall"));
 
 	// declare 2D histograms for use
 	// energy along the x-axis, fwhm along the y-axis
@@ -639,7 +603,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 
 	if(!UseMyList) { // generate vector of peaks
 		peaks.clear();
-		TSpectrum* spec = new TSpectrum();
+		auto* spec = new TSpectrum();
 		int n = spec->Search(temphst);
 		for(int i=0;i<n;i++) {
 			peaks.push_back(spec->GetPositionX()[i]);
@@ -648,26 +612,19 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}
 
 	gStyle->SetOptStat(0);
-	THStack* stack = new THStack("stack","All histograms");
+	auto* stack = new THStack("stack","All histograms");
 
 	// create hstall
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) {
-				skipChannel = kTRUE;
-				break;
-			}
-		}
-		if(skipChannel) continue;
-		hsts[i] = (TH1F*) gFile->Get(Form("hst%i",i));
-		if(hsts[i]==0) {
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
+		hsts[i] = static_cast<TH1F*>(gFile->Get(Form("hst%i",i)));
+		if(hsts[i]==nullptr) {
 			std::cout <<"Error: hst" <<i <<" does not exist. Please check your newcal and calib_hst files and your inputs to GainMatchGRIFFIN." <<std::endl;
 			std::cout <<"Function check_calibration will continue, but will skip this channel." <<std::endl;
 			channelsToSkip.push_back(i);
 			continue;
 		}
-		if(i!=minchannel) hstall->Add(hsts[i]);
+		if(i!=minchannel) { hstall->Add(hsts[i]); }
 	}
 
 	// get peak values from summed spectrum for residual calculation
@@ -678,25 +635,18 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	}	
 
 	// formatting, FWHM, residuals, etc.
-	TGraph** residuals = new TGraph*[maxchannel+1];
+	auto** residuals = new TGraph*[maxchannel+1];
 	for(int i=minchannel;i<=maxchannel;i++) {
-		bool skipChannel = kFALSE;
-		for(auto& skip : channelsToSkip) {
-			if(i == skip) {
-				skipChannel = kTRUE;
-				break;
-			}
-		}
-		if(skipChannel) continue;
+		if(std::any_of(channelsToSkip.begin(), channelsToSkip.end(), [&i](int ch) { return i == ch; })) { continue; }
 		hsts[i]->SetLineColor(i+1);
 		stack->Add(hsts[i]);
 		residuals[i] = new TGraph(peaks.size());
 		for(size_t j=0;j<peaks.size();j++) {
 			// calculate FWHM and FWTM
 			double myfwhm = FWHM(hsts[i],peaks[j]-width,peaks[j]+width);
-			if(myfwhm!=0.0) fwhm->Fill(peaks[j],myfwhm);
+			if(myfwhm!=0.0) { fwhm->Fill(peaks[j],myfwhm); }
 			double myfwtm = FWTM(hsts[i],peaks[j]-width,peaks[j]+width);
-			if(myfwtm!=0.0 && myfwhm!=0.0) fwratio->Fill(peaks[j],myfwtm/myfwhm);
+			if(myfwtm!=0.0 && myfwhm!=0.0) { fwratio->Fill(peaks[j],myfwtm/myfwhm); }
 
 			// calculate residuals
 			double centroid = GetCentroid(type,hsts[i],peaks[j]-width,peaks[j]+width);
@@ -717,9 +667,9 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	// fill 2D histograms for summed spectrum
 	for(auto& peak : peaks) {
 		double myfwhm = FWHM(hstall,peak-width,peak+width);
-		if(myfwhm!=0.0) fwhm_all->Fill(peak,myfwhm);
+		if(myfwhm!=0.0) { fwhm_all->Fill(peak,myfwhm); }
 		double myfwtm = FWTM(hstall,peak-width,peak+width);
-		if(myfwtm!=0.0 && myfwhm!=0.0) fwratio_all->Fill(peak,myfwtm/myfwhm);
+		if(myfwtm!=0.0 && myfwhm!=0.0) { fwratio_all->Fill(peak,myfwtm/myfwhm); }
 	}
 
 	// save histograms to file
@@ -729,13 +679,13 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	fwratio_all->Write();
 
 	// draw fwhm results
-	TCanvas* c_fwhm = new TCanvas("c_fwhm","FWHM comparison, crystals and summed spectrum", 600,400);
+	auto* c_fwhm = new TCanvas("c_fwhm","FWHM comparison, crystals and summed spectrum", 600,400);
 	fwhm->SetTitle("FWHM values of individual crystals and summed spectrum;Energy (keV);FWHM (keV)");
 	fwhm->SetMarkerStyle(4);
 	fwhm->Draw("candle");
 	fwhm_all->SetMarkerStyle(30);
 	fwhm_all->Draw("same");
-	TLegend* legend = new TLegend(0.6,0.6,0.88,0.85);
+	auto* legend = new TLegend(0.6,0.6,0.88,0.85);
 	legend->SetFillColor(kWhite);
 	legend->AddEntry(fwhm,"Single crystal mean","p");
 	legend->AddEntry(fwhm_all,"Summed","p");
@@ -743,7 +693,7 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	c_fwhm->SaveAs(fwhmImgName);
 
 	// draw fwhm results
-	TCanvas* c_fwratio = new TCanvas("c_fwratio","FWTM:FWHM, crystals and summed spectrum", 600,400);
+	auto* c_fwratio = new TCanvas("c_fwratio","FWTM:FWHM, crystals and summed spectrum", 600,400);
 	fwratio->SetTitle("FWTM:FWHM values of individual crystals and summed spectrum;Energy (keV);FWTM/FWHM");
 	fwratio->Draw("candle");
 	fwratio_all->SetMarkerStyle(30);
@@ -761,13 +711,13 @@ void check_calibration(const char* testFileName, int minchannel, int maxchannel,
 	check_calibration(testFileName,minchannel,maxchannel,dummy,peaks,type,width,kFALSE,fwhmImgName,fwratioImgName);
 }
 
-void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<int> channelsToSkip, EType type = EType::kTSpectrum, double width = 10, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png",const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
+void check_calibration(const char* testFileName, int minchannel, int maxchannel, const std::vector<int>& channelsToSkip, EType type = EType::kTSpectrum, double width = 10, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png",const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
 {
 	std::vector<double> peaks;
 	check_calibration(testFileName,minchannel,maxchannel,channelsToSkip,peaks,type,width,kFALSE,fwhmImgName,fwratioImgName);
 }
 
-void check_calibration(const char* testFileName, int minchannel, int maxchannel, std::vector<double> peaks, EType type = EType::kTSpectrum, double width = 10, bool UseMyList = kFALSE, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png", const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
+void check_calibration(const char* testFileName, int minchannel, int maxchannel, const std::vector<double>& peaks, EType type = EType::kTSpectrum, double width = 10, bool UseMyList = kFALSE, const char* fwhmImgName="GRIFFIN_FWHM_diagnostic.png", const char* fwratioImgName="GRIFFIN_FWratio_diagnostic.png")
 {
 	std::vector<int> dummy;
 	check_calibration(testFileName,minchannel,maxchannel,dummy,peaks,type,width,UseMyList,fwhmImgName,fwratioImgName);
@@ -781,7 +731,7 @@ double FWXM(TH1* h, double xmin, double xmax, double percent = 0.5)
 	int maxbin = h->GetMaximumBin();
 	double bincontent = max;
 	int binbelow = maxbin;
-	double low,high;
+	double high = 0.;
 
 	// rough estimation of background
 	int lowbin = h->FindBin(xmin);
@@ -797,14 +747,13 @@ double FWXM(TH1* h, double xmin, double xmax, double percent = 0.5)
 		}
 		bincontent = h->GetBinContent(binbelow);
 	}
-	double x1,y1,x2,y2,y3,m;
-	y3 = (max-bg)*percent+bg;
-	x1 = h->GetBinCenter(binbelow);
-	x2 = h->GetBinCenter(binbelow+1);
-	y1 = h->GetBinContent(binbelow);
-	y2 = h->GetBinContent(binbelow+1);
-	m = (y2-y1)/(x2-x1);
-	low = (y3-y1)/m+x1;
+	double y3 = (max-bg)*percent+bg;
+	double x1 = h->GetBinCenter(binbelow);
+	double x2 = h->GetBinCenter(binbelow+1);
+	double y1 = h->GetBinContent(binbelow);
+	double y2 = h->GetBinContent(binbelow+1);
+	double m = (y2-y1)/(x2-x1);
+	double low = (y3-y1)/m+x1;
 
 	binbelow = maxbin;
 	bincontent = max;
@@ -907,20 +856,24 @@ int main(int argc, char **argv) {
 	//-------------- END OF VARIABLE DECLARATION SECTION --------------//
 
 	// filename strings
-	std::string fileName, calibfileName, newfileName;
-	char *original_name, *calib_hst_name, *test_file_name;
+   std::string fileName;
+   std::string calibfileName;
+   std::string newfileName;
+   char*       original_name  = nullptr;
+   char*       calib_hst_name = nullptr;
+   char*       test_file_name = nullptr;
 
-	// here, we allow a loop over multiple fragment files
-	for(int i=1;i<argc;i++) {
-		fileName = argv[i];
+   // here, we allow a loop over multiple fragment files
+   for(int i = 1; i < argc; i++) {
+      fileName = argv[i];
 		calibfileName = argv[i];
-		if(calibfileName.find_last_of("/") != std::string::npos) {
-			calibfileName.insert(calibfileName.find_last_of("/")+1,"calib_hsts_");
+		if(calibfileName.find_last_of('/') != std::string::npos) {
+			calibfileName.insert(calibfileName.find_last_of('/')+1,"calib_hsts_");
 		} else {
 			calibfileName.insert(0,"calib_hsts_");
 		}
 
-		TFile* file = new TFile(argv[i]);
+		auto* file = new TFile(argv[i]);
 		if(file == nullptr) {
 			printf("Failed to open file '%s'!\n",argv[1]);
 			return 1;
@@ -940,14 +893,14 @@ int main(int argc, char **argv) {
 		if(do_make_calibration_histograms) {
 			make_calibration_histograms(original_name,calib_hst_name,minchannel,maxchannel,channelsToSkip,xbins_charge,xmin_charge,xmax_charge);
 		}
-	}
+   }
 
-	if(argc>2) {
+   if(argc>2) {
 		std::string buffer = "hadd calib_hsts_summed.root ";
 		for(int i=1;i<argc;i++) {
 			calibfileName = argv[i];
-			if(calibfileName.find_last_of("/") != std::string::npos) {
-				calibfileName.insert(calibfileName.find_last_of("/")+1,"calib_hsts_");
+			if(calibfileName.find_last_of('/') != std::string::npos) {
+				calibfileName.insert(calibfileName.find_last_of('/')+1,"calib_hsts_");
 			} else {
 				calibfileName.insert(0,"calib_hsts_");
 			}
@@ -975,13 +928,13 @@ int main(int argc, char **argv) {
 	for(int i=1;i<argc;i++) {
 		fileName = argv[i];
 		newfileName = argv[i];
-		if(newfileName.find_last_of("/") != std::string::npos) {
-			newfileName.insert(newfileName.find_last_of("/")+1,"newcal_");
+		if(newfileName.find_last_of('/') != std::string::npos) {
+			newfileName.insert(newfileName.find_last_of('/')+1,"newcal_");
 		} else {
 			newfileName.insert(0,"newcal_");
 		}
 
-		TFile* file = new TFile(argv[i]);
+		auto* file = new TFile(argv[i]);
 		if(file == nullptr) {
 			printf("Failed to open file '%s'!\n",argv[1]);
 			return 1;
@@ -1007,8 +960,8 @@ int main(int argc, char **argv) {
 		std::string buffer = "hadd newcal_summed.root ";
 		for(int i=1;i<argc;i++) {
 			newfileName = argv[i];
-			if(newfileName.find_last_of("/") != std::string::npos) {
-				newfileName.insert(newfileName.find_last_of("/")+1,"newcal_");
+			if(newfileName.find_last_of('/') != std::string::npos) {
+				newfileName.insert(newfileName.find_last_of('/')+1,"newcal_");
 			} else {
 				newfileName.insert(0,"newcal_");
 			}

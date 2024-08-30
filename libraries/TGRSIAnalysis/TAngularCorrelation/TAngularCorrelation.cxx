@@ -18,11 +18,8 @@ ClassImp(TAngularCorrelation)
 /// Angular correlation default constructor
 ///
 TAngularCorrelation::TAngularCorrelation()
+	: fIndexCorrelation(nullptr), fIndexMapSize(0), fFolded(kFALSE), fGrouped(kFALSE)
 {
-   fIndexCorrelation = nullptr; // used the 1D histograms for a specific energy ranged used for FitSlices
-   fIndexMapSize     = 0;       // number of indexes, never called in making the histograms
-   fFolded           = kFALSE;  // not set yet
-   fGrouped          = kFALSE;  // not set yet
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,10 +48,12 @@ TH2D* TAngularCorrelation::Create2DSlice(THnSparse* hst, Double_t min, Double_t 
 {
    // identify the axes (angular index, energy, energy)
    // we assume that the two axes with identical limits are the energy axes
-   Int_t    indexaxis, energy1axis, energy2axis;
-   Double_t xmin[3];
-   Double_t xmax[3];
-   for(int i = 0; i < 3; i++) { // goes through all three dimensions of THnSparse and finds the min and max values
+   Int_t                   indexaxis   = 0;
+   Int_t                   energy1axis = 0;
+   Int_t                   energy2axis = 0;
+   std::array<Double_t, 3> xmin;
+   std::array<Double_t, 3> xmax;
+   for(int i = 0; i < 3; i++) {   // goes through all three dimensions of THnSparse and finds the min and max values
       xmin[i] = hst->GetAxis(i)->GetXmin();
       xmax[i] = hst->GetAxis(i)->GetXmax();
    }                                              // then look for matching axis since energy axis should be the same
@@ -112,7 +111,7 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    Bool_t   sparse = kFALSE; // true if the array has THnSparse histograms
    Bool_t   hst2d  = kFALSE; // true if the array has some kind of TH2 histogram
    TIter    next(hstarray);
-   TObject* obj;
+   TObject* obj = nullptr;
    while((obj = next()) != nullptr) {
       // TH2 loop
       if(obj->InheritsFrom("TH2")) {
@@ -151,41 +150,40 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    // get axis properties
    Int_t         elements = hstarray->GetEntries();
    Int_t         bins     = 0;
-   Int_t         xmin     = 0;
-   Int_t         xmax     = 0;
+   Double_t      xmin     = 0;
+   Double_t      xmax     = 0;
    const Char_t* name     = nullptr;
    const Char_t* title    = nullptr;
    if(sparse) {
-      THnSparse* firsthst = static_cast<THnSparse*>(hstarray->At(0));
-      bins                = firsthst->GetAxis(0)->GetNbins();
-      xmin                = firsthst->GetAxis(0)->GetBinLowEdge(1);
-      xmax                = firsthst->GetAxis(0)->GetBinUpEdge(bins);
-      name                = firsthst->GetName();
-      title               = firsthst->GetTitle();
+      auto* firsthst = static_cast<THnSparse*>(hstarray->At(0));
+      bins           = firsthst->GetAxis(0)->GetNbins();
+      xmin           = firsthst->GetAxis(0)->GetBinLowEdge(1);
+      xmax           = firsthst->GetAxis(0)->GetBinUpEdge(bins);
+      name           = firsthst->GetName();
+      title          = firsthst->GetTitle();
    } else if(hst2d) {
-      TH2* firsthst = static_cast<TH2*>(hstarray->At(0));
-      bins          = firsthst->GetXaxis()->GetNbins();
-      xmin          = firsthst->GetXaxis()->GetBinLowEdge(1);
-      xmax          = firsthst->GetXaxis()->GetBinUpEdge(bins);
-      name          = firsthst->GetName();
-      title         = firsthst->GetTitle();
+      auto* firsthst = static_cast<TH2*>(hstarray->At(0));
+      bins           = firsthst->GetXaxis()->GetNbins();
+      xmin           = firsthst->GetXaxis()->GetBinLowEdge(1);
+      xmax           = firsthst->GetXaxis()->GetBinUpEdge(bins);
+      name           = firsthst->GetName();
+      title          = firsthst->GetTitle();
    }
    Int_t ybins = elements;
 
    Int_t iteration = 0;
-   TH2D* newslice;
-   if(gFile->Get(Form("%s_%i_%i", name, Int_t(min), Int_t(max))) == nullptr) {
-      newslice = new TH2D(Form("%s_%i_%i", name, Int_t(min), Int_t(max)),
+   TH2D* newslice = nullptr;
+   if(gFile->Get(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max))) == nullptr) {
+      newslice = new TH2D(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max)),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
    } else {
       while(iteration < 10) {
-         if(gFile->Get(Form("%s_%i_%i_%i", name, Int_t(min), Int_t(max), iteration)) == nullptr) {
+         if(gFile->Get(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration)) == nullptr) {
             break;
-         } else {
-            ++iteration;
          }
+			++iteration;
       }
-      newslice = new TH2D(Form("%s_%i_%i_%i", name, Int_t(min), Int_t(max), iteration),
+      newslice = new TH2D(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
    }
 
@@ -195,29 +193,25 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
       TH1D* tempslice = nullptr;
       // sparse option
       if(sparse) {
-         THnSparse* thishst = static_cast<THnSparse*>(hstarray->At(i));
+         auto* thishst = static_cast<THnSparse*>(hstarray->At(i));
          thishst->GetAxis(0)->SetRangeUser(min, max);
          tempslice = thishst->Projection(
             1, "oe"); // the "e" option pushes appropriate errors, the "o" makes the projection correct
-      }
-      // TH2 option
-      else if(hst2d) {
-         TH2* thishst = static_cast<TH2*>(hstarray->At(i)); // itterating through all the indexes
+      } else if(hst2d) {
+         auto* thishst = static_cast<TH2*>(hstarray->At(i)); // itterating through all the indexes
          thishst->GetXaxis()->SetRangeUser(min, max);
          tempslice = thishst->ProjectionY(); // projecting result of gate into temporary slice
       }
 
       // iterate through the appropriate bins, transfer values, and take care of error appropriately
-      Double_t x, y, oldcontent, newcontent, olderror, newerror;
-      Int_t    bin;
-      y = i;
+      Double_t y = i;
       for(Int_t j = 1; j <= bins; j++) {
-         x          = tempslice->GetBinCenter(j); // energy
-         bin        = newslice->FindBin(x, y);
-         newcontent = tempslice->GetBinContent(j); // number of counts
-         oldcontent = newslice->GetBinContent(bin);
-         newerror   = tempslice->GetBinError(j);
-         olderror   = newslice->GetBinError(bin);
+         Double_t x          = tempslice->GetBinCenter(j);   // energy
+         Int_t    bin        = newslice->FindBin(x, y);
+         Double_t newcontent = tempslice->GetBinContent(j);   // number of counts
+         Double_t oldcontent = newslice->GetBinContent(bin);
+         Double_t newerror   = tempslice->GetBinError(j);
+         Double_t olderror   = newslice->GetBinError(bin);
          newslice->SetBinContent(bin, oldcontent + newcontent);
          newslice->SetBinError(bin, sqrt(pow(newerror, 2) + pow(olderror, 2)));
       }
@@ -286,8 +280,8 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
 
    // get x-axis parameters
    Int_t bins = hst->GetNbinsX();
-   Int_t xmin = hst->GetXaxis()->GetBinLowEdge(1);
-   Int_t xmax = hst->GetXaxis()->GetBinUpEdge(bins);
+   Double_t xmin = hst->GetXaxis()->GetBinLowEdge(1);
+   Double_t xmax = hst->GetXaxis()->GetBinUpEdge(bins);
 
    // get histogram name and title
    const Char_t* hst2dname  = hst->GetName();
@@ -298,7 +292,7 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
    Int_t newybins = GetNumModIndices();
 
    // initialize the histogram
-   TH2D* modified_slice;
+   TH2D* modified_slice = nullptr;
    if(static_cast<int>(static_cast<int>((group)) & static_cast<int>(!fold)) != 0) {
       modified_slice = new TH2D(Form("%s_grouped", hst2dname), Form("%s_grouped", hst2dtitle), bins, xmin, xmax,
                                 newybins, 0, newybins); // defines slice
@@ -318,20 +312,18 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
       TH1D* tempslice = nullptr;
       tempslice       = hst->ProjectionX("", i + 1, i + 1);
 
-      Double_t x, y, oldcontent, newcontent, olderror, newerror;
-      Int_t    bin;
       // figure out the new index
-      y = GetModifiedIndex(i);
+      Double_t y = GetModifiedIndex(i);
       // now loop through the energy axis...
       for(Int_t j = 1; j <= bins; j++) { // x-axis bin loop
-         x   = tempslice->GetBinCenter(j);
-         bin = modified_slice->FindBin(x, y);
+         Double_t x   = tempslice->GetBinCenter(j);
+         Int_t bin = modified_slice->FindBin(x, y);
          // pull out the new content / error
-         newcontent = tempslice->GetBinContent(j); // number of counts
-         newerror   = tempslice->GetBinError(j);
+         Double_t newcontent = tempslice->GetBinContent(j); // number of counts
+         Double_t newerror   = tempslice->GetBinError(j);
          // pull out the old content / error
-         oldcontent = modified_slice->GetBinContent(bin);
-         olderror   = modified_slice->GetBinError(bin);
+         Double_t oldcontent = modified_slice->GetBinContent(bin);
+         Double_t olderror   = modified_slice->GetBinError(bin);
          // re-set new 2D histogram bin with combined value
          modified_slice->SetBinContent(bin, oldcontent + newcontent);
          modified_slice->SetBinError(bin, sqrt(pow(newerror, 2) + pow(olderror, 2)));
@@ -388,8 +380,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
 
    // pull angular index limits from hst
    // assumes that angular index is y-axis and energy is x-axis
-   Int_t       indexmin  = static_cast<Int_t>(hst->GetYaxis()->GetXmin());
-   Int_t       indexmax  = static_cast<Int_t>(hst->GetYaxis()->GetXmax());
+   auto        indexmin  = static_cast<Int_t>(hst->GetYaxis()->GetXmin());
+   auto        indexmax  = static_cast<Int_t>(hst->GetYaxis()->GetXmax());
    const Int_t indexbins = indexmax - indexmin;
 
    // pull name from hst, modify for 1D hst
@@ -407,7 +399,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    // set the range on the energy axis (x)
    // this isn't strictly necessary, but it will make the histograms smaller
    // and visually, easier to see in the diagnostic.
-   Double_t minenergy, maxenergy;
+   Double_t minenergy = 0.;
+	Double_t maxenergy = 0.;
    peak->GetRange(minenergy, maxenergy);
    Double_t difference = maxenergy - minenergy;
    minenergy           = minenergy - 0.5 * difference;
@@ -429,7 +422,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    peak->InitParams(totalProjection);
    std::cout<<"initial parameters:"<<std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
-      double min, max;
+      double min = 0.;
+		double max = 0.;
       peak->GetParLimits(i, min, max);
       std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
    }
@@ -446,7 +440,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    peak->SetParLimits(9, peak->GetCentroid() - 2, peak->GetCentroid() + 2);
    std::cout<<"Our parameters:"<<std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
-      double min, max;
+      double min = 0.;
+		double max = 0.;
       peak->GetParLimits(i, min, max);
       std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
    }
@@ -455,7 +450,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    // if (!fit) continue;
    std::cout<<"Final parameters:"<<std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
-      double min, max;
+      double min = 0.;
+		double max = 0.;
       peak->GetParLimits(i, min, max);
       std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
    }
@@ -468,7 +464,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    // loop over the indices
    auto* file = new TFile("Fit_singles.root", "recreate");
    for(Int_t i = 1; i <= indexmax - indexmin; i++) {
-      Int_t index = hst->GetYaxis()->GetBinLowEdge(i);
+      auto index = static_cast<Int_t>(hst->GetYaxis()->GetBinLowEdge(i));
       if(visualization) {
          // find the correct pad
          Int_t canvas = (i - 1) / 16;
@@ -518,7 +514,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
       // fit TPeak
       // Bool_t fitresult = peak->Fit(temphst,"Q");
       // Bool_t fitresult = kFALSE;
-      bool fitresult;
+      bool fitresult = false;
       if(visualization) {
          fitresult = peak->Fit(temphst, "Q");
       } else {
@@ -639,7 +635,7 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
    for(Int_t i = 1; i <= n; i++) { // bin number loop
 
       // get index number
-      Int_t index = hst->GetXaxis()->GetBinLowEdge(i);
+      auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
 
       // get associated angle
       Double_t angle = 0;
@@ -1141,7 +1137,7 @@ std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(st
 /// This function is called by GenerateGroupMaps()
 ///
 
-Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group)
+Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group) const
 {
 
    // get number of group entries
@@ -1162,7 +1158,7 @@ Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group)
 /// Returns the number of groups
 ///
 
-Int_t TAngularCorrelation::GetNumGroups()
+Int_t TAngularCorrelation::GetNumGroups() const
 {
    Int_t max = 0;
    for(int fGroup : fGroups) {
@@ -1177,7 +1173,7 @@ Int_t TAngularCorrelation::GetNumGroups()
 /// Returns the number of groups
 ///
 
-Int_t TAngularCorrelation::GetNumModIndices()
+Int_t TAngularCorrelation::GetNumModIndices() const
 {
    Int_t max = 0;
    for(int fModifiedIndice : fModifiedIndices) {
@@ -1196,7 +1192,7 @@ Int_t TAngularCorrelation::GetNumModIndices()
 /// This function is called by GenerateGroupMaps()
 ///
 
-Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles)
+Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles) const
 {
    std::vector<Double_t> groupangle; // vector to return
 
@@ -1237,10 +1233,7 @@ std::vector<Double_t> TAngularCorrelation::GenerateFoldedAngles(std::vector<Doub
    }
 
    // declare fold array and fill with zeros
-   std::vector<Double_t> foldArray;
-   for(Int_t i = 0; i < size; i++) {
-      foldArray.push_back(0);
-   }
+   std::vector<Double_t> foldArray(size);
 
    // fill fold array with angle values
    for(Int_t i = 0; i < size; i++) {
@@ -1631,7 +1624,7 @@ void TAngularCorrelation::UpdateIndexCorrelation()
       Int_t bin   = (GetIndexCorrelation())->FindBin(index);
 
       // extract area
-      TPeak* peak = static_cast<TPeak*>(GetPeak(index));
+      auto* peak = static_cast<TPeak*>(GetPeak(index));
       if(peak == nullptr) {
          return;
       }
@@ -1650,8 +1643,6 @@ void TAngularCorrelation::UpdateIndexCorrelation()
       static_cast<TH1D*>(GetIndexCorrelation())->SetBinContent(bin, area);
       static_cast<TH1D*>(GetIndexCorrelation())->SetBinError(bin, area_err);
    }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1686,12 +1677,12 @@ void TAngularCorrelation::UpdateDiagnostics()
       Int_t bin   = (GetIndexCorrelation())->FindBin(index);
 
       // extract pertinent values from TPeaks
-      TPeak* peak = static_cast<TPeak*>(GetPeak(index));
+      auto* peak = static_cast<TPeak*>(GetPeak(index));
       if(peak == nullptr) {
          return;
       }
       Double_t chi2         = peak->GetChisquare();
-      Double_t NDF          = static_cast<Double_t>(peak->GetNDF());
+      auto     NDF          = static_cast<Double_t>(peak->GetNDF());
       Double_t centroid     = peak->GetCentroid();
       Double_t centroid_err = peak->GetCentroidErr();
       Double_t fwhm         = peak->GetFWHM();
@@ -1704,8 +1695,6 @@ void TAngularCorrelation::UpdateDiagnostics()
       static_cast<TH1D*>(GetFWHMHst())->SetBinContent(bin, fwhm);
       static_cast<TH1D*>(GetFWHMHst())->SetBinError(bin, fwhm_err);
    }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1726,7 +1715,8 @@ void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this
    TH1D* temphst = Get1DSlice(index);
 
    // adjust range
-   Double_t minenergy, maxenergy;
+   Double_t minenergy = 0.;
+	Double_t maxenergy = 0.;
    peak->GetRange(minenergy, maxenergy);
    Double_t difference = maxenergy - minenergy;
    minenergy           = minenergy - 0.5 * difference;
@@ -1736,7 +1726,7 @@ void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this
    // fit peak
    // peak->SetName(name);
    peak->Fit(Get1DSlice(index), "");
-   TPeak* hstpeak = static_cast<TPeak*>(temphst->GetListOfFunctions()->Last());
+   auto* hstpeak = static_cast<TPeak*>(temphst->GetListOfFunctions()->Last());
 
    // push new peak
    SetPeak(index, hstpeak);
@@ -1764,7 +1754,7 @@ TPeak* TAngularCorrelation::GetPeak(Int_t index)
 ///
 /// \param[in] hst histogram
 ///
-Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst)
+Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst) const
 {
    Int_t hstbins    = hst->GetNbinsX();
    Int_t modindices = GetNumModIndices();
@@ -1783,7 +1773,7 @@ Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst)
 ////////////////////////////////////////////////////////////////////////////////
 /// Prints current folding and grouping settings
 ///
-void TAngularCorrelation::PrintModifiedConditions()
+void TAngularCorrelation::PrintModifiedConditions() const
 {
 	std::cout<<"Current modification conditions:"<<std::endl;
    if(fFolded) {
@@ -1796,7 +1786,6 @@ void TAngularCorrelation::PrintModifiedConditions()
    } else {
 		std::cout<<"Grouped: no"<<std::endl;
    }
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1823,7 +1812,7 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
       }
       // this loop is just for checking to make sure all indices are in the weight vector
       for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
-         Int_t index = hst->GetBinLowEdge(i);
+			auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
          if(index >= size) {
 				std::cout<<"Indices in histogram "<<hst->GetName()<<" go beyond size of weights array. Aborting."<<std::endl;
             return nullptr;
@@ -1856,8 +1845,8 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
    // now that we're satisified everything is kosher, divide the bins.
    for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
 		std::cout<<"\t"<<i<<std::endl;
-      Int_t index        = hst->GetBinLowEdge(i);
-      Int_t found_weight = 0;
+		auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
+      Double_t found_weight = 0;
       if(!fold && !group) {
          found_weight = GetWeightFromIndex(index);
       } else {

@@ -16,7 +16,7 @@ void ExamineMidasFile(const char *filename) {
 		return;
 	}   
 	in.seekg(0, std::ifstream::end);
-	long long filesize = in.tellg();
+	int64_t filesize = in.tellg();
 	in.close();
 
 	TMidasFile  mfile; 
@@ -25,10 +25,10 @@ void ExamineMidasFile(const char *filename) {
 
 	mfile.Open(filename);
 
-	long long starttime    = 0;
-	long long stoptime     = 0;
+	int64_t starttime    = 0;
+	int64_t stoptime     = 0;
 	int currenteventnumber = 0;
-	long long bytesread = 0;
+	int64_t bytesread = 0;
 
 	bool loop = true;
 
@@ -59,22 +59,25 @@ void ExamineMidasFile(const char *filename) {
 				break;
 		}
 		if((++currenteventnumber%15000)== 0) {
-			printf( " Looping over event %i have looped %.2fMB/%.2f MB => %.1f MB/s              "  "\r",
-					currenteventnumber,(bytesread/1000000.0),(filesize/1000000.0),(bytesread/1000000.0)/sw.RealTime());
+			std::streamsize precision = std::cout.precision();
+			std::cout.precision(2);
+			std::cout<<" Looping over event "<<currenteventnumber<<" have looped "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/sw.RealTime()<<" MB/s              \r";
+			std::cout.precision(precision);
 			sw.Continue();
 		}
 	}
-	printf( " Looping over event %i have looped %.2fMB/%.2f MB => %.1f MB/s              "  "\r",
-			currenteventnumber,(bytesread/1000000.0),(filesize/1000000.0),(bytesread/1000000.0)/sw.RealTime());
+	std::streamsize precision = std::cout.precision();
+	std::cout.precision(2);
+	std::cout<<" Looping over event "<<currenteventnumber<<" have looped "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/sw.RealTime()<<" MB/s              \r";
+	std::cout.precision(precision);
 	printf("\n\n");
 	printf("EventTypes Seen: \n");
-	for(std::map<int,int>::iterator it=type_counter.begin();it!=type_counter.end();it++) {
-		printf("\tEventId[0x%x]  =  %i\n",it->first,it->second);
+	for(auto& it : type_counter) {
+		printf("\tEventId[0x%x]  =  %i\n",it.first,it.second);
 	}
 	printf("\n");
-	printf("Run length =  %lli  seconds\n",stoptime-starttime);
+	printf("Run length =  %lli  seconds\n",static_cast<long long int>(stoptime-starttime));
 	printf("\n");
-	return;
 }
 
 

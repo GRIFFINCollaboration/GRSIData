@@ -8,24 +8,25 @@
 ClassImp(TGriffinHit)
 /// \endcond
 
-TGriffinHit::TGriffinHit() : TDetectorHit()
+TGriffinHit::TGriffinHit()
 {
-// Default Ctor. Ignores TObject Streamer in ROOT < 6.
+	/// Default Ctor. Ignores TObject Streamer in ROOT < 6.
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit()
+TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit(rhs)
 {
-   // Copy Ctor. Ignores TObject Streamer in ROOT < 6.
+   /// Copy Ctor. Ignores TObject Streamer in ROOT < 6.
    Clear();
    rhs.Copy(*this);
 }
 
-TGriffinHit::TGriffinHit(const TFragment& frag) : TDetectorHit(frag)
+TGriffinHit::TGriffinHit(const TFragment& frag)
 {
+	frag.Copy(*this);
    SetNPileUps(frag.GetNumberOfPileups());
 }
 
@@ -98,7 +99,7 @@ bool TGriffinHit::CompareEnergy(const TGriffinHit* lhs, const TGriffinHit* rhs)
 
 void TGriffinHit::Add(const TDetectorHit* hit)
 {
-	const TGriffinHit* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
+	const auto* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
 	if(griffinHit == nullptr) {
 		throw std::runtime_error("trying to add non-griffin hit to griffin hit!");
 	}

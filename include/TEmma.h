@@ -17,13 +17,14 @@
 #include "TChannel.h"
 
 class TEmma : public TDetector {
-
 public:
    TEmma();
    TEmma(const TEmma&);
-   ~TEmma() override;
+	TEmma(TEmma&&) noexcept = default;
+   TEmma& operator=(const TEmma&); //!<!
+	TEmma& operator=(TEmma&&) noexcept = default;
+   ~TEmma() override = default;
 
-public:
    TEmmaHit* GetEmmaHit(const int& i) const { return static_cast<TEmmaHit*>(GetHit(i)); }
    TEmmaHit* GetICHit(const int& i);
    TEmmaHit* GetAnodeHit(const int& i);
@@ -46,7 +47,6 @@ public:
 
   // static TVector3 GetPosition(double delayL, double delayR, double delayT, double delayB); //!<!
    static TVector3 GetPosition(double left, double right, double top, double bottom, double delayL, double delayR, double delayT, double delayB );
-   TEmma& operator=(const TEmma&); //!<!
 
 private:
    std::vector<TEmmaHit> fEmmaICHits;
@@ -64,18 +64,17 @@ private:
    static double fYsum;
    static double fXlength;
    static double fYlength;
-   static short fFail;
+   static int16_t fFail;
 
 
 public:
-
    void Copy(TObject&) const override;            //!<!
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TEmma, 4) // Emma Physics structure
+   ClassDefOverride(TEmma, 4) // Emma Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

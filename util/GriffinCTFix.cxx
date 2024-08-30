@@ -14,7 +14,7 @@
 #include "TGriffin.h"
 #include "TUserSettings.h"
 
-double CrossTalkFit(double* x, double* par)
+double CrossTalkFit(double* x, double* par) // NOLINT(readability-non-const-parameter)
 {
    // This function is the linear fit function, but uses the CT coefficients as parameters instead of slope and
    // intercept
@@ -55,9 +55,9 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
    double highCut = energy + 15;
 
 	// create diagonal cut
-   double xpts[5] = {lowCut, 0, 0, highCut, lowCut};
-   double ypts[5] = {0, lowCut, highCut, 0, 0};
-   TCutG  cut("cut", 5, xpts, ypts);
+	std::array<double, 5> xpts = {lowCut, 0, 0, highCut, lowCut};
+   std::array<double, 5> ypts = {0, lowCut, highCut, 0, 0};
+   TCutG cut("cut", 5, xpts.data(), ypts.data());
 
    auto* d   = new double[16]; // matrix of coefficients
    auto* eD  = new double[16]; // matrix of errors
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
       return 1;
    }
 
-	auto userSettings = new TUserSettings();
+	auto* userSettings = new TUserSettings();
 	if(argc == 4) {
 		userSettings->ReadSettings(argv[3]);
 	}

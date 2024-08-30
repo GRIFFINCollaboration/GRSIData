@@ -24,7 +24,10 @@ class TTigressHit : public TDetectorHit {
 public:
    TTigressHit();
    TTigressHit(const TTigressHit&);
-   TTigressHit(const TFragment& frag);
+	TTigressHit(TTigressHit&&) noexcept = default;
+	TTigressHit& operator=(const TTigressHit&) = default;
+	TTigressHit& operator=(TTigressHit&&) noexcept = default;
+   explicit TTigressHit(const TFragment& frag);
    void CopyFragment(const TFragment& frag);
    ~TTigressHit() override;
 
@@ -96,14 +99,14 @@ public:
    /* int GetLastSeg()  const { if(fSegments.size()>0) return fSegments.back().GetSegment(); return -1; } */
    int GetFirstSeg() const
    {
-      if(fSegments.size() > 0) {
+      if(!fSegments.empty()) {
          return fSegments.front().GetSegment();
       }
       return 0;
    }
    int GetLastSeg() const
    {
-      if(fSegments.size() > 0) {
+      if(!fSegments.empty()) {
          return fSegments.back().GetSegment();
       }
       return 0;
@@ -117,7 +120,6 @@ public:
    TVector3 GetPosition(Double_t dist = 0.) const override;
    TVector3 GetLastPosition(Double_t dist = 0.) const;
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Copy(TObject&) const override;            //!<!
    void Copy(TObject&, bool) const override;      //!<!
@@ -127,7 +129,7 @@ public:
    void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); } //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTigressHit, 4)
+   ClassDefOverride(TTigressHit, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

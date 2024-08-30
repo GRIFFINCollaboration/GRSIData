@@ -13,7 +13,6 @@
 #include <string>
 #include <cmath>
 #include <cstdio>
-#include <cmath> /* round, floor, ceil, trunc */
 #include <ctime>
 
 #include "TF1.h"
@@ -42,7 +41,7 @@
 
 void Printaddress(int* channel);
 void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nsclr, int& ncycle, double* rate,
-                 int* channel, int& index, int* trun, double& thresh);
+                 int* channel, int& index, const int* trun, double& thresh);
 void CheckFile(const char*& fname);
 void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& patlen, int& ncycle, int* trun,
                 double& eor, const char*& hname, const char*& iname, const char*& jname, const char*& kname,
@@ -53,38 +52,38 @@ int main(int argc, char* argv[])
    TApplication theApp("Analysis", &argc, argv);
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER
    //INPUTS
-   std::ifstream filelist("/home/mbowry/Documents/ROOT/Backup/newfilelist_hs.txt"); // input file(s) DATA
-   std::ifstream ODBlist("/home/mbowry/Documents/ROOT/Backup/ODBlist_hs.txt");      // input file(s) ODB (runinfo)
-   const char* fname = "viewscaler.root";                                           // output file (scaler spectra)
-   const char* hname = "random_counts.txt";    // output file (frequency histograms, source)
-   const char* iname = "combined_counts.txt";  // output file (frequency histograms, source+pulser)
-   const char* jname = "random_seed.txt";      // output file (check random number generation)
-   const char* kname = "RESULTS.txt";          // output file (deadtime results)
-   const char* lname = "asymmetric_error.txt"; // output file (error combination histogram)
-   const char* mname = "random_deadtime.txt";  // output file (random deadtime histogram)
-   const char* nname = "accepted_rand.txt";    // output file (accepted random rate histogram)
-   int         nsclr   = 9;                    // total number of pulser inputs
-   int         addr[9] = {0x0000, 0x000d, 0x0101, 0x0107, 0x020b,
-                  0x020c, 0x0302, 0x030c, 0x030d}; // addresses with pulser inputs
-   double freq[4] = {2.e3, 5.e3, 1.e4, 2.e4};      // precision pulser rates (2,5,10,20 kHz)
-   int patlen  = 10;                               // pattern length in seconds
-   int ncycle  = 1;                                // read out period of scalers (seconds);
-   int scaleri = 0;                                // scaler# START
-   int scalerf = 3;                                // scaler# END (0->3 = all scalers)
-   double thresh = 0.3;                            // threshold for rejection of spurious scaler events
-   double eor     = 0.3;                           // threshold for end-of-run cut off
-   int    specoff = 1;                             // temporary flag: if =1, only analysis performed
-   //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~DEFINITIONS
-   int     tdiff[4] = {0, 0, 0, 0}; // run time extracted from ODB
-   int*    td       = &tdiff[0];
-   int*    p        = &addr[0];
-   double* q        = &freq[0];
-   int     counter  = 0;
-   int     nds      = 0;
-   int     nscaler  = 0;
-   int     len      = 70;
-   auto*   line     = new char[len];
-   auto*   odb      = new char[len];
+   std::ifstream         filelist("/home/mbowry/Documents/ROOT/Backup/newfilelist_hs.txt");   // input file(s) DATA
+   std::ifstream         ODBlist("/home/mbowry/Documents/ROOT/Backup/ODBlist_hs.txt");        // input file(s) ODB (runinfo)
+   const char*           fname   = "viewscaler.root";                                         // output file (scaler spectra)
+   const char*           hname   = "random_counts.txt";                                       // output file (frequency histograms, source)
+   const char*           iname   = "combined_counts.txt";                                     // output file (frequency histograms, source+pulser)
+   const char*           jname   = "random_seed.txt";                                         // output file (check random number generation)
+   const char*           kname   = "RESULTS.txt";                                             // output file (deadtime results)
+   const char*           lname   = "asymmetric_error.txt";                                    // output file (error combination histogram)
+   const char*           mname   = "random_deadtime.txt";                                     // output file (random deadtime histogram)
+   const char*           nname   = "accepted_rand.txt";                                       // output file (accepted random rate histogram)
+   int                   nsclr   = 9;                                                         // total number of pulser inputs
+   std::array<int, 9>    addr    = {0x0000, 0x000d, 0x0101, 0x0107, 0x020b,
+                                    0x020c, 0x0302, 0x030c, 0x030d};   // addresses with pulser inputs
+   std::array<double, 4> freq    = {2.e3, 5.e3, 1.e4, 2.e4};           // precision pulser rates (2,5,10,20 kHz)
+   int                   patlen  = 10;                                 // pattern length in seconds
+   int                   ncycle  = 1;                                  // read out period of scalers (seconds);
+   int                   scaleri = 0;                                  // scaler# START
+   int                   scalerf = 3;                                  // scaler# END (0->3 = all scalers)
+   double                thresh  = 0.3;                                // threshold for rejection of spurious scaler events
+   double                eor     = 0.3;                                // threshold for end-of-run cut off
+   int                   specoff = 1;                                  // temporary flag: if =1, only analysis performed
+                                                                       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~DEFINITIONS
+   std::array<int, 4> tdiff   = {0, 0, 0, 0};                          // run time extracted from ODB
+   int*               td      = tdiff.data();
+   int*               p       = addr.data();
+   double*            q       = freq.data();
+   int                counter = 0;
+   int                nds     = 0;
+   int                nscaler = 0;
+   int                len     = 70;
+   auto*              line    = new char[len];
+   auto*              odb     = new char[len];
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    if(!(filelist.is_open())) {
       std::cerr<<"Failed to open filelist. Check path. "<<std::endl;
@@ -98,15 +97,15 @@ int main(int argc, char* argv[])
    // Start time binary = DWORD : 1445453916
    // Stop time binary = DWORD : 1445454042
    // the difference (stop-start) equals the run time in seconds. Useful for histogram binning purposes.
-   size_t      posa;
-   size_t      posb;
-   int         sub       = 28;
-   const char* starttime = "Start time binary";
-   const char* stoptime  = "Stop time binary";
-   int         tstart    = 0;
-   int         tend      = 0;
-   int         runtime   = 0;
-   int         nppg      = 0;
+   size_t           posa      = 0;
+   size_t           posb      = 0;
+   int              sub       = 28;
+   const char*      starttime = "Start time binary";
+   const char*      stoptime  = "Stop time binary";
+   int              tstart    = 0;
+   int              tend      = 0;
+   int              runtime   = 0;
+   int              nppg      = 0;
    std::string      odbline;
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    int line_count = std::count( // read in number of lines(files)
@@ -128,7 +127,7 @@ int main(int argc, char* argv[])
    filelist.seekg(0, std::ios::beg);
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    Printaddress(p); // Credit to to E.Kwan for this part
-   p = &addr[0];
+   p = addr.data();
    while(counter < line_count) {
       filelist.getline(line, len, '\n');
       const char* filename = line;
@@ -164,7 +163,7 @@ int main(int argc, char* argv[])
          } else {
             MakeSpectra(filename, counter, fname, nsclr, ncycle, q, p, index, td, thresh);
          }
-         p = &addr[0];
+         p = addr.data();
          nds += 1;
       }
       counter++;
@@ -175,8 +174,8 @@ int main(int argc, char* argv[])
    }
    delete[] line;
    delete[] odb;
-   q  = &freq[0];
-   td = &tdiff[0];
+   q  = freq.data();
+   td = tdiff.data();
    if(counter > 0) {
       nscaler = nds / counter;
    }
@@ -203,18 +202,18 @@ void Printaddress(int* channel)
 }
 
 void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nsclr, int& ncycle, double*, int* channel,
-                 int& index, int* trun, double&)
+                 int& index, const int* const trun, double&)
 {
    int nsc = nsclr;
 
    // define spectra
    auto** grif = new TH1D*[nsc];
    // define file pointer
-   TFile* vs;
+   TFile* vs = nullptr;
 
    // make spectra
    auto*  rf    = new TFile(filename, "read");
-   TTree* maple = dynamic_cast<TTree*>(rf->Get("ScalerTree")); // Scaler data
+   auto* maple = static_cast<TTree*>(rf->Get("ScalerTree")); // Scaler data
 
    int    nofBins = *trun / ncycle;
    double xaxis   = 0;
@@ -255,9 +254,9 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
       for(Long64_t e = 0; e < nentries; e++) {
          maple->GetEntry(e);
          if(scaler->GetAddress() == static_cast<UInt_t>(*channel)) {
-            xaxis = (scaler->GetTimeStamp() / 1e9);
+            xaxis = static_cast<double>(scaler->GetTimeStamp()) / 1e9;
             // we check both the value of the scaler and the timestamp (ts difference should be = readout time)
-            if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= (double(ncycle) + clk)) {
+            if(prev != 0 && prev < scaler->GetScaler(index) && (xaxis - xpast) <= static_cast<double>(ncycle) + clk) {
                yaxis = (scaler->GetScaler(index) - prev);
                grif[k]->Fill(xaxis, yaxis);
             }
@@ -289,7 +288,6 @@ void CheckFile(const char*& fname)
       printf("\n");
       printf(DBLUE "ROOT file %s opens with no problems.." RESET_COLOR "\n", fname);
    }
-   return;
 }
 
 void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& patlen, int&, int* trun, double& eor,
@@ -311,25 +309,24 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
 
    int nsc        = nsclr;
    int cnt        = 0;
-   int ppgstat[2] = {0, 0};
+	std::array<int, 2> ppgstat = {0, 0};
    // generate random seed from system time for use in error analysis
-   time_t timer;
-   timer = time(nullptr);
+   time_t timer = time(nullptr);
    srand(timer);
 
    TFile  f(fname);
    TIter  next(f.GetListOfKeys());
-   TKey*  key;
+   TKey*  key = nullptr;
    auto** spec = new TH1D*[nfile * (nsc * nscaler)];
 
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER EDITABLE
    // limits for deadtime matrices [us]
    // NOTE: The order of the limits (rp1,rp2 etc.) MUST be identical to the file order
-   double  rp1[8]  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 2kHz, scaler0-3
-   double  rp2[8]  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 5kHz, scaler0-3
-   double  rp3[8]  = {-15, 15, -15, 15, 0, 20, 170, 230}; // 10kHz, scaler0-3
-   double  rp4[8]  = {-15, 15, -15, 15, 0, 20, 200, 300}; // 20kHz, scaler0-3
-   double* lowrtau = &rp1[0]; // internal pointers: points to correction coefficients in each array
+	std::array<double, 8>  rp1  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 2kHz, scaler0-3
+   std::array<double, 8>  rp2  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 5kHz, scaler0-3
+   std::array<double, 8>  rp3  = {-15, 15, -15, 15, 0, 20, 170, 230}; // 10kHz, scaler0-3
+   std::array<double, 8>  rp4  = {-15, 15, -15, 15, 0, 20, 200, 300}; // 20kHz, scaler0-3
+   double* lowrtau = rp1.data(); // internal pointers: points to correction coefficients in each array
    double* upprtau = &rp1[1]; //
    int     cflag   = 0;       // counter
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
@@ -363,33 +360,34 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double nrand  = 0;
       double rrand  = 0;
       double sdrand = 0;
-      double sum = 0, sumc = 0;
-      double maxl  = 0;
-      double minl  = 1e6;
-      double x     = 0;
-      double w     = 0;
-      double diff  = 0;
-      double rcmin = 0;
-      int    minb  = 0;
-      double lbd;
-      double ubd;
-      double rmax = 0;
-      int    flag = 0;
-      double z    = 0;
-      double y    = 0;
-      double v    = 0;
-      double dz   = 0;
-      double dv   = 0;
-      double d2z  = 0;
-      int    fbin = 10;
-      double max  = 0;
-      double dlim = 0;
-      int    nt   = 0;
-      int    ord  = 0;
-      int    sref = 0;
-      int    pref = 0;
-      int    chop = 2; //'chop'= ignore first/last two bins of each pattern
-      auto** ppg  = new int*[numpat];
+      double sum    = 0;
+      double sumc   = 0;
+      double maxl   = 0;
+      double minl   = 1e6;
+      double x      = 0;
+      double w      = 0;
+      double diff   = 0;
+      double rcmin  = 0;
+      int    minb   = 0;
+      double lbd    = 0.;
+      double ubd    = 0.;
+      double rmax   = 0.;
+      int    flag   = 0;
+      double z      = 0;
+      double y      = 0;
+      double v      = 0;
+      double dz     = 0;
+      double dv     = 0;
+      double d2z    = 0;
+      int    fbin   = 10;
+      double max    = 0;
+      double dlim   = 0;
+      int    nt     = 0;
+      int    ord    = 0;
+      int    sref   = 0;
+      int    pref   = 0;
+      int    chop   = 2;   //'chop'= ignore first/last two bins of each pattern
+      auto** ppg    = new int*[numpat];
       for(int i = 0; i < numpat; ++i) {
          ppg[i] = new int[2];
       };
@@ -434,7 +432,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                   diff = ((x - z) / z);
                   ord  = 1;
                   break;
-               } else if(z > 0 && x < z) {
+               } 
+					if(z > 0 && x < z) {
                   diff = ((z - x) / x);
                   ord  = 0;
                   break;
@@ -452,7 +451,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                }
             }
             if(z == 0) {
-               for(int j = *trun; j >= (*trun - (int(0.7 * patlen))); j--) {
+               for(int j = *trun; j >= (*trun - static_cast<int>(0.7 * patlen)); j--) {
                   y = spec[cnt]->GetBinContent(j);
                   if(y > 0 && v > 0) {
                      dz = (abs(y - v) / v);
@@ -491,11 +490,11 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int i = 0; i <= xbins; i++) {
          for(int j = 0; j < fbin; j++) {
             if(i == 1) {
-               freq[j][0] = (0. + (double(j) * (rmax / double(fbin))));
+               freq[j][0] = (0. + j * (rmax / fbin));
                freq[j][1] = 0;
             }
-            if(abs(trans[i][1]) > (0. + (double(j) * (rmax / double(fbin)))) &&
-               abs(trans[i][1]) <= (rmax / double(fbin)) + (double(j) * (rmax / double(fbin)))) {
+            if(abs(trans[i][1]) > (0. + j * (rmax / fbin)) &&
+               abs(trans[i][1]) <= (rmax / fbin) + (j * (rmax / fbin))) {
                freq[j][1] = freq[j][1] + 1;
             }
          }
@@ -504,7 +503,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int j = 0; j < fbin; j++) {
          if(freq[j][1] > max) {
             max  = freq[j][1];
-            dlim = (2 * ((rmax / double(fbin)) + (double(j) * (rmax / double(fbin)))));
+            dlim = (2 * ((rmax / fbin) + (j * (rmax / fbin))));
          }
       }
       // std::cout<<"PPG transitions assumed above "<<(dlim*100.)<<" % change in rate.."<<std::endl;
@@ -518,10 +517,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                // std::cout<<"(see bin number "<<i<<" in spectrum "<<sname<<")"<<std::endl;
                ppgstat[1] += 1;
                break;
-            } else {
-               bnd[nt - 1][0] = i;
-               bnd[nt - 1][1] = trans[i][2];
-            }
+            } 
+				bnd[nt - 1][0] = i;
+				bnd[nt - 1][1] = static_cast<int>(trans[i][2]);
          }
       }
       if(nt == numpat) {
@@ -567,8 +565,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       }
       rrand = (wrand / nrand); // mean
       // diagnostic spectrum (dspec) parameters
-      int    lim1  = rrand - (0.5 * dlim * rrand);
-      int    lim2  = rrand + (0.5 * dlim * rrand);
+      int    lim1  = static_cast<int>(rrand - (0.5 * dlim * rrand));
+      int    lim2  = static_cast<int>(rrand + (0.5 * dlim * rrand));
       int    dsbin = (lim2 - lim1) / 20;
       auto** dspec = new int*[dsbin];
       for(int i = 0; i < dsbin; ++i) {
@@ -656,8 +654,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
          }
       }
       // diagnostic spectrum (dspec) parameters (re-define for source+pulser)
-      lim1 = lbd - (2.0 * abs(rcmin - lbd));
-      lim2 = ubd + (2.0 * abs(rcmin - ubd));
+      lim1 = static_cast<int>(lbd - (2.0 * abs(rcmin - lbd)));
+      lim2 = static_cast<int>(ubd + (2.0 * abs(rcmin - ubd)));
       // std::cout<<lim1<<"\t"<<lim2<<"\t"<<rcmin<<std::endl;
       dsbin = (lim2 - lim1) / 20; // dspec[dsbin][2]; What was this statement supposed to do? It has no effect; VB
       for(int i = 0; i < dsbin; i++) {
@@ -703,20 +701,20 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       double du   = (uhi - ulo) / 1e3;
       double u    = ulo;
       int    itr  = 0;
-      int    umin = 0;
-      double w1;
-      double x1;
-      double x2;
-      int    nrow  = int((uhi - ulo) / du);
-      double w2    = pow((pow(sdrand, 2)), 2) / ((2. * pow(sdrand, 2))); // const.
+      int    umin  = 0;
+      double w1    = 0.;
+      double x1    = 0.;
+      double x2    = 0.;
+      int    nrow  = static_cast<int>((uhi - ulo) / du);
+      double w2    = pow((pow(sdrand, 2)), 2) / ((2. * pow(sdrand, 2)));   // const.
       minl         = -1e6;
       auto** array = new double*[nrow];
       for(int i = 0; i < nrow; ++i) {
          array[i] = new double[2];
       }
-      double sigm;
-      double sigp;
-      double lnl;
+      double sigm = 0.;
+      double sigp = 0.;
+      double lnl = 0.;
 
       while(itr < nrow) {
          if(itr == 0) {
@@ -774,12 +772,18 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // which chooses a value within these boundaries - the resulting tau is plotted and the range gives the error in
       // tau
 
-      int    iter = 1e4, bin = 10;
-      double tempa, tempb;
-      double var1, var2, var3;
-      double l1, l2;
+      int    iter = 10000;
+		int    bin = 10;
+      double tempa = 0.;
+		double tempb = 0.;
+      double var1 = 0.;
+		double var2 = 0.;
+		double var3 = 0.;
+      double l1 = 0.;
+		double l2 = 0.;
       int    wbin = 40;
-      int    wrow = 0, wsize = int(pow(wbin, 2));
+      int    wrow = 0;
+		int    wsize = static_cast<int>(pow(wbin, 2));
       auto** randcheck = new double*[bin];
       for(int i = 0; i < bin; ++i) {
          randcheck[i] = new double[2];
@@ -796,15 +800,15 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
 
       // Check the "randomness" of the random number generator **RCHECK**
       for(int i = 0; i < bin; i++) {
-         randcheck[i][0] = 0 + (double(i) * (1 / double(bin)));
+         randcheck[i][0] = 0 + (static_cast<double>(i) * (1 / static_cast<double>(bin)));
          randcheck[i][1] = 0;
       }
       // initialise matrix to get final uncertainty
       for(int i = 0; i < wbin; i++) {
          for(int j = 0; j < wbin; j++) {
-            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (double(i) * ((sigp - sigm) / double(wbin))); // x,
+            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (static_cast<double>(i) * ((sigp - sigm) / static_cast<double>(wbin))); // x,
                                                                                                       // (rcmin-rrand)
-            wspec[wrow][1] = (*lowrtau) + (double(j) * ((*upprtau - *lowrtau) / double(wbin))); // y, (rtau);
+            wspec[wrow][1] = (*lowrtau) + (static_cast<double>(j) * ((*upprtau - *lowrtau) / static_cast<double>(wbin))); // y, (rtau);
             wspec[wrow][2] = 0;                                                                 // z, frequency
             wrow += 1;
          }
@@ -817,9 +821,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             l2 = ((rcmin - rrand) + array[i + binsize][0]);
 
             for(int j = 0; j < iter; j++) {
-               tempa = rand() / double(RAND_MAX);
+               tempa = rand() / static_cast<double>(RAND_MAX);
                var1  = ((tempa * (a1 + a2)) + (rcmin - a2));
-               tempb = rand() / double(RAND_MAX);
+               tempb = rand() / static_cast<double>(RAND_MAX);
                var2  = ((tempb * (2.e0 * sdrand)) + (rrand - sdrand));
                var3  = (var1 - var2);
                //~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~'good'
@@ -850,9 +854,16 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // "\n",(rcmin-rrand),sigp,sigm,rrand,sdrand);
       //~*~*~*~*~*~*~*~*~*~*~*~~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
       // Determine final error bounds using wspec matrix
-      double gmax = 0, hmax = 0;
-      double erbp = 0, erbm = 0, erfp = 0, erfm = 0;
-      double frmin = 1e6, frmax = 0, srmin = 1e6, srmax = 0;
+      double gmax = 0.;
+		double hmax = 0.;
+      double erbp = 0.;
+		double erbm = 0.;
+		double erfp = 0.;
+		double erfm = 0.;
+      double frmin = 1e6;
+		double frmax = 0.;
+		double srmin = 1e6;
+		double srmax = 0.;
 
       for(i = 0; i < wsize; i++) {
          if(wspec[i][2] > gmax) {
@@ -938,13 +949,13 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       if(cnt % (nsc) == 0 && cnt % (nsc * nscaler) == 0) {
          cflag++;
          if(cflag == 1) {
-            lowrtau = &rp2[0];
+            lowrtau = &rp2[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp2[1];
          } else if(cflag == 2) {
-            lowrtau = &rp3[0];
+            lowrtau = &rp3[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp3[1];
          } else if(cflag == 3) {
-            lowrtau = &rp4[0];
+            lowrtau = &rp4[0]; // NOLINT(readability-container-data-pointer)
             upprtau = &rp4[1];
          }
       }
@@ -967,5 +978,4 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    } else {
       printf(DBLUE "Correct # of PPG transitions obtained for %i out of %i spectra" RESET_COLOR "\n", good, cnt);
    }
-   return;
 }

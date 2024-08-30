@@ -15,8 +15,9 @@ TS3Hit::TS3Hit()
    Clear();
 }
 
-TS3Hit::TS3Hit(const TFragment& frag) : TDetectorHit(frag)
+TS3Hit::TS3Hit(const TFragment& frag)
 {
+	frag.Copy(*this);
 	if(static_cast<const TGRSIMnemonic*>(GetChannel()->GetMnemonic())->System() == TGRSIMnemonic::ESystem::kSiLiS3) {
 		SetIsDownstream(false);   
 	} else {

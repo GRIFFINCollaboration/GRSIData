@@ -18,21 +18,15 @@
 #include "TBadFragment.h"
 
 TGRSIDataParser::TGRSIDataParser()
-   : TDataParser()
-{
-	fState = EDataParserState::kGood;
-	fIgnoreMissingChannel = TGRSIOptions::Get()->IgnoreMissingChannel();
-}
-
-TGRSIDataParser::~TGRSIDataParser()
+   : fState(EDataParserState::kGood), fIgnoreMissingChannel(TGRSIOptions::Get()->IgnoreMissingChannel())
 {
 }
 
 int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 {
 	std::shared_ptr<TMidasEvent> event = std::static_pointer_cast<TMidasEvent>(rawEvent);
-   int   banksize;
-   void* ptr;
+   int   banksize = 0;
+   void* ptr = nullptr;
    int   frags = 0;
    try {
       switch(event->GetEventId()) {
@@ -105,20 +99,19 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
 		case 0x8001:
 			// end of file ODB
 #ifdef HAS_XML
-			TXMLOdb*  odb     = new TXMLOdb(event->GetData(), event->GetDataSize());
-			TRunInfo* runInfo = TRunInfo::Get();
-			TXMLNode* node    = odb->FindPath("/Runinfo/Stop time binary");
+         auto*     odb     = new TXMLOdb(event->GetData(), event->GetDataSize());
+         TXMLNode* node    = odb->FindPath("/Runinfo/Stop time binary");
 			if(node != nullptr) {
 				std::stringstream str(node->GetText());
-				unsigned int odbTime;
+				unsigned int odbTime = 0;
 				str>>odbTime;
 				odbTime *= 10; // convert from 10 ns to 1 ns units
 				if(atoi(node->GetText()) != 0 && odbTime != event->GetTimeStamp() && !TGRSIOptions::Get()->SuppressErrors()) {
 					std::cout<<"Warning, ODB stop time of last subrun ("<<odbTime<<") does not match midas time of last event in this subrun ("<<event->GetTimeStamp()<<")!"<<std::endl;
 				}
-				runInfo->SetRunStop(event->GetTimeStamp());
+				TRunInfo::SetRunStop(event->GetTimeStamp());
 			}
-			runInfo->SetRunLength();
+			TRunInfo::SetRunLength();
 			delete odb;
 #endif
 			break;
@@ -151,8 +144,8 @@ int TGRSIDataParser::TigressDataToFragment(uint32_t* data, int size, std::shared
 	int      x     = 0;
 	uint32_t dword = *(data + x);
 
-	uint32_t type;
-	uint32_t value;
+	uint32_t type = 0;
+	uint32_t value = 0;
 
 	if(!SetTIGTriggerID(dword, eventFrag)) {
 		std::cout<<RED<<"Setting TriggerId ("<<hex(dword, 8)<<") failed on midas event: "<<DYELLOW<<event->GetSerialNumber()<<RESET_COLOR<<std::endl;
@@ -264,16 +257,13 @@ void TGRSIDataParser::SetTIGWave(uint32_t value, const std::shared_ptr<TFragment
 	} else {
 		currentFrag->AddWaveformSample(static_cast<Short_t>((value >> 14) & 0x00001fff));
 	}
-	return;
 }
 
 void TGRSIDataParser::SetTIGCfd(uint32_t value, const std::shared_ptr<TFragment>& currentFrag)
 {
 	/// Sets the CFD of a Tigress Event.
 
-	currentFrag->SetCfd(int32_t(value & 0x07ffffff));
-
-	return;
+	currentFrag->SetCfd(static_cast<int32_t>(value & 0x07ffffff));
 }
 
 void TGRSIDataParser::SetTIGLed(uint32_t, const std::shared_ptr<TFragment>&)
@@ -292,7 +282,7 @@ void TGRSIDataParser::SetTIGCharge(uint32_t value, const std::shared_ptr<TFragme
 	}
 	std::string dig_type = chan->GetDigitizerTypeString();
 
-	int charge;
+	int charge = 0;
 	if((dig_type.compare(0, 5, "Tig10") == 0) || (dig_type.compare(0, 5, "TIG10") == 0)) {
 		if((value & 0x02000000) != 0u) {
 			charge = (-((~(static_cast<int32_t>(value) & 0x01ffffff)) & 0x01ffffff) + 1);
@@ -326,7 +316,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	unsigned int LastTriggerIdLoBits = LastTriggerId() & 0x00FFFFFF; // determined by the reported value
 	if(value < MaxTriggerId() / 10) {                                // the trigger id has wrapped around
 		if(LastTriggerIdLoBits > MaxTriggerId() * 9 / 10) {
-			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value + MaxTriggerId()));
+			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value + MaxTriggerId()));
 			std::cout<<DBLUE<<"We are looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
@@ -335,7 +325,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 		currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
 	} else {
 		if(LastTriggerIdLoBits < MaxTriggerId() / 10) {
-			currentFrag->SetTriggerId((uint64_t)(LastTriggerIdHiBits + value - MaxTriggerId()));
+			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value - MaxTriggerId()));
 			std::cout<<DRED<<"We are backwards looping new trigger id = "<<currentFrag->GetTriggerId()<<", last trigger hi bits = "<<LastTriggerIdHiBits<<", last trigger lo bits = "<<LastTriggerIdLoBits<<", value = "<<value<<RESET_COLOR<<std::endl;
 		} else {
 			currentFrag->SetTriggerId(static_cast<uint64_t>(LastTriggerIdHiBits + value));
@@ -343,7 +333,7 @@ bool TGRSIDataParser::SetTIGTriggerID(uint32_t value, const std::shared_ptr<TFra
 	}
 	// fragment_id_map[value]++;
 	// currentFrag->FragmentId = fragment_id_map[value];
-	LastTriggerId(static_cast<unsigned long>(currentFrag->GetTriggerId()));
+	LastTriggerId(static_cast<uint64_t>(currentFrag->GetTriggerId()));
 	return true;
 }
 
@@ -351,13 +341,13 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
 {
 	/// Sets the Timestamp of a Tigress Event
 	for(int x = 0; x < 10; x++) { // finds the timestamp.
-		data = data + 1;
+		++data;
 		if(((*data) >> 28) == 0xa) {
 			break;
 		}
 	}
-	long timestamplow  = -1;
-	long timestamphigh = -1;
+	int64_t timestamplow  = -1;
+	int64_t timestamphigh = -1;
 
 
 	if(!((*data & 0xf0000000) == 0xa0000000)) {
@@ -365,7 +355,7 @@ bool TGRSIDataParser::SetTIGTimeStamp(uint32_t* data, const std::shared_ptr<TFra
 		return false;
 	}
 
-	unsigned int time[5] = {0}; // tigress can report up to 5 valid timestamp words
+	std::array<unsigned int, 5> time = {0}; // tigress can report up to 5 valid timestamp words
 	int          x       = 0;
 
 	while((*(data + x) & 0xf0000000) == 0xa0000000) {
@@ -448,7 +438,7 @@ int TGRSIDataParser::ProcessGriffin(uint32_t* data, const int& size, const EBank
 	for(int index = 0; index < size;) {
 		if(((data[index]) & 0xf0000000) == 0x80000000) {
 			// if we found a fragment header we use GriffinDataToFragment which returns the number of words read
-			int words;
+			int words = 0;
 			try {
 				words = GriffinDataToFragment(&data[index], size - index, bank, event->GetSerialNumber(), event->GetTimeStamp());
 			} catch(TGRSIDataParserException& e) {
@@ -571,7 +561,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 	if(fIgnoreMissingChannel && eventFrag->GetChannel() != nullptr) {
 		// find end of this event
 		for(; x < size; x++) {
-			if((data[x] >> 28) == 0xe) return x;
+			if((data[x] >> 28) == 0xe) { return x; }
 		}
 	}
 
@@ -902,16 +892,12 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 									// low bits; signed, so we
 									// extend the sign bit from 14
 									// (31) to 16 bits
-									if(false && (data[x] & 0x02000000) == 0x02000000) {                             // overflow bit was set - disabled VB
-										tmpCharge.push_back(std::numeric_limits<int>::max());
-									} else {
-										tmpCharge.push_back((data[x] & 0x01ffffff) |
-												(((data[x] & 0x01000000) == 0x01000000)
-												 ? 0xfe000000
-												 : 0x0)); // extend the sign bit of 25bit charge word
-									}
-									++x;
-									tmpIntLength.push_back(tmp | ((data[x] & 0x7fc00000) >> 22));
+                           tmpCharge.push_back((data[x] & 0x01ffffff) |
+                                               (((data[x] & 0x01000000) == 0x01000000)
+                                                   ? 0xfe000000
+                                                   : 0x0));   // extend the sign bit of 25bit charge word
+                           ++x;
+                           tmpIntLength.push_back(tmp | ((data[x] & 0x7fc00000) >> 22));
 									tmpCfd.push_back(data[x] & 0x003fffff);
 									// check if we have two more words (X & XI) with (8 num hits, 2 reserved, 14 IntLength2)(31 Charge2);
 									// x has already been incremented once!
@@ -1254,15 +1240,15 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 {
 	// Parses special RF scaler events which contain only timestamps and fit paramteters
 
-	ULong64_t        ts = 0;
-	ULong64_t        tshigh;
-	double           rfFreq = -1.0;
-	double           rfPar[4];
-	bool             freqSet=false;
-	bool             tsSet=false;
-	int              failedWord = -1;
+   ULong64_t             ts = 0;
+   ULong64_t             tshigh = 0;
+   double                rfFreq = -1.0;
+   std::array<double, 4> rfPar;
+   bool                  freqSet    = false;
+   bool                  tsSet      = false;
+   int                   failedWord = -1;
 
-	int x=0;
+   int x=0;
 	for(int i = 0; i < size; i++) {
 		
 		if(x >= size){
@@ -1310,9 +1296,8 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 				break;
 		}
 		x++;
-		if(freqSet&&tsSet)
-			break;
-	}
+      if(freqSet && tsSet) { break; }
+   }
 
 	if(rfFreq < 0.0){
 		//std::cout << "Bad RF frequency." << std::endl;
@@ -1325,24 +1310,24 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 
 	frag->SetTimeStamp(ts);
 
-	if(!(x<size-3)){
-		//std::cout << "RF fragment does not contain all parameters." << std::endl;
+   if(!(x < size - 3)) {
+      //std::cout << "RF fragment does not contain all parameters." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
 		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
-	}
-	if((data[x]==data[x+1])&&(data[x]==data[x+2])&&(data[x]==data[x+3])){
-		//std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
+   }
+   if((data[x] == data[x + 1]) && (data[x] == data[x + 2]) && (data[x] == data[x + 3])) {
+      //std::cout << "Failed RF fit: all parameters are the same value." << std::endl;
 		TParsingDiagnostics::Get()->BadFragment(frag->GetDetectorType());
 		fState     = EDataParserState::kBadRFScalerWord;
 		failedWord = x;
 		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*frag, data, size, failedWord, false));
 		return -1;
-	}
+   }
 
-	int pos=0;
+   int pos=0;
 	for(int i = 0; i < 4; i++) {
 
 		uint32_t dword  = data[x];
@@ -1366,11 +1351,11 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 				return -1;
 			}
 			
-			if(dword & (1<<29)){ 
+			if((dword & (1<<29)) != 0x0){ 
 				//parameter value is negative
 				//take two's complement
 				for(int j=0;j<30;j++){
-					if(dword & (1<<j)){
+					if((dword & (1<<j)) != 0x0){
 						pos=j;
 						break;
 					}
@@ -1397,7 +1382,7 @@ int TGRSIDataParser::RFScalerToFragment(uint32_t* data, const int size, const st
 	double A = sqrt(rfPar[1] * rfPar[1] + rfPar[0] * rfPar[0]);
 	double s = -rfPar[0] / A;
 	double c = rfPar[1] / A;
-	double rfPhaseShift; //the phase shift, in ns
+	double rfPhaseShift = 0.; //the phase shift, in ns
 	if(s >= 0) {
 		rfPhaseShift = acos(c) * T / (2 * TMath::Pi());
 	} else {
@@ -1688,7 +1673,7 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
 				return -w;
 			}
 			int eventSize = numSampleWords+2; // +2 = trigger time words and charge word
-			if(extras) ++eventSize;
+			if(extras) { ++eventSize; }
 			if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
 				if(!Options()->SuppressErrors()) {
 					std::cerr<<numWords<<" words in channel aggregate, event size is "<<eventSize<<" => "<<static_cast<double>(numWords-2.)/static_cast<double>(eventSize)<<" events?"<<std::endl;
@@ -1698,14 +1683,17 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
 
 			// read channel data
 			for(int ev = 0; ev < (numWords-2)/eventSize; ++ev) { // -2 = 2 header words for channel aggregate
-				eventFrag->SetDaqTimeStamp(boardTime);
-				eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w]>>31)); // highest bit indicates odd channel
-				if(eventFrag->GetAddress() == 0x8000) eventFrag->SetDetectorType(9); //ZDS will always be in channel 0
-				else                                  eventFrag->SetDetectorType(6);
-				// these timestamps are in 2ns units
-				eventFrag->SetTimeStamp(data[w] & 0x7fffffff);
-				++w;
-				if(waveform) {
+            eventFrag->SetDaqTimeStamp(boardTime);
+            eventFrag->SetAddress(0x8000 + (boardId * 0x100) + channel + (data[w] >> 31));   // highest bit indicates odd channel
+            if(eventFrag->GetAddress() == 0x8000) {
+               eventFrag->SetDetectorType(9);   //ZDS will always be in channel 0
+            } else {
+               eventFrag->SetDetectorType(6);
+            }
+            // these timestamps are in 2ns units
+            eventFrag->SetTimeStamp(data[w] & 0x7fffffff);
+            ++w;
+            if(waveform) {
 					if(w + numSampleWords >= size) { // need to read at least the sample words plus the charge/extra word
 						if(!Options()->SuppressErrors()) {
 							std::cerr<<"3 - Missing "<<numSampleWords<<" waveform words, got only "<<w-1<<" words for channel "<<channel<<" (bank size "<<size<<")"<<std::endl;
@@ -1897,8 +1885,8 @@ int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr
 				return -w;
 			}
 			int eventSize = numSampleWords+2; // +2 = trigger time words and charge word
-			if(extras) ++eventSize;
-			if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
+         if(extras) { ++eventSize; }
+         if(numWords%eventSize != 2 && !(eventSize == 2 && numWords%eventSize == 0)) { // 2 header words plus n*eventSize should make up one channel aggregate
 				if(!Options()->SuppressErrors()) {
 					std::cerr<<numWords<<" words in channel aggregate, event size is "<<eventSize<<" ("<<numWords%eventSize<<") => "<<static_cast<double>(numWords-2.)/static_cast<double>(eventSize)<<" events?"<<std::endl;
 				}
@@ -2023,7 +2011,7 @@ static time_t   xfermidts;    // Midas time stamp of events, hopefully the same
 unsigned int    xfermidsn;    // Midas serial number
 
 
-int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event)
+int TGRSIDataParser::EmmaMadcDataToFragment(const uint32_t* const data, int size, std::shared_ptr<TMidasEvent>& event)
 {
 	/// Converts a MIDAS File from the Emma DAQ into a TFragment.
 	int numFragsFound = 0;
@@ -2037,11 +2025,11 @@ int TGRSIDataParser::EmmaMadcDataToFragment(uint32_t* data, int size, std::share
 	int      x     = 0;
 	uint32_t dword = *(data + x);
 
-	uint32_t type;
-	uint32_t adcchannel;
-	uint32_t adcdata;
-	uint32_t adctimestamp;
-	uint32_t adchightimestamp;
+	uint32_t type = 0;
+	uint32_t adcchannel = 0;
+	uint32_t adcdata = 0;
+	uint32_t adctimestamp = 0;
+	uint32_t adchightimestamp = 0;
 
 	eventFrag->SetTimeStamp(0);
 	for(x=size; x-- > 0; ) { // Reads the event backwards 
@@ -2110,7 +2098,7 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 	bool multipleErrors = false; // Variable to store if multiple errors occured parsing one fragment
 	uint32_t tmpTimestamp = 0;
 	uint32_t tmpAddress = 0;
-	Long64_t ts;
+	Long64_t ts = 0;
 
 	std::vector<uint32_t> addresses;
 	std::vector<uint32_t> charges;
@@ -2194,25 +2182,24 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 					std::cout<<"Something went horribly wrong, the number of addresses read "<<addresses.size()<<" doesn't match the number of charges read "<<charges.size()<<std::endl;
 					return 0;
 				}
-				for(size_t i = 0; i < addresses.size(); ++i) {
-					size_t duped = 0;
-					size_t ii;
-					if (i>0) {
-						for (ii=0; ii<i; ii++) {
-							if (addresses[i]==addresses[ii]) {
-								duped++;
-							}
-						}
-					}
-					if (duped==0) {
-						eventFrag->SetAddress(addresses[i]);
-						eventFrag->SetCharge(static_cast<Int_t>(charges[i]));
-						Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
-						++numFragsFound;
-					} 
-				}
+            for(size_t i = 0; i < addresses.size(); ++i) {
+               size_t duped = 0;
+               if(i > 0) {
+                  for(size_t j = 0; j < i; j++) {
+                     if(addresses[i] == addresses[j]) {
+                        duped++;
+                     }
+                  }
+               }
+               if(duped == 0) {
+                  eventFrag->SetAddress(addresses[i]);
+                  eventFrag->SetCharge(static_cast<Int_t>(charges[i]));
+                  Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
+                  ++numFragsFound;
+               }
+            }
 
-				// clear the old data
+            // clear the old data
 				addresses.clear();
 				charges.clear();
 				tmpTimestamp = 0;
@@ -2237,7 +2224,7 @@ int TGRSIDataParser::EmmaTdcDataToFragment(uint32_t* data, int size, std::shared
 int TGRSIDataParser::EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
 {
 	/// Extract SRAW data, i.e. the instantaneous rates
-	auto scaler = new TScalerData;
+	auto* scaler = new TScalerData;
 	scaler->SetAddress(0xfffe); // magic address for raw scaler
 	// counter used to set time
 	static UInt_t nofRawScalers = 0;
@@ -2250,7 +2237,7 @@ int TGRSIDataParser::EmmaRawDataToFragment(uint32_t* data, int size, std::shared
 int TGRSIDataParser::EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>&)
 {
 	/// Extract SSUM data, i.e. the cumulative counts
-	auto scaler = new TScalerData;
+	auto* scaler = new TScalerData;
 	scaler->SetAddress(0xffff); // magic address for sum scaler
 	// counter used to set time
 	static UInt_t nofSumScalers = 0;

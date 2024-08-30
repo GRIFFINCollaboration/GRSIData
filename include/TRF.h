@@ -19,15 +19,17 @@ class TRF : public TDetector {
 public:
    TRF();
    TRF(const TRF&);
+	TRF(TRF&&) noexcept = default;
+	TRF& operator=(const TRF&) = default;
+	TRF& operator=(TRF&&) noexcept = default;
    ~TRF() override;
 
    Double_t Phase() const 
    {
       if(fPeriod > 0.0f) {
          return (fTime / fPeriod) * TMath::TwoPi(); 
-      } else {
-         return -10.0; //negative value indicates failed RF fit
       }
+		return -10.0; //negative value indicates failed RF fit
    }
    Double_t Time() const { return fTime; } //in ns, not tstamp 10ns
    Double_t Period() const { return fPeriod; } //in ns
@@ -45,16 +47,15 @@ public:
    Double_t GetTimeFitns() const
    {
       if(fTime != 0 && fTime < 1000 && fTime > -1000) {
-         return TimeStamp() + fTime; // 
+         return static_cast<Double_t>(TimeStamp()) + fTime; // 
       }
       return 0;
    }
    
    Double_t GetTimestampCfd() const
    { // ticks ->cfdunits
-      long ts =
-         TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
-      return ts;
+      int64_t ts = TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
+      return static_cast<Double_t>(ts);
    }
 
 #ifndef __CINT__
@@ -74,7 +75,7 @@ private:
    double fPeriod;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TRF, 4)
+   ClassDefOverride(TRF, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

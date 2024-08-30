@@ -29,10 +29,12 @@ public:
       kBit7        = 1<<7
    };
 
-public:
    TGriffinHit();
    TGriffinHit(const TGriffinHit&);
-   TGriffinHit(const TFragment&);
+	TGriffinHit(TGriffinHit&&) noexcept = default;
+	TGriffinHit& operator=(const TGriffinHit&) = default;
+	TGriffinHit& operator=(TGriffinHit&&) noexcept = default;
+   explicit TGriffinHit(const TFragment&);
    ~TGriffinHit() override;
 
 private:
@@ -69,7 +71,6 @@ public:
    static bool CompareEnergy(const TGriffinHit*, const TGriffinHit*); //!<!
    void        Add(const TDetectorHit*) override;                     //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -84,7 +85,7 @@ private:
    Double_t GetDefaultDistance() const { return 110.; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffinHit, 8); // Information about a GRIFFIN Hit
+   ClassDefOverride(TGriffinHit, 8); // Information about a GRIFFIN Hit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

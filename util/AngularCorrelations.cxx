@@ -31,18 +31,18 @@ double GetYError(TGraphErrors* graph, const double& x)
 	for(int i = 0; i < graph->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		// exact match: return the error at this point
-		if(graph->GetPointX(i) == x) return graph->GetErrorY(i);
+		if(graph->GetPointX(i) == x) { return graph->GetErrorY(i); }
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		else if(graph->GetPointX(i) > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(graph->GetPointX(i) > x) { return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i)); }
 #else
 		double px, py;
 		graph->GetPoint(i, px, py);
 		// exact match: return the error at this point
-		if(px == x) return graph->GetErrorY(i);
+		if(px == x) { return graph->GetErrorY(i); }
 		// first point with larger x: take maximum of this point and previous point
 		// TGraphErrors::GetErrorY returns -1 if index is negative, so we don't need to check for this
-		else if(px > x) return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i));
+		if(px > x) { return std::max(graph->GetErrorY(i-1), graph->GetErrorY(i)); }
 #endif
 	}
 	return 0.;
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	auto settings = static_cast<TUserSettings*>(input.Get("UserSettings"));
+	auto* settings = static_cast<TUserSettings*>(input.Get("UserSettings"));
 
 	// if we have a path for a settings file provided on command line, we either add it to the ones read
 	// from the root file or (if there weren't any) create a new instance from it
@@ -129,12 +129,12 @@ int main(int argc, char** argv)
 	}
 
 	// set all variables from settings if they haven't been set from command line
-	if(projGateLow == -1.) projGateLow = settings->GetDouble("Projection.Low");
-	if(projGateHigh == -1.) projGateHigh = settings->GetDouble("Projection.High");
-	if(timeRandomNorm == -1.) timeRandomNorm = settings->GetDouble("TimeRandomNormalization");
-	if(peakPos == -1.) peakPos = settings->GetDouble("Peak.Position");
-	if(peakLow == -1.) peakLow = settings->GetDouble("Peak.Low");
-	if(peakHigh == -1.) peakHigh = settings->GetDouble("Peak.High");
+	if(projGateLow == -1.) { projGateLow = settings->GetDouble("Projection.Low"); }
+	if(projGateHigh == -1.) { projGateHigh = settings->GetDouble("Projection.High"); }
+	if(timeRandomNorm == -1.) { timeRandomNorm = settings->GetDouble("TimeRandomNormalization"); }
+	if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
+	if(peakLow == -1.) { peakLow = settings->GetDouble("Peak.Low"); }
+	if(peakHigh == -1.) { peakHigh = settings->GetDouble("Peak.High"); }
 	// for the background-peak positions and background gates we could have multiple, so we create vectors for them
 	std::vector<double> bgPeakPos;
 	std::vector<double> bgLow;
@@ -194,15 +194,15 @@ int main(int argc, char** argv)
 		// only output a warning that the parameter is changed if it's not the default value
 		if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
 			bool output = peakParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". peak parameter ("<<peakParameter[i]<<") is out of range "<<peakParameterLow[i]<<" - "<<peakParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". peak parameter ("<<peakParameter[i]<<") is out of range "<<peakParameterLow[i]<<" - "<<peakParameterHigh[i]<<", resetting it to "; }
 			peakParameter[i] = (peakParameterHigh[i] + peakParameterLow[i])/2.;
-			if(output) std::cout<<peakParameter[i]<<std::endl;
+			if(output) { std::cout<<peakParameter[i]<<std::endl; }
 		}
 		if(bgPeakParameterLow[i] <= bgPeakParameterHigh[i] && (bgPeakParameter[i] < bgPeakParameterLow[i] || bgPeakParameterHigh[i] < bgPeakParameter[i])) {
 			bool output = bgPeakParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". background peak parameter ("<<bgPeakParameter[i]<<") is out of range "<<bgPeakParameterLow[i]<<" - "<<bgPeakParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". background peak parameter ("<<bgPeakParameter[i]<<") is out of range "<<bgPeakParameterLow[i]<<" - "<<bgPeakParameterHigh[i]<<", resetting it to "; }
 			bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i])/2.;
-			if(output) std::cout<<bgPeakParameter[i]<<std::endl;
+			if(output) { std::cout<<bgPeakParameter[i]<<std::endl; }
 		}
 	}
 	// parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
@@ -225,9 +225,9 @@ int main(int argc, char** argv)
 	for(size_t i = 0; i < backgroundParameter.size(); ++i) {
 		if(backgroundParameterLow[i] <= backgroundParameterHigh[i] && (backgroundParameter[i] < backgroundParameterLow[i] || backgroundParameterHigh[i] < backgroundParameter[i])) {
 			bool output = backgroundParameter[i] != -2.;
-			if(output) std::cout<<"Warning, "<<i<<". background parameter ("<<backgroundParameter[i]<<") is out of range "<<backgroundParameterLow[i]<<" - "<<backgroundParameterHigh[i]<<", resetting it to ";
+			if(output) { std::cout<<"Warning, "<<i<<". background parameter ("<<backgroundParameter[i]<<") is out of range "<<backgroundParameterLow[i]<<" - "<<backgroundParameterHigh[i]<<", resetting it to "; }
 			backgroundParameter[i] = (backgroundParameterHigh[i] + backgroundParameterLow[i])/2.;
-			if(output) std::cout<<backgroundParameter[i]<<std::endl;
+			if(output) { std::cout<<backgroundParameter[i]<<std::endl; }
 		}
 	}
 
@@ -269,7 +269,7 @@ int main(int argc, char** argv)
 	}
 
 	// get the angles from the input file
-	auto angles = static_cast<TGriffinAngles*>(input.Get("GriffinAngles"));
+	auto* angles = static_cast<TGriffinAngles*>(input.Get("GriffinAngles"));
 
 	if(angles == nullptr) {
 		std::cerr<<"Failed to find 'GriffinAngles' in '"<<inputFile<<"'"<<std::endl;
@@ -283,40 +283,40 @@ int main(int argc, char** argv)
 	// open output file and create graphs
 	TFile output(outputFile.c_str(), "recreate");
 
-	auto rawAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
+	auto* rawAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
 	rawAngularDistribution->SetName("RawAngularDistribution");
-	auto angularDistribution = new TGraphErrors(angles->NumberOfAngles());
+	auto* angularDistribution = new TGraphErrors(angles->NumberOfAngles());
 	angularDistribution->SetName("AngularDistribution");
-	auto mixedAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
+	auto* mixedAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
 	mixedAngularDistribution->SetName("MixedAngularDistribution");
-	auto rawChiSquares = new TGraph(angles->NumberOfAngles());
+	auto* rawChiSquares = new TGraph(angles->NumberOfAngles());
 	rawChiSquares->SetName("RawChiSquares");
-	auto mixedChiSquares = new TGraph(angles->NumberOfAngles());
+	auto* mixedChiSquares = new TGraph(angles->NumberOfAngles());
 	mixedChiSquares->SetName("MixedChiSquares");
 
 	// write the user settings to the output file
 	settings->Write();
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-	auto fitDir = output.mkdir("fits", "Projections with fits", true);
+	auto* fitDir = output.mkdir("fits", "Projections with fits", true);
 #else
-	auto fitDir = output.mkdir("fits", "Projections with fits");
+	auto* fitDir = output.mkdir("fits", "Projections with fits");
 #endif
 
 	// loop over all matrices
 	for(int i = 0; i < angles->NumberOfAngles(); ++i) {
 		// get the three histograms we need: prompt, time random, and event mixed
-		auto prompt = static_cast<TH2*>(input.Get(Form("AngularCorrelation%d", i)));
+		auto* prompt = static_cast<TH2*>(input.Get(Form("AngularCorrelation%d", i)));
 		if(prompt == nullptr) {
 			std::cerr<<"Failed to find histogram '"<<Form("AngularCorrelation%d", i)<<"', should have "<<angles->NumberOfAngles()<<" angles in total!"<<std::endl;
 			return 1;
 		}
-		auto bg = static_cast<TH2*>(input.Get(Form("AngularCorrelationBG%d", i)));
+		auto* bg = static_cast<TH2*>(input.Get(Form("AngularCorrelationBG%d", i)));
 		if(bg == nullptr) {
 			std::cerr<<"Failed to find histogram '"<<Form("AngularCorrelationBG%d", i)<<"', should have "<<angles->NumberOfAngles()<<" angles in total!"<<std::endl;
 			return 1;
 		}
-		auto mixed = static_cast<TH2*>(input.Get(Form("AngularCorrelationMixed%d", i)));
+		auto* mixed = static_cast<TH2*>(input.Get(Form("AngularCorrelationMixed%d", i)));
 		if(mixed == nullptr) {
 			std::cerr<<"Failed to find histogram '"<<Form("AngularCorrelationMixed%d", i)<<"', should have "<<angles->NumberOfAngles()<<" angles in total!"<<std::endl;
 			return 1;
@@ -328,11 +328,11 @@ int main(int argc, char** argv)
 		mixed->Sumw2();
 
 		// project onto x-axis
-		auto proj =     prompt->ProjectionX(Form("proj%d",i),     prompt->GetYaxis()->FindBin(projGateLow), prompt->GetYaxis()->FindBin(projGateHigh));
-		auto projMixed = mixed->ProjectionX(Form("projMixed%d",i), mixed->GetYaxis()->FindBin(projGateLow),  mixed->GetYaxis()->FindBin(projGateHigh));
+		auto* proj =     prompt->ProjectionX(Form("proj%d",i),     prompt->GetYaxis()->FindBin(projGateLow), prompt->GetYaxis()->FindBin(projGateHigh));
+		auto* projMixed = mixed->ProjectionX(Form("projMixed%d",i), mixed->GetYaxis()->FindBin(projGateLow),  mixed->GetYaxis()->FindBin(projGateHigh));
 		// project background gate(s) onto x-axis
-		auto projBg = prompt->ProjectionX(Form("projBg%d",i), prompt->GetYaxis()->FindBin(bgLow[0]), prompt->GetYaxis()->FindBin(bgHigh[0]));
-		auto projMixedBg = mixed->ProjectionX(Form("projMixedBg%d",i), mixed->GetYaxis()->FindBin(bgLow[0]), mixed->GetYaxis()->FindBin(bgHigh[0]));
+		auto* projBg = prompt->ProjectionX(Form("projBg%d",i), prompt->GetYaxis()->FindBin(bgLow[0]), prompt->GetYaxis()->FindBin(bgHigh[0]));
+		auto* projMixedBg = mixed->ProjectionX(Form("projMixedBg%d",i), mixed->GetYaxis()->FindBin(bgLow[0]), mixed->GetYaxis()->FindBin(bgHigh[0]));
 		double bgGateWidth =     prompt->GetYaxis()->FindBin(bgHigh[0]) - prompt->GetYaxis()->FindBin(bgLow[0])+1;
 		double mixedBgGateWidth = mixed->GetYaxis()->FindBin(bgHigh[0]) -  mixed->GetYaxis()->FindBin(bgLow[0])+1;
 		for(size_t g = 1; g < bgLow.size(); ++g) {
@@ -359,7 +359,7 @@ int main(int argc, char** argv)
 		}
 		pf.AddPeak(&peak);
 		for(auto bgPeak : bgPeakPos) {
-			auto bgP = new TRWPeak(bgPeak);
+			auto* bgP = new TRWPeak(bgPeak);
 			for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
 				if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
 					bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -392,7 +392,7 @@ int main(int argc, char** argv)
 		}
 		pfMixed.AddPeak(&peakMixed);
 		for(auto bgPeak : bgPeakPos) {
-			auto bgP = new TRWPeak(bgPeak);
+			auto* bgP = new TRWPeak(bgPeak);
 			for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
 				if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
 					bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -434,7 +434,7 @@ int main(int argc, char** argv)
 	std::cout<<"Fitting of projections done."<<std::endl;
 
 	// correct the raw and mixed graphs for the number of combinations that contribute to each angle
-	auto rawAngularDistributionCorr = static_cast<TGraphErrors*>(rawAngularDistribution->Clone("RawAngularDistributionCorrected"));
+	auto* rawAngularDistributionCorr = static_cast<TGraphErrors*>(rawAngularDistribution->Clone("RawAngularDistributionCorrected"));
 	for(int i = 0; i < rawAngularDistributionCorr->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		if(angles->Count(rawAngularDistributionCorr->GetPointX(i)) != 0) {
@@ -454,7 +454,7 @@ int main(int argc, char** argv)
 		}
 #endif
 	}
-	auto mixedAngularDistributionCorr = static_cast<TGraphErrors*>(mixedAngularDistribution->Clone("MixedAngularDistributionCorrected"));
+	auto* mixedAngularDistributionCorr = static_cast<TGraphErrors*>(mixedAngularDistribution->Clone("MixedAngularDistributionCorrected"));
 	for(int i = 0; i < mixedAngularDistributionCorr->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		if(angles->Count(mixedAngularDistributionCorr->GetPointX(i)) != 0) {
@@ -486,9 +486,9 @@ int main(int argc, char** argv)
 
 		if(theory.IsOpen()) {
 			// read graphs from file
-			auto z0 = static_cast<TGraphErrors*>(theory.Get("graph000"));
-			auto z2 = static_cast<TGraphErrors*>(theory.Get("graph010"));
-			auto z4 = static_cast<TGraphErrors*>(theory.Get("graph100"));
+			auto* z0 = static_cast<TGraphErrors*>(theory.Get("graph000"));
+			auto* z2 = static_cast<TGraphErrors*>(theory.Get("graph010"));
+			auto* z4 = static_cast<TGraphErrors*>(theory.Get("graph100"));
 
 			if(z0 != nullptr && z2 != nullptr && z4 != nullptr && z0->GetN() == z2->GetN() && z0->GetN() == z4->GetN()) {
 				// check if the sizes of the provided graphs match what we expect:
@@ -506,30 +506,30 @@ int main(int argc, char** argv)
 					// first check which of the vectors we iterate over
 					if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
 						for(auto twoJ : twoJLow) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
 						for(auto twoJ : twoJMiddle) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
 						for(auto twoJ : twoJHigh) {
-							parameters.push_back(std::vector<double>());
+							parameters.emplace_back();
 							spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
 							spinLabel.push_back(twoJ/2.);
 						}
 					} else {
-						parameters.push_back(std::vector<double>());
+						parameters.emplace_back();
 						spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
 						spinLabel.push_back(twoJHigh.at(0)/2.);
 					}
 
 					// create canvas and plot graphs on it
-					auto canvas = new TCanvas;
+					auto* canvas = new TCanvas;
 
 					// determine minimum and maximum y-value
 					double min = TMath::MinElement(spin.at(0)->GetN(), spin.at(0)->GetY());
@@ -543,7 +543,7 @@ int main(int argc, char** argv)
 					// find first graph with more than one data point
 					size_t first = 0;
 					for(first = 0; first < spin.size(); ++first) {
-						if(spin[first]->GetN() > 1) break;
+						if(spin[first]->GetN() > 1) { break; }
 					}
 
 					spin[first]->SetTitle("");
@@ -556,19 +556,19 @@ int main(int argc, char** argv)
 
 					spin[first]->Draw("ac");
 					for(size_t i = 0; i < spin.size(); ++i) {
-						if(i == first) continue;
-						if(spin[i]->GetN() > 1) spin[i]->Draw("c");
-						else                    spin[i]->Draw("*");
+						if(i == first) { continue; }
+						if(spin[i]->GetN() > 1) { spin[i]->Draw("c"); }
+						else                    { spin[i]->Draw("*"); }
 					}
 
-					auto confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
+					auto* confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
 
 					confidenceLevelLine->Draw();
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					auto legend = new TLegend(0.1, 0.3);
+					auto* legend = new TLegend(0.1, 0.3);
 #else
-					auto legend = new TLegend(0.7, 0.6, 0.8, 0.9);
+					auto* legend = new TLegend(0.7, 0.6, 0.8, 0.9);
 #endif
 					for(size_t i = 0; i < spin.size(); ++i) {
 						if(spin[i]->GetN() == 1) {
@@ -600,7 +600,7 @@ int main(int argc, char** argv)
 
 					// create theory graphs with best fit for each spin, and write them to file
 					std::vector<TGraphErrors*> spinFit(spin.size(), new TGraphErrors(angularDistribution->GetN()));
-					auto x = angularDistribution->GetX();
+					auto* x = angularDistribution->GetX();
 					for(int p = 0; p < angularDistribution->GetN(); ++p) {
 						for(size_t i = 0; i < spinFit.size(); ++i) {
 							spinFit[i]->SetPoint(p, x[p], parameters[i][0]*((1.-parameters[i][1]-parameters[i][2])*z0->Eval(x[p]) + parameters[i][1]*z2->Eval(x[p]) + parameters[i][2]*z4->Eval(x[p])));
@@ -647,7 +647,7 @@ int main(int argc, char** argv)
 
 class Ac {
 public:
-	Ac(TGraphErrors* data = nullptr, TGraphErrors* z0 = nullptr, TGraphErrors* z2 = nullptr, TGraphErrors* z4 = nullptr)
+	explicit Ac(TGraphErrors* data = nullptr, TGraphErrors* z0 = nullptr, TGraphErrors* z2 = nullptr, TGraphErrors* z4 = nullptr)
 		: fData(data), fZ0(z0), fZ2(z2), fZ4(z4) {}
 
 	void Data(TGraphErrors* data) { fData = data; }
@@ -662,8 +662,8 @@ public:
 		double chi2 = 0;
 		for(int point = 0; point < fData->GetN(); ++point) {
 			// get data values
-			double x;
-			double y;
+			double x = 0.;
+			double y = 0.;
 			fData->GetPoint(point, x, y);
 			double yError = fData->GetErrorY(point);
 
@@ -710,13 +710,13 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
 	// a is the lowest allowed spin
 	// b is the mixing spin
 	int l1a = TMath::Abs(twoJhigh-twoJmid)/2;
-	if(l1a == 0) l1a = 1;
+	if(l1a == 0) { l1a = 1; }
 	int l1b = l1a + 1;
 	// l2 is the transition between j2 and j3
 	// a is the lowest allowed spin
 	// b is the mixing spin
 	int l2a = TMath::Abs(twoJmid-twoJlow)/2;
-	if(l2a == 0) l2a = 1;
+	if(l2a == 0) { l2a = 1; }
 	int l2b = l2a + 1;
 
 	// run some quick checks on the mixing ratios
@@ -810,14 +810,14 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	assert(data->GetN() == z4->GetN());
 	// create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
 	// this is to get initial conditions for our fit
-	auto cosTheta = new TGraphErrors(*data);
-	auto x = cosTheta->GetX();
+	auto* cosTheta = new TGraphErrors(*data);
+	auto* x = cosTheta->GetX();
 	for(int i = 0; i < cosTheta->GetN(); ++i) {
 		x[i] = TMath::Cos(x[i]/180.*TMath::Pi());
 	}
 
 	int nPar = 3;
-	auto legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
+	auto* legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
 	legendre->SetParNames("a_{0}", "a_{2}", "a_{4}");
 	legendre->SetParameters(1., 0.5, 0.5);
 	cosTheta->Fit(legendre, "QN0");
@@ -836,7 +836,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	fitter.Config().SetMinimizer("Minuit2", "Migrad"); // or simplex?
 	if(!fitter.FitFCN()) {
 		std::cerr<<"Fit failed"<<std::endl;
-		return std::vector<double>();
+		return {};
 	}
 
 
@@ -845,13 +845,13 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	// MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
 	std::cout<<"Reduced chi^2: "<<fitResult.MinFcnValue()/(ac.Np()-fitResult.NFreeParameters())<<std::endl;
 	std::vector<double> parameters(fitResult.GetParams(), fitResult.GetParams()+nPar);
-	auto errors = fitResult.GetErrors();
+	const auto* errors = fitResult.GetErrors();
 	std::cout<<"Parameters a_0: "<<parameters[0]<<" +- "<<errors[0]<<", a_2: "<<parameters[1]<<" +- "<<errors[1]<<", a_4: "<<parameters[2]<<" +- "<<errors[2]<<std::endl;
 	TMatrixD covariance(nPar, nPar);
 	fitResult.GetCovarianceMatrix(covariance);
 
 	// create fit and residual graphs
-	auto fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
+	auto* fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
 	for(int i = 0; i < fit->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		fit->SetPointY(i, parameters[0]*((1. - parameters[1] - parameters[2])*z0->GetPointY(i) + parameters[1]*z2->GetPointY(i) + parameters[2]*z4->GetPointY(i)));
@@ -861,7 +861,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 		fit->SetPointError(i, 0., std::abs(parameters[0])*TMath::Sqrt(TMath::Power((1. - parameters[1] - parameters[2])*z0->GetErrorY(i), 2) + TMath::Power(parameters[1]*z2->GetErrorY(i), 2) + TMath::Power(parameters[2]*z4->GetErrorY(i), 2)));
 	}
 
-	auto residual = static_cast<TGraphErrors*>(data->Clone("residual"));
+	auto* residual = static_cast<TGraphErrors*>(data->Clone("residual"));
 	for(int i = 0; i < residual->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
 		residual->SetPointY(i, data->GetPointY(i) - fit->GetPointY(i));
@@ -873,7 +873,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 
 	// This text box will display the fit statistics
 	// with the margins of the pads, the center in x is at 0.55 (0.545 to be exact_, so we center around that point
-	auto stats = new TPaveText(0.35, 0.7, 0.75, 0.95, "NDC");
+	auto* stats = new TPaveText(0.35, 0.7, 0.75, 0.95, "NDC");
 	stats->SetTextFont(133);
 	stats->SetTextSize(20);
 	stats->SetFillStyle(0);
@@ -885,14 +885,14 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	// create canvas and two pads (big one for comparison and small one for residuals)
 	// wider left margin for y-axis labels and title
 	// same for the bottom margin of the residuals
-	auto canvas = new TCanvas;
-	auto resPad = new TPad("resPad", "resPad", 0., 0., 1., 0.3);
+	auto* canvas = new TCanvas;
+	auto* resPad = new TPad("resPad", "resPad", 0., 0., 1., 0.3);
 	resPad->SetTopMargin(0.);
 	resPad->SetBottomMargin(0.22);
 	resPad->SetLeftMargin(0.1);
 	resPad->SetRightMargin(0.01);
 	resPad->Draw();
-	auto compPad = new TPad("compPad", "compPad", 0., 0.3, 1., 1.);
+	auto* compPad = new TPad("compPad", "compPad", 0., 0.3, 1., 1.);
 	compPad->SetTopMargin(0.01);
 	compPad->SetBottomMargin(0.);
 	compPad->SetLeftMargin(0.1);
@@ -902,7 +902,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	// plot comparison of fit and data
 	compPad->cd();
 
-	auto multiGraph = new TMultiGraph;
+	auto* multiGraph = new TMultiGraph;
 	fit->SetLineColor(kRed);
 	fit->SetFillColor(kRed);
 	fit->SetMarkerColor(kRed);
@@ -937,7 +937,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 	residual->GetYaxis()->SetLabelSize(0.08);
 
 	residual->Draw("ap");
-	auto zeroLine = new TLine(0., 0., 180., 0.);
+	auto* zeroLine = new TLine(0., 0., 180., 0.);
 	zeroLine->Draw("same");
 
 	fit->Write("A2a4Fit");

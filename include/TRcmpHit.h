@@ -21,12 +21,15 @@
 class TRcmpHit : public TDetectorHit {
 public:
    // constructors and destructors
-   TRcmpHit();                  ///< default constructor
+   TRcmpHit() = default;                  ///< default constructor
    TRcmpHit(const TRcmpHit&);   ///< copy constructor
+	TRcmpHit(TRcmpHit&&) noexcept = default;
+	TRcmpHit& operator=(const TRcmpHit&) = default;
+	TRcmpHit& operator=(TRcmpHit&&) noexcept = default;
    // TRcmpHit(const TRcmpHit& front, const TRcmpHit& back);          ///< dual parameter constructor for front and back hits
-   TRcmpHit(const TFragment& frag);                                   ///< single fragment constructor (either front or back)
+   explicit TRcmpHit(const TFragment& frag);                                   ///< single fragment constructor (either front or back)
    TRcmpHit(const TFragment& fragFront, const TFragment& fragBack);   ///< dual parameter constructor for front and back fragments
-   ~TRcmpHit() override;                                              ///< destructor
+   ~TRcmpHit() override = default;                                              ///< destructor
 
    void Clear(Option_t* opt = "") override;         //!<!
    void Print(Option_t* opt = "") const override;   //!<!

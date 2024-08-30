@@ -21,10 +21,12 @@
 
 class TTip : public TDetector {
 public:
-
-   ~TTip() override;
-   TTip();
+   TTip() = default;
    TTip(const TTip& rhs);
+	TTip(TTip&&) noexcept = default;
+   TTip& operator=(const TTip&); //!<!
+	TTip& operator=(TTip&&) noexcept = default;
+   ~TTip() override = default;
 
    static TVector3 GetPosition(int DetNbr); //!<!
    static TVector3 GetPosition(const TTipHit&);
@@ -36,12 +38,10 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   TTip& operator=(const TTip&); //!<!
-
 private:
 
    // Position vectors for individual TIP detectors
-   static TVector3 fPositionVectors[128];     //!<!
+   static std::array<TVector3, 128> fPositionVectors;     //!<!
 
 public:
 
@@ -49,7 +49,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTip, 2);
+   ClassDefOverride(TTip, 2); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

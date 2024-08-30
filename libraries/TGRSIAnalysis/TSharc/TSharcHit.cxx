@@ -19,7 +19,7 @@ TSharcHit::TSharcHit()
 
 TSharcHit::~TSharcHit() = default;
 
-TSharcHit::TSharcHit(const TSharcHit& rhs) : TDetectorHit()
+TSharcHit::TSharcHit(const TSharcHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
@@ -81,7 +81,7 @@ TVector3 TSharcHit::GetPosition() const
 	return GetPosition(GetDefaultDistance());
 }
 
-Double_t TSharcHit::GetTheta(double Xoff, double Yoff, double Zoff)
+Double_t TSharcHit::GetTheta(double Xoff, double Yoff, double Zoff) const
 {
 	TVector3 posOff;
 	posOff.SetXYZ(Xoff, Yoff, Zoff);

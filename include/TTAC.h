@@ -27,10 +27,12 @@
 class TTAC : public TDetector {
 public:
    TTAC();
-   ~TTAC() override;
    TTAC(const TTAC& rhs);
+	TTAC(TTAC&&) noexcept = default;
+   TTAC& operator=(const TTAC&); //!<!
+	TTAC& operator=(TTAC&&) noexcept = default;
+   ~TTAC() override = default;
 
-public:
    TTACHit* GetTACHit(const int& i) const { return static_cast<TTACHit*>(GetHit(i)); }
 
 #ifndef __CINT__
@@ -38,14 +40,11 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   TTAC& operator=(const TTAC&); //!<!
-
-public:
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTAC, 1) // TAC Physics structure
+   ClassDefOverride(TTAC, 1) // TAC Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

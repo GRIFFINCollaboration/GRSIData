@@ -39,37 +39,37 @@ void TGRSIMnemonic::EnumerateSystem()
 {
    // Enumerating the fSystemString must come after the total mnemonic has been parsed as the details of other parts of
    // the mnemonic must be known
-   if(SystemString().compare("TI") == 0) {
+   if(SystemString() == "TI") {
       fSystem = ESystem::kTigress;
-   } else if(SystemString().compare("SH") == 0) {
+   } else if(SystemString() == "SH") {
       fSystem = ESystem::kSharc;
-   } else if(SystemString().compare("TR") == 0) {
+   } else if(SystemString() == "TR") {
       fSystem = ESystem::kTriFoil;
-   } else if(SystemString().compare("RF") == 0) {
+   } else if(SystemString() == "RF") {
       fSystem = ESystem::kRF;
-   } else if(SystemString().compare("SP") == 0) {
+   } else if(SystemString() == "SP") {
       if(SubSystem() == EMnemonic::kI) {
          fSystem = ESystem::kSiLi;
       } else {
          fSystem = ESystem::kSiLiS3;
       }
-   } else if(SystemString().compare("GD") == 0) {
+   } else if(SystemString() == "GD") {
          fSystem = ESystem::kGeneric;
-   } else if(SystemString().compare("CS") == 0) {
+   } else if(SystemString() == "CS") {
       fSystem = ESystem::kCSM;
-   } else if(SystemString().compare("GR") == 0) {
+   } else if(SystemString() == "GR") {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kGriffinBgo;
 		} else {
 			fSystem = ESystem::kGriffin;
 		}
-   } else if(SystemString().compare("SE") == 0) {
+   } else if(SystemString() == "SE") {
       fSystem = ESystem::kSceptar;
-   } else if(SystemString().compare("PA") == 0) {
+   } else if(SystemString() == "PA") {
       fSystem = ESystem::kPaces;
-   } else if(SystemString().compare("DS") == 0) {
+   } else if(SystemString() == "DS") {
       fSystem = ESystem::kDescant;
-   } else if((SystemString().compare("DA") == 0) || (SystemString().compare("LB") == 0) ) {
+   } else if((SystemString() == "DA") || (SystemString() == "LB") ) {
       if(SubSystem() == EMnemonic::kS) {
 			fSystem = ESystem::kLaBrBgo;
 		} else if(SubSystem() == EMnemonic::kT) {
@@ -77,26 +77,26 @@ void TGRSIMnemonic::EnumerateSystem()
 		} else {
 			fSystem = ESystem::kLaBr;
 		}
-   } else if(SystemString().compare("BA") == 0) {
+   } else if(SystemString() == "BA") {
       fSystem = ESystem::kS3;
-   } else if(SystemString().compare("ZD") == 0) {
+   } else if(SystemString() == "ZD") {
       fSystem = ESystem::kZeroDegree;
-   } else if(SystemString().compare("TP") == 0) {
+   } else if(SystemString() == "TP") {
       fSystem = ESystem::kTip;
-   } else if(SystemString().compare("BG") == 0) {
+   } else if(SystemString() == "BG") {
       fSystem = ESystem::kBgo;
-   } else if((SystemString().compare("EM") == 0) || (SystemString().compare("ET") == 0)) {
+   } else if((SystemString() == "EM") || (SystemString() == "ET")) {
       if(SubSystem() == EMnemonic::kE) {
         fSystem = ESystem::kEmmaS3;
       }
       else {
         fSystem = ESystem::kEmma;
       }
-   } else if(SystemString().compare("TF") == 0) {
+   } else if(SystemString() == "TF") {
       fSystem = ESystem::kTrific;
-   }  else if(SystemString().compare("SZ") == 0) {
+   }  else if(SystemString() == "SZ") {
       fSystem = ESystem::kSharc2;
-   }  else if(SystemString().compare("RC") == 0) {  
+   }  else if(SystemString() == "RC") {  
       fSystem = ESystem::kRcmp;
    }  else {
       fSystem = ESystem::kClear;
@@ -109,28 +109,28 @@ void TGRSIMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerNam
    std::transform(name.begin(), name.end(), name.begin(), ::toupper);
 	EDigitizer tmpType = EDigitizer::kDefault;
 	int tmpUnit = 1;
-   if(name.compare("GRF16") == 0) {
+   if(name == "GRF16") {
 		tmpType = EDigitizer::kGRF16;
 		tmpUnit = 10;
-   } else if(name.compare("GRF4G") == 0) {
+   } else if(name == "GRF4G") {
 		tmpType = EDigitizer::kGRF4G;
 		tmpUnit = 10;
-   } else if(name.compare("TIG10") == 0) {
+   } else if(name == "TIG10") {
 		tmpType = EDigitizer::kTIG10;
 		tmpUnit = 10;
-   } else if(name.compare("TIG64") == 0) {
+   } else if(name == "TIG64") {
 		tmpType = EDigitizer::kTIG64;
 		tmpUnit = 10;
-   } else if(name.compare("CAEN") == 0) {
+   } else if(name == "CAEN") {
 		tmpType = EDigitizer::kCaen;
 		tmpUnit = 2;
-   } else if(name.compare("MADC") == 0) {
+   } else if(name == "MADC") {
 		tmpType = EDigitizer::kMadc;
 		tmpUnit = 50;
-   } else if(name.compare("V1190") == 0) {
+   } else if(name == "V1190") {
 		tmpType = EDigitizer::kV1190;
 		tmpUnit = 50;
-   } else if(name.compare("FMC32") == 0) {
+   } else if(name == "FMC32") {
 		tmpType = EDigitizer::kFMC32;
 		tmpUnit = 10;
    } else {
@@ -158,8 +158,6 @@ void TGRSIMnemonic::Parse(std::string* name)
       buf.assign(*name, 7, 2);
       Segment(static_cast<int16_t>(strtol(buf.c_str(), nullptr, 16)));
    }
-
-   return;
 }
 
 void TGRSIMnemonic::Print(Option_t*) const
@@ -211,31 +209,31 @@ double TGRSIMnemonic::GetTime(Long64_t timestamp, Float_t cfd, double energy, co
 {
    if(channel == nullptr) {
       Error("GetTime", "No TChannel provided");
-		return static_cast<Double_t>((timestamp) + gRandom->Uniform());
+		return static_cast<double>(timestamp) + gRandom->Uniform();
    }
 	
+	Double_t dTime = 0.;
    switch(static_cast<EDigitizer>(channel->GetDigitizerType())) {
-		Double_t dTime;
 		case EDigitizer::kGRF16:
 		case EDigitizer::kFMC32:
 			// we need to zero the lowest 18 bits of the timestamp as those are included in the CFD value
 			// TODO: what happens close to the wrap-around of those 18 bits??? This only happens every 2^18 * 10e-8 so 2.5 ms so 400 Hz
-			dTime = (timestamp & (~0x3ffff)) * channel->GetTimeStampUnit() + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>((timestamp & (~0x3ffff)) * channel->GetTimeStampUnit()) + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		case EDigitizer::kGRF4G:
-			dTime = timestamp*channel->GetTimeStampUnit() + channel->CalibrateCFD((static_cast<Int_t>(cfd) >> 22) + ((static_cast<Int_t>(cfd) & 0x3fffff) + gRandom->Uniform()) / 256.);
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>(timestamp*channel->GetTimeStampUnit()) + channel->CalibrateCFD((static_cast<Int_t>(cfd) >> 22) + ((static_cast<Int_t>(cfd) & 0x3fffff) + gRandom->Uniform()) / 256.);
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		case EDigitizer::kTIG10:
-			dTime = (timestamp & (~0x7fffff))*channel->GetTimeStampUnit() +	channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
+			dTime = static_cast<Double_t>((timestamp & (~0x7fffff))*channel->GetTimeStampUnit()) +	channel->CalibrateCFD((cfd + gRandom->Uniform()) / 1.6); // CFD is in 10/16th of a nanosecond
 			//channel->CalibrateCFD((cfd & (~0xf) + gRandom->Uniform()) / 1.6); // PBender suggests this.
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
       case EDigitizer::kCaen:
 			//10 bit CFD for 0-2ns => divide by 512
-			dTime = timestamp*channel->GetTimeStampUnit() + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 512.);
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = static_cast<Double_t>(timestamp*channel->GetTimeStampUnit()) + channel->CalibrateCFD((cfd + gRandom->Uniform()) / 512.);
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 		default:
-			dTime = static_cast<Double_t>(((timestamp) + gRandom->Uniform())*channel->GetTimeStampUnit());
-			return dTime - channel->GetTZero(energy) - channel->GetTimeOffset();
+			dTime = (static_cast<Double_t>(timestamp) + gRandom->Uniform())*channel->GetTimeStampUnit();
+			return dTime - channel->GetTZero(energy) - static_cast<double>(channel->GetTimeOffset());
 	}
    return 0.;
 }

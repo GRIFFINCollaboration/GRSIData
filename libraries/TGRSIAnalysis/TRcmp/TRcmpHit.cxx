@@ -10,44 +10,28 @@
 
 // function implementations are below
 
-TRcmpHit::TRcmpHit()
-{
-/// this is the default constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
-   Clear();
-}
-
-TRcmpHit::TRcmpHit(const TRcmpHit& rhs) : TDetectorHit()
+TRcmpHit::TRcmpHit(const TRcmpHit& rhs) : TDetectorHit(rhs)
 {
 /// this is the copy constructor for a single TRcmpHit parameter
 #if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
-   Clear();
    rhs.Copy(*this);
 }
 
 TRcmpHit::TRcmpHit(const TFragment& frag)
+   : fStrip(frag.GetSegment()) // set the (front or back) strip number of the hit (note that this would be between 00-31 since there are 32 strips)
 {
    /// this is the constructor that builds RCMP hits out of a single fragment (either front or back)
-   Clear();
    frag.Copy(*this);
-   fStrip = frag.GetSegment(); // set the (front or back) strip number of the hit (note that this would be between 00-31 since there are 32 strips)
 }
 
 TRcmpHit::TRcmpHit(const TFragment& fragFront, const TFragment& fragBack)
+   : fFrontStrip(fragFront.GetSegment()), fBackStrip(fragBack.GetSegment())  // set the front and back strip number of the hit  (goes from 00-31)
 {
    /// this is the constructor that builds RCMP hits out of a front and a back fragment (energy, time, etc. is taken from the front-strip)
-   Clear();
    fragFront.Copy(*this);                // we want to use the information from the front (P-side) strip such as energy, time, etc.
-   fFrontStrip = fragFront.GetSegment(); // set the front strip number of the hit (goes from 00-31)
-   fBackStrip  = fragBack.GetSegment();  // set the back strip number of the hit  (goes from 00-31)
 }
-
-// this is the destructor
-TRcmpHit::~TRcmpHit() = default;
 
 void TRcmpHit::Copy(TObject& rhs) const
 {

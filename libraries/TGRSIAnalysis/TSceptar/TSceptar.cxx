@@ -9,7 +9,7 @@ ClassImp(TSceptar)
 
 bool TSceptar::fSetWave = false;
 
-TVector3 TSceptar::gPaddlePosition[21] = {
+std::array<TVector3, 21> TSceptar::fPaddlePosition = {
 	// Sceptar positions from Evan; Thanks Evan.
 	TVector3(0, 0, 1),
 	TVector3(14.3025, 4.6472, 22.8096),
@@ -44,12 +44,7 @@ TSceptar::TSceptar()
 	Clear();
 }
 
-TSceptar::~TSceptar()
-{
-	// Default Destructor
-}
-
-TSceptar::TSceptar(const TSceptar& rhs) : TDetector()
+TSceptar::TSceptar(const TSceptar& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -66,7 +61,7 @@ TSceptar& TSceptar::operator=(const TSceptar& rhs)
 
 void TSceptar::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TSceptarHit* hit = new TSceptarHit(*frag); // Construction of TSceptarHit is handled in the constructor
+	auto* hit = new TSceptarHit(*frag); // Construction of TSceptarHit is handled in the constructor
 	AddHit(hit);
 }
 

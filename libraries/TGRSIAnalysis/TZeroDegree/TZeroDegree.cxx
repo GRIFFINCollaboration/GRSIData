@@ -21,12 +21,7 @@ TZeroDegree::TZeroDegree()
    Clear();
 }
 
-TZeroDegree::~TZeroDegree()
-{
-   // Default Destructor
-}
-
-TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector()
+TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector(rhs)
 {
 // Copy Contructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -62,6 +57,6 @@ void TZeroDegree::AddFragment(const std::shared_ptr<const TFragment>& frag, TCha
       return;
    }
 
-   TZeroDegreeHit* hit = new TZeroDegreeHit(*frag);
+   auto* hit = new TZeroDegreeHit(*frag);
    AddHit(hit);
 }

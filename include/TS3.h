@@ -34,6 +34,9 @@ public:
 
    TS3();
    TS3(const TS3&);
+	TS3(TS3&&) noexcept = default;
+   TS3& operator=(const TS3&);
+	TS3& operator=(TS3&&) noexcept = default;
    ~TS3() override;
 
 #ifndef __CINT__
@@ -112,7 +115,6 @@ public:
    }
 
    void Copy(TObject&) const override;
-   TS3& operator=(const TS3&);                    //
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -127,9 +129,9 @@ private:
    void SetBitNumber(ES3Bits bit, Bool_t set = true);
    Bool_t TestBitNumber(ES3Bits bit) const { return (fS3Bits.TestBit(bit)); }
 
-   static TTransientBits<UShort_t> fgS3Bits; ///< Global Bit
-   static void SetGlobalBit(ES3GlobalBits bit, Bool_t set = true) { fgS3Bits.SetBit(bit, set); }
-   static Bool_t TestGlobalBit(ES3GlobalBits bit) { return (fgS3Bits.TestBit(bit)); }
+   static TTransientBits<UShort_t> fGlobalS3Bits; ///< Global Bit
+   static void SetGlobalBit(ES3GlobalBits bit, Bool_t set = true) { fGlobalS3Bits.SetBit(bit, set); }
+   static Bool_t TestGlobalBit(ES3GlobalBits bit) { return (fGlobalS3Bits.TestBit(bit)); }
 
    /// for geometery
    static int fRingNumber;   //!<!
@@ -149,7 +151,7 @@ private:
 
 
    /// \cond CLASSIMP
-   ClassDefOverride(TS3, 4)
+   ClassDefOverride(TS3, 4) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

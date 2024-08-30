@@ -19,13 +19,12 @@ class TEmmaHit : public TDetectorHit {
 public:
    TEmmaHit();
    TEmmaHit(const TEmmaHit&);
-   TEmmaHit(const TFragment& frag) : TDetectorHit(frag) {}
+	TEmmaHit(TEmmaHit&&) noexcept = default;
+	TEmmaHit& operator=(const TEmmaHit&) = default;
+	TEmmaHit& operator=(TEmmaHit&&) noexcept = default;
+   explicit TEmmaHit(const TFragment& frag) { frag.Copy(*this); }
    ~TEmmaHit() override;
 
-private:
-   Int_t fFilter{0};
-
-public:
    /////////////////////////  Setters	/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
    // void SetHit();
@@ -54,7 +53,6 @@ public:
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;            //!<!
    void Print(Option_t* opt = "") const override;      //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -62,6 +60,8 @@ public:
    void Copy(TObject&, bool) const override;           //!<!
 
 private:
+   Int_t fFilter{0};
+
    Double_t fLeft{0};             // Left Cathode
    Double_t fRight{0};            // Right Cathode
    Double_t fTop{0};              // Top Cathode
@@ -77,7 +77,7 @@ private:
    static double fBdelay;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TEmmaHit, 3);
+   ClassDefOverride(TEmmaHit, 3); // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

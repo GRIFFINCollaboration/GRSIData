@@ -16,13 +16,14 @@
 #include "TPacesHit.h"
 
 class TPaces : public TDetector {
-
 public:
    TPaces();
    TPaces(const TPaces&);
-   ~TPaces() override;
+	TPaces(TPaces&&) noexcept = default;
+   TPaces& operator=(const TPaces&); //!<!
+	TPaces& operator=(TPaces&&) noexcept = default;
+   ~TPaces() override = default;
 
-public:
    TPacesHit* GetPacesHit(const int& i) const { return static_cast<TPacesHit*>(GetHit(i)); }
 
 #ifndef __CINT__
@@ -30,13 +31,11 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return gDetectorPosition[DetNbr]; } //!<!
-
-   TPaces& operator=(const TPaces&); //!<!
+   static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fDetectorPosition[DetNbr]; } //!<!
 
 private:
    static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
-   static ROOT::Math::Polar3DVector gDetectorPosition[6]; //!<!  Position of each detector (plus one default position)
+   static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition; //!<!  Position of each detector (plus one default position)
 
 public:
    static bool SetCoreWave() { return fSetCoreWave; } //!<!
@@ -46,7 +45,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TPaces, 4) // Paces Physics structure
+   ClassDefOverride(TPaces, 4) // Paces Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

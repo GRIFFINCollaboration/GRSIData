@@ -19,9 +19,12 @@
 class TDescantHit : public TDetectorHit {
 public:
    TDescantHit();
-   ~TDescantHit() override;
    TDescantHit(const TDescantHit&);
-   TDescantHit(const TFragment& frag);
+	TDescantHit(TDescantHit&&) noexcept = default;
+	TDescantHit& operator=(const TDescantHit&) = default;
+	TDescantHit& operator=(TDescantHit&&) noexcept = default;
+   explicit TDescantHit(const TFragment& frag);
+   ~TDescantHit() override;
 
 private:
    Int_t              fFilter;
@@ -29,7 +32,7 @@ private:
    Int_t              fZc;
    Int_t              fCcShort;
    Int_t              fCcLong;
-   std::vector<short> fCfdMonitor;
+   std::vector<int16_t> fCfdMonitor;
    std::vector<int>   fPartialSum;
 
 public:
@@ -44,12 +47,12 @@ public:
    // inline void SetCfd(const Int_t& x)           { fCfd    = (fCfd & 0x70000000) | (x & 0x1fffffff); } //!<!
 
    /////////////////////////		/////////////////////////////////////
-   inline Int_t               GetFilterPattern() { return fFilter; } //!<!
-   inline Int_t               GetPsd() { return fPsd; }              //!<!
-   inline Int_t               GetZc() { return fZc; }                //!<!
-   inline Int_t               GetCcShort() { return fCcShort; }      //!<!
-   inline Int_t               GetCcLong() { return fCcLong; }        //!<!
-   inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
+   inline Int_t               GetFilterPattern() const { return fFilter; }   //!<!
+   inline Int_t               GetPsd() const { return fPsd; }                //!<!
+   inline Int_t               GetZc() const { return fZc; }                  //!<!
+   inline Int_t               GetCcShort() const { return fCcShort; }        //!<!
+   inline Int_t               GetCcLong() const { return fCcLong; }          //!<!
+   inline std::vector<int16_t>& GetCfdMonitor() { return fCfdMonitor; }
    inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
 
    Float_t  GetCfd() const override;
@@ -74,7 +77,6 @@ public:
    TVector3 GetPosition(Double_t dist) const override; //!<!
    TVector3 GetPosition() const override;              //!<!
 
-public:
    void Copy(TObject&) const override;            //!<!
    void Copy(TObject&, bool) const override;      //!<!
    void Clear(Option_t* opt = "") override;       //!<!
@@ -85,7 +87,7 @@ private:
    Double_t GetDefaultDistance() const { return 222.; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TDescantHit, 6)
+   ClassDefOverride(TDescantHit, 7) // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

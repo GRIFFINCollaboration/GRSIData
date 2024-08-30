@@ -5,6 +5,8 @@
 #ifndef INCLUDE_TMidasBanksH
 #define INCLUDE_TMidasBanksH
 
+#include <cstdint>
+
 /** \addtogroup Sorting
  *  @{
  */
@@ -33,7 +35,7 @@ struct TMidas_BANK_HEADER {
 /// 16-bit data bank
 
 struct TMidas_BANK {
-   char     fName[4]; ///< bank name
+   char     fName[4]; ///< bank name // NOLINT(*-avoid-c-arrays)
    uint16_t fType;    ///< type of data (see midas.h TID_xxx)
    uint16_t fDataSize;
 };
@@ -41,7 +43,7 @@ struct TMidas_BANK {
 /// 32-bit data bank
 
 struct TMidas_BANK32 {
-   char     fName[4]; ///< bank name
+   char     fName[4]; ///< bank name // NOLINT(*-avoid-c-arrays)
    uint32_t fType;    ///< type of data (see midas.h TID_xxx)
    uint32_t fDataSize;
 };

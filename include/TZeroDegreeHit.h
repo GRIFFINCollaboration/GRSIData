@@ -27,13 +27,16 @@
 class TZeroDegreeHit : public TDetectorHit {
 public:
    TZeroDegreeHit();
-   ~TZeroDegreeHit() override;
    TZeroDegreeHit(const TZeroDegreeHit&);
-   TZeroDegreeHit(const TFragment& frag);
+	TZeroDegreeHit(TZeroDegreeHit&&) noexcept = default;
+	TZeroDegreeHit& operator=(const TZeroDegreeHit&) = default;
+	TZeroDegreeHit& operator=(TZeroDegreeHit&&) noexcept = default;
+   explicit TZeroDegreeHit(const TFragment& frag);
+   ~TZeroDegreeHit() override;
 
 private:
    Int_t              fFilter{0};
-   std::vector<short> fCfdMonitor;
+   std::vector<int16_t> fCfdMonitor;
    std::vector<int>   fPartialSum;
 
 public:
@@ -41,9 +44,9 @@ public:
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
 
    /////////////////////////		/////////////////////////////////////
-   inline Int_t               GetFilterPattern() const { return fFilter; } //!<!
-   inline std::vector<short>& GetCfdMonitor() { return fCfdMonitor; }
-   inline std::vector<int>&   GetPartialSum() { return fPartialSum; }
+   inline Int_t                 GetFilterPattern() const { return fFilter; }   //!<!
+   inline std::vector<int16_t>& GetCfdMonitor() { return fCfdMonitor; }
+   inline std::vector<int>&     GetPartialSum() { return fPartialSum; }
 
    Float_t  GetCfd() const override;
    Int_t    GetRemainder() const;
@@ -60,7 +63,6 @@ public:
 
    bool AnalyzeWaveform(); //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override; //!<!
@@ -70,7 +72,7 @@ public:
    // Position Not written for ZeroDegree Yet
 
    /// \cond CLASSIMP
-   ClassDefOverride(TZeroDegreeHit, 4) // Stores the information for a ZeroDegreeHit
+   ClassDefOverride(TZeroDegreeHit, 4) // Stores the information for a ZeroDegreeHit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

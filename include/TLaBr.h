@@ -39,8 +39,11 @@ public:
    };
 
    TLaBr();
-   ~TLaBr() override;
    TLaBr(const TLaBr& rhs);
+	TLaBr(TLaBr&&) noexcept = default;
+   TLaBr& operator=(const TLaBr&); //!<!
+	TLaBr& operator=(TLaBr&&) noexcept = default;
+   ~TLaBr() override;
 
    void Copy(TObject& rhs) const override;
    TLaBrHit* GetLaBrHit(const int& i) const { return static_cast<TLaBrHit*>(GetHit(i)); }
@@ -58,7 +61,7 @@ public:
    TLaBrHit* GetSuppressedHit(const int& i);                          //!<!
    Short_t GetSuppressedMultiplicity(const TBgo* fBgo);
    bool IsSuppressed() const;
-	void SetSuppressed(const bool flag);
+	void SetSuppressed(bool flag);
    void ResetSuppressed();
 
 #if !defined(__CINT__) && !defined(__CLING__)
@@ -66,9 +69,7 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr) { return gPosition[DetNbr]; } //!<!
-
-   TLaBr& operator=(const TLaBr&); //!<!
+   static TVector3 GetPosition(int DetNbr) { return fPosition[DetNbr]; } //!<!
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
@@ -76,7 +77,7 @@ private:
 #endif
    std::vector<TDetectorHit*> fSuppressedHits; //   The set of suppressed LaBr hits
 
-   static TVector3 gPosition[9]; //!<!  Position of each detectir
+   static std::array<TVector3, 9> fPosition; //!<!  Position of each detectir
 
    mutable TTransientBits<UChar_t> fLaBrBits;  // Transient member flags
 
@@ -90,7 +91,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLaBr, 1) // LaBr Physics structure
+   ClassDefOverride(TLaBr, 1) // LaBr Physics structure // NOLINT(readability-else-after-return)
 	/// \endcond
 };
 /*! @} */

@@ -36,9 +36,11 @@ public:
 
    TGriffin();
    TGriffin(const TGriffin&);
+	TGriffin(TGriffin&&) noexcept = default;
+   TGriffin& operator=(const TGriffin&); //!<!
+	TGriffin& operator=(TGriffin&&) noexcept = default;
    ~TGriffin() override;
 
-public:
    TGriffinHit* GetGriffinLowGainHit(const int& i);                                              //!<!
    TGriffinHit* GetGriffinHighGainHit(const int& i);                                             //!<!
    TGriffinHit* GetGriffinHit(const int& i) { return GetGriffinHit(i, GetDefaultGainType()); } //!<!
@@ -65,8 +67,6 @@ public:
       }
    }
    void ResetFlags() const;
-
-   TGriffin& operator=(const TGriffin&); //!<!
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetAddbackCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
@@ -140,7 +140,7 @@ private:
    static bool fSetCoreWave; //!<!  Flag for Waveforms ON/OFF
    // static bool fSetBGOWave;                //!<!  Flag for BGO Waveforms ON/OFF
 
-   long                            fCycleStart; //!<!  The start of the cycle
+   int64_t                            fCycleStart; //!<!  The start of the cycle
    mutable TTransientBits<UChar_t> fGriffinBits;  // Transient member flags
 
    mutable std::vector<TDetectorHit*> fAddbackLowGainHits;  //!<! Used to create addback hits on the fly
@@ -164,15 +164,14 @@ public:
    static EGainBits GetDefaultGainType() { return fDefaultGainType; }
 
 private:
-   static TVector3 gCloverPosition[17];                      //!<! Position of each HPGe Clover
+   static std::array<TVector3, 17> fCloverPosition;                      //!<! Position of each HPGe Clover
    void            ClearStatus() const { fGriffinBits = 0; } //!<!
    void SetBitNumber(EGriffinBits bit, Bool_t set) const;
    Bool_t TestBitNumber(EGriffinBits bit) const { return fGriffinBits.TestBit(bit); }
 
    // Cross-Talk stuff
 public:
-   static Double_t CTCorrectedEnergy(const TGriffinHit* const hit_to_correct, const TGriffinHit* const other_hit,
-                                     Bool_t time_constraint = true);
+   static Double_t CTCorrectedEnergy(const TGriffinHit* hit_to_correct, const TGriffinHit* other_hit, bool time_constraint = true);
    Bool_t IsCrossTalkSet(const EGainBits& gain_type) const;
    void FixLowGainCrossTalk();
    void FixHighGainCrossTalk();
@@ -215,7 +214,7 @@ public:
 	void Print(std::ostream& out) const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffin, 6) // Griffin Physics structure
+   ClassDefOverride(TGriffin, 6) // Griffin Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

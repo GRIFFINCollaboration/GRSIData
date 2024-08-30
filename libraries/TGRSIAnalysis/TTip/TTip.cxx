@@ -12,7 +12,7 @@ ClassImp(TTip)
 
 // Coordinates for the TIP detectors (in mm)
 // Assumes the target position is at (0,0,0)
-TVector3 TTip::fPositionVectors[128] = {
+std::array<TVector3, 128> TTip::fPositionVectors = {
    TVector3(12.8039,0.0000,91.1047),
    TVector3(0.0000,12.8039,91.1047),
    TVector3(-12.8039,0.0000,91.1047),
@@ -142,20 +142,8 @@ TVector3 TTip::fPositionVectors[128] = {
    TVector3(0.0000,-29.8869,-48.771),
    TVector3(21.1332,-21.1332,-48.771)};
 
-TTip::TTip()
+TTip::TTip(const TTip& rhs) : TDetector(rhs)
 {
-}
-
-TTip::~TTip()
-{
-   // Default Destructor
-}
-
-TTip::TTip(const TTip& rhs) : TDetector()
-{
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    rhs.Copy(*this);
 }
 
@@ -171,7 +159,7 @@ void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* c
       return;
    }
 
-   TTipHit* hit = new TTipHit(*frag);
+   auto* hit = new TTipHit(*frag);
    hit->SetUpNumbering(chan);          // Think about moving this to ctor
    AddHit(hit);
 }
@@ -197,7 +185,7 @@ TVector3 TTip::GetPosition(const TTipHit& hit)
 TVector3 TTip::GetPosition(int DetNbr)
 {
    if(DetNbr > 127) {
-      return TVector3(0, 0, 1); //handle invalid detector index as in TGriffin
+      return {0, 0, 1}; //handle invalid detector index as in TGriffin
    }
 	return fPositionVectors[DetNbr];
 }
