@@ -6,10 +6,6 @@
 
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TS3)
-/// \endcond
-
 int TS3::fRingNumber = 24;
 int TS3::fSectorNumber  = 32;
 

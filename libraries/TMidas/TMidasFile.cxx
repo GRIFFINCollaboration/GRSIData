@@ -22,10 +22,6 @@
 #include "TGRSIMnemonic.h"
 #include "GRSIDataVersion.h"
 
-/// \cond CLASSIMP
-ClassImp(TMidasFile)
-/// \endcond
-
 TMidasFile::TMidasFile()
 #ifdef HAS_XML
 	: fOdb(nullptr)

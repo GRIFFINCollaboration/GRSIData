@@ -2,10 +2,6 @@
 #include "TEmmaHit.h"
 #include "Globals.h"
 
-/// \cond CLASSIMP
-ClassImp(TEmmaHit)
-/// \endcond
-
 double TEmmaHit::fLdelay = 40;
 double TEmmaHit::fRdelay = 20;
 double TEmmaHit::fTdelay = 10;

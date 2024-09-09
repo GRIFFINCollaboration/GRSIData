@@ -2,10 +2,6 @@
 #include "TTrificHit.h"
 #include "Globals.h"
 
-/// \cond CLASSIMP
-ClassImp(TTrificHit)
-/// \endcond
-
 TTrificHit::TTrificHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

@@ -10,10 +10,6 @@
 #include "TChannel.h"
 #include "GValue.h"
 
-/// \cond CLASSIMP
-ClassImp(TDescantHit)
-/// \endcond
-
 TDescantHit::TDescantHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

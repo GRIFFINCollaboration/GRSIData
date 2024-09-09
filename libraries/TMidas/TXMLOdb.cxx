@@ -7,10 +7,6 @@
 #include "TList.h"
 #include "TXMLAttr.h"
 
-/// \cond CLASSIMP
-ClassImp(TXMLOdb)
-/// \endcond
-
 std::array<char, 256> TXMLOdb::fTextBuffer;
 
 TXMLOdb::TXMLOdb(char* buffer, int size)

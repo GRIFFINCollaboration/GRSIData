@@ -5,10 +5,6 @@
 
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TLaBr)
-/// \endcond
-
 bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 {
 	return ((hit->GetDetector() == bgoHit->GetDetector()) &&

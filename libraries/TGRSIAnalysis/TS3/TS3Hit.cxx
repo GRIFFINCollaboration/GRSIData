@@ -6,10 +6,6 @@
 #include "TPulseAnalyzer.h"
 #include "TGRSIMnemonic.h"
 
-/// \cond CLASSIMP
-ClassImp(TS3Hit)
-/// \endcond
-
 TS3Hit::TS3Hit()
 {
    Clear();

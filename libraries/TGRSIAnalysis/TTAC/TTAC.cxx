@@ -3,10 +3,6 @@
 #include "TRandom.h"
 #include "TMath.h"
 
-/// \cond CLASSIMP
-ClassImp(TTAC)
-/// \endcond
-
 TTAC::TTAC()
 {
 	// Default Constructor

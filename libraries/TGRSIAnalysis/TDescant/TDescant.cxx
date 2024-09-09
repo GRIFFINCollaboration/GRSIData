@@ -9,10 +9,6 @@
 #include "TGRSIDetectorInformation.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TDescant)
-/// \endcond
-
 bool TDescant::fSetWave = false;
 
 std::array<TVector3, 71> TDescant::fPosition = {

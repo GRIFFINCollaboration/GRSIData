@@ -11,10 +11,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TTipHit)
-/// \endcond
-
 TTipHit::TTipHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

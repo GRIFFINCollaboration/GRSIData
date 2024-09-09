@@ -6,11 +6,6 @@
 
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TGenericDetector)
-/// \endcond
-
-
 TGenericDetector::TGenericDetector()
 {
    Clear();

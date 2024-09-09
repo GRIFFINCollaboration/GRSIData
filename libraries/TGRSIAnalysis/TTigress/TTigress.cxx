@@ -10,10 +10,6 @@
 #include "TGRSIOptions.h"
 #include "TSortingDiagnostics.h"
 
-/// \cond CLASSIMP
-ClassImp(TTigress)
-/// \endcond
-
 double TTigress::fTargetOffset = 0.;
 double TTigress::fRadialOffset = 0.;
 

@@ -21,10 +21,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TGriffin)
-/// \endcond
-
 bool DefaultGriffinAddback(const TDetectorHit* one, const TDetectorHit* two)
 {
    return ((one->GetDetector() == two->GetDetector()) &&

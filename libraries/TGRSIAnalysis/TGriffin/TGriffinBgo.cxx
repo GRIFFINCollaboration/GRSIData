@@ -20,10 +20,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TGriffinBgo)
-/// \endcond
-
 TGriffinBgo::TGriffinBgo()
 {
 	/// Default ctor.

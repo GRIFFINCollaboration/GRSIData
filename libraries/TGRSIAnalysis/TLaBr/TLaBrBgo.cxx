@@ -20,10 +20,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TLaBrBgo)
-/// \endcond
-
 TLaBrBgo::TLaBrBgo()
 {
 	/// Default ctor.

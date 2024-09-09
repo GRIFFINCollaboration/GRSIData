@@ -12,10 +12,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TPaces)
-/// \endcond
-
 bool TPaces::fSetCoreWave = false;
 
 std::array<ROOT::Math::Polar3DVector, 6> TPaces::fDetectorPosition = {

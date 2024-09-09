@@ -7,10 +7,6 @@
 #include "Globals.h"
 #include "TTAC.h"
 
-/// \cond CLASSIMP
-ClassImp(TTACHit)
-/// \endcond
-
 TTACHit::TTACHit()
 {
 	// Default Constructor

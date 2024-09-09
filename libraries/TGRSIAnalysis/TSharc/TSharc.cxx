@@ -8,10 +8,6 @@
 #include "TClass.h"
 #include "TMath.h"
 
-/// \cond CLASSIMP
-ClassImp(TSharc)
-/// \endcond
-
 // various sharc dimensions in mm
 
 // const int TSharc::frontstripslist[16]     = {16,16,16,16,  24,24,24,24,  24,24,24,24,  16,16,16,16};

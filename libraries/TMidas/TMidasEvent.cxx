@@ -16,10 +16,6 @@
 #include "TRunInfo.h"
 #include "TXMLOdb.h"
 
-/// \cond CLASSIMP
-ClassImp(TMidasEvent)
-/// \endcond
-
 TMidasEvent::TMidasEvent()
 	: fData(nullptr), fBanksN(0), fBankList(nullptr), fAllocatedByUs(false)
 {

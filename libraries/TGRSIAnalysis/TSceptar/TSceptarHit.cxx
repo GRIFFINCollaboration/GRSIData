@@ -8,10 +8,6 @@
 #include "TSceptar.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TSceptarHit)
-/// \endcond
-
 TSceptarHit::TSceptarHit()
 {
 	// Default Constructor

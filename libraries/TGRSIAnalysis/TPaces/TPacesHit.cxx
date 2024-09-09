@@ -2,10 +2,6 @@
 #include "TPacesHit.h"
 #include "Globals.h"
 
-/// \cond CLASSIMP
-ClassImp(TPacesHit)
-/// \endcond
-
 TPacesHit::TPacesHit()
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

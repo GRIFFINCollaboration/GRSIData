@@ -27,8 +27,6 @@
 #include "TSharc2.h"
 #include "TRcmp.h"
 
-ClassImp(TGRSIMnemonic)
-
 void TGRSIMnemonic::Clear(Option_t*)
 {
 	TMnemonic::Clear();

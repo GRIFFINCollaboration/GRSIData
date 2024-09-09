@@ -13,10 +13,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TEmma)
-/// \endcond
-
 double TEmma::fAnodeTrigger = 0;
 double TEmma::fICEnergy = 0;
 double TEmma::fXdiff = 0;

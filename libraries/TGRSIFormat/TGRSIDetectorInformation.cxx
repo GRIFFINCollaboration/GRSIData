@@ -8,10 +8,6 @@
 #include "TGRSIOptions.h"
 #include "TGRSIMnemonic.h"
 
-/// \cond CLASSIMP
-ClassImp(TGRSIDetectorInformation)
-/// \endcond
-
 TGRSIDetectorInformation::TGRSIDetectorInformation()
 {
    /// Default ctor for TGRSIDetectorInformation.

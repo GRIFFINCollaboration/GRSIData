@@ -3,10 +3,6 @@
 #include "TRandom.h"
 #include "TMath.h"
 
-/// \cond CLASSIMP
-ClassImp(TTrific)
-/// \endcond
-
 //declaration of static variables that won't change from event to event
 Int_t TTrific::fGridX = 0;
 Int_t TTrific::fGridY = 0;

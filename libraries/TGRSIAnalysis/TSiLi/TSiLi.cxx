@@ -1,10 +1,6 @@
 #include "TSiLi.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TSiLi)
-/// \endcond
-
 // Having these in Clear() caused issues as functions can be called abstract with out initialising a TSiLi
 int TSiLi::fRingNumber     = 10;
 int    TSiLi::fSectorNumber   = 12;

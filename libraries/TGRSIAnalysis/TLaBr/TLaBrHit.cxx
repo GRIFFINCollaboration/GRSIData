@@ -7,10 +7,6 @@
 #include "Globals.h"
 #include "TLaBr.h"
 
-/// \cond CLASSIMP
-ClassImp(TLaBrHit)
-/// \endcond
-
 TLaBrHit::TLaBrHit()
 {
 // Default Constructor

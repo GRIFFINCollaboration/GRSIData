@@ -1,9 +1,5 @@
 #include "TRF.h"
 
-/// \cond CLASSIMP
-ClassImp(TRF)
-/// \endcond
-
 TRF::TRF()
 {
    Clear();

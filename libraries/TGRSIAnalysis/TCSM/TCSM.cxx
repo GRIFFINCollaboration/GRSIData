@@ -4,10 +4,6 @@
 constexpr bool RecoverHits = true;
 constexpr bool SumHits = false;
 
-/// \cond CLASSIMP
-ClassImp(TCSM)
-/// \endcond
-
 int TCSM::fCfdBuildDiff = 5;
 
 TCSM::TCSM()

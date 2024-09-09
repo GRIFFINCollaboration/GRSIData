@@ -4,10 +4,6 @@
 #include <cmath>
 #include <iostream>
 
-/// \cond CLASSIMP
-ClassImp(TGriffinHit)
-/// \endcond
-
 TGriffinHit::TGriffinHit()
 {
 	/// Default Ctor. Ignores TObject Streamer in ROOT < 6.

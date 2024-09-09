@@ -6,10 +6,6 @@
 #include "TZeroDegree.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TZeroDegree)
-/// \endcond
-
 bool TZeroDegree::fSetWave = false;
 
 TZeroDegree::TZeroDegree()

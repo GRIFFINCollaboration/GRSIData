@@ -3,10 +3,6 @@
 #include <TRandom.h>
 #include <TMath.h>
 
-/// \cond CLASSIMP
-ClassImp(TSceptar)
-/// \endcond
-
 bool TSceptar::fSetWave = false;
 
 std::array<TVector3, 21> TSceptar::fPaddlePosition = {

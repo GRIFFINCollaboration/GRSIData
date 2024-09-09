@@ -10,10 +10,6 @@
 #include "TChannel.h"
 #include "GValue.h"
 
-/// \cond CLASSIMP
-ClassImp(TZeroDegreeHit)
-/// \endcond
-
 TZeroDegreeHit::TZeroDegreeHit()
 {
 // Default Constructor

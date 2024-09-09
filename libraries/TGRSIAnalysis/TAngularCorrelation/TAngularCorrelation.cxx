@@ -10,10 +10,6 @@
 #include "TMath.h"
 #include "TCanvas.h"
 
-/// \cond CLASSIMP
-ClassImp(TAngularCorrelation)
-/// \endcond
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Angular correlation default constructor
 ///

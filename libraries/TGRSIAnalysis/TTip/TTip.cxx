@@ -6,10 +6,6 @@
 #include "TMath.h"
 #include "TClass.h"
 
-/// \cond CLASSIMP
-ClassImp(TTip)
-/// \endcond
-
 // Coordinates for the TIP detectors (in mm)
 // Assumes the target position is at (0,0,0)
 std::array<TVector3, 128> TTip::fPositionVectors = {

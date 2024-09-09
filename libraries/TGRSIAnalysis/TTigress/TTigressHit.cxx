@@ -4,10 +4,6 @@
 
 #include "TTigress.h"
 
-/// \cond CLASSIMP
-ClassImp(TTigressHit)
-/// \endcond
-
 TTigressHit::TTigressHit()
 {
    Clear();
