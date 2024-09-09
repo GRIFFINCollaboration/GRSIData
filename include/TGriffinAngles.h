@@ -36,7 +36,6 @@ public:
    bool   Folding() const { return fFolding; }
    bool   Grouping() const { return fGrouping; }
    bool   Addback() const { return fAddback; }
-   double Rounding() const { return fRounding; }
 
    int    Index(double angle);
    int    NumberOfAngles() const { return fAngles.size(); }
@@ -63,12 +62,15 @@ public:
 
 	void Print(Option_t* = "") const override;
 
+   static double Rounding() { return fRounding; }
+   static void Rounding(const double& val) { fRounding = val; }
+
 private:
 	double fDistance{145.}; ///< distance of detector from center of array in mmm
 	bool fFolding{false}; ///< flag indicating whether we fold our distribution around 90 degree 
 	bool fGrouping{false}; ///< flag indicating whether we group close angles together
 	bool fAddback{true}; ///< flag indicating whether we use addback
-	double fRounding{0.01}; ///< we consider any angles whose difference is less than this to be equal
+	static double fRounding; ///< we consider any angles whose difference is less than this to be equal
 	std::vector<int> fExcludedDetectors; ///< list of detectors that are excluded in calculating the angles
 	std::vector<int> fExcludedCrystals; ///< list of crystals that are excluded in calculating the angles, the crystals are numbered as 4*(det-1)+cry, so start at 0 and go up to 63
 	std::set<double> fAngles; ///< set of unique angles, when grouping is used, the largest angle of the group is used!

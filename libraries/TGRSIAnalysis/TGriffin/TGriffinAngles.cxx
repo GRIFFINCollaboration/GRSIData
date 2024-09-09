@@ -2,103 +2,208 @@
 #include "TGriffin.h"
 #include "TGRSIOptions.h"
 
-ClassImp(TGriffinAngles)
+double TGriffinAngles::fRounding = 0.001;
 
 TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, bool addback)
-	: fDistance(distance), fFolding(folding), fGrouping(grouping), fAddback(addback)
+   : fDistance(distance), fFolding(folding), fGrouping(grouping), fAddback(addback)
 {
-	SetName("GriffinAngles");
-	// get user settings for excluded detectors/crystals
-	if(TGRSIOptions::Get() != nullptr) {
-		auto* settings = TGRSIOptions::UserSettings();
-		if(settings != nullptr) {
-			// try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
-			try {
-				fExcludedCrystals = settings->GetIntVector("ExcludedCrystal", true);
-			} catch(std::out_of_range&) {}
-			try {
-				fExcludedDetectors = settings->GetIntVector("ExcludedDetector", true);
-			} catch(std::out_of_range&) {}
-		} else {
-			std::cout<<"Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals"<<std::endl;
-		}
-	} else {
-		std::cout<<"Failed to find TGRSIOptions, can't get user settings for excluded detectors/crystals"<<std::endl;
-	}
-	
+   SetName("GriffinAngles");
+   // check that we only use grouping if folding is also enabled
+   if(fGrouping && !fFolding) {
+      std::cout << DRED << "Warning, grouping is only possible if folding is also active. Setting folding to true!" << RESET_COLOR << std::endl;
+      fFolding = true;
+   }
+
+   // get user settings for excluded detectors/crystals
+   if(TGRSIOptions::Get() != nullptr) {
+      auto* settings = TGRSIOptions::UserSettings();
+      if(settings != nullptr) {
+         // try quietly to get the vectors of excluded crystals and detectors, catching (and disregarding) any exceptions
+         try {
+            fExcludedCrystals = settings->GetIntVector("ExcludedCrystal", true);
+         } catch(std::out_of_range&) {}
+         try {
+            fExcludedDetectors = settings->GetIntVector("ExcludedDetector", true);
+         } catch(std::out_of_range&) {}
+      } else {
+         std::cout << "Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals" << std::endl;
+      }
+   } else {
+      std::cout << "Failed to find TGRSIOptions, can't get user settings for excluded detectors/crystals" << std::endl;
+   }
+
+   std::cout << "Creating angles for detectors " << fDistance << " mm from center of array, " << (fAddback ? "" : "not ") << "using addback, " << (fFolding ? "" : "not ") << "using folding, and " << (fGrouping ? "" : "not ") << "using grouping. Any angles less than " << fRounding << " degrees apart will be considered the same." << std::endl;
+
    // loop over all possible detector/crystal combinations
    for(int firstDet = 1; firstDet <= 16; ++firstDet) {
-		if(ExcludeDetector(firstDet)) { continue; }
+      if(ExcludeDetector(firstDet)) { continue; }
       for(int firstCry = 0; firstCry < 4; ++firstCry) {
-			if(ExcludeCrystal(firstDet, firstCry)) { continue; }
+         if(ExcludeCrystal(firstDet, firstCry)) { continue; }
          for(int secondDet = 1; secondDet <= 16; ++secondDet) {
-				if(ExcludeDetector(secondDet)) { continue; }
+            if(ExcludeDetector(secondDet)) { continue; }
             for(int secondCry = 0; secondCry < 4; ++secondCry) {
-					if(ExcludeCrystal(secondDet, secondCry)) { continue; }
+               if(ExcludeCrystal(secondDet, secondCry)) { continue; }
                // exclude hits in the same crystal or, if addback is enabled, in the same detector
                if(firstDet == secondDet && (firstCry == secondCry || fAddback)) { continue; }
-               double angle = TGriffin::GetPosition(firstDet, firstCry, fDistance).Angle(TGriffin::GetPosition(secondDet, secondCry, fDistance)) *180./TMath::Pi();
+               double angle = TGriffin::GetPosition(firstDet, firstCry, fDistance).Angle(TGriffin::GetPosition(secondDet, secondCry, fDistance)) * 180. / TMath::Pi();
                // if folding is enable we fold the distribution at 90 degree and only use angles between 0 and 90 degree
                if(fFolding && angle > 90.) {
                   angle = 180. - angle;
                }
-					// if the lower bound and the upper bound are the same we have a new angle 
-               if(fAngles.lower_bound(angle-fRounding) == fAngles.upper_bound(angle+fRounding)) {
-						fAngles.insert(angle);
-					}
-					// this should always work, either this is a new angle, in which case it gets initialized to zero and then incremented to one,
-					// or we increment the existing counter
-					// the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
-					// factor 2 to include that the "normal" rounding is +- fRounding
-					fAngleCount[static_cast<int>(std::round(angle/fRounding))]++;
-            } // second crystal loop
-         } //second detector loop
-      } // first crystal loop
-   } // first detector loop
+               // round down to zero (mainly here for nicer looks)
+               if(angle < fRounding) {
+                  angle = 0.;
+               }
+               // if the lower bound and the upper bound are the same we have a new angle
+               if(fAngles.lower_bound(angle - fRounding) == fAngles.upper_bound(angle + fRounding)) {
+                  fAngles.insert(angle);
+               }
+               // this should always work, either this is a new angle, in which case it gets initialized to zero and then incremented to one,
+               // or we increment the existing counter
+               // the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
+               // factor 2 to include that the "normal" rounding is +- fRounding
+               fAngleCount[static_cast<int>(std::round(angle / fRounding))]++;
+            }   // second crystal loop
+         }      //second detector loop
+      }         // first crystal loop
+   }            // first detector loop
 
-	// create map of indices before we group so that we have an index for each (folded) angle
-	for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
-		fAngleMap.insert(std::make_pair(*it, std::distance(fAngles.begin(), it)));
-	}
+   // create map of indices before we group so that we have an index for each (folded) angle
+   for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
+      fAngleMap.insert(std::make_pair(*it, std::distance(fAngles.begin(), it)));
+   }
 
    if(fGrouping) {
       // If grouping is enable we group angles that are close to each other together.
       // Which angles are grouped is somewhat arbitrary, this grouping was chosen to get similar numbers of detector combinations and thus statistics for each angle group.
       // Due to the way lower_bound works, we use the highest angle of each group as the angle of that group.
       // This is just for the purpose of this algorithm, when plotting the correct average angle of the group should be used!
-		std::set<double> groupedAngles;
-		// for the angle map we need to update the indices: 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5, 10->5, 11->6, 12->6, 13->6 and so on
+      std::set<double> groupedAngles;
+      // for the angle map we need to update the indices: 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5, 10->5, 11->6, 12->6, 13->6 and so on
       for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
-			auto i = std::distance(fAngles.begin(), it);
-         switch(i) {
-         case 0:
-         case 1:
-            // first and second angle are not grouped
-            groupedAngles.insert(*it);
-            break;
-         case 2:
-         case 4:
-         case 6:
-            // three groups of two angles each
-				// 2->2, 4->3, 6->4
-				fAngleMap[*it] -= (i-2)/2;
-            ++it;
-				// 3->2, 5->3, 7->4
-				fAngleMap[*it] -= (i-2)/2+1;
-            groupedAngles.insert(*it);
-            break;
-         default:
-            // all others are groups of three
-				//  8->5, 11->6, 14->7, ...
-				fAngleMap[*it] -= (i-5)/3*2+1;
-            ++it;
-				//  9->5, 12->6, 15->7, ...
-				fAngleMap[*it] -= (i-5)/3*2+2;
-            ++it;
-				// 10->5, 13->6, 16->7, ...
-				fAngleMap[*it] -= (i-5)/3*2+3;
-            groupedAngles.insert(*it);
-            break;
+         auto i = std::distance(fAngles.begin(), it);
+         if(fDistance == 110.) {
+            switch(i) {
+            case 0:
+            case 1:
+               // first and second angle are not grouped
+               groupedAngles.insert(*it);
+               break;
+            case 2:
+            case 4:
+            case 6:
+               // three groups of two angles each
+               // 2->2, 4->3, 6->4
+               fAngleMap[*it] -= (i - 2) / 2;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 3->2, 5->3, 7->4
+               fAngleMap[*it] -= (i - 2) / 2 + 1;
+               groupedAngles.insert(*it);
+               break;
+            default:
+               // all others are groups of three
+               //  8->5, 11->6, 14->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 1;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               //  9->5, 12->6, 15->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 2;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 10->5, 13->6, 16->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 3;
+               groupedAngles.insert(*it);
+               break;
+            }
+         } else if(fDistance == 145.) {
+            switch(i) {
+            case 0:
+            case 1:
+            case 2:
+               // first three angles are not grouped
+               groupedAngles.insert(*it);
+               break;
+            case 3:
+            case 5:
+               // two groups of two angles each
+               // 3->3, 5->4
+               fAngleMap[*it] -= (i - 3) / 2;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 4->3, 6->4
+               fAngleMap[*it] -= (i - 3) / 2 + 1;
+               groupedAngles.insert(*it);
+               break;
+            case 16:
+               // two groups of two angles each
+               // 16->8
+               fAngleMap[*it] = 8;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 17->8
+               fAngleMap[*it] = 8;
+               groupedAngles.insert(*it);
+               break;
+            case 24:
+               // two groups of two angles each
+               // 24->11
+               fAngleMap[*it] = 11;
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 25->11
+               fAngleMap[*it] = 11;
+               groupedAngles.insert(*it);
+               break;
+            default:
+               // all others are groups of three
+               //  8->5, 11->6, 14->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 1 + (i < 18 ? 1 : 0);
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               //  9->5, 12->6, 15->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 2 + (i < 18 ? 1 : 0);
+               ++it;
+               if(it == fAngles.end()) {
+                  --it;
+                  groupedAngles.insert(*it);
+                  break;
+               }
+               // 10->5, 13->6, 16->7, ...
+               fAngleMap[*it] -= (i - 5) / 3 * 2 + 3 + (i < 18 ? 1 : 0);
+               groupedAngles.insert(*it);
+               break;
+            }
+         } else {
+            std::cerr << "Sorry, don't know how to group angles at a distance of " << fDistance << ", only 110. or 145. are programmed" << std::endl;
          }
       }
       fAngles = groupedAngles;
@@ -107,248 +212,278 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
 
 int TGriffinAngles::Index(double angle)
 {
-	auto matches = [angle, this](std::pair<double, int> val) { return std::abs(val.first-angle) < fRounding; };
-	auto it = std::find_if(fAngleMap.begin(), fAngleMap.end(), matches);
+   auto matches = [angle, this](std::pair<double, int> val) { return std::abs(val.first - angle) < fRounding; };
+   auto it      = std::find_if(fAngleMap.begin(), fAngleMap.end(), matches);
 
-	if(it == fAngleMap.end()) {
-		std::cout<<"Failed to find angle "<<angle<<" in map!"<<std::endl;
-		return -1;
-	}
-	if(it->second >= static_cast<int>(fAngles.size())) {
-		std::cout<<"Found index "<<it->second<<" for angle "<<angle<<" which is outside range ("<<fAngles.size()<<")"<<std::endl;
-		return -1;
-	}
-	return it->second;
+   if(it == fAngleMap.end()) {
+      std::cout << "Failed to find angle " << angle << " in map!" << std::endl;
+      return -1;
+   }
+   if(it->second >= static_cast<int>(fAngles.size())) {
+      std::cout << "Found index " << it->second << " for angle " << angle << " which is outside range (" << fAngles.size() << ")" << std::endl;
+      return -1;
+   }
+   return it->second;
 }
 
 double TGriffinAngles::AverageAngle(int index) const
 {
-	double result = 0.;
-	int nofMatches = 0;
-	for(const auto& val : fAngleMap) {
-		if(val.second == index) {
-			result += val.first;
-			++nofMatches;
-		}
-	}
-	return result/nofMatches;
+   double result     = 0.;
+   int    nofMatches = 0;
+   for(const auto& val : fAngleMap) {
+      if(val.second == index) {
+         result += val.first;
+         ++nofMatches;
+      }
+   }
+   return result / nofMatches;
 }
 
-void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose) const 
+void TGriffinAngles::FoldOrGroup(TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, bool verbose) const
 {
-	/// Apply folding and/or grouping to the theory graphs.
-	/// This assumes that the theory graphs all have the exact same length of 49 or 51 for singles or addback, respectively.
+   /// Apply folding and/or grouping to the theory graphs.
+   /// This assumes that the theory graphs all have the exact same length of 49 or 51 for singles or addback, respectively.
 
-	// these are simulated data, so if we add points together we take their average as the new value and change the uncertainties accordingly
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-	if(verbose) {
-		std::cout<<"-------------------- original --------------------"<<std::endl;
-		for(int i = 0; i < z0->GetN(); ++i) {
-			std::cout<<std::setw(8)<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-		}
-		std::cout<<"--------------------------------------------------"<<std::endl;
-	}
-#endif
-
-	// folding first
-	if(fFolding) {
-		// we first change the angles of the data points, then we re-sort the graphs, and finally we combine points for the same angle into one
-		auto* angle0 = z0->GetX();
-		auto* angle2 = z2->GetX();
-		auto* angle4 = z4->GetX();
-		for(int i = 0; i < z0->GetN(); ++i) {
-			if(angle0[i] > 90.) {
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-				if(verbose) {
-					std::cout<<i<<": Folding from "<<std::setw(8)<<z0->GetPointX(i)<<" "<<std::setw(8)<<z2->GetPointX(i)<<" "<<std::setw(8)<<z4->GetPointX(i);
-				}
-#endif
-				angle0[i] = 180. - angle0[i];
-				angle2[i] = angle0[i];
-				angle4[i] = angle0[i];
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-				if(verbose) {
-					std::cout<<" to "<<std::setw(8)<<z0->GetPointX(i)<<" "<<std::setw(8)<<z2->GetPointX(i)<<" "<<std::setw(8)<<z4->GetPointX(i)<<std::endl;
-				}
-#endif
-			}
-		}
-		z0->Sort();
-		z2->Sort();
-		z4->Sort();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-		if(verbose) {
-			std::cout<<"-------------------- sorted --------------------"<<std::endl;
-			for(int i = 0; i < z0->GetN(); ++i) {
-				std::cout<<std::setw(8)<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-			}
-			std::cout<<"------------------------------------------------"<<std::endl;
-		}
-#endif
-		angle0 = z0->GetX();
-		auto* counts0 = z0->GetY();
-		auto* errors0 = z0->GetEY();
-		auto* counts2 = z2->GetY();
-		auto* errors2 = z2->GetEY();
-		auto* counts4 = z4->GetY();
-		auto* errors4 = z4->GetEY();
-		for(int i = 1; i < z0->GetN(); ++i) {
-			if(std::abs(angle0[i] - angle0[i-1]) < fRounding) {
-				if(verbose) {
-					std::cout<<i<<": Adding angles "<<angle0[i-1]<<" and "<<angle0[i]<<std::endl;
-				}
-				// add counts from this point to the previous point, then delete this point, and update our pointers to the data
-				counts0[i-1] += counts0[i]; counts0[i-1] /= 2.; errors0[i-1] = TMath::Sqrt(TMath::Power(errors0[i-1], 2) + TMath::Power(errors0[i], 2))/2.;
-				counts2[i-1] += counts2[i]; counts2[i-1] /= 2.; errors2[i-1] = TMath::Sqrt(TMath::Power(errors2[i-1], 2) + TMath::Power(errors2[i], 2))/2.;
-				counts4[i-1] += counts4[i]; counts4[i-1] /= 2.; errors4[i-1] = TMath::Sqrt(TMath::Power(errors4[i-1], 2) + TMath::Power(errors4[i], 2))/2.;
-				z0->RemovePoint(i);
-				z2->RemovePoint(i);
-				z4->RemovePoint(i);
-				angle0 = z0->GetX();
-				counts0 = z0->GetY(); errors0 = z0->GetEY();
-				counts2 = z2->GetY(); errors2 = z2->GetEY();
-				counts4 = z4->GetY(); errors4 = z4->GetEY();
-				--i; // decrement to re-check the new ith point
-			} else {
-				if(verbose) {
-					std::cout<<i<<": Not adding angles "<<angle0[i-1]<<" and "<<angle0[i]<<std::endl;
-				}
-			}
-		}
-	}
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-	if(verbose) {
-		std::cout<<"-------------------- after folding --------------------"<<std::endl;
-		for(int i = 0; i < z0->GetN(); ++i) {
-			std::cout<<std::setw(8)<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-		}
-		std::cout<<"-------------------------------------------------------"<<std::endl;
-	}
+   // these are simulated data, so if we add points together we take their average as the new value and change the uncertainties accordingly
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+   if(verbose) {
+      std::cout << "-------------------- original --------------------" << std::endl;
+      for(int i = 0; i < z0->GetN(); ++i) {
+         std::cout << std::setw(8) << z0->GetPointX(i) << ": " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+      }
+      std::cout << "--------------------------------------------------" << std::endl;
+   }
 #endif
 
-	// grouping
-	if(fGrouping) {
-		// Due to the way lower_bound works, we use the highest angle of each group as the angle of that group.
-		// This is just for the purpose of this algorithm, when plotting the correct average angle of the group should be used!
-		auto* counts0 = z0->GetY();
-		auto* errors0 = z0->GetEY();
-		auto* counts2 = z2->GetY();
-		auto* errors2 = z2->GetEY();
-		auto* counts4 = z4->GetY();
-		auto* errors4 = z4->GetEY();
-		for(int i = 0; i < z0->GetN(); ++i) {
-			switch(i) {
-				case 0:
-				case 1: // first and second angle are not grouped
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					if(verbose) {
-						std::cout<<i<<": Leaving as is "<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-					}
+   // folding first
+   if(fFolding) {
+      // we first change the angles of the data points, then we re-sort the graphs, and finally we combine points for the same angle into one
+      auto* angle0 = z0->GetX();
+      auto* angle2 = z2->GetX();
+      auto* angle4 = z4->GetX();
+      for(int i = 0; i < z0->GetN(); ++i) {
+         if(angle0[i] > 90.) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << i << ": Folding from " << std::setw(8) << z0->GetPointX(i) << " " << std::setw(8) << z2->GetPointX(i) << " " << std::setw(8) << z4->GetPointX(i);
+            }
 #endif
-					break;
-				case 2:
-				case 3:
-				case 4:
-					// three groups of two angles each, so we add the this point to the next one, delete it, and update the pointers
-					// because we delete the point, we don't skip cases here like when we create the angles above
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					if(verbose) {
-						std::cout<<i<<": Grouping "<<z0->GetPointX(i)<<" and "<<z0->GetPointX(i+1)<<" from "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i);
-					}
+            angle0[i] = 180. - angle0[i];
+            angle2[i] = angle0[i];
+            angle4[i] = angle0[i];
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << " to " << std::setw(8) << z0->GetPointX(i) << " " << std::setw(8) << z2->GetPointX(i) << " " << std::setw(8) << z4->GetPointX(i) << std::endl;
+            }
 #endif
-					counts0[i+1] += counts0[i]; counts0[i+1] /= 2.; errors0[i+1] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i+1], 2))/2.;
-					counts2[i+1] += counts2[i]; counts2[i+1] /= 2.; errors2[i+1] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i+1], 2))/2.;
-					counts4[i+1] += counts4[i]; counts4[i+1] /= 2.; errors4[i+1] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i+1], 2))/2.;
-					z0->RemovePoint(i);
-					z2->RemovePoint(i);
-					z4->RemovePoint(i);
-					counts0 = z0->GetY(); errors0 = z0->GetEY();
-					counts2 = z2->GetY(); errors2 = z2->GetEY();
-					counts4 = z4->GetY(); errors4 = z4->GetEY();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					if(verbose) {
-						std::cout<<" to "<<z0->GetPointX(i)<<" with "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-					}
+         }
+      }
+      z0->Sort();
+      z2->Sort();
+      z4->Sort();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+      if(verbose) {
+         std::cout << "-------------------- sorted --------------------" << std::endl;
+         for(int i = 0; i < z0->GetN(); ++i) {
+            std::cout << std::setw(8) << z0->GetPointX(i) << ": " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+         }
+         std::cout << "------------------------------------------------" << std::endl;
+      }
 #endif
-					// no need to decrement the index, by removing one point the old i+1 became i and we don't want to process that one (we just added to it)
-					break;
-				default:
-					// all others are groups of three, so we add this point and the next one to the one two ahead, delete them, and update the pointers
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					if(verbose) {
-						std::cout<<i<<": Grouping "<<z0->GetPointX(i)<<", "<<z0->GetPointX(i+1)<<", and "<<z0->GetPointX(i+2)<<" from "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i);
-					}
+      angle0        = z0->GetX();
+      auto* counts0 = z0->GetY();
+      auto* errors0 = z0->GetEY();
+      auto* counts2 = z2->GetY();
+      auto* errors2 = z2->GetEY();
+      auto* counts4 = z4->GetY();
+      auto* errors4 = z4->GetEY();
+      for(int i = 1; i < z0->GetN(); ++i) {
+         if(std::abs(angle0[i] - angle0[i - 1]) < fRounding) {
+            if(verbose) {
+               std::cout << i << ": Adding angles " << angle0[i - 1] << " and " << angle0[i] << std::endl;
+            }
+            // add counts from this point to the previous point, then delete this point, and update our pointers to the data
+            counts0[i - 1] += counts0[i];
+            counts0[i - 1] /= 2.;
+            errors0[i - 1] = TMath::Sqrt(TMath::Power(errors0[i - 1], 2) + TMath::Power(errors0[i], 2)) / 2.;
+            counts2[i - 1] += counts2[i];
+            counts2[i - 1] /= 2.;
+            errors2[i - 1] = TMath::Sqrt(TMath::Power(errors2[i - 1], 2) + TMath::Power(errors2[i], 2)) / 2.;
+            counts4[i - 1] += counts4[i];
+            counts4[i - 1] /= 2.;
+            errors4[i - 1] = TMath::Sqrt(TMath::Power(errors4[i - 1], 2) + TMath::Power(errors4[i], 2)) / 2.;
+            z0->RemovePoint(i);
+            z2->RemovePoint(i);
+            z4->RemovePoint(i);
+            angle0  = z0->GetX();
+            counts0 = z0->GetY();
+            errors0 = z0->GetEY();
+            counts2 = z2->GetY();
+            errors2 = z2->GetEY();
+            counts4 = z4->GetY();
+            errors4 = z4->GetEY();
+            --i;   // decrement to re-check the new ith point
+         } else {
+            if(verbose) {
+               std::cout << i << ": Not adding angles " << angle0[i - 1] << " and " << angle0[i] << std::endl;
+            }
+         }
+      }
+   }
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+   if(verbose) {
+      std::cout << "-------------------- after folding --------------------" << std::endl;
+      for(int i = 0; i < z0->GetN(); ++i) {
+         std::cout << std::setw(8) << z0->GetPointX(i) << ": " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+      }
+      std::cout << "-------------------------------------------------------" << std::endl;
+   }
 #endif
-					counts0[i+2] += counts0[i] + counts0[i+1]; counts0[i+2] /= 3.; errors0[i+2] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
-					counts2[i+2] += counts2[i] + counts2[i+1]; counts2[i+2] /= 3.; errors2[i+2] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
-					counts4[i+2] += counts4[i] + counts4[i+1]; counts4[i+2] /= 3.; errors4[i+2] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i+1], 2) + TMath::Power(errors0[i+2], 2))/3.;
-					z0->RemovePoint(i);
-					z2->RemovePoint(i);
-					z4->RemovePoint(i);
-					z0->RemovePoint(i+1);
-					z2->RemovePoint(i+1);
-					z4->RemovePoint(i+1);
-					counts0 = z0->GetY(); errors0 = z0->GetEY();
-					counts2 = z2->GetY(); errors2 = z2->GetEY();
-					counts4 = z4->GetY(); errors4 = z4->GetEY();
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-					if(verbose) {
-						std::cout<<" to "<<z0->GetPointX(i)<<" with "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-					}
+
+   // grouping
+   if(fGrouping) {
+      // Due to the way lower_bound works, we use the highest angle of each group as the angle of that group.
+      // This is just for the purpose of this algorithm, when plotting the correct average angle of the group should be used!
+      auto* counts0 = z0->GetY();
+      auto* errors0 = z0->GetEY();
+      auto* counts2 = z2->GetY();
+      auto* errors2 = z2->GetEY();
+      auto* counts4 = z4->GetY();
+      auto* errors4 = z4->GetEY();
+      for(int i = 0; i < z0->GetN(); ++i) {
+         switch(i) {
+         case 0:
+         case 1:   // first and second angle are not grouped
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << i << ": Leaving as is " << z0->GetPointX(i) << ": " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+            }
 #endif
-					// no need to decrement the index, by removing two points the old i+2 became i and we don't want to processs that one since we just added to it
-					break;
-			}
-		}
-	}
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,20,0)
-	if(verbose) {
-		std::cout<<"-------------------- after folding and grouping --------------------"<<std::endl;
-		for(int i = 0; i < z0->GetN(); ++i) {
-			std::cout<<std::setw(8)<<z0->GetPointX(i)<<": "<<std::setw(8)<<z0->GetPointY(i)<<" "<<std::setw(8)<<z2->GetPointY(i)<<" "<<std::setw(8)<<z4->GetPointY(i)<<std::endl;
-		}
-		std::cout<<"--------------------------------------------------------------------"<<std::endl;
-	}
+            break;
+         case 2:
+         case 3:
+         case 4:
+            // three groups of two angles each, so we add the this point to the next one, delete it, and update the pointers
+            // because we delete the point, we don't skip cases here like when we create the angles above
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << i << ": Grouping " << z0->GetPointX(i) << " and " << z0->GetPointX(i + 1) << " from " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i);
+            }
+#endif
+            counts0[i + 1] += counts0[i];
+            counts0[i + 1] /= 2.;
+            errors0[i + 1] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i + 1], 2)) / 2.;
+            counts2[i + 1] += counts2[i];
+            counts2[i + 1] /= 2.;
+            errors2[i + 1] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i + 1], 2)) / 2.;
+            counts4[i + 1] += counts4[i];
+            counts4[i + 1] /= 2.;
+            errors4[i + 1] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i + 1], 2)) / 2.;
+            z0->RemovePoint(i);
+            z2->RemovePoint(i);
+            z4->RemovePoint(i);
+            counts0 = z0->GetY();
+            errors0 = z0->GetEY();
+            counts2 = z2->GetY();
+            errors2 = z2->GetEY();
+            counts4 = z4->GetY();
+            errors4 = z4->GetEY();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << " to " << z0->GetPointX(i) << " with " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+            }
+#endif
+            // no need to decrement the index, by removing one point the old i+1 became i and we don't want to process that one (we just added to it)
+            break;
+         default:
+            // all others are groups of three, so we add this point and the next one to the one two ahead, delete them, and update the pointers
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << i << ": Grouping " << z0->GetPointX(i) << ", " << z0->GetPointX(i + 1) << ", and " << z0->GetPointX(i + 2) << " from " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i);
+            }
+#endif
+            counts0[i + 2] += counts0[i] + counts0[i + 1];
+            counts0[i + 2] /= 3.;
+            errors0[i + 2] = TMath::Sqrt(TMath::Power(errors0[i], 2) + TMath::Power(errors0[i + 1], 2) + TMath::Power(errors0[i + 2], 2)) / 3.;
+            counts2[i + 2] += counts2[i] + counts2[i + 1];
+            counts2[i + 2] /= 3.;
+            errors2[i + 2] = TMath::Sqrt(TMath::Power(errors2[i], 2) + TMath::Power(errors2[i + 1], 2) + TMath::Power(errors0[i + 2], 2)) / 3.;
+            counts4[i + 2] += counts4[i] + counts4[i + 1];
+            counts4[i + 2] /= 3.;
+            errors4[i + 2] = TMath::Sqrt(TMath::Power(errors4[i], 2) + TMath::Power(errors4[i + 1], 2) + TMath::Power(errors0[i + 2], 2)) / 3.;
+            z0->RemovePoint(i);
+            z2->RemovePoint(i);
+            z4->RemovePoint(i);
+            z0->RemovePoint(i + 1);
+            z2->RemovePoint(i + 1);
+            z4->RemovePoint(i + 1);
+            counts0 = z0->GetY();
+            errors0 = z0->GetEY();
+            counts2 = z2->GetY();
+            errors2 = z2->GetEY();
+            counts4 = z4->GetY();
+            errors4 = z4->GetEY();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+            if(verbose) {
+               std::cout << " to " << z0->GetPointX(i) << " with " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+            }
+#endif
+            // no need to decrement the index, by removing two points the old i+2 became i and we don't want to processs that one since we just added to it
+            break;
+         }
+      }
+   }
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+   if(verbose) {
+      std::cout << "-------------------- after folding and grouping --------------------" << std::endl;
+      for(int i = 0; i < z0->GetN(); ++i) {
+         std::cout << std::setw(8) << z0->GetPointX(i) << ": " << std::setw(8) << z0->GetPointY(i) << " " << std::setw(8) << z2->GetPointY(i) << " " << std::setw(8) << z4->GetPointY(i) << std::endl;
+      }
+      std::cout << "--------------------------------------------------------------------" << std::endl;
+   }
 #endif
 }
 
 bool TGriffinAngles::ExcludeDetector(int detector) const
 {
-	/// Returns true if any of the detectors in fExcludedDetectors matches the given detector.
-	return std::any_of(fExcludedDetectors.begin(), fExcludedDetectors.end(), [&detector](auto exclude) { return detector == exclude; });
+   /// Returns true if any of the detectors in fExcludedDetectors matches the given detector.
+   return std::any_of(fExcludedDetectors.begin(), fExcludedDetectors.end(), [&detector](auto exclude) { return detector == exclude; });
 }
 
 bool TGriffinAngles::ExcludeCrystal(int detector, int crystal) const
 {
-	/// Returns true if any of the crystals in fExcludedCrystals matches the given detector and crystal (using 4*(detector-1)+crystal+1).
-	return std::any_of(fExcludedCrystals.begin(), fExcludedCrystals.end(), [&detector,&crystal](auto exclude) { return 4*(detector-1)+crystal+1 == exclude; });
+   /// Returns true if any of the crystals in fExcludedCrystals matches the given detector and crystal (using 4*(detector-1)+crystal+1).
+   return std::any_of(fExcludedCrystals.begin(), fExcludedCrystals.end(), [&detector, &crystal](auto exclude) { return 4 * (detector - 1) + crystal + 1 == exclude; });
 }
 
 void TGriffinAngles::Print(Option_t*) const
 {
-	std::cout<<"List of unique angles "<<std::setw(2)<<fAngles.size()<<" Map from angles to indices "<<std::setw(2)<<fAngleMap.size()<<"   # of combinations "<<std::setw(2)<<fAngleCount.size()<<std::endl;
-	          //List of unique angles aa Map from angles to indices mm   # of combinations cc"<<std::endl;
-	std::cout<<"index   angle            angle   index  average angle    angle   counts"<<std::endl;
-	          //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
-	auto it = fAngles.begin();
-	auto it2 = fAngleMap.begin();
-	auto it3 = fAngleCount.begin();
-	for(it = fAngles.begin(), it2 = fAngleMap.begin(), it3 = fAngleCount.begin(); it != fAngles.end() || it2 != fAngleMap.end() || it3 != fAngleCount.end(); ++it, ++it2, ++it3) {
-		if(it != fAngles.end()) {
-			std::cout<<std::setw(2)<<std::distance(fAngles.begin(), it)<<":     "<<std::setw(7)<<*it<<"          ";
-		} else {
-	                //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
-			std::cout<<"                         ";
-		}
-		if(it2 != fAngleMap.end()) {
-			std::cout<<std::setw(7)<<it2->first<<" "<<std::setw(2)<<it2->second<<"     "<<std::setw(7)<<AverageAngle(it2->second)<<"          ";
-		} else {
-	                //aa.aaaa ii     aa.aaaa          aa.aaaa ccc
-			std::cout<<"                                ";
-		}
-		if(it3 != fAngleCount.end()) {
-			std::cout<<std::setw(7)<<it3->first*fRounding<<" "<<std::setw(3)<<it3->second;
-		}
-		std::cout<<std::endl;
-	}
+   std::cout << "List of unique angles " << std::setw(2) << fAngles.size() << " Map from angles to indices " << std::setw(2) << fAngleMap.size() << "   # of combinations " << std::setw(2) << fAngleCount.size() << std::endl;
+   //List of unique angles aa Map from angles to indices mm   # of combinations cc"<<std::endl;
+   std::cout << "index   angle            angle   index  average angle    angle   counts" << std::endl;
+   //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+   auto it  = fAngles.begin();
+   auto it2 = fAngleMap.begin();
+   auto it3 = fAngleCount.begin();
+   while(it != fAngles.end() || it2 != fAngleMap.end() || it3 != fAngleCount.end()) {
+      if(it != fAngles.end()) {
+         std::cout << std::setw(2) << std::distance(fAngles.begin(), it) << ":     " << std::setw(7) << *it << "          ";
+         ++it;
+      } else {
+         //ii:     aa.aaaa          aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+         std::cout << "                         ";
+      }
+      if(it2 != fAngleMap.end()) {
+         std::cout << std::setw(7) << it2->first << " " << std::setw(2) << it2->second << "     " << std::setw(7) << AverageAngle(it2->second) << "          ";
+         ++it2;
+      } else {
+         //aa.aaaa ii     aa.aaaa          aa.aaaa ccc
+         std::cout << "                                ";
+      }
+      if(it3 != fAngleCount.end()) {
+         std::cout << std::setw(7) << it3->first * fRounding << " " << std::setw(3) << it3->second;
+         ++it3;
+      }
+      std::cout << std::endl;
+   }
 }
