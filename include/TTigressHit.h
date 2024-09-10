@@ -24,9 +24,9 @@ class TTigressHit : public TDetectorHit {
 public:
    TTigressHit();
    TTigressHit(const TTigressHit&);
-	TTigressHit(TTigressHit&&) noexcept = default;
-	TTigressHit& operator=(const TTigressHit&) = default;
-	TTigressHit& operator=(TTigressHit&&) noexcept = default;
+   TTigressHit(TTigressHit&&) noexcept            = default;
+   TTigressHit& operator=(const TTigressHit&)     = default;
+   TTigressHit& operator=(TTigressHit&&) noexcept = default;
    explicit TTigressHit(const TFragment& frag);
    void CopyFragment(const TFragment& frag);
    ~TTigressHit() override = default;
@@ -37,7 +37,7 @@ private:
 
    std::vector<TDetectorHit> fSegments;
 
-	bool    fCoreSet{false};
+   bool    fCoreSet{false};
    bool    fBgoFired{false};
    Float_t fTimeFit{0.};
    Float_t fSig2Noise{0.};
@@ -48,8 +48,12 @@ private:
 public:
    void SetHit() {}
    /////////////////////////    /////////////////////////////////////
-   void SetCore(const TTigressHit& core) { core.Copy(*this); fCoreSet = true; }                //!<!
-   void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); } //!<!
+   void SetCore(const TTigressHit& core)
+   {
+      core.Copy(*this);
+      fCoreSet = true;
+   }                                                                        //!<!
+   void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); }   //!<!
    //    void AddBGO(const TDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
    // void SetInitalHit(const int &i)     { fFirstSegment = i; }        //!<!
 
@@ -59,8 +63,8 @@ public:
 
    void     SetWavefit(const TFragment&);
    void     SetWavefit();
-   Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
-   Double_t GetFitTime() const { return fTimeFit; }         //!<!
+   Double_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
+   Double_t GetFitTime() const { return fTimeFit; }           //!<!
 
    UShort_t GetArrayNumber() const override { return 4 * (GetDetector() - 1) + GetCrystal(); }
 
@@ -82,14 +86,14 @@ public:
 
    int GetTimeToTrigger() { return (GetTimeStamp() & 0x7fffff) - (static_cast<Int_t>(GetCfd()) >> 4); }
 
-   int GetSegmentMultiplicity() const { return fSegments.size(); } //!<!
-   int GetNSegments() const { return fSegments.size(); }           //!<!
+   int GetSegmentMultiplicity() const { return fSegments.size(); }   //!<!
+   int GetNSegments() const { return fSegments.size(); }             //!<!
    /* int GetBGOMultiplicity()            const { return fBgos.size();     }  //!<! */
    /* int GetNBGOs()                      const { return fBgos.size();     }  //!<! */
 
-   const TDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); } //!<!
+   const TDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); }   //!<!
    /* const TDetectorHit& GetBGO(int i)     const { return fBgos.at(i);      }  //!<! */
-   const TDetectorHit& GetCore() const { return *this; } //!<!
+   const TDetectorHit& GetCore() const { return *this; }   //!<!
 
    const std::vector<TDetectorHit>& GetSegmentVec() const { return fSegments; }
    /* const std::vector<TDetectorHit>& GetBGOVec()     const { return fBgos; } */
@@ -112,24 +116,24 @@ public:
       return 0;
    }
 
-   static bool Compare(const TTigressHit& lhs, const TTigressHit& rhs);       //!<!
-   static bool CompareEnergy(const TTigressHit& lhs, const TTigressHit& rhs); //!<!
+   static bool Compare(const TTigressHit& lhs, const TTigressHit& rhs);         //!<!
+   static bool CompareEnergy(const TTigressHit& lhs, const TTigressHit& rhs);   //!<!
 
-   void SumHit(TTigressHit*); //!<!
+   void SumHit(TTigressHit*);   //!<!
 
    TVector3 GetPosition(Double_t dist = 0.) const override;
    TVector3 GetLastPosition(Double_t dist = 0.) const;
 
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;      //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Copy(TObject&) const override;              //!<!
+   void Copy(TObject&, bool) const override;        //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
 
-   void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); } //!<!
+   void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); }   //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTigressHit, 4) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TTigressHit, 4)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

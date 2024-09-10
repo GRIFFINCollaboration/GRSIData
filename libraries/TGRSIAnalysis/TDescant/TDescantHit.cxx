@@ -23,7 +23,7 @@ TDescantHit::TDescantHit(const TDescantHit& rhs) : TDetectorHit(rhs)
 
 TDescantHit::TDescantHit(const TFragment& frag)
 {
-	frag.Copy(*this);
+   frag.Copy(*this);
 
    SetZc(frag.GetZc());
    SetCcShort(frag.GetCcShort());
@@ -33,7 +33,7 @@ TDescantHit::TDescantHit(const TFragment& frag)
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
       }
-		frag.CopyWave(*this);
+      frag.CopyWave(*this);
       if(!GetWaveform()->empty()) {
          AnalyzeWaveform();
       }
@@ -108,16 +108,16 @@ void TDescantHit::Clear(Option_t*)
 
 void TDescantHit::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TDescantHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"Descant Detector:   "<<GetDetector()<<std::endl;
-   str<<"Descant hit energy: "<<GetEnergy()<<std::endl;
-   str<<"Descant hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "Descant Detector:   " << GetDetector() << std::endl;
+   str << "Descant hit energy: " << GetEnergy() << std::endl;
+   str << "Descant hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }
 
 bool TDescantHit::AnalyzeWaveform()
@@ -125,7 +125,7 @@ bool TDescantHit::AnalyzeWaveform()
    bool error = false;
 
    if(!HasWave()) {
-      return false; // Error!
+      return false;   // Error!
    }
    std::vector<Int_t>   baselineCorrections(8, 0);
    std::vector<Short_t> newWaveform;
@@ -135,7 +135,7 @@ bool TDescantHit::AnalyzeWaveform()
    unsigned int interpolationSteps  = 256;
    int          delay               = 8;
    double       attenuation         = 24. / 64.;
-   int          halfSmoothingWindow = 0; // 2*halfsmoothingwindow + 1 = number of samples in moving window.
+   int          halfSmoothingWindow = 0;   // 2*halfsmoothingwindow + 1 = number of samples in moving window.
 
    // baseline algorithm: correct each adc with average of first two samples in that adc
    for(size_t i = 0; i < 8 && i < WaveSize(); ++i) {
@@ -144,12 +144,12 @@ bool TDescantHit::AnalyzeWaveform()
    for(size_t i = 8; i < 16 && i < WaveSize(); ++i) {
       baselineCorrections[i - 8] =
          ((baselineCorrections[i - 8] + GetWaveform()->at(i)) + ((baselineCorrections[i - 8] + GetWaveform()->at(i)) > 0 ? 1 : -1)) >>
-         1; // Average
+         1;   // Average
    }
    for(size_t i = 0; i < WaveSize(); ++i) {
       newWaveform[i] -= baselineCorrections[i % 8];
    }
-	SetWaveform(newWaveform);
+   SetWaveform(newWaveform);
 
    SetCfd(CalculateCfd(attenuation, delay, halfSmoothingWindow, interpolationSteps));
 
@@ -186,7 +186,7 @@ Int_t TDescantHit::CalculateCfdAndMonitor(double attenuation, unsigned int delay
 
    Int_t cfd = 0;
    if(!HasWave()) {
-      return INT_MAX; // Error!
+      return INT_MAX;   // Error!
    }
    std::vector<Short_t> smoothedWaveform;
 
@@ -243,7 +243,7 @@ std::vector<Short_t> TDescantHit::CalculateSmoothedWaveform(unsigned int halfSmo
 {
 
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
 
    std::vector<Short_t> smoothedWaveform(std::max((static_cast<size_t>(0)), WaveSize() - 2 * halfSmoothingWindow),
@@ -262,7 +262,7 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
                                                       unsigned int halfSmoothingWindow)
 {
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
    std::vector<Short_t> smoothedWaveform;
 
@@ -284,15 +284,15 @@ std::vector<Short_t> TDescantHit::CalculateCfdMonitor(double attenuation, unsign
 std::vector<Int_t> TDescantHit::CalculatePartialSum()
 {
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
 
    std::vector<Int_t> partialSums(WaveSize(), 0);
 
-      partialSums[0] = GetWaveform()->at(0);
-      for(size_t i = 1; i < WaveSize(); ++i) {
-         partialSums[i] = partialSums[i - 1] + GetWaveform()->at(i);
-      }
+   partialSums[0] = GetWaveform()->at(0);
+   for(size_t i = 1; i < WaveSize(); ++i) {
+      partialSums[i] = partialSums[i - 1] + GetWaveform()->at(i);
+   }
 
    if(TGRSIOptions::Get()->Debug()) {
       fPartialSum = partialSums;
@@ -331,4 +331,3 @@ Int_t TDescantHit::CalculatePsdAndPartialSums(double fraction, unsigned int inte
 
    return psd;
 }
-

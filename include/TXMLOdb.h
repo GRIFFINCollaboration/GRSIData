@@ -32,9 +32,9 @@ class TXMLOdb {
 public:
    explicit TXMLOdb(char* buffer, int size = 0);
    TXMLOdb(const TXMLOdb& rhs);
-	TXMLOdb(TXMLOdb&&) noexcept = default;
-	TXMLOdb& operator=(const TXMLOdb&) = default;
-	TXMLOdb& operator=(TXMLOdb&&) noexcept = default;
+   TXMLOdb(TXMLOdb&&) noexcept            = default;
+   TXMLOdb& operator=(const TXMLOdb&)     = default;
+   TXMLOdb& operator=(TXMLOdb&&) noexcept = default;
    virtual ~TXMLOdb();
 
    TXMLDocument* fDoc;
@@ -42,19 +42,19 @@ public:
    TXMLNode*     fOdb;
 
    const char* GetNodeName(TXMLNode*);
-   TXMLNode* FindNode(const char* name, TXMLNode* node = nullptr);
-   TXMLNode* FindPath(const char* path, TXMLNode* node = nullptr);
+   TXMLNode*   FindNode(const char* name, TXMLNode* node = nullptr);
+   TXMLNode*   FindPath(const char* path, TXMLNode* node = nullptr);
 
-   int ReadInt(const char* path, int index = 0, int defaultValue = 0xffffffff);
-   std::vector<int> ReadIntArray(TXMLNode* node);
-   std::vector<double> ReadDoubleArray(TXMLNode* node);
+   int                      ReadInt(const char* path, int index = 0, int defaultValue = 0xffffffff);
+   std::vector<int>         ReadIntArray(TXMLNode* node);
+   std::vector<double>      ReadDoubleArray(TXMLNode* node);
    std::vector<std::string> ReadStringArray(TXMLNode* node);
 
 private:
    static std::array<char, 256> fTextBuffer;
 
    /// \cond CLASSIMP
-   ClassDef(TXMLOdb, 0) // NOLINT(readability-else-after-return)
+   ClassDef(TXMLOdb, 0)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 #endif

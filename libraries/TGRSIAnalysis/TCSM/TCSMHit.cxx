@@ -35,7 +35,7 @@ void TCSMHit::Clear(Option_t*)
    fVerETime   = 0.0;
    fEPosition.SetXYZ(0, 0, 1);
 
-   fDetectorNumber = 0; //
+   fDetectorNumber = 0;   //
 }
 
 Double_t TCSMHit::GetDthickness() const
@@ -111,15 +111,16 @@ Double_t TCSMHit::GetDEnergy() const
 
    case 4: break;
 
-   default: std::cerr<<"  ERROR, Trying to get energy from a D detector that doesn't exist!"<<std::endl;
+   default: std::cerr << "  ERROR, Trying to get energy from a D detector that doesn't exist!" << std::endl;
    }
 
    if((!trustVertical || !trustHorizontal) && debug) {
-      std::cout<<std::endl<<"  GetDEnergy() output: (V,H)"<<std::endl;
-      std::cout<<"  Detector: "<<GetDetectorNumber()<<std::endl;
-      std::cout<<"  Strip: "<<GetDVerticalStrip()<<" "<<GetDHorizontalStrip()<<std::endl;
-      std::cout<<"  Trustworthy: "<<trustVertical<<" "<<trustHorizontal<<std::endl;
-      std::cout<<"  Energy: "<<GetDVerticalEnergy()<<" "<<GetDHorizontalEnergy()<<std::endl;
+      std::cout << std::endl
+                << "  GetDEnergy() output: (V,H)" << std::endl;
+      std::cout << "  Detector: " << GetDetectorNumber() << std::endl;
+      std::cout << "  Strip: " << GetDVerticalStrip() << " " << GetDHorizontalStrip() << std::endl;
+      std::cout << "  Trustworthy: " << trustVertical << " " << trustHorizontal << std::endl;
+      std::cout << "  Energy: " << GetDVerticalEnergy() << " " << GetDHorizontalEnergy() << std::endl;
    }
 
    if(trustVertical && trustHorizontal) {
@@ -128,21 +129,21 @@ Double_t TCSMHit::GetDEnergy() const
    }
    if(trustVertical && !trustHorizontal) {
       if(debug) {
-         std::cout<<"**Returning: "<<GetDVerticalEnergy()<<std::endl;
+         std::cout << "**Returning: " << GetDVerticalEnergy() << std::endl;
       }
       return GetDVerticalEnergy();
    }
    if(!trustVertical && trustHorizontal) {
       if(debug) {
-         std::cout<<"**Returning: "<<GetDHorizontalEnergy()<<std::endl;
+         std::cout << "**Returning: " << GetDHorizontalEnergy() << std::endl;
       }
       return GetDHorizontalEnergy();
-   } 
-	if(!trustVertical && !trustHorizontal) { // Are these correct??? RD
+   }
+   if(!trustVertical && !trustHorizontal) {   // Are these correct??? RD
       return 0.;
-	}
-	std::cerr<<"  ERROR, I don't know who to trust in GetDEnergy()"<<std::endl;
-	return -1; // I added this here so that there is guaranteed a return at the end of the function RD
+   }
+   std::cerr << "  ERROR, I don't know who to trust in GetDEnergy()" << std::endl;
+   return -1;   // I added this here so that there is guaranteed a return at the end of the function RD
 }
 
 Double_t TCSMHit::GetEEnergy() const
@@ -174,7 +175,7 @@ Double_t TCSMHit::GetEEnergy() const
 
    case 4: break;
 
-   default: std::cerr<<"  ERROR, Trying to get energy from a E detector that doesn't exist!"<<std::endl;
+   default: std::cerr << "  ERROR, Trying to get energy from a E detector that doesn't exist!" << std::endl;
    }
 
    if(trustVertical && trustHorizontal) {
@@ -185,40 +186,40 @@ Double_t TCSMHit::GetEEnergy() const
    }
    if(!trustVertical && trustHorizontal) {
       return GetEHorizontalEnergy();
-   } 
-	if(!trustVertical && !trustHorizontal) { // Are these correct? RD
+   }
+   if(!trustVertical && !trustHorizontal) {   // Are these correct? RD
       return 0.;
    }
-	std::cerr<<"  ERROR, I don't know who to trust in GetEEnergy()"<<std::endl;
-	return -1; // I added this here so that there is guaranteed a return at the end of the function RD
+   std::cerr << "  ERROR, I don't know who to trust in GetEEnergy()" << std::endl;
+   return -1;   // I added this here so that there is guaranteed a return at the end of the function RD
 }
 
 void TCSMHit::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TCSMHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"Printing TCSMHit:  Horizontal    Vertical"<<std::endl;
-   str<<"Detector number: "<<GetDetectorNumber()<<std::endl;
-   str<<"D"<<std::endl;
-   str<<"Strip: "<<GetDHorizontalStrip()<<" "<<GetDVerticalStrip()<<std::endl;
-   str<<"Charge: "<<GetDHorizontalCharge()<<" "<<GetDVerticalCharge()<<std::endl;
-   str<<"CFD: "<<GetDHorizontalCFD()<<" "<<GetDVerticalCFD()<<std::endl;
-   str<<"Energy: "<<GetDHorizontalEnergy()<<" "<<GetDVerticalEnergy()<<std::endl;
-   str<<"Theta: "<<GetDPosition().Theta() * 180. / 3.14159
-      <<" Phi: "<<GetDPosition().Phi() * 180. / 3.14159<<std::endl;
-   str<<"E"<<std::endl;
-   str<<"Strip: "<<GetEHorizontalStrip()<<" "<<GetEVerticalStrip()<<std::endl;
-   str<<"Charge: "<<GetEHorizontalCharge()<<" "<<GetEVerticalCharge()<<std::endl;
-   str<<"CFD: "<<GetEHorizontalCFD()<<" "<<GetEVerticalCFD()<<std::endl;
-   str<<"Energy: "<<GetEHorizontalEnergy()<<" "<<GetEVerticalEnergy()<<std::endl;
-   str<<"Theta: "<<GetEPosition().Theta() * 180. / 3.14159
-      <<" Phi: "<<GetEPosition().Phi() * 180. / 3.14159<<std::endl;
-   str<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "Printing TCSMHit:  Horizontal    Vertical" << std::endl;
+   str << "Detector number: " << GetDetectorNumber() << std::endl;
+   str << "D" << std::endl;
+   str << "Strip: " << GetDHorizontalStrip() << " " << GetDVerticalStrip() << std::endl;
+   str << "Charge: " << GetDHorizontalCharge() << " " << GetDVerticalCharge() << std::endl;
+   str << "CFD: " << GetDHorizontalCFD() << " " << GetDVerticalCFD() << std::endl;
+   str << "Energy: " << GetDHorizontalEnergy() << " " << GetDVerticalEnergy() << std::endl;
+   str << "Theta: " << GetDPosition().Theta() * 180. / 3.14159
+       << " Phi: " << GetDPosition().Phi() * 180. / 3.14159 << std::endl;
+   str << "E" << std::endl;
+   str << "Strip: " << GetEHorizontalStrip() << " " << GetEVerticalStrip() << std::endl;
+   str << "Charge: " << GetEHorizontalCharge() << " " << GetEVerticalCharge() << std::endl;
+   str << "CFD: " << GetEHorizontalCFD() << " " << GetEVerticalCFD() << std::endl;
+   str << "Energy: " << GetEHorizontalEnergy() << " " << GetEVerticalEnergy() << std::endl;
+   str << "Theta: " << GetEPosition().Theta() * 180. / 3.14159
+       << " Phi: " << GetEPosition().Phi() * 180. / 3.14159 << std::endl;
+   str << std::endl;
+   out << str.str();
 }
 
 bool TCSMHit::IsEmpty() const

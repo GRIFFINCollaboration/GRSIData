@@ -17,7 +17,7 @@
 #include "TXMLOdb.h"
 
 TMidasEvent::TMidasEvent()
-	: fData(nullptr), fBanksN(0), fBankList(nullptr), fAllocatedByUs(false)
+   : fData(nullptr), fBanksN(0), fBankList(nullptr), fAllocatedByUs(false)
 {
    // Default constructor
    fEventHeader.fEventId      = 0;
@@ -32,7 +32,7 @@ void TMidasEvent::Copy(TObject& rhs) const
    // Copies the entire TMidasEvent. This includes the bank information.
    static_cast<TMidasEvent&>(rhs).fEventHeader = fEventHeader;
 
-   static_cast<TMidasEvent&>(rhs).fData = static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
+   static_cast<TMidasEvent&>(rhs).fData = static_cast<char*>(malloc(static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize));   // NOLINT(cppcoreguidelines-no-malloc)
    assert(static_cast<TMidasEvent&>(rhs).fData);
    memcpy(static_cast<TMidasEvent&>(rhs).fData, fData, static_cast<TMidasEvent&>(rhs).fEventHeader.fDataSize);
    static_cast<TMidasEvent&>(rhs).fAllocatedByUs = true;
@@ -67,7 +67,7 @@ TMidasEvent& TMidasEvent::operator=(const TMidasEvent& rhs)
 void TMidasEvent::Clear(Option_t*)
 {
    // Clears the TMidasEvent.
-	delete fBankList;
+   delete fBankList;
    fBankList = nullptr;
 
    if(fAllocatedByUs) {
@@ -84,7 +84,7 @@ void TMidasEvent::Clear(Option_t*)
    fEventHeader.fTimeStamp    = 0;
    fEventHeader.fDataSize     = 0;
 
-	TRawEvent::Clear();
+   TRawEvent::Clear();
 }
 
 void TMidasEvent::SetData(uint32_t size, char* data)
@@ -146,7 +146,7 @@ bool TMidasEvent::IsGoodSize() const
 
 bool TMidasEvent::IsBank32() const
 {
-   return ((reinterpret_cast<TMidas_BANK_HEADER*>(fData))->fFlags & (1<<4)) != 0u;
+   return ((reinterpret_cast<TMidas_BANK_HEADER*>(fData))->fFlags & (1 << 4)) != 0u;
 }
 
 int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
@@ -154,7 +154,7 @@ int TMidasEvent::LocateBank(const void*, const char* name, void** pdata) const
    /// See FindBank()
 
    int bktype = 0;
-	int bklen = 0;
+   int bklen  = 0;
 
    int status = FindBank(name, &bklen, &bktype, pdata);
 
@@ -180,7 +180,7 @@ int TMidasEvent::FindBank(const char* name, int* bklen, int* bktype, void** pdat
 
    std::array<unsigned, 17> TID_SIZE = {0, 1, 1, 1, 2, 2, 4, 4, 4, 4, 8, 1, 0, 0, 0, 0, 0};
 
-   if(((pbkh->fFlags & (1<<4)) > 0)) {
+   if(((pbkh->fFlags & (1 << 4)) > 0)) {
       TMidas_BANK32* pbk32 = nullptr;
 
       while(true) {
@@ -236,23 +236,23 @@ void TMidasEvent::Print(const char* option) const
 
    auto t = static_cast<time_t>(fEventHeader.fTimeStamp);
 
-	std::cout<<"Event start:"<<std::endl;
-   std::cout<<"  event id:       "<<hex(fEventHeader.fEventId,4)<<std::endl;
-   std::cout<<"  trigger mask:   "<<hex(fEventHeader.fTriggerMask,4)<<std::endl;
-   std::cout<<"  serial number:  "<<fEventHeader.fSerialNumber<<std::endl;
-   std::cout<<"  time stamp:     "<<fEventHeader.fTimeStamp<<", "<<ctime(&t)<<std::endl;
-   std::cout<<"  data size:      "<<std::setw(8)<<fEventHeader.fDataSize<<std::endl;
+   std::cout << "Event start:" << std::endl;
+   std::cout << "  event id:       " << hex(fEventHeader.fEventId, 4) << std::endl;
+   std::cout << "  trigger mask:   " << hex(fEventHeader.fTriggerMask, 4) << std::endl;
+   std::cout << "  serial number:  " << fEventHeader.fSerialNumber << std::endl;
+   std::cout << "  time stamp:     " << fEventHeader.fTimeStamp << ", " << ctime(&t) << std::endl;
+   std::cout << "  data size:      " << std::setw(8) << fEventHeader.fDataSize << std::endl;
    // const_cast<TMidasEvent*>(this)->SetBankList(); // moved here to get event information in case SetBankList crashes
    if((fEventHeader.fEventId & 0xffff) == 0x8000) {
-		std::cout<<"Begin of run "<<fEventHeader.fSerialNumber<<std::endl;
+      std::cout << "Begin of run " << fEventHeader.fSerialNumber << std::endl;
    } else if((fEventHeader.fEventId & 0xffff) == 0x8001) {
-		std::cout<<"End of run "<<fEventHeader.fSerialNumber<<std::endl;
+      std::cout << "End of run " << fEventHeader.fSerialNumber << std::endl;
    } else if((fEventHeader.fEventId & 0xffff) == 0x8002) {
-		std::cout<<"Message event \""<<fData<<"\""<<std::endl;
+      std::cout << "Message event \"" << fData << "\"" << std::endl;
    } else if(fBanksN <= 0) {
-		std::cout<<"TMidasEvent::Print: Use SetBankList() before Print() to print bank data"<<std::endl;
+      std::cout << "TMidasEvent::Print: Use SetBankList() before Print() to print bank data" << std::endl;
    } else {
-		std::cout<<"Banks: "<<fBankList<<std::endl;
+      std::cout << "Banks: " << fBankList << std::endl;
 
       for(int i = 0; i < fBanksN * 4; i += 4) {
          int   bankLength = 0;
@@ -260,7 +260,7 @@ void TMidasEvent::Print(const char* option) const
          void* pdata      = nullptr;
          int   found      = FindBank(&fBankList[i], &bankLength, &bankType, &pdata);
 
-			std::cout<<"Bank "<<fBankList[i]<<fBankList[i+1]<<fBankList[i+2]<<fBankList[i+3]<<", length "<<std::setw(6)<<bankLength<<", type "<<bankType<<std::endl;
+         std::cout << "Bank " << fBankList[i] << fBankList[i + 1] << fBankList[i + 2] << fBankList[i + 3] << ", length " << std::setw(6) << bankLength << ", type " << bankType << std::endl;
 
          int highlight = -1;
          if(strlen(option) > 1) {
@@ -269,59 +269,59 @@ void TMidasEvent::Print(const char* option) const
 
          if(option[0] == 'a' && (found != 0)) {
             switch(bankType) {
-            case 4: // TID_WORD
+            case 4:   // TID_WORD
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << ALERTTEXT << hex((reinterpret_cast<uint16_t*>(pdata))[j], 4) << RESET_COLOR << ((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint16_t*>(pdata))[j],4)<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << hex((reinterpret_cast<uint16_t*>(pdata))[j], 4) << ((j % 10 == 9) ? '\n' : ' ');
                   }
                }
-					std::cout<<std::endl;
+               std::cout << std::endl;
                break;
-            case 6: // TID_DWORD
+            case 6:   // TID_DWORD
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << ALERTTEXT << hex((reinterpret_cast<uint32_t*>(pdata))[j], 8) << RESET_COLOR << ((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << hex((reinterpret_cast<uint32_t*>(pdata))[j], 8) << ((j % 10 == 9) ? '\n' : ' ');
                   }
                }
-					std::cout<<std::endl;
+               std::cout << std::endl;
                break;
-            case 7: // TID_nd280 (like a DWORD?)
+            case 7:   // TID_nd280 (like a DWORD?)
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << ALERTTEXT << hex((reinterpret_cast<uint32_t*>(pdata))[j], 8) << RESET_COLOR << ((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<hex((reinterpret_cast<uint32_t*>(pdata))[j],8)<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << hex((reinterpret_cast<uint32_t*>(pdata))[j], 8) << ((j % 10 == 9) ? '\n' : ' ');
                   }
                }
-					std::cout<<std::endl;
+               std::cout << std::endl;
                break;
-            case 9: // TID_FLOAT
+            case 9:   // TID_FLOAT
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<(reinterpret_cast<float*>(pdata))[j]<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << ALERTTEXT << (reinterpret_cast<float*>(pdata))[j] << RESET_COLOR << ((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<(reinterpret_cast<float*>(pdata))[j]<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << (reinterpret_cast<float*>(pdata))[j] << ((j % 10 == 9) ? '\n' : ' ');
                   }
                }
-					std::cout<<std::endl;
+               std::cout << std::endl;
                break;
-            case 10: // TID_DOUBLE
+            case 10:   // TID_DOUBLE
                for(int j = 0; j < bankLength; j++) {
                   if(j == highlight) {
-							std::cout<<ALERTTEXT<<(reinterpret_cast<double*>(pdata))[j]<<RESET_COLOR<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << ALERTTEXT << (reinterpret_cast<double*>(pdata))[j] << RESET_COLOR << ((j % 10 == 9) ? '\n' : ' ');
                   } else {
-							std::cout<<(reinterpret_cast<double*>(pdata))[j]<<((j % 10 == 9) ? '\n' : ' ');
+                     std::cout << (reinterpret_cast<double*>(pdata))[j] << ((j % 10 == 9) ? '\n' : ' ');
                   }
                }
-					std::cout<<std::endl;
+               std::cout << std::endl;
                break;
             default:
-					std::cout<<"TMidasEvent::Print: Do not know how to print bank of type "<<bankType<<std::endl;
-					break;
+               std::cout << "TMidasEvent::Print: Do not know how to print bank of type " << bankType << std::endl;
+               break;
             }
          }
       }
@@ -333,7 +333,7 @@ void TMidasEvent::AllocateData()
    // Allocates space for the data from the event header if it is a good size
    assert(!fAllocatedByUs);
    assert(IsGoodSize());
-   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize)); // NOLINT(cppcoreguidelines-no-malloc)
+   fData = reinterpret_cast<char*>(malloc(fEventHeader.fDataSize));   // NOLINT(cppcoreguidelines-no-malloc)
    assert(fData);
    fAllocatedByUs = true;
 }
@@ -366,7 +366,7 @@ int TMidasEvent::SetBankList()
    while(true) {
       if(fBanksN * 4 >= listSize) {
          listSize += 400;
-         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize)); // NOLINT(cppcoreguidelines-no-malloc)
+         fBankList = reinterpret_cast<char*>(realloc(fBankList, listSize));   // NOLINT(cppcoreguidelines-no-malloc)
       }
 
       if(IsBank32()) {
@@ -374,14 +374,14 @@ int TMidasEvent::SetBankList()
          if(pmbk32 == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+         memcpy(fBankList + fBanksN * 4, pmbk32->fName, 4);   // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       } else {
          IterateBank(&pmbk, &pdata);
          if(pmbk == nullptr) {
             break;
          }
-         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+         memcpy(fBankList + fBanksN * 4, pmbk->fName, 4);   // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
          fBanksN++;
       }
    }
@@ -430,13 +430,13 @@ int TMidasEvent::IterateBank32(TMidas_BANK32** pbk, char** pdata) const
    } else {
       uint32_t length          = (*pbk)->fDataSize;
       uint32_t length_adjusted = (length + 7) & ~7;
-      *pbk = reinterpret_cast<TMidas_BANK32*>(reinterpret_cast<char*>(*pbk + 1) + length_adjusted);
+      *pbk                     = reinterpret_cast<TMidas_BANK32*>(reinterpret_cast<char*>(*pbk + 1) + length_adjusted);
    }
 
    auto* bk4 = reinterpret_cast<TMidas_BANK32*>((reinterpret_cast<char*>(*pbk)) + 4);
 
-   if((*pbk)->fType > 17) {// bad - unknown bank type - it's invalid MIDAS file?
-      if(bk4->fType <= 17) {// okey, this is a malformed T2K/ND280 data file
+   if((*pbk)->fType > 17) {    // bad - unknown bank type - it's invalid MIDAS file?
+      if(bk4->fType <= 17) {   // okey, this is a malformed T2K/ND280 data file
          *pbk = bk4;
       } else {
          // truncate invalid data
@@ -516,11 +516,11 @@ void TMidasEvent::SwapBytesEventHeader()
 int TMidasEvent::SwapBytes(bool force)
 {
    // Swaps bytes for endian-ness reasons
-   TMidas_BANK_HEADER* pbh = nullptr;
-   TMidas_BANK*        pbk = nullptr;
+   TMidas_BANK_HEADER* pbh   = nullptr;
+   TMidas_BANK*        pbk   = nullptr;
    TMidas_BANK32*      pbk32 = nullptr;
    void*               pdata = nullptr;
-   uint16_t            type = 0;
+   uint16_t            type  = 0;
 
    pbh = reinterpret_cast<TMidas_BANK_HEADER*>(fData);
 
@@ -534,15 +534,15 @@ int TMidasEvent::SwapBytes(bool force)
       return 0;
    }
 
-   if(pbh->fDataSize == 0x6d783f3c) { // string "<xml..." in wrong-endian format
+   if(pbh->fDataSize == 0x6d783f3c) {   // string "<xml..." in wrong-endian format
       return 1;
    }
 
-   if(pbh->fDataSize == 0x3c3f786d) { // string "<xml..."
+   if(pbh->fDataSize == 0x3c3f786d) {   // string "<xml..."
       return 1;
    }
 
-   if(dssw > fEventHeader.fDataSize + 100) { // swapped data size looks wrong. do not swap.
+   if(dssw > fEventHeader.fDataSize + 100) {   // swapped data size looks wrong. do not swap.
       return 1;
    }
 
@@ -616,4 +616,3 @@ int TMidasEvent::SwapBytes(bool force)
    }
    return 1;
 }
-

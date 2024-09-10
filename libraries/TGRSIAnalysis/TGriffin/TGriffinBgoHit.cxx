@@ -6,6 +6,5 @@
 
 TGriffinBgoHit::TGriffinBgoHit()
 {
-	Clear();
+   Clear();
 }
-

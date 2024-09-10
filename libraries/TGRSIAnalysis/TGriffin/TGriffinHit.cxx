@@ -6,7 +6,7 @@
 
 TGriffinHit::TGriffinHit()
 {
-	/// Default Ctor. Ignores TObject Streamer in ROOT < 6.
+   /// Default Ctor. Ignores TObject Streamer in ROOT < 6.
    Clear();
 }
 
@@ -19,7 +19,7 @@ TGriffinHit::TGriffinHit(const TGriffinHit& rhs) : TDetectorHit(rhs)
 
 TGriffinHit::TGriffinHit(const TFragment& frag)
 {
-	frag.Copy(*this);
+   frag.Copy(*this);
    SetNPileUps(frag.GetNumberOfPileups());
 }
 
@@ -50,7 +50,7 @@ bool TGriffinHit::InFilter(Int_t)
 void TGriffinHit::Clear(Option_t* opt)
 {
    // Clears the information stored in the TGriffinHit.
-   TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+   TDetectorHit::Clear(opt);   // clears the base (address, position and waveform)
    fFilter              = 0;
    fGriffinHitBits      = 0;
    fBremSuppressed_flag = false;
@@ -59,18 +59,18 @@ void TGriffinHit::Clear(Option_t* opt)
 void TGriffinHit::Print(Option_t*) const
 {
    // Prints the Detector Number, Crystal Number, Energy, Time and Angle.
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TGriffinHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-	str<<"Griffin Detector: "<<GetDetector()<<std::endl
-		<<"Griffin Crystal:  "<<GetCrystal()<<std::endl
-		<<"Griffin Energy:   "<<GetEnergy()<<std::endl
-		<<"Griffin hit time:   "<<GetTime()<<", TS (in ns) "<<GetTimeStampNs()<<", TS "<<GetTimeStamp()<<std::endl
-		<<"Griffin hit TV3 theta: "<<GetPosition().Theta() * 180 / (3.141597)<<" \tphi: "<<GetPosition().Phi() * 180 / (3.141597)<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "Griffin Detector: " << GetDetector() << std::endl
+       << "Griffin Crystal:  " << GetCrystal() << std::endl
+       << "Griffin Energy:   " << GetEnergy() << std::endl
+       << "Griffin hit time:   " << GetTime() << ", TS (in ns) " << GetTimeStampNs() << ", TS " << GetTimeStamp() << std::endl
+       << "Griffin hit TV3 theta: " << GetPosition().Theta() * 180 / (3.141597) << " \tphi: " << GetPosition().Phi() * 180 / (3.141597) << std::endl;
+   out << str.str();
 }
 
 TVector3 TGriffinHit::GetPosition(double dist) const
@@ -90,10 +90,10 @@ bool TGriffinHit::CompareEnergy(const TGriffinHit* lhs, const TGriffinHit* rhs)
 
 void TGriffinHit::Add(const TDetectorHit* hit)
 {
-	const auto* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
-	if(griffinHit == nullptr) {
-		throw std::runtime_error("trying to add non-griffin hit to griffin hit!");
-	}
+   const auto* griffinHit = dynamic_cast<const TGriffinHit*>(hit);
+   if(griffinHit == nullptr) {
+      throw std::runtime_error("trying to add non-griffin hit to griffin hit!");
+   }
    // add another griffin hit to this one (for addback),
    // using the time and position information of the one with the higher energy
    if(!CompareEnergy(this, griffinHit)) {
@@ -139,7 +139,7 @@ UShort_t TGriffinHit::PUHit() const
 {
    // The pluralized test bits returns the actual value of the fBits masked. Not just a bool.
    return static_cast<UShort_t>(fGriffinHitBits.TestBits(EGriffinHitBits::kPUHit1) +
-                               (fGriffinHitBits.TestBits(EGriffinHitBits::kPUHit2) >> static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)));
+                                (fGriffinHitBits.TestBits(EGriffinHitBits::kPUHit2) >> static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)));
 }
 
 void TGriffinHit::SetNPileUps(UChar_t npileups)
@@ -155,8 +155,8 @@ void TGriffinHit::SetPUHit(UChar_t puhit)
    }
    // The pluralized test bits returns the actual value of the fBits masked. Not just a bool.
 
-   SetGriffinFlag(EGriffinHitBits::kPUHit1, ((puhit<<static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)) & static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHit1)) != 0);
-   SetGriffinFlag(EGriffinHitBits::kPUHit2, ((puhit<<static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)) & static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHit2)) != 0);
+   SetGriffinFlag(EGriffinHitBits::kPUHit1, ((puhit << static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)) & static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHit1)) != 0);
+   SetGriffinFlag(EGriffinHitBits::kPUHit2, ((puhit << static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHitOffset)) & static_cast<std::underlying_type<EGriffinHitBits>::type>(EGriffinHitBits::kPUHit2)) != 0);
 }
 
 Double_t TGriffinHit::GetNoCTEnergy(Option_t*) const

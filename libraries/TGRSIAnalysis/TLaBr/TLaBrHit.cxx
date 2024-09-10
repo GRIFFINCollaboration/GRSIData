@@ -9,13 +9,13 @@
 
 TLaBrHit::TLaBrHit()
 {
-// Default Constructor
+   // Default Constructor
    Clear();
 }
 
 TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit(rhs)
 {
-// Copy Constructor
+   // Copy Constructor
    Clear();
    rhs.Copy(*this);
 }
@@ -68,14 +68,14 @@ void TLaBrHit::Print(Option_t*) const
    /// Detector
    /// Energy
    /// Time
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TLaBrHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"LaBr Detector:   "<<GetDetector()<<std::endl;
-   str<<"LaBr hit energy: "<<GetEnergy()<<std::endl;
-   str<<"LaBr hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "LaBr Detector:   " << GetDetector() << std::endl;
+   str << "LaBr hit energy: " << GetEnergy() << std::endl;
+   str << "LaBr hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }

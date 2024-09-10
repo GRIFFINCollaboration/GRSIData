@@ -22,13 +22,13 @@
 
 TGriffinBgo::TGriffinBgo()
 {
-	/// Default ctor.
+   /// Default ctor.
    TBgo::Clear();
 }
 
 TGriffinBgo::TGriffinBgo(const TGriffinBgo& rhs) : TBgo(rhs)
 {
-	/// Copy ctor.
+   /// Copy ctor.
    rhs.Copy(*this);
 }
 

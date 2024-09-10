@@ -29,22 +29,22 @@ public:
    TTAC();
    TTAC(const TTAC& rhs);
 	TTAC(TTAC&&) noexcept = default;
-   TTAC& operator=(const TTAC&); //!<!
-	TTAC& operator=(TTAC&&) noexcept = default;
-   ~TTAC() override = default;
+   TTAC& operator=(const TTAC&);   //!<!
+   TTAC& operator=(TTAC&&) noexcept = default;
+   ~TTAC() override                 = default;
 
    TTACHit* GetTACHit(const int& i) const { return static_cast<TTACHit*>(GetHit(i)); }
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
+   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTAC, 1) // TAC Physics structure // NOLINT(readability-else-after-return)
+   ClassDefOverride(TTAC, 1)   // TAC Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

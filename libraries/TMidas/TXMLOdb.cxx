@@ -12,8 +12,8 @@ std::array<char, 256> TXMLOdb::fTextBuffer;
 TXMLOdb::TXMLOdb(char* buffer, int size)
    : fDoc(nullptr), fParser(new TDOMParser), fOdb(nullptr)
 {
-	/// Creator, tries to open buffer as input file and parse it, if that fails, parses size bytes of the buffer.
-	
+   /// Creator, tries to open buffer as input file and parse it, if that fails, parses size bytes of the buffer.
+
    std::ifstream input;
    input.open(buffer);
    fParser->SetValidate(false);
@@ -24,7 +24,7 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
    }
    fDoc = fParser->GetXMLDocument();
    if(fDoc == nullptr) {
-		std::runtime_error("XmlOdb::XmlOdb: Malformed ODB dump: cannot get XML document");
+      std::runtime_error("XmlOdb::XmlOdb: Malformed ODB dump: cannot get XML document");
    }
    fOdb = fDoc->GetRootNode();
    if(strcmp(fOdb->GetNodeName(), "odb") != 0) {
@@ -34,20 +34,20 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
 
 TXMLOdb::~TXMLOdb()
 {
-	/// Default destructor, deletes the parser.
-	delete fParser;
+   /// Default destructor, deletes the parser.
+   delete fParser;
 }
 
 TXMLNode* TXMLOdb::FindNode(const char* name, TXMLNode* node)
 {
-	/// Finds node with name "name". If a node is provided this node will be used as a starting point.
-	/// If the provided node is a null pointer fOdb is used instead. Returns a null pointer if the 
-	/// search fails.
+   /// Finds node with name "name". If a node is provided this node will be used as a starting point.
+   /// If the provided node is a null pointer fOdb is used instead. Returns a null pointer if the
+   /// search fails.
    if(node == nullptr) {
       if(fOdb == nullptr) {
          return nullptr;
       }
-      node = fOdb; //->GetChildren();
+      node = fOdb;   //->GetChildren();
    }
    if(!node->HasChildren()) {
       return nullptr;
@@ -66,12 +66,12 @@ TXMLNode* TXMLOdb::FindNode(const char* name, TXMLNode* node)
 
 TXMLNode* TXMLOdb::FindPath(const char* path, TXMLNode* node)
 {
-	/// Find path "path" under the provided node. If the node is a null pointer, fOdb is used instead.
+   /// Find path "path" under the provided node. If the node is a null pointer, fOdb is used instead.
    if(node == nullptr) {
       if(fOdb == nullptr) {
          return nullptr;
       }
-      node = fOdb; //->GetChildren();
+      node = fOdb;   //->GetChildren();
    }
 
    std::string              pathname = path;
@@ -104,7 +104,7 @@ TXMLNode* TXMLOdb::FindPath(const char* path, TXMLNode* node)
 
 const char* TXMLOdb::GetNodeName(TXMLNode* node)
 {
-	/// Returns the name of a node.
+   /// Returns the name of a node.
    TList* list = node->GetAttributes();
    if(list != nullptr) {
       std::string buffer = (static_cast<TXMLAttr*>(list->At(0)))->GetValue();
@@ -116,7 +116,7 @@ const char* TXMLOdb::GetNodeName(TXMLNode* node)
 
 int TXMLOdb::ReadInt(const char* path, int, int defaultValue)
 {
-	/// tries to find the path "path", returns defaultValue if that fails, otherwise returns 0.
+   /// tries to find the path "path", returns defaultValue if that fails, otherwise returns 0.
    TXMLNode* node = FindPath(path);
    if(node == nullptr) {
       return defaultValue;
@@ -126,8 +126,8 @@ int TXMLOdb::ReadInt(const char* path, int, int defaultValue)
 
 std::vector<int> TXMLOdb::ReadIntArray(TXMLNode* node)
 {
-	/// Reads and returns an array of integers.
-	
+   /// Reads and returns an array of integers.
+
    std::vector<int> temp;
    if(node == nullptr) {
       return temp;
@@ -151,11 +151,11 @@ std::vector<int> TXMLOdb::ReadIntArray(TXMLNode* node)
    int       counter = 0;
    while(true) {
       if(TList* index = child->GetAttributes()) {
-         int indexnum = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
-         int value    = atoi(child->GetText());
+         int indexnum      = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
+         int value         = atoi(child->GetText());
          temp.at(indexnum) = value;
       } else if(child->GetText() != nullptr) {
-         int indexnum = counter++;
+         int indexnum      = counter++;
          temp.at(indexnum) = atoi(child->GetText());
       }
       child = child->GetNextNode();
@@ -168,7 +168,7 @@ std::vector<int> TXMLOdb::ReadIntArray(TXMLNode* node)
 
 std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
 {
-	/// Reads and returns an array of strings.
+   /// Reads and returns an array of strings.
 
    std::vector<std::string> temp;
    if(node == nullptr) {
@@ -218,7 +218,7 @@ std::vector<std::string> TXMLOdb::ReadStringArray(TXMLNode* node)
 
 std::vector<double> TXMLOdb::ReadDoubleArray(TXMLNode* node)
 {
-	/// Reads and returns an array of doubles.
+   /// Reads and returns an array of doubles.
 
    std::vector<double> temp;
    if(node == nullptr) {
@@ -243,8 +243,8 @@ std::vector<double> TXMLOdb::ReadDoubleArray(TXMLNode* node)
    int       counter = 0;
    while(true) {
       if(TList* index = child->GetAttributes()) {
-         int    indexnum = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
-         double value    = atof(child->GetText());
+         int    indexnum   = atoi((static_cast<TXMLAttr*>(index->At(0)))->GetValue());
+         double value      = atof(child->GetText());
          temp.at(indexnum) = value;
       } else if(child->GetText() != nullptr) {
          int indexnum      = counter++;

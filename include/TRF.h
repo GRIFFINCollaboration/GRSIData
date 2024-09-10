@@ -20,26 +20,26 @@ public:
    TRF();
    TRF(const TRF&);
 	TRF(TRF&&) noexcept = default;
-	TRF& operator=(const TRF&) = default;
-	TRF& operator=(TRF&&) noexcept = default;
-   ~TRF() override = default;
+   TRF& operator=(const TRF&)     = default;
+   TRF& operator=(TRF&&) noexcept = default;
+   ~TRF() override                = default;
 
-   Double_t Phase() const 
+   Double_t Phase() const
    {
       if(fPeriod > 0.0f) {
-         return (fTime / fPeriod) * TMath::TwoPi(); 
+         return (fTime / fPeriod) * TMath::TwoPi();
       }
-		return -10.0; //negative value indicates failed RF fit
+      return -10.0;   //negative value indicates failed RF fit
    }
-   Double_t Time() const { return fTime; } //in ns, not tstamp 10ns
-   Double_t Period() const { return fPeriod; } //in ns
+   Double_t Time() const { return fTime; }       //in ns, not tstamp 10ns
+   Double_t Period() const { return fPeriod; }   //in ns
    Long_t   TimeStamp() const { return fTimeStamp; }
    time_t   MidasTime() const { return fMidasTime; }
 
    Double_t GetTimeFitCfd() const
    {
       if(fTime != 0 && fTime < 1000 && fTime > -1000) {
-         return GetTimestampCfd() + fTime * 1.6; // ns->cfdunits
+         return GetTimestampCfd() + fTime * 1.6;   // ns->cfdunits
       }
       return 0;
    }
@@ -47,35 +47,35 @@ public:
    Double_t GetTimeFitns() const
    {
       if(fTime != 0 && fTime < 1000 && fTime > -1000) {
-         return static_cast<Double_t>(TimeStamp()) + fTime; // 
+         return static_cast<Double_t>(TimeStamp()) + fTime;   //
       }
       return 0;
    }
-   
+
    Double_t GetTimestampCfd() const
-   { // ticks ->cfdunits
-      int64_t ts = TimeStamp()<<4 & 0x07ffffff; // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
+   {                                                // ticks ->cfdunits
+      int64_t ts = TimeStamp() << 4 & 0x07ffffff;   // bit shift by 4 (x16) then knock off the highest bit which is absent from cfd
       return static_cast<Double_t>(ts);
    }
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
+   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
    void Copy(TObject&) const override;
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
 
 private:
    time_t fMidasTime;
    Long_t fTimeStamp;
-   double fTime; //RF time offset from timestamp, like a CFD value
+   double fTime;   //RF time offset from timestamp, like a CFD value
    double fPeriod;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TRF, 4) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TRF, 4)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

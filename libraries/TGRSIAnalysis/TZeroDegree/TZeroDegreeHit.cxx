@@ -12,16 +12,16 @@
 
 TZeroDegreeHit::TZeroDegreeHit()
 {
-// Default Constructor
+   // Default Constructor
    Clear();
 }
 
 TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag)
 {
-	frag.Copy(*this);
+   frag.Copy(*this);
    if(TGRSIOptions::Get()->ExtractWaves()) {
       if(frag.GetWaveform()->empty()) {
-			std::cout<<"Warning, TZeroDegree::SetWave() set, but data waveform size is zero!"<<std::endl;
+         std::cout << "Warning, TZeroDegree::SetWave() set, but data waveform size is zero!" << std::endl;
       } else {
          frag.CopyWave(*this);
       }
@@ -33,7 +33,7 @@ TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag)
 
 TZeroDegreeHit::TZeroDegreeHit(const TZeroDegreeHit& rhs) : TDetectorHit(rhs)
 {
-// Copy Constructor
+   // Copy Constructor
    Clear();
    rhs.Copy(*this);
 }
@@ -93,16 +93,16 @@ void TZeroDegreeHit::Print(Option_t*) const
    ///Detector
    ///Energy
    ///Time
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TZeroDegreeHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"ZeroDegree Detector:   "<<GetDetector()<<std::endl;
-   str<<"ZeroDegree hit energy: "<<GetEnergy()<<std::endl;
-   str<<"ZeroDegree hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "ZeroDegree Detector:   " << GetDetector() << std::endl;
+   str << "ZeroDegree hit energy: " << GetEnergy() << std::endl;
+   str << "ZeroDegree hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }
 
 bool TZeroDegreeHit::AnalyzeWaveform()
@@ -110,7 +110,7 @@ bool TZeroDegreeHit::AnalyzeWaveform()
    /// Calculates the cfd time from the waveform
    bool error = false;
    if(!HasWave()) {
-      return false; // Error!
+      return false;   // Error!
    }
 
    std::vector<Int_t>   baselineCorrections(8, 0);
@@ -121,7 +121,7 @@ bool TZeroDegreeHit::AnalyzeWaveform()
    unsigned int interpolationSteps  = 256;
    int          delay               = 2;
    double       attenuation         = 24. / 64.;
-   int          halfsmoothingwindow = 0; // 2*halfsmoothingwindow + 1 = number of samples in moving window.
+   int          halfsmoothingwindow = 0;   // 2*halfsmoothingwindow + 1 = number of samples in moving window.
 
    // baseline algorithm: correct each adc with average of first two samples in that adc
    for(size_t i = 0; i < 8 && i < WaveSize(); ++i) {
@@ -133,7 +133,7 @@ bool TZeroDegreeHit::AnalyzeWaveform()
    for(size_t i = 0; i < WaveSize(); ++i) {
       newWaveform[i] -= baselineCorrections[i % 8];
    }
-	SetWaveform(newWaveform);
+   SetWaveform(newWaveform);
 
    SetCfd(CalculateCfd(attenuation, delay, halfsmoothingwindow, interpolationSteps));
 
@@ -165,7 +165,7 @@ Int_t TZeroDegreeHit::CalculateCfdAndMonitor(double attenuation, unsigned int de
    std::vector<Short_t> smoothedWaveform;
 
    if(!HasWave()) {
-      return INT_MAX; // Error!
+      return INT_MAX;   // Error!
    }
 
    if(static_cast<unsigned int>(WaveSize()) > delay + 1) {
@@ -222,7 +222,7 @@ std::vector<Short_t> TZeroDegreeHit::CalculateSmoothedWaveform(unsigned int half
    /// Used when calculating the CFD from the waveform
 
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
 
    std::vector<Short_t> smoothedWaveform(std::max(static_cast<size_t>(0), WaveSize() - 2 * halfsmoothingwindow),
@@ -242,7 +242,7 @@ std::vector<Short_t> TZeroDegreeHit::CalculateCfdMonitor(double attenuation, int
    /// Used when calculating the CFD from the waveform
 
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
 
    std::vector<Short_t> smoothedWaveform;
@@ -266,19 +266,19 @@ std::vector<Int_t> TZeroDegreeHit::CalculatePartialSum()
 {
 
    if(!HasWave()) {
-      return {}; // Error!
+      return {};   // Error!
    }
 
    std::vector<Int_t> partialSums(WaveSize(), 0);
 
-	partialSums[0] = GetWaveform()->at(0);
-	for(size_t i = 1; i < WaveSize(); ++i) {
-		partialSums[i] = partialSums[i - 1] + GetWaveform()->at(i);
-	}
+   partialSums[0] = GetWaveform()->at(0);
+   for(size_t i = 1; i < WaveSize(); ++i) {
+      partialSums[i] = partialSums[i - 1] + GetWaveform()->at(i);
+   }
 
-	if(TGRSIOptions::Get()->Debug()) {
-		fPartialSum = partialSums;
-	}
+   if(TGRSIOptions::Get()->Debug()) {
+      fPartialSum = partialSums;
+   }
 
-	return partialSums;
+   return partialSums;
 }

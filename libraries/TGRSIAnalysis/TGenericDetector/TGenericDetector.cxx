@@ -24,7 +24,7 @@ TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector(rhs)
 
 void TGenericDetector::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-	
+
    /// This function creates TGenericDetectorHits for each fragment and stores them in separate front and back vectors
    if(frag == nullptr || chan == nullptr) {
       return;
@@ -36,12 +36,12 @@ void TGenericDetector::AddFragment(const std::shared_ptr<const TFragment>& frag,
 
 void TGenericDetector::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TGenericDetector::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-	out<<str.str();
+   std::ostringstream str;
+   str << __PRETTY_FUNCTION__ << "\tnot yet written." << std::endl;   // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+   out << str.str();
 }

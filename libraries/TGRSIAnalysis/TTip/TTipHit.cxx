@@ -18,7 +18,7 @@ TTipHit::TTipHit()
 
 TTipHit::TTipHit(const TFragment& frag)
 {
-	frag.Copy(*this);
+   frag.Copy(*this);
    // SetVariables(frag);
    if(TGRSIOptions::AnalysisOptions()->IsWaveformFitting() && !IsCsI()) {
       SetWavefit(frag);
@@ -36,7 +36,7 @@ TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit(rhs)
 void TTipHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);
-   TDetectorHit::CopyWave(rhs); //waveforms are basically always needed (for TIP PID)
+   TDetectorHit::CopyWave(rhs);   //waveforms are basically always needed (for TIP PID)
    static_cast<TTipHit&>(rhs).fFilter     = fFilter;
    static_cast<TTipHit&>(rhs).fPID        = fPID;
    static_cast<TTipHit&>(rhs).fTipChannel = fTipChannel;
@@ -48,10 +48,10 @@ void TTipHit::Copy(TObject& rhs) const
 
 void TTipHit::Copy(TObject& rhs, bool waveform) const
 {
-	Copy(rhs);
-	if(waveform) {
-		CopyWave(rhs);
-	}
+   Copy(rhs);
+   if(waveform) {
+      CopyWave(rhs);
+   }
 }
 
 TVector3 TTipHit::GetPosition() const
@@ -76,16 +76,16 @@ void TTipHit::Clear(Option_t*)
 
 void TTipHit::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TTipHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"Tip Detector: "<<GetDetector()<<std::endl;
-   str<<"Tip hit energy: "<<GetEnergy()<<std::endl;
-   str<<"Tip hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "Tip Detector: " << GetDetector() << std::endl;
+   str << "Tip hit energy: " << GetEnergy() << std::endl;
+   str << "Tip hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }
 
 void TTipHit::SetWavefit(const TFragment& frag)

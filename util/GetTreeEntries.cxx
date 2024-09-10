@@ -30,28 +30,28 @@
 int main(int argc, char** argv)
 {
    if(argc == 1) {
-      std::cout<<"Usage: "<<argv[0]<<" <root file name>"<<std::endl;
+      std::cout << "Usage: " << argv[0] << " <root file name>" << std::endl;
       return -1;
    }
 
-   std::cout<<"Running on "<<argc - 1<<" file(s)"<<std::endl;
+   std::cout << "Running on " << argc - 1 << " file(s)" << std::endl;
 
    for(int i = 1; i < argc; ++i) {
       TFile f(argv[i]);
       if(!f.IsOpen()) {
-         std::cout<<"Failed to open "<<argv[i]<<std::endl;
+         std::cout << "Failed to open " << argv[i] << std::endl;
          continue;
       }
 
       auto* tree = dynamic_cast<TTree*>(f.Get("FragmentTree"));
       if(tree != nullptr) {
-         std::cout<<argv[i]<<" - FragmentTree: "<<tree->GetEntries()<<std::endl;
+         std::cout << argv[i] << " - FragmentTree: " << tree->GetEntries() << std::endl;
          continue;
       }
 
       tree = dynamic_cast<TTree*>(f.Get("AnalysisTree"));
       if(tree != nullptr) {
-         std::cout<<argv[i]<<" - AnalysisTree: "<<tree->GetEntries()<<std::endl;
+         std::cout << argv[i] << " - AnalysisTree: " << tree->GetEntries() << std::endl;
 
          // S3
 
@@ -131,30 +131,30 @@ int main(int argc, char** argv)
          }
 
          if(gotGriffin) {
-            std::cout<<numGriffin<<" GRIFFIN, ";
+            std::cout << numGriffin << " GRIFFIN, ";
          }
          if(gotDescant) {
-            std::cout<<numDescant<<" DESCANT, ";
+            std::cout << numDescant << " DESCANT, ";
          }
          if(gotLaBr) {
-            std::cout<<numLaBr<<" LABR, ";
+            std::cout << numLaBr << " LABR, ";
          }
          if(gotZeroDegree) {
-            std::cout<<numZeroDegree<<" ZERO-DEGREE, ";
+            std::cout << numZeroDegree << " ZERO-DEGREE, ";
          }
          if(gotSceptar) {
-            std::cout<<numSceptar<<" SCEPTAR, ";
+            std::cout << numSceptar << " SCEPTAR, ";
          }
          if(gotPaces) {
-            std::cout<<numPaces<<" PACES, ";
+            std::cout << numPaces << " PACES, ";
          }
-         std::cout<<" "<<numGriffin + numDescant + numLaBr + numZeroDegree + numSceptar + numPaces<<" total hits"
-                  <<std::endl;
+         std::cout << " " << numGriffin + numDescant + numLaBr + numZeroDegree + numSceptar + numPaces << " total hits"
+                   << std::endl;
 
          continue;
       }
 
-      std::cout<<"Failed to find 'FragmentTree' or 'AnalysisTree' in "<<argv[i]<<std::endl;
+      std::cout << "Failed to find 'FragmentTree' or 'AnalysisTree' in " << argv[i] << std::endl;
 
       f.ls();
    }

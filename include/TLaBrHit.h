@@ -29,34 +29,34 @@ public:
    TLaBrHit();
    ~TLaBrHit() override = default;
    TLaBrHit(const TLaBrHit&);
-	TLaBrHit(TLaBrHit&&) noexcept = default;
-	TLaBrHit& operator=(const TLaBrHit&) = default;
-	TLaBrHit& operator=(TLaBrHit&&) noexcept = default;
+   TLaBrHit(TLaBrHit&&) noexcept            = default;
+   TLaBrHit& operator=(const TLaBrHit&)     = default;
+   TLaBrHit& operator=(TLaBrHit&&) noexcept = default;
    explicit TLaBrHit(const TFragment& frag) { frag.Copy(*this); }
 
    /////////////////////////		/////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
+   inline void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
 
    /////////////////////////		/////////////////////////////////////
-   inline Int_t GetFilterPattern() const { return fFilter; } //!<!
+   inline Int_t GetFilterPattern() const { return fFilter; }   //!<!
 
-   bool InFilter(Int_t); //!<!
+   bool InFilter(Int_t);   //!<!
 
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;      //!<!
+   void     Clear(Option_t* opt = "") override;         //!<!
+   void     Print(Option_t* opt = "") const override;   //!<!
+   void     Print(std::ostream& out) const override;    //!<!
+   void     Copy(TObject&) const override;              //!<!
+   void     Copy(TObject&, bool) const override;        //!<!
    TVector3 GetPosition(Double_t dist) const override;
    TVector3 GetPosition() const override;
 
 private:
    Int_t fFilter{0};
 
-   Double_t GetDefaultDistance() const { return 0.; } // This needs to be updated
+   Double_t GetDefaultDistance() const { return 0.; }   // This needs to be updated
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLaBrHit, 3) // Stores the information for a LaBrrHit // NOLINT(readability-else-after-return)
+   ClassDefOverride(TLaBrHit, 3)   // Stores the information for a LaBrrHit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

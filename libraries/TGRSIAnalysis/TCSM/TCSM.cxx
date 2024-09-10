@@ -2,7 +2,7 @@
 #include "TMath.h"
 
 constexpr bool RecoverHits = true;
-constexpr bool SumHits = false;
+constexpr bool SumHits     = false;
 
 int TCSM::fCfdBuildDiff = 5;
 
@@ -110,7 +110,7 @@ TVector3 TCSM::GetPosition(int detector, char pos, int horizontalstrip, int vert
       x             = -EX + (50. / 32.) * cos(detTheta) * (2 * verticalstrip + 1);
       z             = EZ + (50. / 32.) * sin(detTheta) * (2 * verticalstrip + 1);
    } else {
-		std::cout<<"***Error, unrecognized detector and position combo!***"<<std::endl;
+      std::cout << "***Error, unrecognized detector and position combo!***" << std::endl;
    }
 
    y = (50. / 32.) * (2 * horizontalstrip + 1) - (50 / 16.) * 8;
@@ -192,10 +192,10 @@ TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragme
    auto* csmHit = new TCSMHit;
 
    if(h.second.ArrayPosition() != v.second.ArrayPosition()) {
-      std::cerr<<"\tSomething is wrong, Horizontal and Vertical detector numbers don't match."<<std::endl;
+      std::cerr << "\tSomething is wrong, Horizontal and Vertical detector numbers don't match." << std::endl;
    }
    if(h.second.ArraySubPositionString().c_str()[0] != v.second.ArraySubPositionString().c_str()[0]) {
-      std::cerr<<"\tSomething is wrong, Horizontal and Vertical positions don't match."<<std::endl;
+      std::cerr << "\tSomething is wrong, Horizontal and Vertical positions don't match." << std::endl;
    }
 
    if(h.second.ArraySubPositionString()[0] == 'D') {
@@ -211,7 +211,7 @@ TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragme
       csmHit->SetDHorizontalEnergy(h.first.GetEnergy());
       csmHit->SetDVerticalEnergy(v.first.GetEnergy());
       csmHit->SetDPosition(TCSM::GetPosition(h.second.ArrayPosition(), h.second.ArraySubPositionString()[0],
-                                            h.second.Segment(), v.second.Segment()));
+                                             h.second.Segment(), v.second.Segment()));
    } else if(h.second.ArraySubPositionString().c_str()[0] == 'E') {
       csmHit->SetDetectorNumber(h.second.ArrayPosition());
       csmHit->SetEHorizontalCharge(h.first.GetCharge());
@@ -225,19 +225,19 @@ TCSMHit* TCSM::MakeHit(std::pair<TFragment, TGRSIMnemonic>& h, std::pair<TFragme
       csmHit->SetEHorizontalEnergy(h.first.GetEnergy());
       csmHit->SetEVerticalEnergy(v.first.GetEnergy());
       csmHit->SetEPosition(TCSM::GetPosition(h.second.ArrayPosition(), h.second.ArraySubPositionString()[0],
-                                            h.second.Segment(), v.second.Segment()));
+                                             h.second.Segment(), v.second.Segment()));
    }
 
    return csmHit;
 }
 
 TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
-                      std::vector<std::pair<TFragment, TGRSIMnemonic>>& vvV)
+                       std::vector<std::pair<TFragment, TGRSIMnemonic>>& vvV)
 {
    auto* csmHit = new TCSMHit;
 
    if(hhV.empty() || vvV.empty()) {
-      std::cerr<<"\tSomething is wrong, empty vector in MakeHit"<<std::endl;
+      std::cerr << "\tSomething is wrong, empty vector in MakeHit" << std::endl;
    }
 
    //-------------------- horizontal strips
@@ -254,10 +254,10 @@ TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
       }
 
       if(hhV[i].second.ArrayPosition() != DetNumH) {
-         std::cerr<<"\tSomething is wrong, Horizontal detector numbers don't match in vector loop."<<std::endl;
+         std::cerr << "\tSomething is wrong, Horizontal detector numbers don't match in vector loop." << std::endl;
       }
       if(hhV[i].second.ArraySubPositionString()[0] != DetPosH) {
-         std::cerr<<"\tSomething is wrong, Horizontal detector positions don't match in vector loop."<<std::endl;
+         std::cerr << "\tSomething is wrong, Horizontal detector positions don't match in vector loop." << std::endl;
       }
       ChargeH += static_cast<int>(hhV[i].first.GetCharge());
       EnergyH += hhV[i].first.GetEnergy();
@@ -281,10 +281,10 @@ TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
       }
 
       if(vvV[i].second.ArrayPosition() != DetNumV) {
-         std::cerr<<"\tSomething is wrong, Vertical detector numbers don't match in vector loop."<<std::endl;
+         std::cerr << "\tSomething is wrong, Vertical detector numbers don't match in vector loop." << std::endl;
       }
       if(vvV[i].second.ArraySubPositionString()[0] != DetPosV) {
-         std::cerr<<"\tSomething is wrong, Vertical detector positions don't match in vector loop."<<std::endl;
+         std::cerr << "\tSomething is wrong, Vertical detector positions don't match in vector loop." << std::endl;
       }
       ChargeV += static_cast<int>(vvV[i].first.GetCharge());
       EnergyV += vvV[i].first.GetEnergy();
@@ -295,10 +295,10 @@ TCSMHit* TCSM::MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>& hhV,
    auto TimeV   = static_cast<double>(vvV[biggestV].first.GetTimeStamp());
 
    if(DetNumH != DetNumV) {
-      std::cerr<<"\tSomething is wrong, Horizontal and Vertical detector numbers don't match in vector."<<std::endl;
+      std::cerr << "\tSomething is wrong, Horizontal and Vertical detector numbers don't match in vector." << std::endl;
    }
    if(DetPosH != DetPosV) {
-      std::cerr<<"\tSomething is wrong, Horizontal and Vertical positions don't match in vector."<<std::endl;
+      std::cerr << "\tSomething is wrong, Horizontal and Vertical positions don't match in vector." << std::endl;
    }
 
    if(DetPosH == 'D') {
@@ -340,8 +340,8 @@ void TCSM::BuilddEE(std::vector<std::vector<TDetectorHit*>>& hitVec, std::vector
    std::vector<TDetectorHit*> e2;
 
    for(auto& i : hitVec[0]) {
-		auto* hit = static_cast<TCSMHit*>(i);
-      if(hit->GetDetectorNumber() == 3 || hit->GetDetectorNumber() == 4) { // I am in side detectors
+      auto* hit = static_cast<TCSMHit*>(i);
+      if(hit->GetDetectorNumber() == 3 || hit->GetDetectorNumber() == 4) {   // I am in side detectors
          // I will never have a pair in the side detector, so go ahead and send it through.
          builtHits.push_back(i);
       } else if(hit->GetDetectorNumber() == 1) {
@@ -349,18 +349,18 @@ void TCSM::BuilddEE(std::vector<std::vector<TDetectorHit*>>& hitVec, std::vector
       } else if(hit->GetDetectorNumber() == 2) {
          d2.push_back(i);
       } else {
-         std::cerr<<"  Caution, in BuilddEE detector number in D vector is out of bounds."<<std::endl;
+         std::cerr << "  Caution, in BuilddEE detector number in D vector is out of bounds." << std::endl;
       }
    }
 
    for(auto& i : hitVec[1]) {
-		auto* hit = static_cast<TCSMHit*>(i);
+      auto* hit = static_cast<TCSMHit*>(i);
       if(hit->GetDetectorNumber() == 1) {
          e1.push_back(i);
       } else if(hit->GetDetectorNumber() == 2) {
          e2.push_back(i);
       } else {
-         std::cerr<<"  Caution, in BuilddEE detector number in E vector is out of bounds."<<std::endl;
+         std::cerr << "  Caution, in BuilddEE detector number in E vector is out of bounds." << std::endl;
       }
    }
 
@@ -435,14 +435,14 @@ void TCSM::MakedEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetectorHit
          // BuiltHits.back().Print();
       }
    } else {
-      std::cout<<"D Size: "<<DHitVec.size()<<" E Size: "<<EHitVec.size()<<std::endl;
+      std::cout << "D Size: " << DHitVec.size() << " E Size: " << EHitVec.size() << std::endl;
    }
 }
 
 void TCSM::OldBuilddEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetectorHit*>& EHitVec, std::vector<TDetectorHit*>& BuiltHits)
 {
    bool printbit = false;
-   if(DHitVec.empty() && EHitVec.empty()) { // Why am I even here?!
+   if(DHitVec.empty() && EHitVec.empty()) {   // Why am I even here?!
       return;
    }
 
@@ -460,9 +460,9 @@ void TCSM::OldBuilddEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetecto
          }
 
          if(static_cast<TCSMHit*>(DHitVec.at(diter))->GetDetectorNumber() ==
-            static_cast<TCSMHit*>(EHitVec.at(eiter))->GetDetectorNumber()) { // Hits are in the same stack
+            static_cast<TCSMHit*>(EHitVec.at(eiter))->GetDetectorNumber()) {   // Hits are in the same stack
             if(AlmostEqual(static_cast<TCSMHit*>(DHitVec.at(diter))->GetDPosition().Theta(),
-                           static_cast<TCSMHit*>(EHitVec.at(eiter))->GetEPosition().Theta())) { // Same-ish Theta
+                           static_cast<TCSMHit*>(EHitVec.at(eiter))->GetEPosition().Theta())) {   // Same-ish Theta
                //&& AlmostEqual(DHitVec.at(diter).GetDPosition().Phi(),EHitVec.at(eiter).GetEPosition().Phi())
                //)//Same-ish Phi
                BuiltHits.push_back(CombineHits(DHitVec.at(diter), EHitVec.at(eiter)));
@@ -504,9 +504,9 @@ void TCSM::OldBuilddEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetecto
 
    if(printbit) {
       for(auto& BuiltHit : BuiltHits) {
-         std::cout<<DGREEN;
+         std::cout << DGREEN;
          BuiltHit->Print();
-         std::cout<<RESET_COLOR<<std::endl;
+         std::cout << RESET_COLOR << std::endl;
       }
    }
 }
@@ -525,7 +525,7 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
    switch(detno) {
    case 1: return;
    case 2:
-      if(pos == 'D' && orientation == 'V') { // Recover 2DN09, channel 1040
+      if(pos == 'D' && orientation == 'V') {   // Recover 2DN09, channel 1040
          csmHit->SetDetectorNumber(detno);
          csmHit->SetDHorizontalCharge(hit.first.GetCharge());
          csmHit->SetDVerticalCharge(hit.first.GetCharge());
@@ -542,10 +542,10 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
       break;
    case 3:
       if(pos == 'E') {
-         std::cerr<<"3E in RecoverHit"<<std::endl;
+         std::cerr << "3E in RecoverHit" << std::endl;
 
          return;
-      } else if(orientation == 'H') { // Recover 3DP11, channel 1145
+      } else if(orientation == 'H') {   // Recover 3DP11, channel 1145
          csmHit->SetDetectorNumber(detno);
          csmHit->SetDHorizontalCharge(hit.first.GetCharge());
          csmHit->SetDVerticalCharge(hit.first.GetCharge());
@@ -562,9 +562,9 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
       break;
    case 4:
       if(pos == 'E') {
-         std::cerr<<"4E in RecoverHit"<<std::endl;
+         std::cerr << "4E in RecoverHit" << std::endl;
          return;
-      } else if(orientation == 'H') { // Recover 4DP15, channel 1181
+      } else if(orientation == 'H') {   // Recover 4DP15, channel 1181
          csmHit->SetDetectorNumber(detno);
          csmHit->SetDHorizontalCharge(hit.first.GetCharge());
          csmHit->SetDVerticalCharge(hit.first.GetCharge());
@@ -580,7 +580,7 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
       }
       break;
    default:
-      std::cerr<<"Something is wrong.  The detector number in recover hit is out of bounds."<<std::endl;
+      std::cerr << "Something is wrong.  The detector number in recover hit is out of bounds." << std::endl;
       return;
    }
 
@@ -591,10 +591,10 @@ void TCSM::RecoverHit(char orientation, std::pair<TFragment, TGRSIMnemonic>& hit
 
 TCSMHit* TCSM::CombineHits(TDetectorHit* d_hit, TDetectorHit* e_hit)
 {
-	auto* dHit = static_cast<TCSMHit*>(d_hit);
-	auto* eHit = static_cast<TCSMHit*>(e_hit);
+   auto* dHit = static_cast<TCSMHit*>(d_hit);
+   auto* eHit = static_cast<TCSMHit*>(e_hit);
    if(dHit->GetDetectorNumber() != eHit->GetDetectorNumber()) {
-      std::cerr<<"Something is wrong.  In combine hits, the detector numbers don't match"<<std::endl;
+      std::cerr << "Something is wrong.  In combine hits, the detector numbers don't match" << std::endl;
    }
 
    dHit->SetEHorizontalStrip(eHit->GetEHorizontalStrip());

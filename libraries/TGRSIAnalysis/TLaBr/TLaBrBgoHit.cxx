@@ -8,4 +8,3 @@ TLaBrBgoHit::TLaBrBgoHit()
 {
    Clear();
 }
-

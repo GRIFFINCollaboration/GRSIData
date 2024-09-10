@@ -9,10 +9,10 @@
 #include "TGRSIMnemonic.h"
 
 extern "C" TMidasFile* CreateFile(std::string& fileName) { return new TMidasFile(fileName.c_str()); }
-extern "C" void DestroyFile(TMidasFile* obj) { delete obj; }
+extern "C" void        DestroyFile(TMidasFile* obj) { delete obj; }
 
 extern "C" TGRSIDataParser* CreateParser() { return new TGRSIDataParser; }
-extern "C" void DestroyParser(TGRSIDataParser* obj) { delete obj; }
+extern "C" void             DestroyParser(TGRSIDataParser* obj) { delete obj; }
 
 extern "C" std::string LibraryVersion() { return {GRSIDATA_RELEASE}; }
 

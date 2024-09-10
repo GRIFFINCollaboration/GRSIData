@@ -19,9 +19,9 @@ class TPacesHit : public TDetectorHit {
 public:
    TPacesHit();
    TPacesHit(const TPacesHit&);
-	TPacesHit(TPacesHit&&) noexcept = default;
-	TPacesHit& operator=(const TPacesHit&) = default;
-	TPacesHit& operator=(TPacesHit&&) noexcept = default;
+   TPacesHit(TPacesHit&&) noexcept            = default;
+   TPacesHit& operator=(const TPacesHit&)     = default;
+   TPacesHit& operator=(TPacesHit&&) noexcept = default;
    explicit TPacesHit(const TFragment& frag) { frag.Copy(*this); }
    ~TPacesHit() override = default;
 
@@ -30,28 +30,28 @@ private:
 
 public:
    /////////////////////////  Setters	/////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
+   inline void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
    // void SetHit();
 
    /////////////////////////  Getters	/////////////////////////////////////
-   inline Int_t GetFilterPattern() const { return fFilter; } //!<!
+   inline Int_t GetFilterPattern() const { return fFilter; }   //!<!
 
    /////////////////////////  TChannel Helpers /////////////////////////////////////
-   bool InFilter(Int_t); //!<!
+   bool InFilter(Int_t);   //!<!
 
-   void Clear(Option_t* opt = "") override;            //!<!
-   void Print(Option_t* opt = "") const override;      //!<!
-	void Print(std::ostream& out) const override; //!<!
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;           //!<!
-   TVector3 GetPosition(Double_t dist) const override; //!<!
-   TVector3 GetPosition() const override;              //!<!
+   void     Clear(Option_t* opt = "") override;          //!<!
+   void     Print(Option_t* opt = "") const override;    //!<!
+   void     Print(std::ostream& out) const override;     //!<!
+   void     Copy(TObject&) const override;               //!<!
+   void     Copy(TObject&, bool) const override;         //!<!
+   TVector3 GetPosition(Double_t dist) const override;   //!<!
+   TVector3 GetPosition() const override;                //!<!
 
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
 
    /// \cond CLASSIMP
-   ClassDefOverride(TPacesHit, 4); // NOLINT(readability-else-after-return)
+   ClassDefOverride(TPacesHit, 4);   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

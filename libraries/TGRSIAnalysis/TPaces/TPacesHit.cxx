@@ -21,10 +21,10 @@ void TPacesHit::Copy(TObject& rhs) const
 
 void TPacesHit::Copy(TObject& rhs, bool waveform) const
 {
-	Copy(rhs);
-	if(waveform) {
-		CopyWave(rhs);
-	}
+   Copy(rhs);
+   if(waveform) {
+      CopyWave(rhs);
+   }
 }
 
 bool TPacesHit::InFilter(Int_t)
@@ -36,27 +36,27 @@ bool TPacesHit::InFilter(Int_t)
 
 void TPacesHit::Clear(Option_t* opt)
 {
-   TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+   TDetectorHit::Clear(opt);   // clears the base (address, position and waveform)
    fFilter = 0;
 }
 
 void TPacesHit::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TPacesHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"Paces Detector: "<<GetDetector()<<std::endl;
-   str<<"Paces Energy:   "<<GetEnergy()<<std::endl;
-   str<<"Paces hit time: "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "Paces Detector: " << GetDetector() << std::endl;
+   str << "Paces Energy:   " << GetEnergy() << std::endl;
+   str << "Paces hit time: " << GetTime() << std::endl;
+   out << str.str();
 }
 
 TVector3 TPacesHit::GetPosition(Double_t) const
 {
-	auto vec = TPaces::GetPosition(GetDetector());
+   auto vec = TPaces::GetPosition(GetDetector());
    return {vec.X(), vec.Y(), vec.Z()};
 }
 

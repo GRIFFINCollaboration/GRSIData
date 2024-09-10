@@ -19,29 +19,29 @@ class TTrificHit : public TDetectorHit {
 public:
    TTrificHit();
    TTrificHit(const TTrificHit&);
-	TTrificHit(TTrificHit&&) noexcept = default;
-	TTrificHit& operator=(const TTrificHit&) = default;
-	TTrificHit& operator=(TTrificHit&&) noexcept = default;
+   TTrificHit(TTrificHit&&) noexcept            = default;
+   TTrificHit& operator=(const TTrificHit&)     = default;
+   TTrificHit& operator=(TTrificHit&&) noexcept = default;
    explicit TTrificHit(const TFragment& frag) { frag.Copy(*this); }
    ~TTrificHit() override = default;
 
    /////////////////////////  Setters	/////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
+   inline void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
    // void SetHit();
 
    /////////////////////////  Getters	/////////////////////////////////////
-   inline Int_t GetFilterPattern() const { return fFilter; } //!<!
+   inline Int_t GetFilterPattern() const { return fFilter; }   //!<!
 
    /////////////////////////  TChannel Helpers /////////////////////////////////////
-   bool InFilter(Int_t); //!<!
+   bool InFilter(Int_t);   //!<!
 
-   void Clear(Option_t* opt = "") override;            //!<!
-   void Print(Option_t* opt = "") const override;      //!<!
-	void Print(std::ostream& out) const override; //!<!
-   void Copy(TObject&) const override;             //!<!
-   void Copy(TObject&, bool) const override;      //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
+   void Copy(TObject&) const override;              //!<!
+   void Copy(TObject&, bool) const override;        //!<!
    //TVector3 GetPosition(Double_t dist) const override; //!<!
-   TVector3 GetPosition() const override;  //!<!             
+   TVector3 GetPosition() const override;   //!<!
    //TVector3 GetPosition() const; //!<!
 
 private:
@@ -50,7 +50,7 @@ private:
    Int_t fFilter{0};
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTrificHit, 3); // NOLINT(readability-else-after-return)
+   ClassDefOverride(TTrificHit, 3);   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */
