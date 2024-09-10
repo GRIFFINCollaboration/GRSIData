@@ -13,9 +13,6 @@
 TRcmpHit::TRcmpHit(const TRcmpHit& rhs) : TDetectorHit(rhs)
 {
 /// this is the copy constructor for a single TRcmpHit parameter
-#if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    rhs.Copy(*this);
 }
 

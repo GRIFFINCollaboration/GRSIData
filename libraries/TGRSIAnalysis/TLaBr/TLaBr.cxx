@@ -30,9 +30,6 @@ std::array<TVector3, 9> TLaBr::fPosition = {
 TLaBr::TLaBr()
 {
 	// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
@@ -47,9 +44,6 @@ TLaBr::~TLaBr()
 TLaBr::TLaBr(const TLaBr& rhs) : TSuppressed(rhs)
 {
 	// Copy Contructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 

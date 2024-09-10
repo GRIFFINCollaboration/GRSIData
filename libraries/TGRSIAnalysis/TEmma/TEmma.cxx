@@ -25,17 +25,11 @@ int16_t TEmma::fFail = 0;
 
 TEmma::TEmma()
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
 TEmma::TEmma(const TEmma& rhs) : TDetector(rhs)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 

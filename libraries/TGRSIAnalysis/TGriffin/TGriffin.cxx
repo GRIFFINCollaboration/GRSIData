@@ -113,18 +113,12 @@ std::array<TVector3, 17> TGriffin::fCloverPosition = {
 TGriffin::TGriffin()
 {
 	/// Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    Clear();
 }
 
 TGriffin::TGriffin(const TGriffin& rhs) : TSuppressed(rhs)
 {
 	/// Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    rhs.Copy(*this);
 }
 

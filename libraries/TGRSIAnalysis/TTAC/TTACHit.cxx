@@ -10,18 +10,12 @@
 TTACHit::TTACHit()
 {
 	// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
 TTACHit::TTACHit(const TTACHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 	rhs.Copy(*this);
 }

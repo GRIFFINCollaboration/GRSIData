@@ -6,18 +6,12 @@
 TTAC::TTAC()
 {
 	// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
 TTAC::TTAC(const TTAC& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 

@@ -9,9 +9,6 @@ int TCSM::fCfdBuildDiff = 5;
 TCSM::TCSM()
    : fAlmostEqualWindow(0.2)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 }
 
 void TCSM::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)

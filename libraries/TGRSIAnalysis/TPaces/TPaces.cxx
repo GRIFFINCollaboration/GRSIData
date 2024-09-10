@@ -24,17 +24,11 @@ std::array<ROOT::Math::Polar3DVector, 6> TPaces::fDetectorPosition = {
 
 TPaces::TPaces()
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
 TPaces::TPaces(const TPaces& rhs) : TDetector(rhs)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 

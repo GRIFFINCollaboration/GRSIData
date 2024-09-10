@@ -26,9 +26,6 @@ void TTriFoil::Copy(TObject& rhs) const
 
 TTriFoil::TTriFoil(const TTriFoil& rhs) : TDetector(rhs)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 

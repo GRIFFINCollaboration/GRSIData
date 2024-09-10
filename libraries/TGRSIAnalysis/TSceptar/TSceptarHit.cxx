@@ -11,18 +11,12 @@
 TSceptarHit::TSceptarHit()
 {
 	// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 
 TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 	rhs.Copy(*this);
 }

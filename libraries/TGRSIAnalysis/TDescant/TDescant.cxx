@@ -73,18 +73,12 @@ std::array<TVector3, 9> TDescant::fAncillaryPosition = {
 TDescant::TDescant()
 {
 	/// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
    Clear();
 }
 
 void TDescant::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 }
 
 TDescant::TDescant(const TDescant& rhs) : TDetector(rhs)

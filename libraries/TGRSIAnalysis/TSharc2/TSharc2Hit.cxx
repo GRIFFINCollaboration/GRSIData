@@ -7,17 +7,11 @@
 
 TSharc2Hit::TSharc2Hit()
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear("ALL");
 }
 
 TSharc2Hit::TSharc2Hit(const TSharc2Hit& rhs) : TDetectorHit(rhs)
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 	rhs.Copy(*this);
 }

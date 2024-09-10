@@ -59,9 +59,6 @@ double TSharc2::fStripBPitch = TSharc2::fZdim / 48.0; // TSharc2::backstripslist
 
 TSharc2::TSharc2()
 {
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	Clear();
 }
 

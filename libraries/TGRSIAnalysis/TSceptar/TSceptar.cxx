@@ -32,9 +32,6 @@ std::array<TVector3, 21> TSceptar::fPaddlePosition = {
 TSceptar::TSceptar()
 {
 	// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	// Class()->AddRule("TSceptar sceptar_hits attributes=NotOwner");
 	// Class()->AddRule("TSceptar sceptardata attributes=NotOwner");
 	Clear();
@@ -43,9 +40,6 @@ TSceptar::TSceptar()
 TSceptar::TSceptar(const TSceptar& rhs) : TDetector(rhs)
 {
 	// Copy Contructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-	Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
 	rhs.Copy(*this);
 }
 
