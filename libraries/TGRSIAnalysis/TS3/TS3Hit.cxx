@@ -22,9 +22,6 @@ TS3Hit::TS3Hit(const TFragment& frag)
 	}
 }
 
-
-TS3Hit::~TS3Hit() = default;
-
 TS3Hit::TS3Hit(const TS3Hit& rhs) : TDetectorHit(rhs)
 {
 	Clear();

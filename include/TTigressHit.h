@@ -29,7 +29,7 @@ public:
 	TTigressHit& operator=(TTigressHit&&) noexcept = default;
    explicit TTigressHit(const TFragment& frag);
    void CopyFragment(const TFragment& frag);
-   ~TTigressHit() override;
+   ~TTigressHit() override = default;
 
 private:
    // UShort_t fFirstSegment;

@@ -27,7 +27,7 @@
 class TLaBrHit : public TDetectorHit {
 public:
    TLaBrHit();
-   ~TLaBrHit() override;
+   ~TLaBrHit() override = default;
    TLaBrHit(const TLaBrHit&);
 	TLaBrHit(TLaBrHit&&) noexcept = default;
 	TLaBrHit& operator=(const TLaBrHit&) = default;

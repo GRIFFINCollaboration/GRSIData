@@ -30,8 +30,6 @@ TTipHit::TTipHit(const TFragment& frag)
    }
 }
 
-TTipHit::~TTipHit() = default;
-
 TTipHit::TTipHit(const TTipHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

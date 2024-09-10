@@ -24,7 +24,7 @@ public:
 	TTipHit(TTipHit&&) noexcept = default;
 	TTipHit& operator=(const TTipHit&) = default;
 	TTipHit& operator=(TTipHit&&) noexcept = default;
-   ~TTipHit() override;
+   ~TTipHit() override = default;
 
 private:
    Int_t    fFilter{0}; //

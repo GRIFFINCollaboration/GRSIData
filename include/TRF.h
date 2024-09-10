@@ -22,7 +22,7 @@ public:
 	TRF(TRF&&) noexcept = default;
 	TRF& operator=(const TRF&) = default;
 	TRF& operator=(TRF&&) noexcept = default;
-   ~TRF() override;
+   ~TRF() override = default;
 
    Double_t Phase() const 
    {

@@ -9,5 +9,3 @@ TGriffinBgoHit::TGriffinBgoHit()
 	Clear();
 }
 
-TGriffinBgoHit::~TGriffinBgoHit() = default;
-

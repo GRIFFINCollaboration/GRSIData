@@ -30,7 +30,7 @@ public:
       }
       return *this;
    } //!<!
-   ~TSharc2() override;
+   ~TSharc2() override = default;
 
    TSharc2Hit* GetSharc2Hit(const int& i) const { return static_cast<TSharc2Hit*>(GetHit(i)); }
    static TVector3 GetPosition(int detector, int frontstrip, int backstrip, double X = 0.00, double Y = 0.00,

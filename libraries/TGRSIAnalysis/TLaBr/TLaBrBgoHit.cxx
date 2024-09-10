@@ -9,5 +9,3 @@ TLaBrBgoHit::TLaBrBgoHit()
    Clear();
 }
 
-TLaBrBgoHit::~TLaBrBgoHit() = default;
-

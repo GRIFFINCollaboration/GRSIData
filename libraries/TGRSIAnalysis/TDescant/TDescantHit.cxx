@@ -43,8 +43,6 @@ TDescantHit::TDescantHit(const TFragment& frag)
    }
 }
 
-TDescantHit::~TDescantHit() = default;
-
 void TDescantHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);

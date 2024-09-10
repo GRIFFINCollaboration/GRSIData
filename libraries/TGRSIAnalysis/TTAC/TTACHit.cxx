@@ -16,8 +16,6 @@ TTACHit::TTACHit()
 	Clear();
 }
 
-TTACHit::~TTACHit() = default;
-
 TTACHit::TTACHit(const TTACHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor

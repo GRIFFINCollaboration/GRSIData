@@ -11,8 +11,6 @@ TGenericDetector::TGenericDetector()
    Clear();
 }
 
-TGenericDetector::~TGenericDetector() = default;
-
 TGenericDetector& TGenericDetector::operator=(const TGenericDetector& rhs)
 {
    rhs.Copy(*this);

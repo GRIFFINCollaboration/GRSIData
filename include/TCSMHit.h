@@ -29,7 +29,7 @@ public:
 	TCSMHit(TCSMHit&&) noexcept = default;
 	TCSMHit& operator=(const TCSMHit&) = default;
 	TCSMHit& operator=(TCSMHit&&) noexcept = default;
-   ~TCSMHit() override;
+   ~TCSMHit() override = default;
 
 private:
    Short_t fHorDStrip;  //

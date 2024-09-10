@@ -25,8 +25,6 @@ TSiLi::TSiLi()
    Clear();
 }
 
-TSiLi::~TSiLi() = default;
-
 void TSiLi::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);

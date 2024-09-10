@@ -27,7 +27,7 @@ public:
 	TGRSIDetectorInformation(TGRSIDetectorInformation&&) noexcept = default;
 	TGRSIDetectorInformation& operator=(const TGRSIDetectorInformation&) = default;
 	TGRSIDetectorInformation& operator=(TGRSIDetectorInformation&&) noexcept = default;
-   ~TGRSIDetectorInformation() override;
+   ~TGRSIDetectorInformation() override = default;
    
    TEventBuildingLoop::EBuildMode BuildMode() const override;
 

@@ -30,7 +30,7 @@ public:
 	TSiLi(TSiLi&&) noexcept = default;
    TSiLi& operator=(const TSiLi&); //
 	TSiLi& operator=(TSiLi&&) noexcept = default;
-   ~TSiLi() override;
+   ~TSiLi() override = default;
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

@@ -32,7 +32,7 @@ public:
 	TZeroDegreeHit& operator=(const TZeroDegreeHit&) = default;
 	TZeroDegreeHit& operator=(TZeroDegreeHit&&) noexcept = default;
    explicit TZeroDegreeHit(const TFragment& frag);
-   ~TZeroDegreeHit() override;
+   ~TZeroDegreeHit() override = default;
 
 private:
    Int_t              fFilter{0};

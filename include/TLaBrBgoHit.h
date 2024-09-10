@@ -29,7 +29,7 @@ public:
 	TLaBrBgoHit& operator=(const TLaBrBgoHit&) = default;
 	TLaBrBgoHit& operator=(TLaBrBgoHit&&) noexcept = default;
    explicit TLaBrBgoHit(const TFragment& frag) : TBgoHit(frag) {}
-   ~TLaBrBgoHit() override;
+   ~TLaBrBgoHit() override = default;
 
    /////////////////////////		/////////////////////////////////////
    UShort_t GetArrayNumber() const override { return (3 * (GetDetector() - 1) + GetCrystal()); } //!<! the BGO of each detector has three segments

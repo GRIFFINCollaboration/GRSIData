@@ -50,7 +50,7 @@ public:
 	TTigress(TTigress&&) noexcept = default;
    TTigress& operator=(const TTigress&); //!<!
 	TTigress& operator=(TTigress&&) noexcept = default;
-   ~TTigress() override;
+   ~TTigress() override = default;
 
    // Dont know why these were changes to return by reference rather than pointer
    // The tigress group prefer them the old way

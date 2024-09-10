@@ -40,7 +40,7 @@ public:
 	TCSM(TCSM&&) noexcept = default;
 	TCSM& operator=(const TCSM&) = default;
 	TCSM& operator=(TCSM&&) noexcept = default;
-   ~TCSM() override;
+   ~TCSM() override = default;
 
    TCSMHit* GetCSMHit(const int& i) const { return static_cast<TCSMHit*>(GetHit(i)); }
 

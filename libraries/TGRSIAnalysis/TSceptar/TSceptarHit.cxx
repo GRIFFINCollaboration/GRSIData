@@ -17,8 +17,6 @@ TSceptarHit::TSceptarHit()
 	Clear();
 }
 
-TSceptarHit::~TSceptarHit() = default;
-
 TSceptarHit::TSceptarHit(const TSceptarHit& rhs) : TDetectorHit(rhs)
 {
 	// Copy Constructor

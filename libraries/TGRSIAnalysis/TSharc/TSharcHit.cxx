@@ -13,8 +13,6 @@ TSharcHit::TSharcHit()
 	Clear("ALL");
 }
 
-TSharcHit::~TSharcHit() = default;
-
 TSharcHit::TSharcHit(const TSharcHit& rhs) : TDetectorHit(rhs)
 {
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)

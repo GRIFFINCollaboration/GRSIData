@@ -23,7 +23,7 @@ public:
 	TTrificHit& operator=(const TTrificHit&) = default;
 	TTrificHit& operator=(TTrificHit&&) noexcept = default;
    explicit TTrificHit(const TFragment& frag) { frag.Copy(*this); }
-   ~TTrificHit() override;
+   ~TTrificHit() override = default;
 
    /////////////////////////  Setters	/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

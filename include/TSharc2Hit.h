@@ -39,7 +39,7 @@ public:
 	TSharc2Hit(TSharc2Hit&&) noexcept = default;
 	TSharc2Hit& operator=(const TSharc2Hit&) = default;
 	TSharc2Hit& operator=(TSharc2Hit&&) noexcept = default;
-   ~TSharc2Hit() override;
+   ~TSharc2Hit() override = default;
 
 private:
    TDetectorHit fBackHit; //

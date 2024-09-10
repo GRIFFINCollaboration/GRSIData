@@ -85,8 +85,6 @@ TTigress::TTigress(const TTigress& rhs) : TDetector(rhs)
    rhs.Copy(*this);
 }
 
-TTigress::~TTigress() = default;
-
 void TTigress::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);

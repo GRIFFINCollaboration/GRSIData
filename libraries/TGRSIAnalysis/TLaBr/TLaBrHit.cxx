@@ -16,8 +16,6 @@ TLaBrHit::TLaBrHit()
    Clear();
 }
 
-TLaBrHit::~TLaBrHit() = default;
-
 TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit(rhs)
 {
 // Copy Constructor

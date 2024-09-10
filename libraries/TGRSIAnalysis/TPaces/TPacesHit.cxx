@@ -19,8 +19,6 @@ TPacesHit::TPacesHit(const TPacesHit& rhs) : TDetectorHit(rhs)
    rhs.Copy(*this);
 }
 
-TPacesHit::~TPacesHit() = default;
-
 void TPacesHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);

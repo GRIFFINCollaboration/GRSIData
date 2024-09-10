@@ -19,7 +19,7 @@ public:
 	TTriFoil(TTriFoil&&) noexcept = default;
 	TTriFoil& operator=(const TTriFoil&) = default;
 	TTriFoil& operator=(TTriFoil&&) noexcept = default;
-   ~TTriFoil() override;
+   ~TTriFoil() override = default;
 
    std::vector<Short_t> GetWave() { return fTfWave; }
    bool                 Beam() const { return fBeam; }

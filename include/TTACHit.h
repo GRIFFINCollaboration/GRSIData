@@ -33,7 +33,7 @@ public:
 	TTACHit& operator=(const TTACHit&) = default;
 	TTACHit& operator=(TTACHit&&) noexcept = default;
    explicit TTACHit(const TFragment& frag) { frag.Copy(*this); }
-   ~TTACHit() override;
+   ~TTACHit() override = default;
 
    /////////////////////////		/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

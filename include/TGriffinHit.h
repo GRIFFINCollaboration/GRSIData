@@ -35,7 +35,7 @@ public:
 	TGriffinHit& operator=(const TGriffinHit&) = default;
 	TGriffinHit& operator=(TGriffinHit&&) noexcept = default;
    explicit TGriffinHit(const TFragment&);
-   ~TGriffinHit() override;
+   ~TGriffinHit() override = default;
 
 private:
    Int_t                   fFilter{0};                  ///<  The Filter Word

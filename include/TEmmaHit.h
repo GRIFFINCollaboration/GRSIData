@@ -23,7 +23,7 @@ public:
 	TEmmaHit& operator=(const TEmmaHit&) = default;
 	TEmmaHit& operator=(TEmmaHit&&) noexcept = default;
    explicit TEmmaHit(const TFragment& frag) { frag.Copy(*this); }
-   ~TEmmaHit() override;
+   ~TEmmaHit() override = default;
 
    /////////////////////////  Setters	/////////////////////////////////////
    inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!

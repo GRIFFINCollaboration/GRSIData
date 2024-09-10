@@ -26,8 +26,6 @@ TGriffinHit::TGriffinHit(const TFragment& frag)
    SetNPileUps(frag.GetNumberOfPileups());
 }
 
-TGriffinHit::~TGriffinHit() = default;
-
 void TGriffinHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);

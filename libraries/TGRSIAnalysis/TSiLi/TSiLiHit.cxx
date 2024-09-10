@@ -13,8 +13,6 @@ TSiLiHit::TSiLiHit(const TFragment& frag)
    SetWavefit(frag);
 }
 
-TSiLiHit::~TSiLiHit() = default;
-
 TSiLiHit::TSiLiHit(const TSiLiHit& rhs) : TDetectorHit(rhs)
 {
    Clear();

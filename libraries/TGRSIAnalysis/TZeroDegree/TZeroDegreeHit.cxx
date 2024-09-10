@@ -19,8 +19,6 @@ TZeroDegreeHit::TZeroDegreeHit()
    Clear();
 }
 
-TZeroDegreeHit::~TZeroDegreeHit() = default;
-
 TZeroDegreeHit::TZeroDegreeHit(const TFragment& frag)
 {
 	frag.Copy(*this);

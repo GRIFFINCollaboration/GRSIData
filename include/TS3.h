@@ -37,7 +37,7 @@ public:
 	TS3(TS3&&) noexcept = default;
    TS3& operator=(const TS3&);
 	TS3& operator=(TS3&&) noexcept = default;
-   ~TS3() override;
+   ~TS3() override = default;
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

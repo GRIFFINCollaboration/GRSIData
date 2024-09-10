@@ -15,8 +15,6 @@ TGRSIDetectorInformation::TGRSIDetectorInformation()
 	Set();
 }
 
-TGRSIDetectorInformation::~TGRSIDetectorInformation() = default;
-
 TEventBuildingLoop::EBuildMode TGRSIDetectorInformation::BuildMode() const
 {
 	if(fSortByTriggerId) {

@@ -9,8 +9,6 @@ TTigressHit::TTigressHit()
    Clear();
 }
 
-TTigressHit::~TTigressHit() = default;
-
 TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit(rhs)
 {
    rhs.Copy(*this);

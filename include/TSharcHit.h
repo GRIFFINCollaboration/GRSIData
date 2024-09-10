@@ -39,7 +39,7 @@ public:
 	TSharcHit(TSharcHit&&) noexcept = default;
 	TSharcHit& operator=(const TSharcHit&) = default;
 	TSharcHit& operator=(TSharcHit&&) noexcept = default;
-   ~TSharcHit() override;
+   ~TSharcHit() override = default;
 
 private:
    // UShort_t   fDetectorNumber;  //

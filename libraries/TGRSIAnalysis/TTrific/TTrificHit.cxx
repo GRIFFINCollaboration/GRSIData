@@ -19,8 +19,6 @@ TTrificHit::TTrificHit(const TTrificHit& rhs) : TDetectorHit(rhs)
 	rhs.Copy(*this);
 }
 
-TTrificHit::~TTrificHit() = default;
-
 void TTrificHit::Copy(TObject& rhs) const
 {
 	TDetectorHit::Copy(rhs);

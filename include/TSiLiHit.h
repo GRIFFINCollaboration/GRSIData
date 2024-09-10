@@ -24,7 +24,7 @@ public:
 	TSiLiHit& operator=(const TSiLiHit&) = default;
 	TSiLiHit& operator=(TSiLiHit&&) noexcept = default;
    explicit TSiLiHit(const TFragment&);
-   ~TSiLiHit() override;
+   ~TSiLiHit() override = default;
 
    void Copy(TObject&, bool = false) const override; //!
    void Clear(Option_t* opt = "") override;

@@ -29,7 +29,7 @@ public:
 	TGriffinBgoHit& operator=(const TGriffinBgoHit&) = default;
 	TGriffinBgoHit& operator=(TGriffinBgoHit&&) noexcept = default;
    explicit TGriffinBgoHit(const TFragment& frag) : TBgoHit(frag) {}
-   ~TGriffinBgoHit() override;
+   ~TGriffinBgoHit() override = default;
 
    /////////////////////////		/////////////////////////////////////
    UShort_t GetArrayNumber() const override { return (20 * (GetDetector() - 1) + 5 * GetCrystal() + GetSegment()); } //!<!

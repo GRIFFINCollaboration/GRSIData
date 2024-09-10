@@ -18,7 +18,7 @@ public:
 	TGenericDetector(TGenericDetector&&) noexcept = default;
 	TGenericDetector& operator=(const TGenericDetector&);
 	TGenericDetector& operator=(TGenericDetector&&) noexcept = default;
-   ~TGenericDetector() override;
+   ~TGenericDetector() override  = default;
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!

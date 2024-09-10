@@ -8,8 +8,6 @@ TCSMHit::TCSMHit()
    Clear();
 }
 
-TCSMHit::~TCSMHit() = default;
-
 void TCSMHit::Clear(Option_t*)
 {
    fHorDStrip  = -1;

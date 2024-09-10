@@ -5,8 +5,6 @@ TTriFoil::TTriFoil()
 	Clear();
 }
 
-TTriFoil::~TTriFoil() = default;
-
 void TTriFoil::Clear(Option_t* opt)
 {
 	// Clears all of the hits and data

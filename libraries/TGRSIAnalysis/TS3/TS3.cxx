@@ -28,8 +28,6 @@ TS3::TS3()
    Clear();
 }
 
-TS3::~TS3() = default;
-
 TS3& TS3::operator=(const TS3& rhs)
 {
    rhs.Copy(*this);

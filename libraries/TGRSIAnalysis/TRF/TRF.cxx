@@ -19,8 +19,6 @@ TRF::TRF(const TRF& rhs) : TDetector(rhs)
    rhs.Copy(*this);
 }
 
-TRF::~TRF() = default;
-
 void TRF::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 

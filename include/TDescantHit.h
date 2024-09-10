@@ -24,7 +24,7 @@ public:
 	TDescantHit& operator=(const TDescantHit&) = default;
 	TDescantHit& operator=(TDescantHit&&) noexcept = default;
    explicit TDescantHit(const TFragment& frag);
-   ~TDescantHit() override;
+   ~TDescantHit() override = default;
 
 private:
    Int_t              fFilter;

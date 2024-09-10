@@ -23,7 +23,7 @@ public:
 	TPacesHit& operator=(const TPacesHit&) = default;
 	TPacesHit& operator=(TPacesHit&&) noexcept = default;
    explicit TPacesHit(const TFragment& frag) { frag.Copy(*this); }
-   ~TPacesHit() override;
+   ~TPacesHit() override = default;
 
 private:
    Int_t fFilter{0};

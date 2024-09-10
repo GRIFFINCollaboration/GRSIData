@@ -24,8 +24,6 @@ TEmmaHit::TEmmaHit(const TEmmaHit& rhs) : TDetectorHit(rhs)
    rhs.Copy(*this);
 }
 
-TEmmaHit::~TEmmaHit() = default;
-
 void TEmmaHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);
