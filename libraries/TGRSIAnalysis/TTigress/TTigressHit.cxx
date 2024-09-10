@@ -4,16 +4,10 @@
 
 #include "TTigress.h"
 
-/// \cond CLASSIMP
-ClassImp(TTigressHit)
-/// \endcond
-
 TTigressHit::TTigressHit()
 {
    Clear();
 }
-
-TTigressHit::~TTigressHit() = default;
 
 TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit(rhs)
 {
@@ -22,7 +16,7 @@ TTigressHit::TTigressHit(const TTigressHit& rhs) : TDetectorHit(rhs)
 
 TTigressHit::TTigressHit(const TFragment& frag)
 {
-	frag.Copy(*this);
+   frag.Copy(*this);
 }
 
 void TTigressHit::CopyFragment(const TFragment& frag)
@@ -36,7 +30,7 @@ void TTigressHit::Clear(Option_t* opt)
    fTimeFit   = 0.0;
    fSig2Noise = 0.0;
 
-	fCoreSet  = false;
+   fCoreSet  = false;
    fBgoFired = false;
    fSegments.clear();
 }
@@ -52,10 +46,10 @@ void TTigressHit::Copy(TObject& rhs) const
 
 void TTigressHit::Copy(TObject& rhs, bool waveform) const
 {
-	Copy(rhs);
-	if(waveform) {
-		CopyWave(rhs);
-	}
+   Copy(rhs);
+   if(waveform) {
+      CopyWave(rhs);
+   }
 }
 
 TVector3 TTigressHit::GetPosition(Double_t dist) const
@@ -67,9 +61,9 @@ TVector3 TTigressHit::GetLastPosition(Double_t dist) const
 {
    const TDetectorHit* seg = nullptr;
    if(GetNSegments() > 0) {
-      seg = &GetSegmentHit(GetNSegments() - 1); // returns the last segment in the segment vector.
+      seg = &GetSegmentHit(GetNSegments() - 1);   // returns the last segment in the segment vector.
    } else {
-      seg = this; // if no segments, use the core. pcb.
+      seg = this;   // if no segments, use the core. pcb.
    }
 
    return TTigress::GetPosition(seg->GetDetector(), seg->GetCrystal(), seg->GetSegment(), dist);
@@ -77,32 +71,32 @@ TVector3 TTigressHit::GetLastPosition(Double_t dist) const
 
 void TTigressHit::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TTigressHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
+   std::ostringstream str;
    //TString sopt(opt);
-   str<<"==== TigressHit @ "<<this<<" ===="<<std::endl;
-   str<<"\t"<<GetName()<<std::endl;
-   str<<"\tCharge:    "<<GetCharge()<<std::endl;
-   str<<"\tEnergy:    "<<GetEnergy()<<std::endl;
-   str<<"\tTime:      "<<GetTime()<<std::endl;
-   str<<"\tCore set:  "<<(CoreSet() ? "true" : "false")<<std::endl;
-   str<<"\tBGO Fired: "<<(BGOFired() ? "true" : "false")<<std::endl;
-   str<<"\tTime:      "<<GetTimeStamp()<<std::endl;
-   str<<"\thit contains "<<GetNSegments()<<" segments."<<std::endl;
+   str << "==== TigressHit @ " << this << " ====" << std::endl;
+   str << "\t" << GetName() << std::endl;
+   str << "\tCharge:    " << GetCharge() << std::endl;
+   str << "\tEnergy:    " << GetEnergy() << std::endl;
+   str << "\tTime:      " << GetTime() << std::endl;
+   str << "\tCore set:  " << (CoreSet() ? "true" : "false") << std::endl;
+   str << "\tBGO Fired: " << (BGOFired() ? "true" : "false") << std::endl;
+   str << "\tTime:      " << GetTimeStamp() << std::endl;
+   str << "\thit contains " << GetNSegments() << " segments." << std::endl;
    //if(sopt.Contains("all")) {
-      str<<"Name           Charge"<<std::endl;
-      for(int x = 0; x < GetNSegments(); x++) {
-         str<<"\t\t"<<GetSegmentHit(x).GetName()<<"  |   "<<GetSegmentHit(x).GetCharge()<<std::endl;
-      }
-		auto p = GetPosition();
-		str<<p.GetName()<<" "<<p.GetTitle()<<" (x,y,z)=("<<p.X()<<","<<p.Y()<<","<<p.Z()<<") (rho,theta,phi)=("<<p.Mag()<<","<<p.Theta()<<","<<p.Phi()<<")"<<std::endl;
+   str << "Name           Charge" << std::endl;
+   for(int x = 0; x < GetNSegments(); x++) {
+      str << "\t\t" << GetSegmentHit(x).GetName() << "  |   " << GetSegmentHit(x).GetCharge() << std::endl;
+   }
+   auto p = GetPosition();
+   str << p.GetName() << " " << p.GetTitle() << " (x,y,z)=(" << p.X() << "," << p.Y() << "," << p.Z() << ") (rho,theta,phi)=(" << p.Mag() << "," << p.Theta() << "," << p.Phi() << ")" << std::endl;
    //}
-   str<<"============================"<<std::endl;
-	out<<str.str();
+   str << "============================" << std::endl;
+   out << str.str();
 }
 
 bool TTigressHit::Compare(const TTigressHit& lhs, const TTigressHit& rhs)
@@ -124,8 +118,8 @@ void TTigressHit::SumHit(TTigressHit* hit)
 
       // Should always be true when called by addback construction due to energy ordering during detector construction
       if(GetEnergy() > hit->GetEnergy()) {
-         SetTime(GetTime()); // Needs to be call before energy sum to ensure and kIsTimeSet using original energy
-                             // for any adjustment
+         SetTime(GetTime());   // Needs to be call before energy sum to ensure and kIsTimeSet using original energy
+                               // for any adjustment
          for(int x = 0; x < hit->GetNSegments(); x++) {
             AddSegment((hit->fSegments[x]));
          }

@@ -6,27 +6,17 @@
 #include "TZeroDegree.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TZeroDegree)
-/// \endcond
-
 bool TZeroDegree::fSetWave = false;
 
 TZeroDegree::TZeroDegree()
 {
-// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
+   // Default Constructor
    Clear();
 }
 
 TZeroDegree::TZeroDegree(const TZeroDegree& rhs) : TDetector(rhs)
 {
-// Copy Contructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
+   // Copy Contructor
    rhs.Copy(*this);
 }
 
@@ -39,14 +29,14 @@ TZeroDegree& TZeroDegree::operator=(const TZeroDegree& rhs)
 void TZeroDegree::Print(Option_t*) const
 {
    /// Prints out TZeroDegree multiplicity, currently does little.
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TZeroDegree::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-	str<<"TZeroDegree contains "<<GetMultiplicity()<<" hits"<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "TZeroDegree contains " << GetMultiplicity() << " hits" << std::endl;
+   out << str.str();
 }
 
 void TZeroDegree::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)

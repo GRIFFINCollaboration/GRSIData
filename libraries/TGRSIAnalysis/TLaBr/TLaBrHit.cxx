@@ -7,27 +7,15 @@
 #include "Globals.h"
 #include "TLaBr.h"
 
-/// \cond CLASSIMP
-ClassImp(TLaBrHit)
-/// \endcond
-
 TLaBrHit::TLaBrHit()
 {
-// Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
+   // Default Constructor
    Clear();
 }
 
-TLaBrHit::~TLaBrHit() = default;
-
 TLaBrHit::TLaBrHit(const TLaBrHit& rhs) : TDetectorHit(rhs)
 {
-// Copy Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
-   Class()->IgnoreTObjectStreamer(kTRUE);
-#endif
+   // Copy Constructor
    Clear();
    rhs.Copy(*this);
 }
@@ -80,14 +68,14 @@ void TLaBrHit::Print(Option_t*) const
    /// Detector
    /// Energy
    /// Time
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TLaBrHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-   str<<"LaBr Detector:   "<<GetDetector()<<std::endl;
-   str<<"LaBr hit energy: "<<GetEnergy()<<std::endl;
-   str<<"LaBr hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "LaBr Detector:   " << GetDetector() << std::endl;
+   str << "LaBr hit energy: " << GetEnergy() << std::endl;
+   str << "LaBr hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }

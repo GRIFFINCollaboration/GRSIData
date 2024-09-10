@@ -18,11 +18,11 @@
 /// Event header
 
 struct TMidas_EVENT_HEADER {
-   uint16_t fEventId;      ///< event id
-   uint16_t fTriggerMask;  ///< event trigger mask
-   uint32_t fSerialNumber; ///< event serial number
-   uint32_t fTimeStamp;    ///< event timestamp in seconds
-   uint32_t fDataSize;     ///< event size in bytes
+   uint16_t fEventId;        ///< event id
+   uint16_t fTriggerMask;    ///< event trigger mask
+   uint32_t fSerialNumber;   ///< event serial number
+   uint32_t fTimeStamp;      ///< event timestamp in seconds
+   uint32_t fDataSize;       ///< event size in bytes
 };
 
 /// Bank header
@@ -35,16 +35,16 @@ struct TMidas_BANK_HEADER {
 /// 16-bit data bank
 
 struct TMidas_BANK {
-   char     fName[4]; ///< bank name // NOLINT(*-avoid-c-arrays)
-   uint16_t fType;    ///< type of data (see midas.h TID_xxx)
+   char     fName[4];   ///< bank name // NOLINT(*-avoid-c-arrays)
+   uint16_t fType;      ///< type of data (see midas.h TID_xxx)
    uint16_t fDataSize;
 };
 
 /// 32-bit data bank
 
 struct TMidas_BANK32 {
-   char     fName[4]; ///< bank name // NOLINT(*-avoid-c-arrays)
-   uint32_t fType;    ///< type of data (see midas.h TID_xxx)
+   char     fName[4];   ///< bank name // NOLINT(*-avoid-c-arrays)
+   uint32_t fType;      ///< type of data (see midas.h TID_xxx)
    uint32_t fDataSize;
 };
 /*! @} */

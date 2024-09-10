@@ -44,14 +44,24 @@
 class TGRSIDataParser : public TDataParser {
 public:
    TGRSIDataParser();
-   TGRSIDataParser(const TGRSIDataParser&) = default;
-	TGRSIDataParser(TGRSIDataParser&&) noexcept = default;
-	TGRSIDataParser& operator=(const TGRSIDataParser&) = delete;
-	TGRSIDataParser& operator=(TGRSIDataParser&&) noexcept = delete;
-   ~TGRSIDataParser() override = default;
+   TGRSIDataParser(const TGRSIDataParser&)                = default;
+   TGRSIDataParser(TGRSIDataParser&&) noexcept            = default;
+   TGRSIDataParser& operator=(const TGRSIDataParser&)     = delete;
+   TGRSIDataParser& operator=(TGRSIDataParser&&) noexcept = delete;
+   ~TGRSIDataParser() override                            = default;
 
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);
-   enum class EBank { kWFDN = 0, kGRF1 = 1, kGRF2 = 2, kGRF3 = 3, kGRF4 = 4, kFME0 = 5, kFME1 = 6, kFME2 = 7, kFME3 = 8, kMADC = 9, kEMMT = 10};
+   enum class EBank { kWFDN = 0,
+                      kGRF1 = 1,
+                      kGRF2 = 2,
+                      kGRF3 = 3,
+                      kGRF4 = 4,
+                      kFME0 = 5,
+                      kFME1 = 6,
+                      kFME2 = 7,
+                      kFME3 = 8,
+                      kMADC = 9,
+                      kEMMT = 10 };
 
    enum class EDataParserState {
       kGood,
@@ -81,15 +91,15 @@ public:
    };
 
 #ifndef __CINT__
-	int Process(std::shared_ptr<TRawEvent>) override;
-	int ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event);
-        int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaMadcDataToFragment(const uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
-	int EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int Process(std::shared_ptr<TRawEvent>) override;
+   int ProcessGriffin(uint32_t* data, const int& size, const EBank& bank, std::shared_ptr<TMidasEvent>& event);
+   int TigressDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int EmmaMadcDataToFragment(const uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int EmmaTdcDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int EmmaRawDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
+   int EmmaSumDataToFragment(uint32_t* data, int size, std::shared_ptr<TMidasEvent>& event);
 #endif
 
    int GriffinDataToFragment(uint32_t* data, int size, EBank bank, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
@@ -103,8 +113,8 @@ public:
    int EightPIDataToFragment(uint32_t stream, uint32_t* data, int size, unsigned int midasSerialNumber = 0, time_t midasTime = 0);
 
 private:
-	EDataParserState fState;
-	bool fIgnoreMissingChannel; ///< flag that's set to TGRSIOptions::IgnoreMissingChannel
+   EDataParserState fState;
+   bool             fIgnoreMissingChannel;   ///< flag that's set to TGRSIOptions::IgnoreMissingChannel
 #ifndef __CINT__
    void SetTIGWave(uint32_t, const std::shared_ptr<TFragment>&);
    void SetTIGAddress(uint32_t, const std::shared_ptr<TFragment>&);

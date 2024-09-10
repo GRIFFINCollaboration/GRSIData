@@ -25,17 +25,17 @@ class TGriffinBgoHit : public TBgoHit {
 public:
    TGriffinBgoHit();
    TGriffinBgoHit(const TGriffinBgoHit& hit) : TBgoHit(static_cast<const TBgoHit&>(hit)) {}
-	TGriffinBgoHit(TGriffinBgoHit&&) noexcept = default;
-	TGriffinBgoHit& operator=(const TGriffinBgoHit&) = default;
-	TGriffinBgoHit& operator=(TGriffinBgoHit&&) noexcept = default;
+   TGriffinBgoHit(TGriffinBgoHit&&) noexcept            = default;
+   TGriffinBgoHit& operator=(const TGriffinBgoHit&)     = default;
+   TGriffinBgoHit& operator=(TGriffinBgoHit&&) noexcept = default;
    explicit TGriffinBgoHit(const TFragment& frag) : TBgoHit(frag) {}
-   ~TGriffinBgoHit() override;
+   ~TGriffinBgoHit() override = default;
 
    /////////////////////////		/////////////////////////////////////
-   UShort_t GetArrayNumber() const override { return (20 * (GetDetector() - 1) + 5 * GetCrystal() + GetSegment()); } //!<!
+   UShort_t GetArrayNumber() const override { return (20 * (GetDetector() - 1) + 5 * GetCrystal() + GetSegment()); }   //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffinBgoHit, 2) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TGriffinBgoHit, 2)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

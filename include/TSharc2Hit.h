@@ -36,25 +36,25 @@ class TSharc2Hit : public TDetectorHit {
 public:
    TSharc2Hit();
    TSharc2Hit(const TSharc2Hit&);
-	TSharc2Hit(TSharc2Hit&&) noexcept = default;
-	TSharc2Hit& operator=(const TSharc2Hit&) = default;
-	TSharc2Hit& operator=(TSharc2Hit&&) noexcept = default;
-   ~TSharc2Hit() override;
+   TSharc2Hit(TSharc2Hit&&) noexcept            = default;
+   TSharc2Hit& operator=(const TSharc2Hit&)     = default;
+   TSharc2Hit& operator=(TSharc2Hit&&) noexcept = default;
+   ~TSharc2Hit() override                       = default;
 
 private:
-   TDetectorHit fBackHit; //
-   TDetectorHit fPadHit;  //
+   TDetectorHit fBackHit;   //
+   TDetectorHit fPadHit;    //
 
 public:
-   void Copy(TObject&) const override;        //!<!
-   void Copy(TObject&, bool) const override;           //!<!
-   void Clear(Option_t* = "") override;       //!<!
-   void Print(Option_t* = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
+   void Copy(TObject&) const override;             //!<!
+   void Copy(TObject&, bool) const override;       //!<!
+   void Clear(Option_t* = "") override;            //!<!
+   void Print(Option_t* = "") const override;      //!<!
+   void Print(std::ostream& out) const override;   //!<!
 
    // inline UShort_t GetDetector()       const  { return TDetectorHit::GetDetector();  } //!<!
-   UShort_t GetFrontStrip() const { return GetSegment(); } //!<!
-   UShort_t GetBackStrip() const { return GetBack().GetSegment(); }          //!<!
+   UShort_t GetFrontStrip() const { return GetSegment(); }            //!<!
+   UShort_t GetBackStrip() const { return GetBack().GetSegment(); }   //!<!
 
    // TDetectorHit* GetFront() const { return this; }
    TDetectorHit GetBack() const { return fBackHit; }
@@ -65,27 +65,27 @@ public:
       return GetCfd() - GetBack().GetCfd() + ((GetBackStrip() % 24) * 157.6) - (GetFrontStrip() * 157.6);
    }
 
-   inline Double_t GetDeltaE() const { return TDetectorHit::GetEnergy(); } //!<!
-   inline Double_t GetDeltaT() const { return TDetectorHit::GetTime(); }   //!<!
+   inline Double_t GetDeltaE() const { return TDetectorHit::GetEnergy(); }   //!<!
+   inline Double_t GetDeltaT() const { return TDetectorHit::GetTime(); }     //!<!
 
-   inline Double_t GetDeltaFrontE() const { return TDetectorHit::GetEnergy(); } //!<!
-   inline Double_t GetDeltaFrontT() const { return TDetectorHit::GetTime(); }   //!<!
-   inline Double_t GetDeltaBackE() const { return GetBack().GetEnergy(); }          //!<!
-   inline Double_t GetDeltaBackT() const { return GetBack().GetTime(); }            //!<!
+   inline Double_t GetDeltaFrontE() const { return TDetectorHit::GetEnergy(); }   //!<!
+   inline Double_t GetDeltaFrontT() const { return TDetectorHit::GetTime(); }     //!<!
+   inline Double_t GetDeltaBackE() const { return GetBack().GetEnergy(); }        //!<!
+   inline Double_t GetDeltaBackT() const { return GetBack().GetTime(); }          //!<!
 
-   inline Int_t GetFrontAddress() const { return TDetectorHit::GetAddress(); } //!<!
-   inline Int_t GetBackAddress() const { return GetBack().GetAddress(); }          //!<!
-   inline Int_t GetPadAddress() const { return GetPad().GetAddress(); }            //!<!
+   inline Int_t GetFrontAddress() const { return TDetectorHit::GetAddress(); }   //!<!
+   inline Int_t GetBackAddress() const { return GetBack().GetAddress(); }        //!<!
+   inline Int_t GetPadAddress() const { return GetPad().GetAddress(); }          //!<!
 
-   inline Double_t GetPadE() const { return GetPad().GetEnergy(); } //!<!
-   inline Double_t GetPadT() const { return GetPad().GetTime(); }   //!<!
+   inline Double_t GetPadE() const { return GetPad().GetEnergy(); }   //!<!
+   inline Double_t GetPadT() const { return GetPad().GetTime(); }     //!<!
 
    Float_t GetFrontCharge() const
    {
       return TDetectorHit::GetCharge();
-   }                                                               //!<!  //Charge is now stored after integration.
-   Float_t GetBackCharge() const { return GetBack().GetCharge(); } //!<!  //Charge is now stored after integration.
-   Float_t GetPadCharge() const { return GetPad().GetCharge(); }   //!<!  //Charge is now stored after integration.
+   }                                                                 //!<!  //Charge is now stored after integration.
+   Float_t GetBackCharge() const { return GetBack().GetCharge(); }   //!<!  //Charge is now stored after integration.
+   Float_t GetPadCharge() const { return GetPad().GetCharge(); }     //!<!  //Charge is now stored after integration.
 
    inline Double_t GetEnergy(Option_t* = "") const override
    {
@@ -98,21 +98,21 @@ public:
    Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const
    {
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
-   };                                                                          //!<!
-   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const; //!<!
+   };                                                                                  //!<!
+   Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const;   //!<!
 
-   void SetFront(const TFragment& frag); //!<!
-   void SetBack(const TFragment& frag);  //!<!
-   void SetPad(const TFragment& frag);   //!<!
+   void SetFront(const TFragment& frag);   //!<!
+   void SetBack(const TFragment& frag);    //!<!
+   void SetPad(const TFragment& frag);     //!<!
 
-   TVector3 GetPosition(Double_t dist) const override; //!<!
-   TVector3 GetPosition() const override;              //!<!
+   TVector3 GetPosition(Double_t dist) const override;   //!<!
+   TVector3 GetPosition() const override;                //!<!
 
 private:
    Double_t GetDefaultDistance() const { return 0.; };
 
    /// \cond CLASSIMP
-   ClassDefOverride(TSharc2Hit, 6) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TSharc2Hit, 6)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

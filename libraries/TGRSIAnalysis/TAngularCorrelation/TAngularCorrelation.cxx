@@ -10,15 +10,11 @@
 #include "TMath.h"
 #include "TCanvas.h"
 
-/// \cond CLASSIMP
-ClassImp(TAngularCorrelation)
-/// \endcond
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Angular correlation default constructor
 ///
 TAngularCorrelation::TAngularCorrelation()
-	: fIndexCorrelation(nullptr), fIndexMapSize(0), fFolded(kFALSE), fGrouped(kFALSE)
+   : fIndexCorrelation(nullptr), fIndexMapSize(0), fFolded(kFALSE), fGrouped(kFALSE)
 {
 }
 
@@ -56,21 +52,21 @@ TH2D* TAngularCorrelation::Create2DSlice(THnSparse* hst, Double_t min, Double_t 
    for(int i = 0; i < 3; i++) {   // goes through all three dimensions of THnSparse and finds the min and max values
       xmin[i] = hst->GetAxis(i)->GetXmin();
       xmax[i] = hst->GetAxis(i)->GetXmax();
-   }                                              // then look for matching axis since energy axis should be the same
-   if(xmin[0] == xmin[1] && xmax[0] == xmax[1]) { // are 0 and 1 the same? then axis 2 is the index axis
+   }                                                // then look for matching axis since energy axis should be the same
+   if(xmin[0] == xmin[1] && xmax[0] == xmax[1]) {   // are 0 and 1 the same? then axis 2 is the index axis
       indexaxis   = 2;
       energy1axis = 0;
       energy2axis = 1;
-   } else if(xmin[1] == xmin[2] && xmax[1] == xmax[2]) { // are 1 and 2 the same? then axis 0 is the index axis
+   } else if(xmin[1] == xmin[2] && xmax[1] == xmax[2]) {   // are 1 and 2 the same? then axis 0 is the index axis
       indexaxis   = 0;
       energy1axis = 1;
       energy2axis = 2;
-   } else if(xmin[2] == xmin[0] && xmax[2] == xmax[0]) { // are 0 and 2 the same? then axis 1 is the index axis
+   } else if(xmin[2] == xmin[0] && xmax[2] == xmax[0]) {   // are 0 and 2 the same? then axis 1 is the index axis
       indexaxis   = 1;
       energy1axis = 0;
       energy2axis = 2;
    } else {
-		std::cout<<"Can't identify energy axes. Assuming index axis is axis 0."<<std::endl; // no two axis are the same
+      std::cout << "Can't identify energy axes. Assuming index axis is axis 0." << std::endl;   // no two axis are the same
       indexaxis   = 0;
       energy1axis = 1;
       energy2axis = 2;
@@ -78,7 +74,7 @@ TH2D* TAngularCorrelation::Create2DSlice(THnSparse* hst, Double_t min, Double_t 
 
    // project the THnSparse
    hst->GetAxis(energy1axis)->SetRangeUser(min, max);
-   TH2D* tempslice = hst->Projection(indexaxis, energy2axis, "eo"); // the "e" option pushes appropriate errors
+   TH2D* tempslice = hst->Projection(indexaxis, energy2axis, "eo");   // the "e" option pushes appropriate errors
    tempslice->SetName(Form("%s_proj_%i", hst->GetName(), static_cast<Int_t>((max + min) / 2)));
    tempslice->SetTitle(Form("%s: %i keV", hst->GetTitle(), static_cast<Int_t>((max + min) / 2)));
 
@@ -108,8 +104,8 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    // identify the type of histograms included in the array
    // a TH2D will need to be projected differently than a THnSparse array
 
-   Bool_t   sparse = kFALSE; // true if the array has THnSparse histograms
-   Bool_t   hst2d  = kFALSE; // true if the array has some kind of TH2 histogram
+   Bool_t   sparse = kFALSE;   // true if the array has THnSparse histograms
+   Bool_t   hst2d  = kFALSE;   // true if the array has some kind of TH2 histogram
    TIter    next(hstarray);
    TObject* obj = nullptr;
    while((obj = next()) != nullptr) {
@@ -119,9 +115,9 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
          if(!sparse) {
             hst2d = kTRUE;
          } else {
-				std::cout<<"found both THnSparse and TH2 in array."<<std::endl;
-				std::cout<<"currently, Create2DSlice only deals with one."<<std::endl;
-				std::cout<<"Bailing out."<<std::endl;
+            std::cout << "found both THnSparse and TH2 in array." << std::endl;
+            std::cout << "currently, Create2DSlice only deals with one." << std::endl;
+            std::cout << "Bailing out." << std::endl;
             return nullptr;
          }
       } else if(obj->InheritsFrom("THnSparse")) {
@@ -129,21 +125,21 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
          if(!hst2d) {
             sparse = kTRUE;
          } else {
-				std::cout<<"found both THnSparse and TH2 in array."<<std::endl;
-				std::cout<<"currently, Create2DSlice only deals with one."<<std::endl;
-				std::cout<<"Bailing out."<<std::endl;
+            std::cout << "found both THnSparse and TH2 in array." << std::endl;
+            std::cout << "currently, Create2DSlice only deals with one." << std::endl;
+            std::cout << "Bailing out." << std::endl;
             return nullptr;
          }
       } else {
-			std::cout<<"Element is neither THnSparse or TH2."<<std::endl;
-			std::cout<<"Bailing."<<std::endl;
+         std::cout << "Element is neither THnSparse or TH2." << std::endl;
+         std::cout << "Bailing." << std::endl;
       }
    }
 
    // if the array is neither, bail out
    if(!sparse && !hst2d) {
-		std::cout<<"Can't identify the type of object in the array."<<std::endl;
-		std::cout<<"Returning without slicing."<<std::endl;
+      std::cout << "Can't identify the type of object in the array." << std::endl;
+      std::cout << "Returning without slicing." << std::endl;
       return nullptr;
    }
 
@@ -172,7 +168,7 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
    Int_t ybins = elements;
 
    Int_t iteration = 0;
-   TH2D* newslice = nullptr;
+   TH2D* newslice  = nullptr;
    if(gFile->Get(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max))) == nullptr) {
       newslice = new TH2D(Form("%s_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max)),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
@@ -181,14 +177,14 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
          if(gFile->Get(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration)) == nullptr) {
             break;
          }
-			++iteration;
+         ++iteration;
       }
       newslice = new TH2D(Form("%s_%i_%i_%i", name, static_cast<Int_t>(min), static_cast<Int_t>(max), iteration),
                           Form("%s, E_{#gamma 1}=[%.1f,%.1f)", title, min, max), bins, xmin, xmax, ybins, 0, ybins);
    }
 
    // iterate over the array of 2D gamma-gamma matrices
-   for(Int_t i = 0; i < elements; i++) { // takes slice and itterates through all indexes
+   for(Int_t i = 0; i < elements; i++) {   // takes slice and itterates through all indexes
       // slice this particular matrix
       TH1D* tempslice = nullptr;
       // sparse option
@@ -196,11 +192,11 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
          auto* thishst = static_cast<THnSparse*>(hstarray->At(i));
          thishst->GetAxis(0)->SetRangeUser(min, max);
          tempslice = thishst->Projection(
-            1, "oe"); // the "e" option pushes appropriate errors, the "o" makes the projection correct
+            1, "oe");   // the "e" option pushes appropriate errors, the "o" makes the projection correct
       } else if(hst2d) {
-         auto* thishst = static_cast<TH2*>(hstarray->At(i)); // itterating through all the indexes
+         auto* thishst = static_cast<TH2*>(hstarray->At(i));   // itterating through all the indexes
          thishst->GetXaxis()->SetRangeUser(min, max);
-         tempslice = thishst->ProjectionY(); // projecting result of gate into temporary slice
+         tempslice = thishst->ProjectionY();   // projecting result of gate into temporary slice
       }
 
       // iterate through the appropriate bins, transfer values, and take care of error appropriately
@@ -231,8 +227,8 @@ TH2D* TAngularCorrelation::Create2DSlice(TObjArray* hstarray, Double_t min, Doub
 TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
 {
    if(!fold && !group) {
-		std::cout<<"No folding or grouping selected."<<std::endl;
-		std::cout<<"Returning unmodified 2D slice."<<std::endl;
+      std::cout << "No folding or grouping selected." << std::endl;
+      std::cout << "Returning unmodified 2D slice." << std::endl;
       return static_cast<TH2D*>(hst);
    }
 
@@ -251,35 +247,35 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
 
       // check for index map
       if(angle_numbers == 0) {
-			std::cout<<"Angle Map has not been defined yet."<<std::endl;
-			std::cout<<"Need Angle Map to assign groups."<<std::endl;
-			std::cout<<"Bailing out."<<std::endl;
+         std::cout << "Angle Map has not been defined yet." << std::endl;
+         std::cout << "Need Angle Map to assign groups." << std::endl;
+         std::cout << "Bailing out." << std::endl;
          return nullptr;
       }
       // check for group assignments
       if(group_numbers == 0) {
-			std::cout<<"Groups have not been assigned yet."<<std::endl;
-			std::cout<<"Cannot group Angular Indexes."<<std::endl;
-			std::cout<<"Bailing out."<<std::endl;
+         std::cout << "Groups have not been assigned yet." << std::endl;
+         std::cout << "Cannot group Angular Indexes." << std::endl;
+         std::cout << "Bailing out." << std::endl;
          return nullptr;
       }
       // consistency check
       if(group_numbers != angle_numbers) {
          if(group_numbers < angle_numbers) {
-				std::cout<<"Not all angular indexes have been assigned a group."<<std::endl;
-				std::cout<<"Bailing out."<<std::endl;
+            std::cout << "Not all angular indexes have been assigned a group." << std::endl;
+            std::cout << "Bailing out." << std::endl;
             return nullptr;
          }
          if(group_numbers > angle_numbers) {
-				std::cout<<"Too many groups have been assigned, not enough angular indexes."<<std::endl;
-				std::cout<<"Bailing out."<<std::endl;
+            std::cout << "Too many groups have been assigned, not enough angular indexes." << std::endl;
+            std::cout << "Bailing out." << std::endl;
             return nullptr;
          }
       }
    }
 
    // get x-axis parameters
-   Int_t bins = hst->GetNbinsX();
+   Int_t    bins = hst->GetNbinsX();
    Double_t xmin = hst->GetXaxis()->GetBinLowEdge(1);
    Double_t xmax = hst->GetXaxis()->GetBinUpEdge(bins);
 
@@ -295,31 +291,31 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
    TH2D* modified_slice = nullptr;
    if(static_cast<int>(static_cast<int>((group)) & static_cast<int>(!fold)) != 0) {
       modified_slice = new TH2D(Form("%s_grouped", hst2dname), Form("%s_grouped", hst2dtitle), bins, xmin, xmax,
-                                newybins, 0, newybins); // defines slice
+                                newybins, 0, newybins);   // defines slice
    } else if(static_cast<int>(static_cast<int>((fold)) & static_cast<int>(!group)) != 0) {
       modified_slice = new TH2D(Form("%s_folded", hst2dname), Form("%s_folded", hst2dtitle), bins, xmin, xmax, newybins,
-                                0, newybins); // defines slice
+                                0, newybins);   // defines slice
    } else if(fold && group) {
       modified_slice = new TH2D(Form("%s_grouped_folded", hst2dname), Form("%s_grouped_folded", hst2dtitle), bins, xmin,
-                                xmax, newybins, 0, newybins); // defines slice
+                                xmax, newybins, 0, newybins);   // defines slice
    } else {
       modified_slice = new TH2D(Form("%s_unknown", hst2dname), Form("%s_unknown", hst2dtitle), bins, xmin, xmax,
-                                newybins, 0, newybins); // defines slice
+                                newybins, 0, newybins);   // defines slice
    }
 
    // loop through the original 2D histograms y-axis...
-   for(Int_t i = 0; i < ybins; i++) { // y-axis bin loop
+   for(Int_t i = 0; i < ybins; i++) {   // y-axis bin loop
       TH1D* tempslice = nullptr;
       tempslice       = hst->ProjectionX("", i + 1, i + 1);
 
       // figure out the new index
       Double_t y = GetModifiedIndex(i);
       // now loop through the energy axis...
-      for(Int_t j = 1; j <= bins; j++) { // x-axis bin loop
+      for(Int_t j = 1; j <= bins; j++) {   // x-axis bin loop
          Double_t x   = tempslice->GetBinCenter(j);
-         Int_t bin = modified_slice->FindBin(x, y);
+         Int_t    bin = modified_slice->FindBin(x, y);
          // pull out the new content / error
-         Double_t newcontent = tempslice->GetBinContent(j); // number of counts
+         Double_t newcontent = tempslice->GetBinContent(j);   // number of counts
          Double_t newerror   = tempslice->GetBinError(j);
          // pull out the old content / error
          Double_t oldcontent = modified_slice->GetBinContent(bin);
@@ -327,12 +323,12 @@ TH2D* TAngularCorrelation::Modify2DSlice(TH2* hst, Bool_t fold, Bool_t group)
          // re-set new 2D histogram bin with combined value
          modified_slice->SetBinContent(bin, oldcontent + newcontent);
          modified_slice->SetBinError(bin, sqrt(pow(newerror, 2) + pow(olderror, 2)));
-      } // end x-axis bin loop
+      }   // end x-axis bin loop
 
       // cleanup
       delete tempslice;
 
-   } // end y-axis bin loop
+   }   // end y-axis bin loop
 
    return modified_slice;
 }
@@ -400,7 +396,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    // this isn't strictly necessary, but it will make the histograms smaller
    // and visually, easier to see in the diagnostic.
    Double_t minenergy = 0.;
-	Double_t maxenergy = 0.;
+   Double_t maxenergy = 0.;
    peak->GetRange(minenergy, maxenergy);
    Double_t difference = maxenergy - minenergy;
    minenergy           = minenergy - 0.5 * difference;
@@ -420,14 +416,14 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    TPeak::SetLogLikelihoodFlag(true);
    peak->SetParameter("centroid", peak->GetCentroid());
    peak->InitParams(totalProjection);
-   std::cout<<"initial parameters:"<<std::endl;
+   std::cout << "initial parameters:" << std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
       double min = 0.;
-		double max = 0.;
+      double max = 0.;
       peak->GetParLimits(i, min, max);
-      std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
+      std::cout << i << ": " << peak->GetParameter(i) << "; " << min << " - " << max << std::endl;
    }
-   std::cout<<"==========================="<<std::endl;
+   std::cout << "===========================" << std::endl;
    peak->SetParameter(0, totalProjection->GetMaximum() / 2.);
    peak->SetParLimits(0, 0., 2. * totalProjection->GetMaximum());
    peak->SetParameter(1, peak->GetCentroid());
@@ -438,29 +434,29 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    peak->FixParameter(8, 0.);
    peak->SetParameter(9, peak->GetCentroid());
    peak->SetParLimits(9, peak->GetCentroid() - 2, peak->GetCentroid() + 2);
-   std::cout<<"Our parameters:"<<std::endl;
+   std::cout << "Our parameters:" << std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
       double min = 0.;
-		double max = 0.;
+      double max = 0.;
       peak->GetParLimits(i, min, max);
-      std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
+      std::cout << i << ": " << peak->GetParameter(i) << "; " << min << " - " << max << std::endl;
    }
-   std::cout<<"=========================="<<std::endl;
+   std::cout << "==========================" << std::endl;
    // bool fit = peak->Fit(totalProjection, "LL");
    // if (!fit) continue;
-   std::cout<<"Final parameters:"<<std::endl;
+   std::cout << "Final parameters:" << std::endl;
    for(int i = 0; i < peak->GetNpar(); i++) {
       double min = 0.;
-		double max = 0.;
+      double max = 0.;
       peak->GetParLimits(i, min, max);
-      std::cout<<i<<": "<<peak->GetParameter(i)<<"; "<<min<<" - "<<max<<std::endl;
+      std::cout << i << ": " << peak->GetParameter(i) << "; " << min << " - " << max << std::endl;
    }
-   std::cout<<"=========================="<<std::endl;
-   std::cout<<"Peak area = "<<peak->GetArea()<<" +/- "<<peak->GetAreaErr()<<std::endl;
+   std::cout << "==========================" << std::endl;
+   std::cout << "Peak area = " << peak->GetArea() << " +/- " << peak->GetAreaErr() << std::endl;
    double peakCentroid = peak->GetParameter(1);
    double sigma        = peak->GetParameter(2);
-   std::cout<<"Fixing the centroid to "<<peakCentroid<<", and sigma to "<<sigma<<" (FWHM = "<<2.355 * sigma
-            <<")"<<std::endl;
+   std::cout << "Fixing the centroid to " << peakCentroid << ", and sigma to " << sigma << " (FWHM = " << 2.355 * sigma
+             << ")" << std::endl;
    // loop over the indices
    auto* file = new TFile("Fit_singles.root", "recreate");
    for(Int_t i = 1; i <= indexmax - indexmin; i++) {
@@ -521,7 +517,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
          fitresult = peak->Fit(temphst, "Q0");
       }
       if(!fitresult) {
-         continue; // if fit failed, continue on to next index
+         continue;   // if fit failed, continue on to next index
       }
       if(visualization) {
          static_cast<TPeak*>(temphst->GetListOfFunctions()->Last())->Background()->Draw("same");
@@ -539,8 +535,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
       Double_t ndf      = peak->GetNDF();
       Double_t scale    = TMath::Max(1.0, TMath::Sqrt(chi2 / ndf));
       if(area_err < scale * TMath::Sqrt(area)) {
-			std::cout<<"Area error was less than the scaled square root of the area."<<std::endl;
-			std::cout<<"This means something is wrong; using scaled square root of area for area error."<<std::endl;
+         std::cout << "Area error was less than the scaled square root of the area." << std::endl;
+         std::cout << "This means something is wrong; using scaled square root of area for area error." << std::endl;
          area_err = TMath::Sqrt(area) * scale;
       }
 
@@ -550,7 +546,7 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    }
 
    Double_t TrueFWHM = AvgFWHM / (indexmax - indexmin);
-   std::cout<<"True sigma = "<<TrueFWHM<<std::endl;
+   std::cout << "True sigma = " << TrueFWHM << std::endl;
    ///////////////////////////////////////////////////////
    // Create diagnostic window
    ///////////////////////////////////////////////////////
@@ -569,8 +565,8 @@ TH1D* TAngularCorrelation::FitSlices(TH2* hst, TPeak* peak, Bool_t visualization
    auto* centroidhst = new TH1D(Form("%s_centroid", hst1dname),
                                 Form("%s: Peak centroid;Angular index;Peak centroid (keV)", newhst->GetTitle()),
                                 indexbins, indexmin, indexmax);
-   auto* fwhmhst = new TH1D(Form("%s_fwhm", hst1dname), Form("%s: FWHM;Angular index;FWHM (keV)", newhst->GetTitle()),
-                            indexbins, indexmin, indexmax);
+   auto* fwhmhst     = new TH1D(Form("%s_fwhm", hst1dname), Form("%s: FWHM;Angular index;FWHM (keV)", newhst->GetTitle()),
+                                indexbins, indexmin, indexmax);
 
    // assign histogram to fIndexCorrelation
    fIndexCorrelation = newhst;
@@ -603,8 +599,8 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
    if(!fold && !group) {
       Int_t check = fAngleMap.size();
       if(check == 0) {
-			std::cout<<"Angles have not been assigned."<<std::endl;
-			std::cout<<"Therefore cannot create graph."<<std::endl;
+         std::cout << "Angles have not been assigned." << std::endl;
+         std::cout << "Therefore cannot create graph." << std::endl;
          return nullptr;
       }
    } else {
@@ -617,8 +613,8 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
 
       Int_t check = fModifiedAngles.size();
       if(check == 0) {
-			std::cout<<"Modified angles have not been assigned."<<std::endl;
-			std::cout<<"Therefore cannot create graph."<<std::endl;
+         std::cout << "Modified angles have not been assigned." << std::endl;
+         std::cout << "Therefore cannot create graph." << std::endl;
          return nullptr;
       }
 
@@ -632,7 +628,7 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
    auto* graph = new TGraphAsymmErrors();
    Int_t n     = hst->GetNbinsX();
 
-   for(Int_t i = 1; i <= n; i++) { // bin number loop
+   for(Int_t i = 1; i <= n; i++) {   // bin number loop
 
       // get index number
       auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
@@ -656,7 +652,7 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
       Int_t graphn = graph->GetN();
       graph->SetPoint(graphn, TMath::Cos(angle), y);
       graph->SetPointError(graphn, 0, 0, yerr, yerr);
-   } // bin number loop end
+   }   // bin number loop end
 
    // set title on graph
    graph->SetTitle(Form("%s;cos(#theta);Counts", hst->GetTitle()));
@@ -674,15 +670,15 @@ TGraphAsymmErrors* TAngularCorrelation::CreateGraphFromHst(TH1* hst, Bool_t fold
 Int_t TAngularCorrelation::GetAngularIndex(Int_t arraynum1, Int_t arraynum2)
 {
    if(arraynum1 == 0 || arraynum2 == 0) {
-		std::cout<<"Array numbers usually begin at 1 - unless you have programmed"<<std::endl;
-		std::cout<<"it differently explicitly, don't trust this output."<<std::endl;
+      std::cout << "Array numbers usually begin at 1 - unless you have programmed" << std::endl;
+      std::cout << "it differently explicitly, don't trust this output." << std::endl;
    }
    if(fIndexMap.count(arraynum1) == 0) {
-		std::cout<<"Error: array number "<<arraynum1<<" is not present in the index map."<<std::endl;
+      std::cout << "Error: array number " << arraynum1 << " is not present in the index map." << std::endl;
       return -1;
    }
    if(fIndexMap[arraynum1].count(arraynum2) == 0) {
-		std::cout<<"Error: element ["<<arraynum1<<"]["<<arraynum2<<"] is not present in the index map."<<std::endl;
+      std::cout << "Error: element [" << arraynum1 << "][" << arraynum2 << "] is not present in the index map." << std::endl;
       return -1;
    }
    // Array numbers start counting at 1
@@ -696,19 +692,19 @@ Int_t TAngularCorrelation::GetAngularIndex(Int_t arraynum1, Int_t arraynum2)
 
 Bool_t TAngularCorrelation::CheckMaps(Bool_t fold, Bool_t group)
 {
-   Bool_t result = kTRUE; // result to return
+   Bool_t result = kTRUE;   // result to return
    if(!fold && !group) {
       if(fAngleMap.size() != fWeights.size()) {
-			std::cout<<"fAngleMap and fWeights do not have the same size."<<std::endl;
-			std::cout<<"fAngleMap size is: "<<static_cast<Int_t>(fAngleMap.size())<<std::endl;
-			std::cout<<"fWeights size is: "<<static_cast<Int_t>(fWeights.size())<<std::endl;
+         std::cout << "fAngleMap and fWeights do not have the same size." << std::endl;
+         std::cout << "fAngleMap size is: " << static_cast<Int_t>(fAngleMap.size()) << std::endl;
+         std::cout << "fWeights size is: " << static_cast<Int_t>(fWeights.size()) << std::endl;
          result = kFALSE;
       }
    } else {
       if(fModifiedAngles.size() != fModifiedWeights.size()) {
-			std::cout<<"fModifiedAngles and fModifiedWeights do not have the same size."<<std::endl;
-			std::cout<<"fModifiedAngles size is: "<<static_cast<Int_t>(fModifiedAngles.size())<<std::endl;
-			std::cout<<"fModifiedWeights size is: "<<static_cast<Int_t>(fModifiedWeights.size())<<std::endl;
+         std::cout << "fModifiedAngles and fModifiedWeights do not have the same size." << std::endl;
+         std::cout << "fModifiedAngles size is: " << static_cast<Int_t>(fModifiedAngles.size()) << std::endl;
+         std::cout << "fModifiedWeights size is: " << static_cast<Int_t>(fModifiedWeights.size()) << std::endl;
          result = kFALSE;
       }
    }
@@ -723,23 +719,23 @@ void TAngularCorrelation::PrintIndexMap()
 {
    Int_t size = fIndexMapSize;
    if(size == 0) {
-		std::cout<<"Indexes have not been assigned yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Indexes have not been assigned yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
 
    for(Int_t i = 1; i <= size; i++) {
-		std::cout<<"-----------------------------------------------------"<<std::endl;
-		std::cout<<"|| Array number 1 | Array number 2 | Angular index ||"<<std::endl;
-		std::cout<<"-----------------------------------------------------"<<std::endl;
+      std::cout << "-----------------------------------------------------" << std::endl;
+      std::cout << "|| Array number 1 | Array number 2 | Angular index ||" << std::endl;
+      std::cout << "-----------------------------------------------------" << std::endl;
       for(Int_t j = 1; j <= size; j++) {
          if(GetAngularIndex(i, j) == -1) {
             continue;
          }
-			std::cout<<std::left<<"|| "<<std::setw(14)<<i<<" | "<<std::setw(14)<<j<<" | "<<std::setw(13)<<GetAngularIndex(i, j)<<" ||"<<std::right<<std::endl;
+         std::cout << std::left << "|| " << std::setw(14) << i << " | " << std::setw(14) << j << " | " << std::setw(13) << GetAngularIndex(i, j) << " ||" << std::right << std::endl;
       }
    }
-	std::cout<<"-----------------------------------------------------"<<std::endl;
+   std::cout << "-----------------------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -751,24 +747,24 @@ void TAngularCorrelation::PrintWeights()
    Int_t size        = fAngleMap.size();
    Int_t weight_size = fWeights.size();
    if(size == 0) {
-		std::cout<<"The angle map hasn't been created yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The angle map hasn't been created yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
 
    if(weight_size == 0) {
-		std::cout<<"The weights haven't been calculated yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The weights haven't been calculated yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
 
-	std::cout<<"--------------------------------------------------------"<<std::endl;
-	std::cout<<"||  Angular index  |  Opening angle (rad)  |  Weight  ||"<<std::endl;
-	std::cout<<"--------------------------------------------------------"<<std::endl;
+   std::cout << "--------------------------------------------------------" << std::endl;
+   std::cout << "||  Angular index  |  Opening angle (rad)  |  Weight  ||" << std::endl;
+   std::cout << "--------------------------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<std::left<<"|| "<<std::setw(13)<<i<<" | "<<std::setw(19)<<GetAngleFromIndex(i)<<" | "<<std::setw(6)<<GetWeightFromIndex(i)<<"  ||"<<std::right<<std::endl;
+      std::cout << std::left << "|| " << std::setw(13) << i << " | " << std::setw(19) << GetAngleFromIndex(i) << " | " << std::setw(6) << GetWeightFromIndex(i) << "  ||" << std::right << std::endl;
    }
-	std::cout<<"--------------------------------------------------------"<<std::endl;
+   std::cout << "--------------------------------------------------------" << std::endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
 /// Prints map of angular index vs. opening angle vs. group
@@ -779,23 +775,23 @@ void TAngularCorrelation::PrintGroupIndexMap()
    Int_t size       = fAngleMap.size();
    Int_t group_size = fGroups.size();
    if(size == 0) {
-		std::cout<<"The angle map hasn't been created yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The angle map hasn't been created yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
    if(group_size == 0) {
-		std::cout<<"The groups haven't been assigned yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The groups haven't been assigned yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
 
-	std::cout<<"-------------------------------------"<<std::endl;
-	std::cout<<"||  Angular index  |  Group index  ||"<<std::endl;
-	std::cout<<"-------------------------------------"<<std::endl;
+   std::cout << "-------------------------------------" << std::endl;
+   std::cout << "||  Angular index  |  Group index  ||" << std::endl;
+   std::cout << "-------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<"||  "<<std::setw(13)<<i<<"  |  "<<std::setw(11)<<GetGroupFromIndex(i)<<"  ||"<<std::endl;
+      std::cout << "||  " << std::setw(13) << i << "  |  " << std::setw(11) << GetGroupFromIndex(i) << "  ||" << std::endl;
    }
-	std::cout<<"-------------------------------------"<<std::endl;
+   std::cout << "-------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -807,22 +803,22 @@ void TAngularCorrelation::PrintGroupAngleMap()
    Int_t size       = GetNumGroups();
    Int_t angle_size = fGroupAngles.size();
    if(size == 0) {
-		std::cout<<"The number of groups haven't been determined yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The number of groups haven't been determined yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
    if(angle_size == 0) {
-		std::cout<<"The angles haven't been assigned yet."<<std::endl;
-		std::cout<<"Therefore, can't print."<<std::endl;
+      std::cout << "The angles haven't been assigned yet." << std::endl;
+      std::cout << "Therefore, can't print." << std::endl;
       return;
    }
-	std::cout<<"-----------------------------------"<<std::endl;
-	std::cout<<"||  Group index  |  Angle (rad)  ||"<<std::endl;
-	std::cout<<"-----------------------------------"<<std::endl;
+   std::cout << "-----------------------------------" << std::endl;
+   std::cout << "||  Group index  |  Angle (rad)  ||" << std::endl;
+   std::cout << "-----------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<"||  "<<std::setw(11)<<i<<"  |  "<<std::setw(12)<<GetGroupAngleFromIndex(i)<<"  ||"<<std::endl;
+      std::cout << "||  " << std::setw(11) << i << "  |  " << std::setw(12) << GetGroupAngleFromIndex(i) << "  ||" << std::endl;
    }
-	std::cout<<"-----------------------------------"<<std::endl;
+   std::cout << "-----------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -833,18 +829,18 @@ void TAngularCorrelation::PrintAngleMap()
 {
    Int_t size = fAngleMap.size();
    if(size == 0) {
-		std::cout<<"Folded angles have not been assigned yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Folded angles have not been assigned yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
 
-	std::cout<<"---------------------------------------------"<<std::endl;
-	std::cout<<"||  Angular index  |  Opening angle (rad)  ||"<<std::endl;
-	std::cout<<"---------------------------------------------"<<std::endl;
+   std::cout << "---------------------------------------------" << std::endl;
+   std::cout << "||  Angular index  |  Opening angle (rad)  ||" << std::endl;
+   std::cout << "---------------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<std::left<<"|| "<<std::setw(13)<<i<<" | "<<std::setw(19)<<GetAngleFromIndex(i)<<"  ||"<<std::right<<std::endl;
+      std::cout << std::left << "|| " << std::setw(13) << i << " | " << std::setw(19) << GetAngleFromIndex(i) << "  ||" << std::right << std::endl;
    }
-	std::cout<<"---------------------------------------------"<<std::endl;
+   std::cout << "---------------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -856,18 +852,18 @@ void TAngularCorrelation::PrintModifiedAngleMap()
    Int_t size = fModifiedAngles.size();
 
    if(size == 0) {
-		std::cout<<"Folded angles have not been assigned yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Folded angles have not been assigned yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
 
-	std::cout<<"--------------------------------------"<<std::endl;
-	std::cout<<"||  Modified index  |  Angle (rad)  ||"<<std::endl;
-	std::cout<<"--------------------------------------"<<std::endl;
+   std::cout << "--------------------------------------" << std::endl;
+   std::cout << "||  Modified index  |  Angle (rad)  ||" << std::endl;
+   std::cout << "--------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<"||  "<<std::setw(14)<<i<<"  |  "<<std::setw(11)<<GetModifiedAngleFromIndex(i)<<"  ||"<<std::endl;
+      std::cout << "||  " << std::setw(14) << i << "  |  " << std::setw(11) << GetModifiedAngleFromIndex(i) << "  ||" << std::endl;
    }
-	std::cout<<"--------------------------------------"<<std::endl;
+   std::cout << "--------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -880,23 +876,23 @@ void TAngularCorrelation::PrintModifiedWeights()
    Int_t weight_size = fModifiedWeights.size();
 
    if(size == 0) {
-		std::cout<<"Modified angles have not been assigned yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Modified angles have not been assigned yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
    if(weight_size == 0) {
-		std::cout<<"Modified weights have not been generated yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Modified weights have not been generated yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
 
-	std::cout<<"-------------------------------------------------"<<std::endl;
-	std::cout<<"||  Modified index  |  Angle (rad)  |  Weight  ||"<<std::endl;
-	std::cout<<"-------------------------------------------------"<<std::endl;
+   std::cout << "-------------------------------------------------" << std::endl;
+   std::cout << "||  Modified index  |  Angle (rad)  |  Weight  ||" << std::endl;
+   std::cout << "-------------------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<"||  "<<std::setw(14)<<i<<"  |  "<<std::setw(11)<<GetModifiedAngleFromIndex(i)<<"  |  "<<GetModifiedWeight(i)<<"  ||"<<std::endl;
+      std::cout << "||  " << std::setw(14) << i << "  |  " << std::setw(11) << GetModifiedAngleFromIndex(i) << "  |  " << GetModifiedWeight(i) << "  ||" << std::endl;
    }
-	std::cout<<"-------------------------------------------------"<<std::endl;
+   std::cout << "-------------------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -906,18 +902,18 @@ void TAngularCorrelation::PrintModifiedIndexMap()
 {
    Int_t size = fModifiedIndices.size();
    if(size == 0) {
-		std::cout<<"Modified indices have not been assigned yet."<<std::endl;
-		std::cout<<"Therefore cannot print map."<<std::endl;
+      std::cout << "Modified indices have not been assigned yet." << std::endl;
+      std::cout << "Therefore cannot print map." << std::endl;
       return;
    }
 
-	std::cout<<"----------------------------------------"<<std::endl;
-	std::cout<<"||  Angular index  |  Modified index  ||"<<std::endl;
-	std::cout<<"----------------------------------------"<<std::endl;
+   std::cout << "----------------------------------------" << std::endl;
+   std::cout << "||  Angular index  |  Modified index  ||" << std::endl;
+   std::cout << "----------------------------------------" << std::endl;
    for(Int_t i = 0; i < size; i++) {
-		std::cout<<"||  "<<std::setw(13)<<i<<"  |  "<<std::setw(14)<<GetModifiedIndex(i)<<"  ||"<<std::endl;
+      std::cout << "||  " << std::setw(13) << i << "  |  " << std::setw(14) << GetModifiedIndex(i) << "  ||" << std::endl;
    }
-	std::cout<<"----------------------------------------"<<std::endl;
+   std::cout << "----------------------------------------" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -931,14 +927,14 @@ std::vector<Double_t> TAngularCorrelation::GenerateAngleMap(std::vector<Int_t>& 
                                                             std::vector<Int_t>& distances)
 {
 
-   std::vector<Double_t> map; // vector to return
+   std::vector<Double_t> map;   // vector to return
 
    // basic consistency check
    const Int_t size = arraynumbers.size();
    if(size != static_cast<Int_t>(distances.size())) {
-		std::cout<<"Lengths of array number and distance vectors are inconsistent."<<std::endl;
-		std::cout<<"Array number vector size: "<<size<<std::endl;
-		std::cout<<"Distance vector size: "<<distances.size()<<std::endl;
+      std::cout << "Lengths of array number and distance vectors are inconsistent." << std::endl;
+      std::cout << "Array number vector size: " << size << std::endl;
+      std::cout << "Distance vector size: " << distances.size() << std::endl;
    }
 
    // loop through array numbers (a list of crystals in the array)
@@ -953,10 +949,10 @@ std::vector<Double_t> TAngularCorrelation::GenerateAngleMap(std::vector<Int_t>& 
          Int_t    detector2 = (arraynumbers[j] - 1) / 4 + 1;
          Int_t    crystal2  = (arraynumbers[j] - 1) % 4;
          TVector3 positionone =
-            TGriffin::GetPosition(detector1, crystal1, distances[i]); // distance is in mm, usually 110, 145, or 160
+            TGriffin::GetPosition(detector1, crystal1, distances[i]);   // distance is in mm, usually 110, 145, or 160
          TVector3 positiontwo =
-            TGriffin::GetPosition(detector2, crystal2, distances[j]); // distance is in mm, usually 110, 145, or 160
-         Double_t angle          = positionone.Angle(positiontwo);    // in radians
+            TGriffin::GetPosition(detector2, crystal2, distances[j]);   // distance is in mm, usually 110, 145, or 160
+         Double_t angle          = positionone.Angle(positiontwo);      // in radians
          Bool_t   alreadyclaimed = kFALSE;
          for(double m : map) {
             if(TMath::Abs(angle - m) < 0.00005) {
@@ -988,10 +984,10 @@ std::vector<Double_t> TAngularCorrelation::GenerateAngleMap(std::vector<Int_t>& 
 ///
 /// This function is called by GenerateMaps()
 
-std::vector<Int_t> TAngularCorrelation::GenerateWeights(std::vector<Int_t>& arraynumbers, std::vector<Int_t>&,
+std::vector<Int_t> TAngularCorrelation::GenerateWeights(std::vector<Int_t>&                      arraynumbers, std::vector<Int_t>&,
                                                         std::map<Int_t, std::map<Int_t, Int_t>>& indexmap)
 {
-   std::vector<Int_t> weights; // vector to return
+   std::vector<Int_t> weights;   // vector to return
 
    // get array number size
    Int_t size = arraynumbers.size();
@@ -1014,8 +1010,8 @@ std::vector<Int_t> TAngularCorrelation::GenerateWeights(std::vector<Int_t>& arra
    // loop through array numbers (a list of crystals in the array)
    for(Int_t i = 0; i < size; i++) {
       if(arraynumbers[i] < 1 || arraynumbers[i] > 64) {
-			std::cout<<arraynumbers[i]<<" is not a good array number."<<std::endl;
-			std::cout<<"Skipping... you'll probably get some errors."<<std::endl;
+         std::cout << arraynumbers[i] << " is not a good array number." << std::endl;
+         std::cout << "Skipping... you'll probably get some errors." << std::endl;
          continue;
       }
       // here, we want all combinations for the indices, so we start from j=0
@@ -1041,7 +1037,7 @@ std::vector<Int_t> TAngularCorrelation::GenerateWeights(std::vector<Int_t>& arra
 std::vector<Int_t> TAngularCorrelation::GenerateModifiedWeights(std::vector<Int_t>& modindices,
                                                                 std::vector<Int_t>& weights)
 {
-   std::vector<Int_t> modifiedweights; // vector to return
+   std::vector<Int_t> modifiedweights;   // vector to return
 
    // get weights size
    Int_t size = weights.size();
@@ -1077,7 +1073,7 @@ std::vector<Int_t> TAngularCorrelation::GenerateModifiedWeights(std::vector<Int_
 ///
 /// This function is called by GenerateMaps()
 ///
-std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(std::vector<Int_t>& arraynumbers,
+std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(std::vector<Int_t>&    arraynumbers,
                                                                               std::vector<Int_t>&    distances,
                                                                               std::vector<Double_t>& anglemap)
 {
@@ -1093,8 +1089,8 @@ std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(st
    // loop through array numbers (a list of crystals in the array)
    for(Int_t i = 0; i < size; i++) {
       if(arraynumbers[i] < 1 || arraynumbers[i] > 64) {
-			std::cout<<arraynumbers[i]<<" is not a good array number."<<std::endl;
-			std::cout<<"Skipping... you'll probably get some errors."<<std::endl;
+         std::cout << arraynumbers[i] << " is not a good array number." << std::endl;
+         std::cout << "Skipping... you'll probably get some errors." << std::endl;
          continue;
       }
 
@@ -1102,7 +1098,7 @@ std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(st
       Int_t    detector1 = (arraynumbers[i] - 1) / 4 + 1;
       Int_t    crystal1  = (arraynumbers[i] - 1) % 4;
       TVector3 positionone =
-         TGriffin::GetPosition(detector1, crystal1, distances[i]); // distance is in mm, usually 110, 145, or 160
+         TGriffin::GetPosition(detector1, crystal1, distances[i]);   // distance is in mm, usually 110, 145, or 160
 
       // here, we want all combinations for the indices, so we start from j=0
       for(Int_t j = 0; j < size; j++) {
@@ -1110,14 +1106,14 @@ std::map<Int_t, std::map<Int_t, Int_t>> TAngularCorrelation::GenerateIndexMap(st
          Int_t    detector2 = (arraynumbers[j] - 1) / 4 + 1;
          Int_t    crystal2  = (arraynumbers[j] - 1) % 4;
          TVector3 positiontwo =
-            TGriffin::GetPosition(detector2, crystal2, distances[j]); // distance is in mm, usually 110, 145, or 160
-         Double_t angle = positionone.Angle(positiontwo);             // in radians
+            TGriffin::GetPosition(detector2, crystal2, distances[j]);   // distance is in mm, usually 110, 145, or 160
+         Double_t angle = positionone.Angle(positiontwo);               // in radians
          for(Int_t m = 0; m < mapsize; m++) {
             if(TMath::Abs(angle - anglemap[m]) < 0.00005) {
                Int_t index1 = arraynumbers[i];
                Int_t index2 = arraynumbers[j];
                if(index1 == 0 || index2 == 0) {
-						std::cout<<"found array number of zero?"<<std::endl;
+                  std::cout << "found array number of zero?" << std::endl;
                }
                indexmap[index1][index2] = m;
                break;
@@ -1145,9 +1141,9 @@ Bool_t TAngularCorrelation::CheckGroups(std::vector<Int_t>& group) const
 
    // basic consistency check
    if(size != fNumIndices) {
-		std::cout<<"The group list is inconsistent with the number of angular indices."<<std::endl;
-		std::cout<<"Number of groups: "<<size<<std::endl;
-		std::cout<<"Number of angular indices: "<<fNumIndices<<std::endl;
+      std::cout << "The group list is inconsistent with the number of angular indices." << std::endl;
+      std::cout << "Number of groups: " << size << std::endl;
+      std::cout << "Number of angular indices: " << fNumIndices << std::endl;
       return kFALSE;
    }
 
@@ -1194,7 +1190,7 @@ Int_t TAngularCorrelation::GetNumModIndices() const
 
 Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles) const
 {
-   std::vector<Double_t> groupangle; // vector to return
+   std::vector<Double_t> groupangle;   // vector to return
 
    // get number of group entries
    Int_t size      = groupangles.size();
@@ -1202,7 +1198,7 @@ Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles)
 
    // basic consistency check
    if(size != numgroups) {
-		std::cout<<"Not all groups have been assigned an angle."<<std::endl;
+      std::cout << "Not all groups have been assigned an angle." << std::endl;
       return kFALSE;
    }
 
@@ -1220,15 +1216,15 @@ Bool_t TAngularCorrelation::CheckGroupAngles(std::vector<Double_t>& groupangles)
 
 std::vector<Double_t> TAngularCorrelation::GenerateFoldedAngles(std::vector<Double_t>& anglemap)
 {
-   std::vector<Double_t> folds; // vector to return
+   std::vector<Double_t> folds;   // vector to return
 
    // get size
    Int_t size = anglemap.size();
 
    // consistancy check
    if(size == 0) {
-		std::cout<<"Angles have not been assigned yet. "<<std::endl;
-		std::cout<<"Therefore cannot fold indexes. "<<std::endl;
+      std::cout << "Angles have not been assigned yet. " << std::endl;
+      std::cout << "Therefore cannot fold indexes. " << std::endl;
       return folds;
    }
 
@@ -1247,7 +1243,7 @@ std::vector<Double_t> TAngularCorrelation::GenerateFoldedAngles(std::vector<Doub
 
       for(double fold : folds) {
          if(TMath::Abs(TMath::Sin(fold_angle) - TMath::Sin(fold)) <
-            0.000005) { // look for duplicated angles in the fold array
+            0.000005) {   // look for duplicated angles in the fold array
             alreadyclaimed = kTRUE;
             break;
          }
@@ -1274,7 +1270,7 @@ std::vector<Double_t> TAngularCorrelation::GenerateFoldedAngles(std::vector<Doub
 std::vector<Int_t> TAngularCorrelation::GenerateFoldedIndices(std::vector<Double_t>& folds,
                                                               std::vector<Double_t>& anglemap)
 {
-   std::vector<Int_t> fold_indexes; // vector to return
+   std::vector<Int_t> fold_indexes;   // vector to return
 
    // get sizes of fold and angle vectors
    Int_t fold_size  = folds.size();
@@ -1289,8 +1285,8 @@ std::vector<Int_t> TAngularCorrelation::GenerateFoldedIndices(std::vector<Double
       for(Int_t j = 0; j < fold_size; j++) {
          Double_t rad_angle  = folds[j];
          Double_t fold_angle = TMath::Sin(rad_angle);
-         if(TMath::Abs(fold_angle - sin_angle) < 0.000005) { // compare abs(cos(angle)) to fold_Angles to find matches
-            fold_indexes.push_back(j);                       // assign folds
+         if(TMath::Abs(fold_angle - sin_angle) < 0.000005) {   // compare abs(cos(angle)) to fold_Angles to find matches
+            fold_indexes.push_back(j);                         // assign folds
             break;
          }
       }
@@ -1310,9 +1306,9 @@ Int_t TAngularCorrelation::GenerateMaps(std::vector<Int_t>& arraynumbers, std::v
    // basic consistency check
    const Int_t size = arraynumbers.size();
    if(size != static_cast<Int_t>(distances.size())) {
-		std::cout<<"Lengths of array number and distance vectors are inconsistent."<<std::endl;
-		std::cout<<"Array number vector size: "<<size<<std::endl;
-		std::cout<<"Distance vector size: "<<distances.size()<<std::endl;
+      std::cout << "Lengths of array number and distance vectors are inconsistent." << std::endl;
+      std::cout << "Array number vector size: " << size << std::endl;
+      std::cout << "Distance vector size: " << distances.size() << std::endl;
    }
 
    // clear vector map
@@ -1345,9 +1341,9 @@ Int_t TAngularCorrelation::GenerateModifiedMaps(Bool_t fold, Bool_t group)
 {
    if(group) {
       if(static_cast<Int_t>(fGroups.size()) != fNumIndices) {
-			std::cout<<"The groups are not set up properly."<<std::endl;
-			std::cout<<"Cannot create grouped maps."<<std::endl;
-			std::cout<<"Please use AssignGroupMaps first."<<std::endl;
+         std::cout << "The groups are not set up properly." << std::endl;
+         std::cout << "Cannot create grouped maps." << std::endl;
+         std::cout << "Please use AssignGroupMaps first." << std::endl;
          return 0;
       }
    }
@@ -1374,9 +1370,9 @@ Int_t TAngularCorrelation::GenerateGroupMaps(std::vector<Int_t>& arraynumbers, s
    // basic consistency check
    const Int_t size = arraynumbers.size();
    if(size != static_cast<Int_t>(distances.size())) {
-		std::cout<<"Lengths of array number and distance vectors are inconsistent."<<std::endl;
-		std::cout<<"Array number vector size: "<<size<<std::endl;
-		std::cout<<"Distance vector size: "<<distances.size()<<std::endl;
+      std::cout << "Lengths of array number and distance vectors are inconsistent." << std::endl;
+      std::cout << "Array number vector size: " << size << std::endl;
+      std::cout << "Distance vector size: " << distances.size() << std::endl;
    }
 
    // clear vector map
@@ -1444,43 +1440,43 @@ Int_t TAngularCorrelation::GenerateMaps(Int_t detectors, Int_t distance)
    std::vector<Int_t> distances;
 
    if(detectors == 16) {
-		std::cout<<"Generating maps for full array setup."<<std::endl;
+      std::cout << "Generating maps for full array setup." << std::endl;
       for(Int_t i = 1; i <= 64; i++) {
          array_numbers.push_back(i);
          distances.push_back(distance);
       }
    } else if(detectors == 15) {
-		std::cout<<"Generating maps for full array setup, less detector 13."<<std::endl;
+      std::cout << "Generating maps for full array setup, less detector 13." << std::endl;
       for(Int_t i = 1; i <= 64; i++) {
          if(i >= 49 && i <= 52) {
-            continue; // no detector 13
+            continue;   // no detector 13
          }
          array_numbers.push_back(i);
          distances.push_back(distance);
       }
    } else if(detectors == 12) {
-		std::cout<<"Generating maps for detectors 5-16."<<std::endl;
+      std::cout << "Generating maps for detectors 5-16." << std::endl;
       for(Int_t i = 17; i <= 64; i++) {
          array_numbers.push_back(i);
          distances.push_back(distance);
       }
    } else if(detectors == 11) {
-		std::cout<<"Generating maps for detectors 5-16, less detector 13."<<std::endl;
+      std::cout << "Generating maps for detectors 5-16, less detector 13." << std::endl;
       for(Int_t i = 17; i <= 64; i++) {
          if(i >= 49 && i <= 52) {
-            continue; // no detector 13
+            continue;   // no detector 13
          }
          array_numbers.push_back(i);
          distances.push_back(distance);
       }
    } else if(detectors == 8) {
-		std::cout<<"Generating maps for the corona only, detectors 5-12."<<std::endl;
+      std::cout << "Generating maps for the corona only, detectors 5-12." << std::endl;
       for(Int_t i = 17; i <= 48; i++) {
          array_numbers.push_back(i);
          distances.push_back(distance);
       }
    } else {
-		std::cout<<"This option isn't coded. Please use the more general GenerateMap(std::vector<Int_t> &arraynumbers, std::vector<Int_t> &distances)function."<<std::endl;
+      std::cout << "This option isn't coded. Please use the more general GenerateMap(std::vector<Int_t> &arraynumbers, std::vector<Int_t> &distances)function." << std::endl;
       return 0;
    }
 
@@ -1500,21 +1496,21 @@ std::vector<Int_t> TAngularCorrelation::GenerateModifiedIndices(Bool_t fold, Boo
    std::vector<Int_t> modindices;
 
    if(fNumIndices == 0) {
-		std::cout<<"You haven't set any angular indices yet."<<std::endl;
-		std::cout<<"Returning empty vector from GenerateModifiedIndices."<<std::endl;
+      std::cout << "You haven't set any angular indices yet." << std::endl;
+      std::cout << "Returning empty vector from GenerateModifiedIndices." << std::endl;
       return modindices;
    }
    // make sure the modified angles are set appropriately
    if(fold != fFolded || group != fGrouped) {
-		std::cout<<"Please call GenerateModifiedAngles before calling GenerateModifiedIndices."<<std::endl;
-		std::cout<<"Returning empty vector from GenerateModifiedIndices."<<std::endl;
+      std::cout << "Please call GenerateModifiedAngles before calling GenerateModifiedIndices." << std::endl;
+      std::cout << "Returning empty vector from GenerateModifiedIndices." << std::endl;
       return modindices;
    }
 
    if(group) {
       if(static_cast<Int_t>(fGroups.size()) != fNumIndices) {
-			std::cout<<"The groups are not set up properly."<<std::endl;
-			std::cout<<"Returning empty vector from GenerateModifiedIndices."<<std::endl;
+         std::cout << "The groups are not set up properly." << std::endl;
+         std::cout << "Returning empty vector from GenerateModifiedIndices." << std::endl;
          return modindices;
       }
    }
@@ -1564,36 +1560,36 @@ std::vector<Double_t> TAngularCorrelation::GenerateModifiedAngles(Bool_t fold, B
 
    // checking to see that we have regular indices
    if(fNumIndices == 0) {
-		std::cout<<"You haven't set any angular indices yet."<<std::endl;
-		std::cout<<"Aborting."<<std::endl;
+      std::cout << "You haven't set any angular indices yet." << std::endl;
+      std::cout << "Aborting." << std::endl;
       return modangles;
    }
 
    // checking for groups set up
    if(static_cast<Int_t>(fGroups.size()) != fNumIndices) {
-		std::cout<<"The groups are not set up properly."<<std::endl;
-		std::cout<<"Returning empty vector from GenerateModifiedAngles."<<std::endl;
+      std::cout << "The groups are not set up properly." << std::endl;
+      std::cout << "Returning empty vector from GenerateModifiedAngles." << std::endl;
       return modangles;
    }
 
    // checking for group angle setup
    if(group && static_cast<Int_t>(fGroupAngles.size()) != GetNumGroups()) {
-		std::cout<<"Group angles aren't set up properly."<<std::endl;
-		std::cout<<"Returning empty vector from GenerateModifiedAngles."<<std::endl;
+      std::cout << "Group angles aren't set up properly." << std::endl;
+      std::cout << "Returning empty vector from GenerateModifiedAngles." << std::endl;
       return modangles;
    }
 
    ClearModifiedMaps();
-	std::cout<<"Changing modification conditions to:"<<std::endl;
+   std::cout << "Changing modification conditions to:" << std::endl;
    if(fold) {
-		std::cout<<"Folded: yes"<<std::endl;
+      std::cout << "Folded: yes" << std::endl;
    } else {
-		std::cout<<"Folded: no"<<std::endl;
+      std::cout << "Folded: no" << std::endl;
    }
    if(group) {
-		std::cout<<"Grouped: yes"<<std::endl;
+      std::cout << "Grouped: yes" << std::endl;
    } else {
-		std::cout<<"Grouped: no"<<std::endl;
+      std::cout << "Grouped: no" << std::endl;
    }
    fFolded  = fold;
    fGrouped = group;
@@ -1634,8 +1630,8 @@ void TAngularCorrelation::UpdateIndexCorrelation()
       Double_t ndf      = peak->GetNDF();
       Double_t scale    = TMath::Max(1.0, TMath::Sqrt(chi2 / ndf));
       if(area_err < scale * TMath::Sqrt(area)) {
-			std::cout<<"Area error was less than the scaled square root of the area."<<std::endl;
-			std::cout<<"This means something is wrong; using scaled square root of area for area error."<<std::endl;
+         std::cout << "Area error was less than the scaled square root of the area." << std::endl;
+         std::cout << "This means something is wrong; using scaled square root of area for area error." << std::endl;
          area_err = TMath::Sqrt(area) * scale;
       }
 
@@ -1658,7 +1654,7 @@ void TAngularCorrelation::ScaleSingleIndex(TH1* hst, Int_t index, Double_t facto
 
    // set new values
    Double_t new_value = old_value * factor;
-	std::cout<<"old value is "<<old_value<<" multiplied by "<<factor<<" is "<<new_value<<std::endl;
+   std::cout << "old value is " << old_value << " multiplied by " << factor << " is " << new_value << std::endl;
    Double_t new_area_err = old_error * factor;
 
    // fill histogram with new values
@@ -1703,10 +1699,10 @@ void TAngularCorrelation::UpdateDiagnostics()
 /// \param[in] index angular index
 /// \param[in] peak Tpeak to be used for fitting
 
-void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this function will cause grsisort to crash
-                                                               // when I try to re-fit a bad peak, we should add in a
-                                                               // safe-gaurd to make the function return if the peak
-                                                               // cannot be re-fit
+void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak)   // sometimes this function will cause grsisort to crash
+                                                                 // when I try to re-fit a bad peak, we should add in a
+                                                                 // safe-gaurd to make the function return if the peak
+                                                                 // cannot be re-fit
 {
    // create canvas
    new TCanvas(Form("peak%iupdate", index), Form("Peak %i update", index), 400, 400);
@@ -1716,7 +1712,7 @@ void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this
 
    // adjust range
    Double_t minenergy = 0.;
-	Double_t maxenergy = 0.;
+   Double_t maxenergy = 0.;
    peak->GetRange(minenergy, maxenergy);
    Double_t difference = maxenergy - minenergy;
    minenergy           = minenergy - 0.5 * difference;
@@ -1743,7 +1739,7 @@ void TAngularCorrelation::UpdatePeak(Int_t index, TPeak* peak) // sometimes this
 TPeak* TAngularCorrelation::GetPeak(Int_t index)
 {
    if(fPeaks[index] == nullptr) {
-		std::cout<<"No peak exists for index "<<index<<". Returning nullptr."<<std::endl;
+      std::cout << "No peak exists for index " << index << ". Returning nullptr." << std::endl;
       return nullptr;
    }
    return fPeaks[index];
@@ -1760,9 +1756,9 @@ Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst) const
    Int_t modindices = GetNumModIndices();
 
    if(hstbins != modindices) {
-		std::cout<<"The histogram "<<hst->GetName()<<" does not have the same number of bins as the current settings."<<std::endl;
-		std::cout<<"Bins in the histogram: "<<hstbins<<std::endl;
-		std::cout<<"Number of modified indices: "<<modindices<<std::endl;
+      std::cout << "The histogram " << hst->GetName() << " does not have the same number of bins as the current settings." << std::endl;
+      std::cout << "Bins in the histogram: " << hstbins << std::endl;
+      std::cout << "Number of modified indices: " << modindices << std::endl;
       PrintModifiedConditions();
       return kFALSE;
    }
@@ -1775,16 +1771,16 @@ Bool_t TAngularCorrelation::CheckModifiedHistogram(TH1* hst) const
 ///
 void TAngularCorrelation::PrintModifiedConditions() const
 {
-	std::cout<<"Current modification conditions:"<<std::endl;
+   std::cout << "Current modification conditions:" << std::endl;
    if(fFolded) {
-		std::cout<<"Folded: yes"<<std::endl;
+      std::cout << "Folded: yes" << std::endl;
    } else {
-		std::cout<<"Folded: no"<<std::endl;
+      std::cout << "Folded: no" << std::endl;
    }
    if(fGrouped) {
-		std::cout<<"Grouped: yes"<<std::endl;
+      std::cout << "Grouped: yes" << std::endl;
    } else {
-		std::cout<<"Grouped: no"<<std::endl;
+      std::cout << "Grouped: no" << std::endl;
    }
 }
 
@@ -1804,17 +1800,17 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
 
       // consistency/stability checks
       if(size == 0) {
-			std::cout<<"You haven't created the weights yet. Please use the GenerateMaps function to do so."<<std::endl;
+         std::cout << "You haven't created the weights yet. Please use the GenerateMaps function to do so." << std::endl;
          return nullptr;
       }
       if(size != hst->GetNbinsX()) {
-			std::cout<<"Warning: size of weights array is different than number of bins in "<<hst->GetName()<<std::endl;
+         std::cout << "Warning: size of weights array is different than number of bins in " << hst->GetName() << std::endl;
       }
       // this loop is just for checking to make sure all indices are in the weight vector
       for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
-			auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
+         auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
          if(index >= size) {
-				std::cout<<"Indices in histogram "<<hst->GetName()<<" go beyond size of weights array. Aborting."<<std::endl;
+            std::cout << "Indices in histogram " << hst->GetName() << " go beyond size of weights array. Aborting." << std::endl;
             return nullptr;
          }
       }
@@ -1836,16 +1832,16 @@ TH1D* TAngularCorrelation::DivideByWeights(TH1* hst, Bool_t fold, Bool_t group)
       if(static_cast<Int_t>(fModifiedWeights.size()) == hst->GetNbinsX()) {
          // do nothing
       } else {
-			std::cout<<"Weights array size is not the same as the number of bins."<<std::endl;
-			std::cout<<"Returning from DivideByWeights without dividing."<<std::endl;
+         std::cout << "Weights array size is not the same as the number of bins." << std::endl;
+         std::cout << "Returning from DivideByWeights without dividing." << std::endl;
          return nullptr;
       }
    }
 
    // now that we're satisified everything is kosher, divide the bins.
    for(Int_t i = 1; i <= hst->GetNbinsX(); i++) {
-		std::cout<<"\t"<<i<<std::endl;
-		auto index = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
+      std::cout << "\t" << i << std::endl;
+      auto     index        = static_cast<Int_t>(hst->GetXaxis()->GetBinLowEdge(i));
       Double_t found_weight = 0;
       if(!fold && !group) {
          found_weight = GetWeightFromIndex(index);
@@ -1880,7 +1876,7 @@ void TAngularCorrelation::DisplayDiagnostics(TCanvas* c_diag)
    TH1D* fwhmhst     = GetFWHMHst();
 
    for(int i = 0; i < 52; i++) {
-      std::cout<<chi2hst->GetBinContent(i)<<std::endl;
+      std::cout << chi2hst->GetBinContent(i) << std::endl;
    }
 
    // format the diagnostic plots

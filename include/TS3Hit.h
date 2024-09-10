@@ -14,36 +14,37 @@ public:
    TS3Hit();
    explicit TS3Hit(const TFragment&);
    TS3Hit(const TS3Hit&);
-	TS3Hit(TS3Hit&&) noexcept = default;
-	TS3Hit& operator=(const TS3Hit&) = default;
-	TS3Hit& operator=(TS3Hit&&) noexcept = default;
-   ~TS3Hit() override;
+   TS3Hit(TS3Hit&&) noexcept            = default;
+   TS3Hit& operator=(const TS3Hit&)     = default;
+   TS3Hit& operator=(TS3Hit&&) noexcept = default;
+   ~TS3Hit() override                   = default;
 
    Short_t GetRing() const { return fRing; }
    Short_t GetSector() const { return fSector; }
    Bool_t  GetIsDownstream() const { return fIsDownstream; }
-   Int_t   GetArrayPosition() const {
-	   if(GetChannel()!= nullptr){
-		   return GetChannel()->GetMnemonic()->ArrayPosition(); 
-	   }
-	   return -1;
+   Int_t   GetArrayPosition() const
+   {
+      if(GetChannel() != nullptr) {
+         return GetChannel()->GetMnemonic()->ArrayPosition();
+      }
+      return -1;
    }
-   std::string GetDistanceStr() const {
-	   if(GetChannel()!= nullptr){
-		   return GetChannel()->GetMnemonic()->ArraySubPositionString();
-	   }
-	   return "0";
+   std::string GetDistanceStr() const
+   {
+      if(GetChannel() != nullptr) {
+         return GetChannel()->GetMnemonic()->ArraySubPositionString();
+      }
+      return "0";
    }
-   
 
-   void Copy(TObject&) const override; //!
-   void Copy(TObject&, bool) const override;           //!<!
+   void Copy(TObject&) const override;         //!
+   void Copy(TObject&, bool) const override;   //!<!
    void Print(Option_t* opt = "") const override;
-	void Print(std::ostream& out) const override; //!<!
+   void Print(std::ostream& out) const override;   //!<!
    void Clear(Option_t* opt = "") override;
 
-   inline Double_t GetFitTime() const { return fTimeFit; }         //!<!
-   inline Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
+   inline Double_t GetFitTime() const { return fTimeFit; }           //!<!
+   inline Double_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
 
    void SetRingNumber(Short_t rn) { fRing = rn; }
    void SetSectorNumber(Short_t sn) { fSector = sn; }
@@ -61,7 +62,7 @@ public:
    void SetSig2Noise(Double_t sig2noise) { fSig2Noise = sig2noise; }
 
    Bool_t SectorsDownstream() const;
-   
+
    Double_t GetPhi(double offset = 0) const { return GetPosition(offset).Phi(); }
 
    Double_t GetTheta(double offset = 0, TVector3* vec = nullptr) const
@@ -74,18 +75,18 @@ public:
    }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
-   TVector3 GetPosition(Double_t phioffset, Double_t dist, bool smear = false) const; //!
-   TVector3 GetPosition(Double_t phioffset, bool smear = false) const;                //!
-   TVector3 GetPosition(bool smear = false) const;                                    //!
+   TVector3 GetPosition(Double_t phioffset, Double_t dist, bool smear = false) const;   //!
+   TVector3 GetPosition(Double_t phioffset, bool smear = false) const;                  //!
+   TVector3 GetPosition(bool smear = false) const;                                      //!
 #pragma clang diagnostic pop
 
 private:
-   Double_t GetDefaultPhiOffset() const; //!
-   Double_t GetDefaultDistance() const;  //!
+   Double_t GetDefaultPhiOffset() const;   //!
+   Double_t GetDefaultDistance() const;    //!
 
-   Bool_t  fIsDownstream{false}; // Downstream check
-   Short_t fRing{0};         // front
-   Short_t fSector{0};       // back
+   Bool_t  fIsDownstream{false};   // Downstream check
+   Short_t fRing{0};               // front
+   Short_t fSector{0};             // back
 
    Double_t fTimeFit{0.};
    Double_t fSig2Noise{0.};

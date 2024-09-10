@@ -17,7 +17,7 @@ UInt_t chanId_threshold = 100;
 Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
 {
    // This function does not work if a Midas event contains multiple fragments
-   static std::map<Int_t, Bool_t> triggermap; // Map of Digitizer vs have we had a triggerId < threshold yet?
+   static std::map<Int_t, Bool_t> triggermap;   // Map of Digitizer vs have we had a triggerId < threshold yet?
    // First parse the  Midas Event.
    evt->SetBankList();
 
@@ -45,8 +45,8 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
       switch(type) {
       case 0x80000000:
          switch(bank) {
-         case 1: // header format from before May 2015 experiments
-                 // Sets:
+         case 1:   // header format from before May 2015 experiments
+                   // Sets:
             //     The number of filters
             //     The Data Type
             //     Number of Pileups
@@ -85,7 +85,7 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
       };
    }
    if(triggermap.find(chanadd) == triggermap.end()) {
-      triggermap[chanadd] = false; // initialize the new digitizer number to false.
+      triggermap[chanadd] = false;   // initialize the new digitizer number to false.
    }
    // Check to make sure we aren't getting any triggerId's = 0. I think these are corrupt events RD.
    if(trigId == 0) {
@@ -99,8 +99,8 @@ Bool_t CheckEvent(const std::shared_ptr<TMidasEvent>& evt)
    if(trigId < chanId_threshold) {
       triggermap.find(chanadd)->second = true;
       return true;
-	}
-	return false;
+   }
+   return false;
 }
 
 void Write(const std::shared_ptr<TMidasEvent>& evt, TMidasFile* outfile)
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
    int64_t filesize = in.tellg();
    in.close();
 
-   int       bytes     = 0;
+   int     bytes     = 0;
    int64_t bytesread = 0;
 
    TStopwatch w;
@@ -144,13 +144,13 @@ int main(int argc, char** argv)
 
    UInt_t                       num_bad_evt = 0;
    UInt_t                       num_evt     = 0;
-   std::shared_ptr<TMidasEvent> event = std::make_shared<TMidasEvent>(); // need to new for each event
+   std::shared_ptr<TMidasEvent> event       = std::make_shared<TMidasEvent>();   // need to new for each event
 
    while(true) {
       bytes = file->Read(event);
       if(bytes == 0) {
          printf(DMAGENTA "\tfile: %s ended on %s" RESET_COLOR "\n", file->GetFilename(), file->GetLastError());
-         if(file->GetLastErrno() == -1) { // try to read some more...
+         if(file->GetLastErrno() == -1) {   // try to read some more...
             continue;
          }
          break;
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
          printf(RESET_COLOR);
          Write(event, file);
          break;
-      case 0x0001: // This is a GRIFFIN digitizer event
+      case 0x0001:   // This is a GRIFFIN digitizer event
          if(CheckEvent(event)) {
             Write(event, file);
          } else {
@@ -180,17 +180,17 @@ int main(int argc, char** argv)
          }
          num_evt++;
          break;
-      default: // Probably epics
+      default:   // Probably epics
          Write(event, file);
          break;
       };
 
       if(num_evt % 5000 == 0) {
          gSystem->ProcessEvents();
-			std::streamsize precision = std::cout.precision();
-			std::cout.precision(2);
-			std::cout<<HIDE_CURSOR<<" bad events "<<num_bad_evt<<"/"<<num_evt<<" have processed "<<static_cast<double>(bytesread)/1000000.<<"MB/"<<static_cast<double>(filesize)/1000000.<<" MB => "<<std::setprecision(1)<<static_cast<double>(bytesread)/1000000/w.RealTime()<<" MB/s              "<<SHOW_CURSOR<<"\r";
-			std::cout.precision(precision);
+         std::streamsize precision = std::cout.precision();
+         std::cout.precision(2);
+         std::cout << HIDE_CURSOR << " bad events " << num_bad_evt << "/" << num_evt << " have processed " << static_cast<double>(bytesread) / 1000000. << "MB/" << static_cast<double>(filesize) / 1000000. << " MB => " << std::setprecision(1) << static_cast<double>(bytesread) / 1000000 / w.RealTime() << " MB/s              " << SHOW_CURSOR << "\r";
+         std::cout.precision(precision);
          w.Continue();
       }
    }

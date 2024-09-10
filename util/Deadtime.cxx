@@ -86,10 +86,10 @@ int main(int argc, char* argv[])
    auto*              odb     = new char[len];
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
    if(!(filelist.is_open())) {
-      std::cerr<<"Failed to open filelist. Check path. "<<std::endl;
+      std::cerr << "Failed to open filelist. Check path. " << std::endl;
       exit(EXIT_FAILURE);
    } else if(!(ODBlist.is_open())) {
-      std::cerr<<"Failed to open ODBlist. Check path. "<<std::endl;
+      std::cerr << "Failed to open ODBlist. Check path. " << std::endl;
       exit(EXIT_FAILURE);
    }
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
@@ -97,18 +97,18 @@ int main(int argc, char* argv[])
    // Start time binary = DWORD : 1445453916
    // Stop time binary = DWORD : 1445454042
    // the difference (stop-start) equals the run time in seconds. Useful for histogram binning purposes.
-   size_t           posa      = 0;
-   size_t           posb      = 0;
-   int              sub       = 28;
-   const char*      starttime = "Start time binary";
-   const char*      stoptime  = "Stop time binary";
-   int              tstart    = 0;
-   int              tend      = 0;
-   int              runtime   = 0;
-   int              nppg      = 0;
-   std::string      odbline;
+   size_t      posa      = 0;
+   size_t      posb      = 0;
+   int         sub       = 28;
+   const char* starttime = "Start time binary";
+   const char* stoptime  = "Stop time binary";
+   int         tstart    = 0;
+   int         tend      = 0;
+   int         runtime   = 0;
+   int         nppg      = 0;
+   std::string odbline;
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
-   int line_count = std::count( // read in number of lines(files)
+   int line_count = std::count(   // read in number of lines(files)
       std::istreambuf_iterator<char>(filelist), std::istreambuf_iterator<char>(), '\n');
    printf(DMAGENTA "-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/" RESET_COLOR
                    "\n");
@@ -126,14 +126,14 @@ int main(int argc, char* argv[])
    filelist.clear();
    filelist.seekg(0, std::ios::beg);
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
-   Printaddress(p); // Credit to to E.Kwan for this part
+   Printaddress(p);   // Credit to to E.Kwan for this part
    p = addr.data();
    while(counter < line_count) {
       filelist.getline(line, len, '\n');
       const char* filename = line;
       //-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ODB STUFF
-      ODBlist.getline(odb, len, '\n'); //<retreive ODB file name ('odb' assigned here)
-      std::ifstream InFile(odb);       //<set the I/O stream to the current file
+      ODBlist.getline(odb, len, '\n');   //<retreive ODB file name ('odb' assigned here)
+      std::ifstream InFile(odb);         //<set the I/O stream to the current file
       while(InFile.good()) {
          getline(InFile, odbline);
          posa = odbline.find(starttime);
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
       runtime        = tend - tstart;
       nppg           = floor(runtime / patlen);
       tdiff[counter] = runtime;
-      std::cout<<"\n";
+      std::cout << "\n";
       if(runtime <= 600) {
          printf(DBLUE "Read ODB %s : run time = %i seconds / %i transitions" RESET_COLOR "\n", odb, runtime, nppg);
       } else if(runtime > 600) {
@@ -167,9 +167,9 @@ int main(int argc, char* argv[])
          nds += 1;
       }
       counter++;
-      q++;  // these two lines had a de-reference which makes no sense (and makes the compiler complain)
-      td++; // unless this was meant to increment the value the pointers are pointing to (in which case it should read
-            // (*q)++); VB
+      q++;    // these two lines had a de-reference which makes no sense (and makes the compiler complain)
+      td++;   // unless this was meant to increment the value the pointers are pointing to (in which case it should read
+              // (*q)++); VB
       tstart = tend = 0;
    }
    delete[] line;
@@ -212,8 +212,8 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
    TFile* vs = nullptr;
 
    // make spectra
-   auto*  rf    = new TFile(filename, "read");
-   auto* maple = static_cast<TTree*>(rf->Get("ScalerTree")); // Scaler data
+   auto* rf    = new TFile(filename, "read");
+   auto* maple = static_cast<TTree*>(rf->Get("ScalerTree"));   // Scaler data
 
    int    nofBins = *trun / ncycle;
    double xaxis   = 0;
@@ -222,7 +222,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
    double xpast   = 0;
    int    j       = 0;
    int    k       = 0;
-   double clk     = 20e-9; // 2 clock tics (20ns)
+   double clk     = 20e-9;   // 2 clock tics (20ns)
 
    while(j < nsc) {
       grif[j] =
@@ -230,7 +230,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
                   Form("Address 0x%04x, scaler %i vs time in cycle; time [s]; counts/%d s", *channel, index, ncycle),
                   nofBins, 0., *trun);
       j++;
-      channel++; // used to have a de-reference, see comments above; VB
+      channel++;   // used to have a de-reference, see comments above; VB
    }
 
    TScalerData* scaler = nullptr;
@@ -248,7 +248,7 @@ void MakeSpectra(const char*& filename, int& prog, const char*& fname, int& nscl
    }
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*
    for(int i = 0; i < nsc; i++) {
-      channel--; // used to have a de-reference, see comments above; VB
+      channel--;   // used to have a de-reference, see comments above; VB
    }
    while(k < nsc) {
       for(Long64_t e = 0; e < nentries; e++) {
@@ -295,7 +295,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                 const char*& mname, const char*& nname, int& nscaler)
 {
 
-   auto*    vs = new TFile(fname, "read");
+   auto*         vs = new TFile(fname, "read");
    std::ofstream ofile;
    ofile.open("diagnostic.txt");
    FILE* random    = fopen(hname, "w");
@@ -307,31 +307,31 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    FILE* randw     = fopen(nname, "w");
    ofile.precision(4);
 
-   int nsc        = nsclr;
-   int cnt        = 0;
-	std::array<int, 2> ppgstat = {0, 0};
+   int                nsc     = nsclr;
+   int                cnt     = 0;
+   std::array<int, 2> ppgstat = {0, 0};
    // generate random seed from system time for use in error analysis
    time_t timer = time(nullptr);
    srand(timer);
 
    TFile  f(fname);
    TIter  next(f.GetListOfKeys());
-   TKey*  key = nullptr;
+   TKey*  key  = nullptr;
    auto** spec = new TH1D*[nfile * (nsc * nscaler)];
 
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~USER EDITABLE
    // limits for deadtime matrices [us]
    // NOTE: The order of the limits (rp1,rp2 etc.) MUST be identical to the file order
-	std::array<double, 8>  rp1  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 2kHz, scaler0-3
-   std::array<double, 8>  rp2  = {-15, 15, -15, 15, 0, 20, 85, 115};  // 5kHz, scaler0-3
-   std::array<double, 8>  rp3  = {-15, 15, -15, 15, 0, 20, 170, 230}; // 10kHz, scaler0-3
-   std::array<double, 8>  rp4  = {-15, 15, -15, 15, 0, 20, 200, 300}; // 20kHz, scaler0-3
-   double* lowrtau = rp1.data(); // internal pointers: points to correction coefficients in each array
-   double* upprtau = &rp1[1]; //
-   int     cflag   = 0;       // counter
+   std::array<double, 8> rp1     = {-15, 15, -15, 15, 0, 20, 85, 115};    // 2kHz, scaler0-3
+   std::array<double, 8> rp2     = {-15, 15, -15, 15, 0, 20, 85, 115};    // 5kHz, scaler0-3
+   std::array<double, 8> rp3     = {-15, 15, -15, 15, 0, 20, 170, 230};   // 10kHz, scaler0-3
+   std::array<double, 8> rp4     = {-15, 15, -15, 15, 0, 20, 200, 300};   // 20kHz, scaler0-3
+   double*               lowrtau = rp1.data();                            // internal pointers: points to correction coefficients in each array
+   double*               upprtau = &rp1[1];                               //
+   int                   cflag   = 0;                                     // counter
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
-   std::cout<<"\n";
+   std::cout << "\n";
    // output headers
    fprintf(deadtime, "#np=pulser,nr=source,nrp=source+pulser,tau=deadtime,erb=FWHM est. err,erf=full range "
                      "err,erp=standard err propagation");
@@ -347,7 +347,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
    fprintf(randdt, "\n");
 
    while((key = dynamic_cast<TKey*>(next())) != nullptr) {
-      int         numpat = floor(*trun / patlen); // minimum number of expected transitions based on run time
+      int         numpat = floor(*trun / patlen);   // minimum number of expected transitions based on run time
       const char* sname  = key->GetName();
       spec[cnt]          = dynamic_cast<TH1D*>(vs->Get(sname));
 
@@ -432,8 +432,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                   diff = ((x - z) / z);
                   ord  = 1;
                   break;
-               } 
-					if(z > 0 && x < z) {
+               }
+               if(z > 0 && x < z) {
                   diff = ((z - x) / x);
                   ord  = 0;
                   break;
@@ -517,9 +517,9 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                // std::cout<<"(see bin number "<<i<<" in spectrum "<<sname<<")"<<std::endl;
                ppgstat[1] += 1;
                break;
-            } 
-				bnd[nt - 1][0] = i;
-				bnd[nt - 1][1] = static_cast<int>(trans[i][2]);
+            }
+            bnd[nt - 1][0] = i;
+            bnd[nt - 1][1] = static_cast<int>(trans[i][2]);
          }
       }
       if(nt == numpat) {
@@ -538,19 +538,19 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
          ppg[i + 1][0] = bnd[i][0];
          ppg[i][1]     = (bnd[i][0]) - 1;
       }
-      if(bnd[0][1] == 0) { // pulser must be first (first transition is pulser OFF)
+      if(bnd[0][1] == 0) {   // pulser must be first (first transition is pulser OFF)
          sref = 1;
          pref = 0;
-      } else if(bnd[0][1] == 1) { // source must be first (first transition is pulser ON)
+      } else if(bnd[0][1] == 1) {   // source must be first (first transition is pulser ON)
          sref = 0;
          pref = 1;
       }
       // diagnostic only
       if(cnt % nsc == 0) {
          for(int i = 0; i < numpat; i++) {
-            ofile<<ppg[i][0]<<"\t"<<ppg[i][1]<<std::endl;
+            ofile << ppg[i][0] << "\t" << ppg[i][1] << std::endl;
          }
-         ofile<<"/"<<std::endl;
+         ofile << "/" << std::endl;
       }
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
       // SOURCE ONLY
@@ -563,7 +563,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             }
          }
       }
-      rrand = (wrand / nrand); // mean
+      rrand = (wrand / nrand);   // mean
       // diagnostic spectrum (dspec) parameters
       int    lim1  = static_cast<int>(rrand - (0.5 * dlim * rrand));
       int    lim2  = static_cast<int>(rrand + (0.5 * dlim * rrand));
@@ -580,7 +580,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int i = sref; i < numpat; i += 2) {
          for(int j = (ppg[i][0] + chop); j <= (ppg[i][1] - chop); j++) {
             x = spec[cnt]->GetBinContent(j);
-            if(cnt % nsc == 0) { // dspec for channel 0 only
+            if(cnt % nsc == 0) {   // dspec for channel 0 only
                for(int k = 0; k < dsbin; k++) {
                   if(x >= dspec[k][0] && x < dspec[k + 1][0]) {
                      dspec[k][1] += 1;
@@ -592,10 +592,10 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             }
          }
       }
-      sdrand = sqrt(sum / (nrand - 1)); // standard deviation
+      sdrand = sqrt(sum / (nrand - 1));   // standard deviation
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~FREQUENCY HISTOGRAM
       if(cnt % nsc == 0) {
-         for(int i = 0; i < dsbin; i++) { // dspec
+         for(int i = 0; i < dsbin; i++) {   // dspec
             fprintf(random, "%i \t %i", dspec[i][0], dspec[i][1]);
             fprintf(random, "\n");
          }
@@ -616,7 +616,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             }
          }
       }
-      rcomb = (wcomb / ncomb); // mean
+      rcomb = (wcomb / ncomb);   // mean
       // now calculate max. likelihood
       for(int i = pref; i < numpat; i += 2) {
          for(int j = (ppg[i][0] + chop); j <= (ppg[i][1] - chop); j++) {
@@ -642,10 +642,10 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             if(x != 0) {
                maxl = (0.5 * (pow((x - rcmin), 2))) / x;
                // ofile<<j<<"\t"<<x<<"\t"<<maxl<<std::endl;
-               if(maxl <= (minl + 0.5) && x < rcmin && x < lbd) { // fixed
+               if(maxl <= (minl + 0.5) && x < rcmin && x < lbd) {   // fixed
                   lbd = x;
                }
-               if(maxl <= (minl + 0.5) && x > rcmin && x > ubd) { // fixed
+               if(maxl <= (minl + 0.5) && x > rcmin && x > ubd) {   // fixed
                   ubd = x;
                }
             } else {
@@ -657,7 +657,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       lim1 = static_cast<int>(lbd - (2.0 * abs(rcmin - lbd)));
       lim2 = static_cast<int>(ubd + (2.0 * abs(rcmin - ubd)));
       // std::cout<<lim1<<"\t"<<lim2<<"\t"<<rcmin<<std::endl;
-      dsbin = (lim2 - lim1) / 20; // dspec[dsbin][2]; What was this statement supposed to do? It has no effect; VB
+      dsbin = (lim2 - lim1) / 20;   // dspec[dsbin][2]; What was this statement supposed to do? It has no effect; VB
       for(int i = 0; i < dsbin; i++) {
          dspec[i][0] = lim1 + (i * ((lim2 - lim1) / dsbin));
          dspec[i][1] = 0;
@@ -666,7 +666,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       for(int i = pref; i < numpat; i += 2) {
          for(int j = (ppg[i][0] + chop); j <= (ppg[i][1] - chop); j++) {
             x = spec[cnt]->GetBinContent(j);
-            if(cnt % nsc == 0) { // dspec for channel 0 only
+            if(cnt % nsc == 0) {   // dspec for channel 0 only
                for(int k = 0; k < dsbin; k++) {
                   if(x >= dspec[k][0] && x < dspec[k + 1][0]) {
                      dspec[k][1] += 1;
@@ -678,10 +678,10 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
             }
          }
       }
-      sdcomb = sqrt(sumc / (ncomb - 1)); // standard deviation (not strictly applicable to source+pulser data)
+      sdcomb = sqrt(sumc / (ncomb - 1));   // standard deviation (not strictly applicable to source+pulser data)
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~FREQUENCY HISTOGRAM
       if(cnt % nsc == 0) {
-         for(int i = 0; i < dsbin; i++) { // dspec
+         for(int i = 0; i < dsbin; i++) {   // dspec
             fprintf(combine, "%i \t %i", dspec[i][0], dspec[i][1]);
             fprintf(combine, "\n");
          }
@@ -693,14 +693,14 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // Ref. "Asymmetric Statistical Errors", Roger Barlow, http://arxiv.org/pdf/physics/0406120.pdf
       // WARNING: u must be given a reasonable range. This is assumed to be ~1.5*max(a1,a2)
 
-      double a1   = abs(rcmin - ubd);
-      double a2   = abs(rcmin - lbd);
-      double maxa = std::max(a1, a2);
-      double uhi  = (1.5 * maxa);
-      double ulo  = -uhi;
-      double du   = (uhi - ulo) / 1e3;
-      double u    = ulo;
-      int    itr  = 0;
+      double a1    = abs(rcmin - ubd);
+      double a2    = abs(rcmin - lbd);
+      double maxa  = std::max(a1, a2);
+      double uhi   = (1.5 * maxa);
+      double ulo   = -uhi;
+      double du    = (uhi - ulo) / 1e3;
+      double u     = ulo;
+      int    itr   = 0;
       int    umin  = 0;
       double w1    = 0.;
       double x1    = 0.;
@@ -714,7 +714,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       }
       double sigm = 0.;
       double sigp = 0.;
-      double lnl = 0.;
+      double lnl  = 0.;
 
       while(itr < nrow) {
          if(itr == 0) {
@@ -726,8 +726,8 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
          }
          w1  = pow(((a1 * a2) + ((a1 - a2) * x1)), 2) / ((2. * (a1 * a2)) + ((a1 - a2) * x1));
          lnl = -0.5 * ((pow(x1, 2) / ((a1 * a2) + ((a1 - a2) * x1))) + (pow(x2, 2) / (pow(sdrand, 2))));
-         if(lnl <= 0.) {                // reject positive likelihoods (these tend occur at large +/- values of u)
-            if(itr > 0 && lnl > minl) { // mean value
+         if(lnl <= 0.) {                  // reject positive likelihoods (these tend occur at large +/- values of u)
+            if(itr > 0 && lnl > minl) {   // mean value
                minl = lnl;
                umin = itr;
             }
@@ -763,7 +763,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       }
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
-      double tau  = ((1.0 / rrand) * (1.0 - sqrt((rcmin - rrand) / (*rate)))) * 1.0e6; // deadtime (us)
+      double tau  = ((1.0 / rrand) * (1.0 - sqrt((rcmin - rrand) / (*rate)))) * 1.0e6;   // deadtime (us)
       double rtau = 0;
       //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
       // FINAL ERROR ANALYSIS*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
@@ -772,18 +772,18 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // which chooses a value within these boundaries - the resulting tau is plotted and the range gives the error in
       // tau
 
-      int    iter = 10000;
-		int    bin = 10;
-      double tempa = 0.;
-		double tempb = 0.;
-      double var1 = 0.;
-		double var2 = 0.;
-		double var3 = 0.;
-      double l1 = 0.;
-		double l2 = 0.;
-      int    wbin = 40;
-      int    wrow = 0;
-		int    wsize = static_cast<int>(pow(wbin, 2));
+      int    iter      = 10000;
+      int    bin       = 10;
+      double tempa     = 0.;
+      double tempb     = 0.;
+      double var1      = 0.;
+      double var2      = 0.;
+      double var3      = 0.;
+      double l1        = 0.;
+      double l2        = 0.;
+      int    wbin      = 40;
+      int    wrow      = 0;
+      int    wsize     = static_cast<int>(pow(wbin, 2));
       auto** randcheck = new double*[bin];
       for(int i = 0; i < bin; ++i) {
          randcheck[i] = new double[2];
@@ -806,10 +806,10 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // initialise matrix to get final uncertainty
       for(int i = 0; i < wbin; i++) {
          for(int j = 0; j < wbin; j++) {
-            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (static_cast<double>(i) * ((sigp - sigm) / static_cast<double>(wbin))); // x,
-                                                                                                      // (rcmin-rrand)
-            wspec[wrow][1] = (*lowrtau) + (static_cast<double>(j) * ((*upprtau - *lowrtau) / static_cast<double>(wbin))); // y, (rtau);
-            wspec[wrow][2] = 0;                                                                 // z, frequency
+            wspec[wrow][0] = ((rcmin - rrand) + sigm) + (static_cast<double>(i) * ((sigp - sigm) / static_cast<double>(wbin)));   // x,
+                                                                                                                                  // (rcmin-rrand)
+            wspec[wrow][1] = (*lowrtau) + (static_cast<double>(j) * ((*upprtau - *lowrtau) / static_cast<double>(wbin)));         // y, (rtau);
+            wspec[wrow][2] = 0;                                                                                                   // z, frequency
             wrow += 1;
          }
       }
@@ -835,7 +835,7 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
                   for(int k = 0; k < wsize; k++) {
                      if(var3 >= wspec[k][0] && var3 < wspec[k + wbin][0] && rtau >= wspec[k][1] &&
                         rtau < wspec[k + 1][1]) {
-                        wspec[k][2] += 1; // this seems to work now
+                        wspec[k][2] += 1;   // this seems to work now
                      }
                   }
                   //~*~*~*~*~*~*~*~*~*~*~*~~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
@@ -854,16 +854,16 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       // "\n",(rcmin-rrand),sigp,sigm,rrand,sdrand);
       //~*~*~*~*~*~*~*~*~*~*~*~~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
       // Determine final error bounds using wspec matrix
-      double gmax = 0.;
-		double hmax = 0.;
-      double erbp = 0.;
-		double erbm = 0.;
-		double erfp = 0.;
-		double erfm = 0.;
+      double gmax  = 0.;
+      double hmax  = 0.;
+      double erbp  = 0.;
+      double erbm  = 0.;
+      double erfp  = 0.;
+      double erfm  = 0.;
       double frmin = 1e6;
-		double frmax = 0.;
-		double srmin = 1e6;
-		double srmax = 0.;
+      double frmax = 0.;
+      double srmin = 1e6;
+      double srmax = 0.;
 
       for(i = 0; i < wsize; i++) {
          if(wspec[i][2] > gmax) {
@@ -936,30 +936,30 @@ void DoAnalysis(const char*& fname, int& nfile, double* rate, int& nsclr, int& p
       cnt++;
       // change pulser rate and runtime accordingly for each file
       if(cnt % (nsc * nscaler) == 0) {
-         rate++; // used to have a de-reference, see comments above; VB
-         trun++; // used to have a de-reference, see comments above; VB
+         rate++;   // used to have a de-reference, see comments above; VB
+         trun++;   // used to have a de-reference, see comments above; VB
       }
       // change limits accordingly for each scaler in each file
       if(cnt % (nsc) == 0) {
          for(i = 0; i < 2; i++) {
-            lowrtau++; // used to have a de-reference, see comments above; VB
-            upprtau++; // used to have a de-reference, see comments above; VB
+            lowrtau++;   // used to have a de-reference, see comments above; VB
+            upprtau++;   // used to have a de-reference, see comments above; VB
          }
       }
       if(cnt % (nsc) == 0 && cnt % (nsc * nscaler) == 0) {
          cflag++;
          if(cflag == 1) {
-            lowrtau = &rp2[0]; // NOLINT(readability-container-data-pointer)
+            lowrtau = &rp2[0];   // NOLINT(readability-container-data-pointer)
             upprtau = &rp2[1];
          } else if(cflag == 2) {
-            lowrtau = &rp3[0]; // NOLINT(readability-container-data-pointer)
+            lowrtau = &rp3[0];   // NOLINT(readability-container-data-pointer)
             upprtau = &rp3[1];
          } else if(cflag == 3) {
-            lowrtau = &rp4[0]; // NOLINT(readability-container-data-pointer)
+            lowrtau = &rp4[0];   // NOLINT(readability-container-data-pointer)
             upprtau = &rp4[1];
          }
       }
-   } // END SPECTRUM ANALYSIS LOOP
+   }   // END SPECTRUM ANALYSIS LOOP
    //*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~**~*~*~*~*~*~**~*~*~*~*~*~*
    delete[] spec;
    ofile.close();

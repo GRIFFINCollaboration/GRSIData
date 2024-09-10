@@ -4,14 +4,7 @@
 
 #include "GValue.h"
 
-/// \cond CLASSIMP
-ClassImp(TGriffinBgoHit)
-/// \endcond
-
 TGriffinBgoHit::TGriffinBgoHit()
 {
-	Clear();
+   Clear();
 }
-
-TGriffinBgoHit::~TGriffinBgoHit() = default;
-

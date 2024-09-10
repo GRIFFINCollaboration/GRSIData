@@ -21,14 +21,14 @@ public:
    TTipHit();
    explicit TTipHit(const TFragment&);
    TTipHit(const TTipHit&);
-	TTipHit(TTipHit&&) noexcept = default;
-	TTipHit& operator=(const TTipHit&) = default;
-	TTipHit& operator=(TTipHit&&) noexcept = default;
-   ~TTipHit() override;
+   TTipHit(TTipHit&&) noexcept            = default;
+   TTipHit& operator=(const TTipHit&)     = default;
+   TTipHit& operator=(TTipHit&&) noexcept = default;
+   ~TTipHit() override                    = default;
 
 private:
-   Int_t    fFilter{0}; //
-   Double_t fPID{0.};    //
+   Int_t    fFilter{0};   //
+   Double_t fPID{0.};     //
    Int_t    fChiSq{0};
    Int_t    fFitType{0};
 
@@ -45,23 +45,23 @@ private:
 
 public:
    /////////////////////////    /////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
-   inline void SetPID(Double_t x) { fPID = x; }                //!<!
-   inline void SetTipChannel(const int x) { fTipChannel = x; } //!<!
+   inline void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
+   inline void SetPID(Double_t x) { fPID = x; }                  //!<!
+   inline void SetTipChannel(const int x) { fTipChannel = x; }   //!<!
 
    inline Int_t    GetFilterPattern() const { return fFilter; }      //!<!
-   inline Double_t GetPID() const { return fPID; }                 //!<!
-   inline Int_t    GetFitChiSq() const { return fChiSq; }          //!<!
-   inline Double_t GetFitTime() const { return fTimeFit; }         //!<!
-   inline Int_t    GetFitType() const { return fFitType; }         //!<!
-   inline Double_t GetSignalToNoise() const { return fSig2Noise; } //!<!
-   inline Int_t    GetTipChannel() const { return fTipChannel; }   //!<!
+   inline Double_t GetPID() const { return fPID; }                   //!<!
+   inline Int_t    GetFitChiSq() const { return fChiSq; }            //!<!
+   inline Double_t GetFitTime() const { return fTimeFit; }           //!<!
+   inline Int_t    GetFitType() const { return fFitType; }           //!<!
+   inline Double_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
+   inline Int_t    GetTipChannel() const { return fTipChannel; }     //!<!
 
    inline bool IsCsI() const { return csi_flag; }              //!<!
    inline void SetCsI(bool flag = true) { csi_flag = flag; }   //!<!
    inline void SetFitChiSq(int chisq) { fChiSq = chisq; }      //!<!
 
-   bool InFilter(Int_t); //!<!
+   bool InFilter(Int_t);   //!<!
 
    // void SetVariables(const TFragment &frag) { SetAddress(frag.ChannelAddress);
    //									 SetCfd(frag.GetCfd());
@@ -88,14 +88,14 @@ public:
 
    TVector3 GetPosition() const override;
 
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override; //!<!
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;      //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
+   void Copy(TObject&) const override;              //!<!
+   void Copy(TObject&, bool) const override;        //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TTipHit, 1); // NOLINT(readability-else-after-return)
+   ClassDefOverride(TTipHit, 1);   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

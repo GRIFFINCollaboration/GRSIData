@@ -21,15 +21,15 @@
 class TRcmpHit : public TDetectorHit {
 public:
    // constructors and destructors
-   TRcmpHit() = default;                  ///< default constructor
+   TRcmpHit() = default;        ///< default constructor
    TRcmpHit(const TRcmpHit&);   ///< copy constructor
-	TRcmpHit(TRcmpHit&&) noexcept = default;
-	TRcmpHit& operator=(const TRcmpHit&) = default;
-	TRcmpHit& operator=(TRcmpHit&&) noexcept = default;
+   TRcmpHit(TRcmpHit&&) noexcept            = default;
+   TRcmpHit& operator=(const TRcmpHit&)     = default;
+   TRcmpHit& operator=(TRcmpHit&&) noexcept = default;
    // TRcmpHit(const TRcmpHit& front, const TRcmpHit& back);          ///< dual parameter constructor for front and back hits
-   explicit TRcmpHit(const TFragment& frag);                                   ///< single fragment constructor (either front or back)
+   explicit TRcmpHit(const TFragment& frag);                          ///< single fragment constructor (either front or back)
    TRcmpHit(const TFragment& fragFront, const TFragment& fragBack);   ///< dual parameter constructor for front and back fragments
-   ~TRcmpHit() override = default;                                              ///< destructor
+   ~TRcmpHit() override = default;                                    ///< destructor
 
    void Clear(Option_t* opt = "") override;         //!<!
    void Print(Option_t* opt = "") const override;   //!<!
@@ -37,10 +37,10 @@ public:
    void Copy(TObject&) const override;              //!<!
    void Copy(TObject&, bool) const override;        //!<!
 
-   inline Short_t GetFrontStripNumber() const { return fFrontStrip; }   ///< RcmpHit vector elements can access this
-   inline Short_t GetBackStripNumber() const  { return fBackStrip; }    ///< RcmpHit vector elements can access this
-   inline Short_t GetStripNumber() const      { return fStrip; }        ///< RcmpFrontHit or RcmpBackHit vector elements can access this
-   inline UShort_t GetArrayNumber() const override { return ( 32 * (GetDetector() - 1) + GetSegment() ); }   //!<! //function to plot all front strips or back strips for energy vs channel histograms
+   inline Short_t  GetFrontStripNumber() const { return fFrontStrip; }                                     ///< RcmpHit vector elements can access this
+   inline Short_t  GetBackStripNumber() const { return fBackStrip; }                                       ///< RcmpHit vector elements can access this
+   inline Short_t  GetStripNumber() const { return fStrip; }                                               ///< RcmpFrontHit or RcmpBackHit vector elements can access this
+   inline UShort_t GetArrayNumber() const override { return (32 * (GetDetector() - 1) + GetSegment()); }   //!<! //function to plot all front strips or back strips for energy vs channel histograms
 
 private:
    Double_t GetDefaultDistance() const { return 0.0; }
@@ -51,7 +51,7 @@ private:
    Short_t fStrip      = -1;   ///< this corresponds to the front strip number for a front hit and the back strip number for a back hit
 
    /// \cond CLASSIMP
-   ClassDefOverride(TRcmpHit, 1); // NOLINT
+   ClassDefOverride(TRcmpHit, 1);   // NOLINT
    /// \endcond
 };
 

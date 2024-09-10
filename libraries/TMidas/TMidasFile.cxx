@@ -22,32 +22,28 @@
 #include "TGRSIMnemonic.h"
 #include "GRSIDataVersion.h"
 
-/// \cond CLASSIMP
-ClassImp(TMidasFile)
-/// \endcond
-
 TMidasFile::TMidasFile()
 #ifdef HAS_XML
-	: fOdb(nullptr)
+   : fOdb(nullptr)
 #endif
 {
    // Default Constructor
    uint32_t endian = 0x12345678;
-   fDoByteSwap = *reinterpret_cast<char*>(&endian) != 0x78;
+   fDoByteSwap     = *reinterpret_cast<char*>(&endian) != 0x78;
 }
 
 TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TMidasFile()
 {
-	bool status = false;
+   bool status = false;
    switch(open_type) {
-		case TRawFile::EOpenType::kRead: status = Open(filename); break;
-		case TRawFile::EOpenType::kWrite: status = OutOpen(filename); break;
+   case TRawFile::EOpenType::kRead: status = Open(filename); break;
+   case TRawFile::EOpenType::kWrite: status = OutOpen(filename); break;
    }
-	if(!status) {
-		std::stringstream str;
-		str<<RED<<"Failed to create midas file \""<<filename<<"\": "<<fLastError<<RESET_COLOR<<std::endl;
-		throw std::runtime_error(str.str());
-	}
+   if(!status) {
+      std::stringstream str;
+      str << RED << "Failed to create midas file \"" << filename << "\": " << fLastError << RESET_COLOR << std::endl;
+      throw std::runtime_error(str.str());
+   }
 }
 
 TMidasFile::~TMidasFile()
@@ -59,9 +55,9 @@ TMidasFile::~TMidasFile()
 
 std::string TMidasFile::Status(bool)
 {
-	std::stringstream str;
-	str<<HIDE_CURSOR<<" Processing event "<<fCurrentEventNumber<<" have processed "<<std::setprecision(2)<<static_cast<double>(BytesRead())/1000000.<<"MB/"<<static_cast<double>(FileSize())/1000000.<<" MB               "<<SHOW_CURSOR<<"\r";
-	return str.str();
+   std::stringstream str;
+   str << HIDE_CURSOR << " Processing event " << fCurrentEventNumber << " have processed " << std::setprecision(2) << static_cast<double>(BytesRead()) / 1000000. << "MB/" << static_cast<double>(FileSize()) / 1000000. << " MB               " << SHOW_CURSOR << "\r";
+   return str.str();
 }
 
 static int hasSuffix(const char* name, const char* suffix)
@@ -157,7 +153,7 @@ bool TMidasFile::Open(const char* filename)
       }
    } else if(strncmp(filename, "pipein://", 9) == 0) {
       pipe = filename + 9;
-#if 0 // read compressed files using the zlib library
+#if 0   // read compressed files using the zlib library
 	} else if(hasSuffix(filename, ".gz")) {
 		pipe = "gzip -dc ";
 		pipe += filename;
@@ -212,20 +208,20 @@ bool TMidasFile::Open(const char* filename)
       }
    }
 
-	// setup TChannel to use our mnemonics
-	TChannel::SetMnemonicClass(TGRSIMnemonic::Class());
+   // setup TChannel to use our mnemonics
+   TChannel::SetMnemonicClass(TGRSIMnemonic::Class());
 
-	// read ODB from file
-	if(fOdbEvent == nullptr) { fOdbEvent = std::make_shared<TMidasEvent>(); }
+   // read ODB from file
+   if(fOdbEvent == nullptr) { fOdbEvent = std::make_shared<TMidasEvent>(); }
    Read(fOdbEvent);
 
-	SetFileOdb();
+   SetFileOdb();
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
-	TRunInfo::ClearLibraryVersion();
-	TRunInfo::SetLibraryVersion(GRSIDATA_RELEASE);
+   TRunInfo::ClearLibraryVersion();
+   TRunInfo::SetLibraryVersion(GRSIDATA_RELEASE);
 
-	auto* detInfo = new TGRSIDetectorInformation();
-	TRunInfo::SetDetectorInformation(detInfo);
+   auto* detInfo = new TGRSIDetectorInformation();
+   TRunInfo::SetDetectorInformation(detInfo);
 
    return true;
 }
@@ -245,7 +241,7 @@ bool TMidasFile::OutOpen(const char* filename)
 
    fOutFilename = filename;
 
-	std::cout<<"Attempting normal open of file "<<filename<<std::endl;
+   std::cout << "Attempting normal open of file " << filename << std::endl;
    // fOutFile = open(filename, O_CREAT |  O_WRONLY | O_LARGEFILE , S_IRUSR| S_IWUSR | S_IRGRP | S_IROTH );
    // fOutFile = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY | O_LARGEFILE, 0644);
    fOutFile = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, 0644);
@@ -256,10 +252,10 @@ bool TMidasFile::OutOpen(const char* filename)
       return false;
    }
 
-	std::cout<<"Opened output file "<<filename<<"; return fOutFile is "<<fOutFile<<std::endl;
+   std::cout << "Opened output file " << filename << "; return fOutFile is " << fOutFile << std::endl;
 
    if(hasSuffix(filename, ".gz") != 0) {
-		// this is a compressed file
+      // this is a compressed file
 #ifdef HAVE_ZLIB
       fOutGzFile           = new gzFile;
       *(gzFile*)fOutGzFile = gzdopen(fOutFile, "wb");
@@ -268,15 +264,15 @@ bool TMidasFile::OutOpen(const char* filename)
          fLastError.assign("zlib gzdopen() error");
          return false;
       }
-		std::cout<<"Opened gz file successfully"<<std::endl;
+      std::cout << "Opened gz file successfully" << std::endl;
       if(true) {
-			if(gzsetparams(*(gzFile*)fOutGzFile, 1, Z_DEFAULT_STRATEGY) != Z_OK) {
-				std::cout<<"Cannot set gzparams"<<std::endl;
+         if(gzsetparams(*(gzFile*)fOutGzFile, 1, Z_DEFAULT_STRATEGY) != Z_OK) {
+            std::cout << "Cannot set gzparams" << std::endl;
             fLastErrno = -1;
             fLastError.assign("zlib gzsetparams() error");
             return false;
          }
-			std::cout<<"setparams for gz file successfully"<<std::endl;
+         std::cout << "setparams for gz file successfully" << std::endl;
       }
 #else
       fLastErrno = -1;
@@ -327,7 +323,7 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
    midasEvent->Clear();
    memcpy(reinterpret_cast<char*>(midasEvent->GetEventHeader()), BufferData(), sizeof(TMidas_EVENT_HEADER));
    if(fDoByteSwap) {
-		std::cout<<"Swapping bytes"<<std::endl;
+      std::cout << "Swapping bytes" << std::endl;
       midasEvent->SwapBytesEventHeader();
    }
    if(!midasEvent->IsGoodSize()) {
@@ -360,56 +356,56 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
 
 void TMidasFile::Skip(size_t nofEvents)
 {
-	TMidasEvent ev;
-	for(size_t i = 0; i < nofEvents; ++i) {
-		// if we don't have enough data left for a header, we try and read more
-		if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
-			ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - BufferSize());
-		}
+   TMidasEvent ev;
+   for(size_t i = 0; i < nofEvents; ++i) {
+      // if we don't have enough data left for a header, we try and read more
+      if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
+         ReadMoreBytes(sizeof(TMidas_EVENT_HEADER) - BufferSize());
+      }
 
-		// if we don't have enough data to read the header we are done
-		if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
-			return;
-		}
+      // if we don't have enough data to read the header we are done
+      if(BufferSize() < sizeof(TMidas_EVENT_HEADER)) {
+         return;
+      }
 
-		ev.Clear();
-		// copy the header
-		memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), BufferData(), sizeof(TMidas_EVENT_HEADER));
-		if(fDoByteSwap) {
-			std::cout<<"Swapping bytes"<<std::endl;
-			ev.SwapBytesEventHeader();
-		}
-		if(!ev.IsGoodSize()) {
-			fLastErrno = -1;
-			fLastError.assign("Invalid event size");
-			return;
-		}
+      ev.Clear();
+      // copy the header
+      memcpy(reinterpret_cast<char*>(ev.GetEventHeader()), BufferData(), sizeof(TMidas_EVENT_HEADER));
+      if(fDoByteSwap) {
+         std::cout << "Swapping bytes" << std::endl;
+         ev.SwapBytesEventHeader();
+      }
+      if(!ev.IsGoodSize()) {
+         fLastErrno = -1;
+         fLastError.assign("Invalid event size");
+         return;
+      }
 
-		// check if this event is the end-of-run event
-		if((ev.GetEventHeader()->fEventId & 0xffff) == 0x8001) {
-			// we simply return here so that the next event read is the end-of-run event
-			return;
-		}
+      // check if this event is the end-of-run event
+      if((ev.GetEventHeader()->fEventId & 0xffff) == 0x8001) {
+         // we simply return here so that the next event read is the end-of-run event
+         return;
+      }
 
-		size_t event_size = ev.GetDataSize();
-		size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
+      size_t event_size = ev.GetDataSize();
+      size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
 
-		// try and read the total event if we don't already have it in the buffer
-		if(BufferSize() < total_size) {
-			ReadMoreBytes(total_size - BufferSize());
-		}
+      // try and read the total event if we don't already have it in the buffer
+      if(BufferSize() < total_size) {
+         ReadMoreBytes(total_size - BufferSize());
+      }
 
-		// if we don't have enough data to read the whole event we are done
-		if(BufferSize() < total_size) {
-			return;
-		}
+      // if we don't have enough data to read the whole event we are done
+      if(BufferSize() < total_size) {
+         return;
+      }
 
-		//increment our counters and clear the buffer
-		size_t bytesRead = BufferSize();
-		IncrementBytesRead(bytesRead);
-		fCurrentEventNumber++;
-		ClearBuffer();
-	}
+      //increment our counters and clear the buffer
+      size_t bytesRead = BufferSize();
+      IncrementBytesRead(bytesRead);
+      fCurrentEventNumber++;
+      ClearBuffer();
+   }
 }
 
 void TMidasFile::ReadMoreBytes(size_t bytes)
@@ -515,12 +511,12 @@ bool TMidasFile::Write(const std::shared_ptr<TMidasEvent>& midasEvent, Option_t*
    }
 
    if(wr != sizeof(TMidas_EVENT_HEADER)) {
-		std::cout<<"TMidasFile: error on write event header, return "<<wr<<", size requested "<<sizeof(TMidas_EVENT_HEADER)<<std::endl;
+      std::cout << "TMidasFile: error on write event header, return " << wr << ", size requested " << sizeof(TMidas_EVENT_HEADER) << std::endl;
       return false;
    }
 
    if(strncmp(opt, "q", 1) != 0) {
-		std::cout<<"Written event header to outfile , return is "<<wr<<std::endl;
+      std::cout << "Written event header to outfile , return is " << wr << std::endl;
    }
 
    if(fOutGzFile != nullptr) {
@@ -534,7 +530,7 @@ bool TMidasFile::Write(const std::shared_ptr<TMidasEvent>& midasEvent, Option_t*
    }
 
    if(strncmp(opt, "q", 1) != 0) {
-		std::cout<<"Written event to outfile , return is "<<wr<<std::endl;
+      std::cout << "Written event to outfile , return is " << wr << std::endl;
    }
 
    return wr != 0;
@@ -563,7 +559,7 @@ void TMidasFile::Close()
       close(fFile);
    }
 
-   fFile     = -1;
+   fFile = -1;
    Filename("");
 }
 
@@ -643,21 +639,21 @@ void TMidasFile::SetFileOdb()
 #ifdef HAS_XML
    // check if we have already set the TChannels....
    //
-	delete fOdb;
-	fOdb = nullptr;
+   delete fOdb;
+   fOdb = nullptr;
 
    if(TGRSIOptions::Get()->IgnoreFileOdb()) {
-		std::cout<<DYELLOW<<"\tskipping odb information stored in file."<<RESET_COLOR<<std::endl;
+      std::cout << DYELLOW << "\tskipping odb information stored in file." << RESET_COLOR << std::endl;
       return;
    }
 
-	try {
-		fOdb = new TXMLOdb(fOdbEvent->GetData(), fOdbEvent->GetDataSize());
-	} catch(std::exception& e) {
-		std::cout<<"Got exception '"<<e.what()<<"' trying to read "<<fOdbEvent->GetDataSize()<<" bytes (or words?) from:"<<std::endl;
-		std::cout<<fOdbEvent->GetData()<<std::endl;
-		throw e;
-	}
+   try {
+      fOdb = new TXMLOdb(fOdbEvent->GetData(), fOdbEvent->GetDataSize());
+   } catch(std::exception& e) {
+      std::cout << "Got exception '" << e.what() << "' trying to read " << fOdbEvent->GetDataSize() << " bytes (or words?) from:" << std::endl;
+      std::cout << fOdbEvent->GetData() << std::endl;
+      throw e;
+   }
    TChannel::DeleteAllChannels();
 
    SetRunInfo(fOdbEvent->GetTimeStamp());
@@ -665,10 +661,10 @@ void TMidasFile::SetFileOdb()
    // Check for EPICS variables
    SetEPICSOdb();
 
-	if(TGRSIOptions::Get()->IgnoreOdbChannels()) {
-		std::cout<<DYELLOW<<"\tskipping odb channel information stored in file."<<RESET_COLOR<<std::endl;
-		return;
-	}
+   if(TGRSIOptions::Get()->IgnoreOdbChannels()) {
+      std::cout << DYELLOW << "\tskipping odb channel information stored in file." << RESET_COLOR << std::endl;
+      return;
+   }
 
    // Check to see if we are running a GRIFFIN or TIGRESS experiment
    TXMLNode* node = fOdb->FindPath("/Experiment");
@@ -691,40 +687,40 @@ void TMidasFile::SetFileOdb()
    if(expt == "tigress") {
       SetTIGOdb();
    } else if(expt.find("grif") != std::string::npos) {
-		// for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
+      // for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
-   } else if(expt == "tigdaq") { //New TIGRESS DAQ
+   } else if(expt == "tigdaq") {   //New TIGRESS DAQ
       SetTIGDAQOdb();
    } else {
-		std::cerr<<RED<<"Unknown experiment name \""<<expt<<"\", ODB won't be read!"<<RESET_COLOR<<std::endl;
-	}
+      std::cerr << RED << "Unknown experiment name \"" << expt << "\", ODB won't be read!" << RESET_COLOR << std::endl;
+   }
 #endif
 }
 
 void TMidasFile::SetRunInfo(uint32_t time)
 {
 #ifdef HAS_XML
-   TXMLNode*     node    = fOdb->FindPath("/Runinfo/Start time binary");
+   TXMLNode* node = fOdb->FindPath("/Runinfo/Start time binary");
    if(node != nullptr) {
-		std::stringstream str(node->GetText());
-		unsigned int odbTime = 0;
-		str>>odbTime;
-		if(TRunInfo::SubRunNumber() == 0 && time != odbTime) {
-			std::cout<<"Warning, ODB start time of first subrun ("<<odbTime<<") does not match midas time of first event in this subrun ("<<time<<")!"<<std::endl;
-		}
-		TRunInfo::SetRunStart(time);
+      std::stringstream str(node->GetText());
+      unsigned int      odbTime = 0;
+      str >> odbTime;
+      if(TRunInfo::SubRunNumber() == 0 && time != odbTime) {
+         std::cout << "Warning, ODB start time of first subrun (" << odbTime << ") does not match midas time of first event in this subrun (" << time << ")!" << std::endl;
+      }
+      TRunInfo::SetRunStart(time);
    }
 
    node = fOdb->FindPath("/Experiment/Run parameters/Run Title");
    if(node != nullptr) {
-		TRunInfo::SetRunTitle(node->GetText());
-      std::cout<<"Title: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
+      TRunInfo::SetRunTitle(node->GetText());
+      std::cout << "Title: " << DBLUE << node->GetText() << RESET_COLOR << std::endl;
    }
 
    if(node != nullptr) {
       node = fOdb->FindPath("/Experiment/Run parameters/Comment");
-		TRunInfo::SetRunComment(node->GetText());
-      std::cout<<"Comment: "<<DBLUE<<node->GetText()<<RESET_COLOR<<std::endl;
+      TRunInfo::SetRunComment(node->GetText());
+      std::cout << "Comment: " << DBLUE << node->GetText() << RESET_COLOR << std::endl;
    }
 #endif
 }
@@ -742,21 +738,21 @@ void TMidasFile::SetGRIFFOdb()
 {
 #ifdef HAS_XML
    // get calibrations
-	// check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
+   // check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
    std::string path = "/DAQ/PSC";
    std::string temp;
-	if(fOdb->FindPath(path.c_str()) != nullptr) {
-		std::cout<<"using GRIFFIN path to analyzer info: "<<path<<"..."<<std::endl;
+   if(fOdb->FindPath(path.c_str()) != nullptr) {
+      std::cout << "using GRIFFIN path to analyzer info: " << path << "..." << std::endl;
 
-		temp = path;
-		temp.append("/PSC");
-	} else {
-		path = "/DAQ/MSC";
-		std::cout<<"using GRIFFIN path to analyzer info: "<<path<<"..."<<std::endl;
+      temp = path;
+      temp.append("/PSC");
+   } else {
+      path = "/DAQ/MSC";
+      std::cout << "using GRIFFIN path to analyzer info: " << path << "..." << std::endl;
 
-		temp = path;
-		temp.append("/MSC");
-	}
+      temp = path;
+      temp.append("/MSC");
+   }
    TXMLNode*        node    = fOdb->FindPath(temp.c_str());
    std::vector<int> address = fOdb->ReadIntArray(node);
 
@@ -769,14 +765,14 @@ void TMidasFile::SetGRIFFOdb()
    temp.append("/datatype");
    node                  = fOdb->FindPath(temp.c_str());
    std::vector<int> type = fOdb->ReadIntArray(node);
-	if(type.empty()) {
-		// failed to read array from /DAQ/<P/M>SC/datatype, so try to read /DAQ/<P/M>SC/DetType
-		temp = path;
-		temp.append("/DetType");
-		node = fOdb->FindPath(temp.c_str());
-		type = fOdb->ReadIntArray(node);
-		std::cout<<"failed to find ODB path "<<path<<"/datatype, using "<<type.size()<<" entries from "<<path<<"/DetType instead"<<std::endl;
-	}
+   if(type.empty()) {
+      // failed to read array from /DAQ/<P/M>SC/datatype, so try to read /DAQ/<P/M>SC/DetType
+      temp = path;
+      temp.append("/DetType");
+      node = fOdb->FindPath(temp.c_str());
+      type = fOdb->ReadIntArray(node);
+      std::cout << "failed to find ODB path " << path << "/datatype, using " << type.size() << " entries from " << path << "/DetType instead" << std::endl;
+   }
 
    temp = path;
    temp.append("/gain");
@@ -791,20 +787,20 @@ void TMidasFile::SetGRIFFOdb()
    // DAQ has quadratic terms in ODB from November 2019
    temp = path;
    temp.append("/quadratic");
-   node                        = fOdb->FindPath(temp.c_str());
-   std::vector<double> quads   = fOdb->ReadDoubleArray(node);
+   node                      = fOdb->FindPath(temp.c_str());
+   std::vector<double> quads = fOdb->ReadDoubleArray(node);
 
    temp = path;
    temp.append("/digitizer");
-   node                          = fOdb->FindPath(temp.c_str());
+   node                               = fOdb->FindPath(temp.c_str());
    std::vector<std::string> digitizer = fOdb->ReadStringArray(node);
 
    if((address.size() == names.size()) && (names.size() == gains.size()) && (gains.size() == offsets.size()) &&
       (offsets.size() == type.size())) {
       // all good. We ignore the digitizer size as this information is not present for all data
-      // Also ignoring quad terms as this will only be present in future data - S. Gillespie 
+      // Also ignoring quad terms as this will only be present in future data - S. Gillespie
       for(size_t x = 0; x < address.size(); x++) {
-         TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
+         TChannel* tempChan = TChannel::GetChannel(address.at(x), false);   // names.at(x).c_str());
          if(tempChan == nullptr) {
             tempChan = new TChannel();
          }
@@ -814,18 +810,18 @@ void TMidasFile::SetGRIFFOdb()
 
          tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
          tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
-			if(x < quads.size()) {
-				tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); //Assuming this means quad terms won't be added if not there. 
-			}
-			if(x < digitizer.size()) {
-				tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
-			}
+         if(x < quads.size()) {
+            tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x)));   //Assuming this means quad terms won't be added if not there.
+         }
+         if(x < digitizer.size()) {
+            tempChan->SetDigitizerType(TPriorityValue<std::string>(digitizer.at(x), EPriority::kRootFile));
+         }
          // TChannel::UpdateChannel(tempChan);
          TChannel::AddChannel(tempChan, "overwrite");
       }
-		std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
+      std::cout << TChannel::GetNumberOfChannels() << "\t TChannels created." << std::endl;
    } else {
-		std::cout<<BG_WHITE DRED<<"problem parsing odb data, arrays are different sizes, channels not set."<<RESET_COLOR<<std::endl;
+      std::cout << BG_WHITE DRED << "problem parsing odb data, arrays are different sizes, channels not set." << RESET_COLOR << std::endl;
    }
 
    // get cycle information
@@ -834,12 +830,12 @@ void TMidasFile::SetGRIFFOdb()
    // "/PPG/Cycles/146Cs_S1468" then has four PPGcodes and four durations
    node = fOdb->FindPath("/PPG/Current");
    if(node == nullptr) {
-      std::cerr<<R"(Failed to find "/PPG/Current" in ODB!)"<<std::endl;
+      std::cerr << R"(Failed to find "/PPG/Current" in ODB!)" << std::endl;
       return;
    }
 
    if(!node->HasChildren()) {
-      std::cout<<"Node has no children, can't read ODB cycle"<<std::endl;
+      std::cout << "Node has no children, can't read ODB cycle" << std::endl;
       return;
    }
    std::string currentCycle = "/PPG/Cycles/";
@@ -848,7 +844,7 @@ void TMidasFile::SetGRIFFOdb()
    temp.append("/PPGcodes");
    node = fOdb->FindPath(temp.c_str());
    if(node == nullptr) {
-      std::cerr<<R"(Failed to find ")"<<temp<<R"(" in ODB!)"<<std::endl;
+      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
       return;
    }
    std::vector<int> tmpCodes = fOdb->ReadIntArray(node);
@@ -857,8 +853,8 @@ void TMidasFile::SetGRIFFOdb()
    std::vector<int16_t> ppgCodes;
    for(auto& code : tmpCodes) {
       if(((code >> 16) & 0xffff) != (code & 0xffff)) {
-         std::cout<<DRED<<"Found ppg code in the ODB with high bits (0x"<<std::hex<<(code >> 16)
-                  <<") != low bits ("<<(code & 0xffff)<<std::dec<<")"<<RESET_COLOR<<std::endl;
+         std::cout << DRED << "Found ppg code in the ODB with high bits (0x" << std::hex << (code >> 16)
+                   << ") != low bits (" << (code & 0xffff) << std::dec << ")" << RESET_COLOR << std::endl;
       }
       ppgCodes.push_back(code & 0xffff);
    }
@@ -866,15 +862,15 @@ void TMidasFile::SetGRIFFOdb()
    temp.append("/durations");
    node = fOdb->FindPath(temp.c_str());
    if(node == nullptr) {
-      std::cerr<<R"(Failed to find ")"<<temp<<R"(" in ODB!)"<<std::endl;
+      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
       return;
    }
    std::vector<int> durations = fOdb->ReadIntArray(node);
 
-	if(durations.size() != ppgCodes.size()) {
-      std::cerr<<"Mismatching sizes of ppg codes ("<<ppgCodes.size()<<") and duration ("<<durations.size()<<")"<<std::endl;
+   if(durations.size() != ppgCodes.size()) {
+      std::cerr << "Mismatching sizes of ppg codes (" << ppgCodes.size() << ") and duration (" << durations.size() << ")" << std::endl;
       return;
-	}
+   }
 
    TPPG::Get()->SetOdbCycle(ppgCodes, durations);
 #endif
@@ -883,10 +879,10 @@ void TMidasFile::SetGRIFFOdb()
 void TMidasFile::SetTIGOdb()
 {
 #ifdef HAS_XML
-   std::string typepath = "/Equipment/Trigger/settings/Detector Settings";
+   std::string                                        typepath = "/Equipment/Trigger/settings/Detector Settings";
    std::map<int, std::pair<std::string, std::string>> typemap;
-   TXMLNode* typenode    = fOdb->FindPath(typepath.c_str());
-   int       typecounter = 0;
+   TXMLNode*                                          typenode    = fOdb->FindPath(typepath.c_str());
+   int                                                typecounter = 0;
    if(typenode->HasChildren()) {
       TXMLNode* typechild = typenode->GetChildren();
       while(true) {
@@ -917,9 +913,9 @@ void TMidasFile::SetTIGOdb()
    std::string path = "/Analyzer/Shared Parameters/Config";
    TXMLNode*   test = fOdb->FindPath(path.c_str());
    if(test == nullptr) {
-      path.assign("/Analyzer/Parameters/Cathode/Config"); // the old path to the useful odb info.
+      path.assign("/Analyzer/Parameters/Cathode/Config");   // the old path to the useful odb info.
    }
-	std::cout<<"using TIGRESS path to analyzer info: "<<path<<"..."<<std::endl;
+   std::cout << "using TIGRESS path to analyzer info: " << path << "..." << std::endl;
 
    std::string temp = path;
    temp.append("/FSCP");
@@ -951,17 +947,17 @@ void TMidasFile::SetTIGOdb()
    if((address.size() == gains.size()) && (gains.size() == offsets.size()) && offsets.size() == type.size()) {
       // all good.
    } else {
-		std::cout<<BG_WHITE DRED<<"problem parsing odb data, arrays are different sizes, channels not set."<<RESET_COLOR<<std::endl;
-      std::cout<<DRED<<"\taddress.size() = "<<address.size()<<RESET_COLOR<<std::endl;
-      std::cout<<DRED<<"\tnames.size()   = "<<names.size()<<RESET_COLOR<<std::endl;
-      std::cout<<DRED<<"\tgains.size()   = "<<gains.size()<<RESET_COLOR<<std::endl;
-      std::cout<<DRED<<"\toffsets.size() = "<<offsets.size()<<RESET_COLOR<<std::endl;
-      std::cout<<DRED<<"\ttype.size()    = "<<type.size()<<RESET_COLOR<<std::endl;
+      std::cout << BG_WHITE DRED << "problem parsing odb data, arrays are different sizes, channels not set." << RESET_COLOR << std::endl;
+      std::cout << DRED << "\taddress.size() = " << address.size() << RESET_COLOR << std::endl;
+      std::cout << DRED << "\tnames.size()   = " << names.size() << RESET_COLOR << std::endl;
+      std::cout << DRED << "\tgains.size()   = " << gains.size() << RESET_COLOR << std::endl;
+      std::cout << DRED << "\toffsets.size() = " << offsets.size() << RESET_COLOR << std::endl;
+      std::cout << DRED << "\ttype.size()    = " << type.size() << RESET_COLOR << std::endl;
       return;
    }
 
    for(size_t x = 0; x < address.size(); x++) {
-      TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
+      TChannel* tempChan = TChannel::GetChannel(address.at(x), false);   // names.at(x).c_str());
       if(tempChan == nullptr) {
          tempChan = new TChannel();
       }
@@ -974,7 +970,7 @@ void TMidasFile::SetTIGOdb()
       if(type.at(x) != 0) {
          tempChan->SetDigitizerType(TPriorityValue<std::string>(typemap[type.at(x)].second, EPriority::kRootFile));
          if(strcmp(tempChan->GetDigitizerTypeString(), "Tig64") ==
-            0) { // TODO: maybe use enumerations via GetDigitizerType()
+            0) {   // TODO: maybe use enumerations via GetDigitizerType()
             temp_integration = 25;
          } else if(strcmp(tempChan->GetDigitizerTypeString(), "Tig10") == 0) {
             temp_integration = 125;
@@ -986,29 +982,29 @@ void TMidasFile::SetTIGOdb()
 
       TChannel::AddChannel(tempChan, "overwrite");
    }
-	std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
+   std::cout << TChannel::GetNumberOfChannels() << "\t TChannels created." << std::endl;
 #endif
 }
 
-void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without the PPG (as we don't have one) and digitizer <P/M>SC key which is not in TIGDAQ 
+void TMidasFile::SetTIGDAQOdb()   // Basically a copy of the GRIFFIN one without the PPG (as we don't have one) and digitizer <P/M>SC key which is not in TIGDAQ
 {
 #ifdef HAS_XML
    // get calibrations
-	// check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
+   // check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
    std::string path = "/DAQ/PSC";
    std::string temp;
-	if(fOdb->FindPath(path.c_str()) != nullptr) {
-		std::cout<<"using TIGRESS path to analyzer info: "<<path<<"..."<<std::endl;
+   if(fOdb->FindPath(path.c_str()) != nullptr) {
+      std::cout << "using TIGRESS path to analyzer info: " << path << "..." << std::endl;
 
-		temp = path;
-		temp.append("/PSC");
-	} else {
-		path = "/DAQ/MSC";
-		std::cout<<"using TIGRESS path to analyzer info: "<<path<<"..."<<std::endl;
+      temp = path;
+      temp.append("/PSC");
+   } else {
+      path = "/DAQ/MSC";
+      std::cout << "using TIGRESS path to analyzer info: " << path << "..." << std::endl;
 
-		temp = path;
-		temp.append("/MSC");
-	}
+      temp = path;
+      temp.append("/MSC");
+   }
    TXMLNode*        node    = fOdb->FindPath(temp.c_str());
    std::vector<int> address = fOdb->ReadIntArray(node);
 
@@ -1021,14 +1017,14 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
    temp.append("/datatype");
    node                  = fOdb->FindPath(temp.c_str());
    std::vector<int> type = fOdb->ReadIntArray(node);
-	if(type.empty()) {
-		// failed to read array from <path>/datatype, so try to read <path>/DetType
-		temp = path;
-		temp.append("/DetType");
-		node = fOdb->FindPath(temp.c_str());
-		type = fOdb->ReadIntArray(node);
-		std::cout<<"failed to find ODB path "<<path<<"/datatype, using "<<type.size()<<" entries from "<<path<<"/DetType instead"<<std::endl;
-	}
+   if(type.empty()) {
+      // failed to read array from <path>/datatype, so try to read <path>/DetType
+      temp = path;
+      temp.append("/DetType");
+      node = fOdb->FindPath(temp.c_str());
+      type = fOdb->ReadIntArray(node);
+      std::cout << "failed to find ODB path " << path << "/datatype, using " << type.size() << " entries from " << path << "/DetType instead" << std::endl;
+   }
 
    temp = path;
    temp.append("/gain");
@@ -1043,19 +1039,19 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
    // DAQ has quadratic terms in ODB from November 2019
    temp = path;
    temp.append("/quadratic");
-   node                        = fOdb->FindPath(temp.c_str());
-   std::vector<double> quads   = fOdb->ReadDoubleArray(node);
+   node                      = fOdb->FindPath(temp.c_str());
+   std::vector<double> quads = fOdb->ReadDoubleArray(node);
 
    temp = path;
    temp.append("/digitizer");
-   node                          = fOdb->FindPath(temp.c_str());
+   node                               = fOdb->FindPath(temp.c_str());
    std::vector<std::string> digitizer = fOdb->ReadStringArray(node);
 
    if((address.size() == names.size()) && (names.size() == gains.size()) && (gains.size() == offsets.size()) && (gains.size() == offsets.size()) &&
       (offsets.size() == type.size())) {
-      // Only data without quad terms is mine so they will always be present - S. Gillespie 
+      // Only data without quad terms is mine so they will always be present - S. Gillespie
       for(size_t x = 0; x < address.size(); x++) {
-         TChannel* tempChan = TChannel::GetChannel(address.at(x), false); // names.at(x).c_str());
+         TChannel* tempChan = TChannel::GetChannel(address.at(x), false);   // names.at(x).c_str());
          if(tempChan == nullptr) {
             tempChan = new TChannel();
          }
@@ -1065,11 +1061,11 @@ void TMidasFile::SetTIGDAQOdb()  // Basically a copy of the GRIFFIN one without 
 
          tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
          tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
-         if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); } //Assuming this means quad terms won't be added if not there. 
+         if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); }   //Assuming this means quad terms won't be added if not there.
       }
-		std::cout<<TChannel::GetNumberOfChannels()<<"\t TChannels created."<<std::endl;
+      std::cout << TChannel::GetNumberOfChannels() << "\t TChannels created." << std::endl;
    } else {
-		std::cout<<BG_WHITE DRED<<"problem parsing odb data, arrays are different sizes, channels not set."<<RESET_COLOR<<std::endl;
+      std::cout << BG_WHITE DRED << "problem parsing odb data, arrays are different sizes, channels not set." << RESET_COLOR << std::endl;
    }
 #endif
 }

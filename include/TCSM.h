@@ -36,11 +36,11 @@
 class TCSM : public TDetector {
 public:
    TCSM();
-	TCSM(const TCSM&) = default;
+   TCSM(const TCSM&) = default;
 	TCSM(TCSM&&) noexcept = default;
-	TCSM& operator=(const TCSM&) = default;
-	TCSM& operator=(TCSM&&) noexcept = default;
-   ~TCSM() override;
+   TCSM& operator=(const TCSM&)     = default;
+   TCSM& operator=(TCSM&&) noexcept = default;
+   ~TCSM() override                 = default;
 
    TCSMHit* GetCSMHit(const int& i) const { return static_cast<TCSMHit*>(GetHit(i)); }
 
@@ -48,29 +48,29 @@ public:
                                double Y = 0.00, double Z = 0.00);
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
+   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override;
 
 private:
-   std::map<int16_t, std::vector<std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>>> fFragments; //!<!
-   double               fAlmostEqualWindow;
+   std::map<int16_t, std::vector<std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>>> fFragments;   //!<!
+   double                                                                                        fAlmostEqualWindow;
 
-   static int fCfdBuildDiff; //!<! largest acceptable time difference between events (clock ticks)  (50 ns)
+   static int fCfdBuildDiff;   //!<! largest acceptable time difference between events (clock ticks)  (50 ns)
 
-   void BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>&, std::vector<TDetectorHit*>&);
-   void BuilddEE(std::vector<std::vector<TDetectorHit*>>&, std::vector<TDetectorHit*>&);
-   void OldBuilddEE(std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&);
-   void MakedEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetectorHit*>& EHitVec, std::vector<TDetectorHit*>& BuiltHits);
+   void     BuildVH(std::vector<std::vector<std::pair<TFragment, TGRSIMnemonic>>>&, std::vector<TDetectorHit*>&);
+   void     BuilddEE(std::vector<std::vector<TDetectorHit*>>&, std::vector<TDetectorHit*>&);
+   void     OldBuilddEE(std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&, std::vector<TDetectorHit*>&);
+   void     MakedEE(std::vector<TDetectorHit*>& DHitVec, std::vector<TDetectorHit*>& EHitVec, std::vector<TDetectorHit*>& BuiltHits);
    TCSMHit* MakeHit(std::pair<TFragment, TGRSIMnemonic>&, std::pair<TFragment, TGRSIMnemonic>&);
    TCSMHit* MakeHit(std::vector<std::pair<TFragment, TGRSIMnemonic>>&, std::vector<std::pair<TFragment, TGRSIMnemonic>>&);
    TCSMHit* CombineHits(TDetectorHit*, TDetectorHit*);
-   void    RecoverHit(char, std::pair<TFragment, TGRSIMnemonic>&, std::vector<TDetectorHit*>&);
-   bool    AlmostEqual(int, int) const;
-   bool    AlmostEqual(double, double) const;
+   void     RecoverHit(char, std::pair<TFragment, TGRSIMnemonic>&, std::vector<TDetectorHit*>&);
+   bool     AlmostEqual(int, int) const;
+   bool     AlmostEqual(double, double) const;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TCSM, 5) // NOLINT(readability-else-after-return)
+   ClassDefOverride(TCSM, 5)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

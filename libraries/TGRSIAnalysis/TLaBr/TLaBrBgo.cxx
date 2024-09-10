@@ -20,19 +20,15 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TLaBrBgo)
-/// \endcond
-
 TLaBrBgo::TLaBrBgo()
 {
-	/// Default ctor.
+   /// Default ctor.
    TBgo::Clear();
 }
 
 TLaBrBgo::TLaBrBgo(const TLaBrBgo& rhs) : TBgo(rhs)
 {
-	/// Copy ctor.
+   /// Copy ctor.
    rhs.Copy(*this);
 }
 

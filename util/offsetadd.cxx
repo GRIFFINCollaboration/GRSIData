@@ -63,7 +63,7 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
    // int size;
    // int data[1024];
 
-   void* ptr = nullptr;
+   void* ptr      = nullptr;
    int   banksize = event->LocateBank(nullptr, "GRF1", &ptr);
 
    uint32_t type  = 0xffffffff;
@@ -86,7 +86,7 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
          dettype = value & 0x0000000f;
          chanadd = (value & 0x0003fff0) >> 4;
          break;
-      case 0xa0000000: timelow  = value & 0x0fffffff; break;
+      case 0xa0000000: timelow = value & 0x0fffffff; break;
       case 0xb0000000: timehigh = value & 0x00003fff; break;
       };
    }
@@ -100,8 +100,8 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
    // printf("timelow  = 0x%08x\n",timelow);
    // printf("timehigh = 0x%08x\n",timehigh);
 
-   if((dettype == 1) || (dettype == 5)) { // 1 for GRIFFIN, 5 for PACES
-                                          // do nothing.
+   if((dettype == 1) || (dettype == 5)) {   // 1 for GRIFFIN, 5 for PACES
+                                            // do nothing.
    } else {
       outfile->Write(event, "q");
       return;
@@ -116,7 +116,7 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
    }
 
    time = timehigh;
-   time = time<<28;
+   time = time << 28;
    time |= timelow & 0x0fffffff;
 
    // printf("time = 0x%016x\n",time);
@@ -124,21 +124,21 @@ void ProcessEvent(const std::shared_ptr<TMidasEvent>& event, TMidasFile* outfile
 
    // Here's where we change the values of the time stamps!!!!
    switch(chanadd & 0x0000ff00) {
-   case 0x00000000: // if the first GRIF-16
-                    //         time -= 10919355323; // run 2369 correction
-      time -= 87;   // run 2394 correction
+   case 0x00000000:   // if the first GRIF-16
+                      //         time -= 10919355323; // run 2369 correction
+      time -= 87;     // run 2394 correction
       break;
-   case 0x00000100: // if the second GRIF-16
+   case 0x00000100:   // if the second GRIF-16
       break;
-   case 0x00001000: // if the third GRIF-16
-                    //         time -= 10919355323; // run 2369 correction
+   case 0x00001000:   // if the third GRIF-16
+                      //         time -= 10919355323; // run 2369 correction
       break;
-   case 0x00001100: // if the fourth GRIF-16
-                    //         time -= 10919355239; // run 2369 correction
+   case 0x00001100:   // if the fourth GRIF-16
+                      //         time -= 10919355239; // run 2369 correction
       break;
-   case 0x00001200: // if the fifth GRIF-16
-                    //         time += 7;
-      time -= 87;   // run 2394 correction
+   case 0x00001200:   // if the fifth GRIF-16
+                      //         time += 7;
+      time -= 87;     // run 2394 correction
       break;
    };
    if(time < 0) {
