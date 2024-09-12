@@ -73,6 +73,7 @@ private:
    static double         fRounding;            ///< we consider any angles whose difference is less than this to be equal
    std::vector<int>      fExcludedDetectors;   ///< list of detectors that are excluded in calculating the angles
    std::vector<int>      fExcludedCrystals;    ///< list of crystals that are excluded in calculating the angles, the crystals are numbered as 4*(det-1)+cry, so start at 0 and go up to 63
+   std::vector<int>      fCustomGrouping;      ///< list of custom groups
    std::set<double>      fAngles;              ///< set of unique angles, when grouping is used, the largest angle of the group is used!
    std::map<double, int> fAngleMap;            ///< Maps angles to indices. This is fairly straight forward without grouping, but if grouping is used multiple angles can be mapped to the same index.
    std::map<int, int>    fAngleCount;          ///< Maps angles (divided by rounding and cast to integers) to number of combinations contributing to it.
