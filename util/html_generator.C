@@ -25,53 +25,55 @@ void html_generator(){
 }
 */
 
-
-
 #include "THtml.h"
 #include <string>
 #include <sstream>
 
-class THtmlCreator: public TObject {
+class THtmlCreator : public TObject {
 public:
-   THtmlCreator(): fHtml(0)
-   { 
-      printf("This class generates HTML documentation\n"); 
+   THtmlCreator() : fHtml(0)
+   {
+      printf("This class generates HTML documentation\n");
    }
-   ~THtmlCreator() { if (fHtml) delete fHtml; }
+   ~THtmlCreator()
+   {
+      if(fHtml) delete fHtml;
+   }
 
-   // inline methods can have their documentation in front 
+   // inline methods can have their documentation in front
    // of the declaration. DontDoMuch is so short - where
    // else would one put it?
    void DontDoMuch() {}
 
-   void Convert() 
+   void Convert()
    {
       // Create a "beautified" version of this source file.
       // It will be called htmldoc/htmlex.C.html.
       GetHtml()->SetMacroPath("$(ROOTSYS)/macros/");
       GetHtml()->SetSourceDir("$(GRSISYS)/util:$(GRSISYS)/scripts");
       GetHtml()->Convert("html_generator.C", "Generates HTML Documentation", "./htmldoc/", "./");
-      GetHtml()->Convert("DroppedData.C","Calculates Dropped Events","./htmldoc/","./");
+      GetHtml()->Convert("DroppedData.C", "Calculates Dropped Events", "./htmldoc/", "./");
    }
 
-   void MakeDocForAllClasses() 
+   void MakeDocForAllClasses()
    {
       // Creates the documentation pages for all classes that have
       // been loaded, and that are accessible from "./".
-      // If evenForROOT is set, we'll try to document ROOT's classes, 
+      // If evenForROOT is set, we'll try to document ROOT's classes,
       // too - you will end up with a copy of ROOT's class reference.
       // The documentation will end up in the subdirectory htmldoc/.
 
-      std::string inclpath = "$(GRSISYS)/grsisort/";
+      std::string       inclpath = "$(GRSISYS)/grsisort/";
       std::stringstream totpath;
-      totpath<<inclpath<<fpath.str();
-      std::string incldirs = totpath.str(); 
+      totpath << inclpath << fpath.str();
+      std::string incldirs = totpath.str();
       GetHtml()->SetSourceDir(incldirs.c_str());
       GetHtml()->SetOutputDir("$GRSISYS/htmldoc");
       GetHtml()->MakeAll();
    }
 
-   void RunAll() {
+   void RunAll()
+   {
       // Do everything we can.
       MakeDocForAllClasses();
       Convert();
@@ -87,65 +89,67 @@ public:
    {
       gSystem->PrependPathName(getenv("GRSISYS"), name);
       GetHtml()->SetEtcDir(name);
-      std::cout<<"ETC "<<GetHtml()->GetEtcDir()<<std::endl;
+      std::cout << "ETC " << GetHtml()->GetEtcDir() << std::endl;
    }
 
    void AddSourcePath(std::string newpath)
-   {   
-       fpath<<":$(GRSISYS)/libraries/"<<newpath;
+   {
+      fpath << ":$(GRSISYS)/libraries/" << newpath;
    }
 
-   void AddRootSourcePath(){
-      fpath<<":$(ROOTSYS)/";
+   void AddRootSourcePath()
+   {
+      fpath << ":$(ROOTSYS)/";
    }
 
 protected:
-   THtml* GetHtml() 
+   THtml* GetHtml()
    {
       // Return out THtml object, and create it if it doesn't exist.
-      if (!fHtml) fHtml = new THtml();
+      if(!fHtml) fHtml = new THtml();
       return fHtml;
    }
 
 private:
-   THtml* fHtml; // our local THtml instance.
+   THtml*            fHtml;   // our local THtml instance.
    std::stringstream fpath;
-   ClassDef(THtmlCreator, 0); // The Html Creation Class. 
+   ClassDef(THtmlCreator, 0);   // The Html Creation Class.
 };
 
-void html_generator() {
-	gErrorIgnoreLevel=kError;
+void html_generator()
+{
+   gErrorIgnoreLevel = kError;
 
-	gSystem->ListLibraries();
+   gSystem->ListLibraries();
 
-	THtmlCreator html;
-	html.SetProductName("GRSIData");
-	html.AddRootSourcePath();
-	html.SetEtcDir("etc/html");
-	//We must do this because of our naming convention of GRSISort directories
-	html.AddSourcePath("TGRSIFormat"); 
-	html.AddSourcePath("TGRSIDataParser");
-	html.AddSourcePath("TGRSIAnalysis");
-	html.AddSourcePath("TMidas");
-	html.AddSourcePath("TGRSIAnalysis/TAngularCorrelation");
-	html.AddSourcePath("TGRSIAnalysis/TCSM");
-	html.AddSourcePath("TGRSIAnalysis/TDescant");
-	html.AddSourcePath("TGRSIAnalysis/TEmma");
-	html.AddSourcePath("TGRSIAnalysis/TGenericDetector");
-	html.AddSourcePath("TGRSIAnalysis/TGriffin");
-	html.AddSourcePath("TGRSIAnalysis/TLaBr");
-	html.AddSourcePath("TGRSIAnalysis/TPaces");
-	html.AddSourcePath("TGRSIAnalysis/TRF");
-	html.AddSourcePath("TGRSIAnalysis/TS3");
-	html.AddSourcePath("TGRSIAnalysis/TSceptar");
-	html.AddSourcePath("TGRSIAnalysis/TSharc");
-	html.AddSourcePath("TGRSIAnalysis/TSiLi");
-	html.AddSourcePath("TGRSIAnalysis/TTAC");
-	html.AddSourcePath("TGRSIAnalysis/TTigress");
-	html.AddSourcePath("TGRSIAnalysis/TTip");
-	html.AddSourcePath("TGRSIAnalysis/TTrific");
-	html.AddSourcePath("TGRSIAnalysis/TTriFoil");
-	html.AddSourcePath("TGRSIAnalysis/TZeroDegree");
+   THtmlCreator html;
+   html.SetProductName("GRSIData");
+   html.AddRootSourcePath();
+   html.SetEtcDir("etc/html");
+   //We must do this because of our naming convention of GRSISort directories
+   html.AddSourcePath("TGRSIFormat");
+   html.AddSourcePath("TGRSIDataParser");
+   html.AddSourcePath("TGRSIAnalysis");
+   html.AddSourcePath("TMidas");
+   html.AddSourcePath("TGRSIAnalysis/TAngularCorrelation");
+   html.AddSourcePath("TGRSIAnalysis/TCSM");
+   html.AddSourcePath("TGRSIAnalysis/TDescant");
+   html.AddSourcePath("TGRSIAnalysis/TEmma");
+   html.AddSourcePath("TGRSIAnalysis/TGenericDetector");
+   html.AddSourcePath("TGRSIAnalysis/TGriffin");
+   html.AddSourcePath("TGRSIAnalysis/TLaBr");
+   html.AddSourcePath("TGRSIAnalysis/TPaces");
+   html.AddSourcePath("TGRSIAnalysis/TRF");
+   html.AddSourcePath("TGRSIAnalysis/TS3");
+   html.AddSourcePath("TGRSIAnalysis/TSceptar");
+   html.AddSourcePath("TGRSIAnalysis/TSharc");
+   html.AddSourcePath("TGRSIAnalysis/TSiLi");
+   html.AddSourcePath("TGRSIAnalysis/TTAC");
+   html.AddSourcePath("TGRSIAnalysis/TTigress");
+   html.AddSourcePath("TGRSIAnalysis/TTip");
+   html.AddSourcePath("TGRSIAnalysis/TTrific");
+   html.AddSourcePath("TGRSIAnalysis/TTriFoil");
+   html.AddSourcePath("TGRSIAnalysis/TZeroDegree");
 
-	html.RunAll();
+   html.RunAll();
 }

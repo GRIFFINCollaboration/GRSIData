@@ -59,7 +59,7 @@ public:
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<! //adds front and back fragments to their respective fragment vectors
 #endif
-   void BuildHits() override {} ///< even though we are not using this function, we still need to override it to avoid warning during the sorting process
+   void BuildHits() override {}   ///< even though we are not using this function, we still need to override it to avoid warning during the sorting process
 
    // functions to access the individual fragments
    inline TFragment GetRcmpFrontFrag(const int& i) const { return fFrontPFragVector.at(i); }   ///< returns the front fragment stored at the index

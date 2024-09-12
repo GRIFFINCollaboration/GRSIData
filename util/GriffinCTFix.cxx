@@ -248,8 +248,8 @@ int main(int argc, char** argv)
    if(lastSlash != std::string::npos) {
       outputFileName = std::string("ct_") + outputFileName.substr(lastSlash + 1);
    } else {
-		outputFileName = std::string("ct_") + std::string(argv[1]);
-	}
+      outputFileName = std::string("ct_") + std::string(argv[1]);
+   }
 
    auto* outputFile = new TFile(outputFileName.c_str(), "recreate");
 
