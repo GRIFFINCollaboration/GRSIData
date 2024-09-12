@@ -20,3 +20,4 @@ include/GRSIDataVersion.h
 *.pyc
 __pycache__
 *.pcm
+megalinter-reports
