@@ -21,6 +21,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
          } catch(std::out_of_range&) {}
          try {
             fCustomGrouping = settings->GetIntVector("CustomGrouping", true);
+				std::sort(fCustomGrouping.begin(), fCustomGrouping.end());
          } catch(std::out_of_range&) {}
       } else {
          std::cout << "Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals" << std::endl;
