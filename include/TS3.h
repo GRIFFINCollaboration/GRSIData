@@ -34,7 +34,7 @@ public:
 
    TS3();
    TS3(const TS3&);
-	TS3(TS3&&) noexcept = default;
+   TS3(TS3&&) noexcept = default;
    TS3& operator=(const TS3&);
    TS3& operator=(TS3&&) noexcept = default;
    ~TS3() override                = default;
@@ -42,7 +42,7 @@ public:
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
-	void BuildHits() override {} ///< no need to build any hits, everything already done in AddFragment
+   void BuildHits() override {}   ///< no need to build any hits, everything already done in AddFragment
 
    Short_t GetRingMultiplicity() const { return fS3RingHits.size(); }
    Short_t GetSectorMultiplicity() const { return fS3SectorHits.size(); }

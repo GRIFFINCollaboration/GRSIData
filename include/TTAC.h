@@ -28,7 +28,7 @@ class TTAC : public TDetector {
 public:
    TTAC();
    TTAC(const TTAC& rhs);
-	TTAC(TTAC&&) noexcept = default;
+   TTAC(TTAC&&) noexcept = default;
    TTAC& operator=(const TTAC&);   //!<!
    TTAC& operator=(TTAC&&) noexcept = default;
    ~TTAC() override                 = default;
@@ -38,7 +38,7 @@ public:
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
-	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
+   void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 
    void Print(Option_t* opt = "") const override;   //!<!
    void Print(std::ostream& out) const override;    //!<!
