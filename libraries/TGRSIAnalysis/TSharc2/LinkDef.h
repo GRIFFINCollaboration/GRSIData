@@ -1,20 +1,15 @@
-//TSharc2.h TSharc2Hit.h 
+//TSharc2.h TSharc2Hit.h
 #ifdef __CINT__
 
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
-#pragma link C++ nestedclasses;
+#pragma link         C++ nestedclasses;
 
 //#pragma link C++ class std::vector<Short_t>+;
 
-#pragma link C++ class TSharc2Hit+;
-#pragma link C++ class std::vector<TSharc2Hit>+;
-#pragma link C++ class TSharc2+;
+#pragma link C++ class TSharc2Hit + ;
+#pragma link C++ class std::vector < TSharc2Hit> + ;
+#pragma link C++ class TSharc2 + ;
 
 #endif
-
-
-
-
-

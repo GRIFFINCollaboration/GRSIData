@@ -19,7 +19,7 @@ class TRF : public TDetector {
 public:
    TRF();
    TRF(const TRF&);
-	TRF(TRF&&) noexcept = default;
+   TRF(TRF&&) noexcept            = default;
    TRF& operator=(const TRF&)     = default;
    TRF& operator=(TRF&&) noexcept = default;
    ~TRF() override                = default;
@@ -61,7 +61,7 @@ public:
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
-   void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
+   void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 
    void Copy(TObject&) const override;
    void Clear(Option_t* opt = "") override;         //!<!
