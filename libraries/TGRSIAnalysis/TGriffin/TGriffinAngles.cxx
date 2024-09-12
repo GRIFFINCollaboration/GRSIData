@@ -8,13 +8,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
    : fDistance(distance), fFolding(folding), fGrouping(grouping), fAddback(addback)
 {
    SetName("GriffinAngles");
-   // check that we only use grouping if folding is also enabled
-   if(fGrouping && !fFolding) {
-      std::cout << DRED << "Warning, grouping is only possible if folding is also active. Setting folding to true!" << RESET_COLOR << std::endl;
-      fFolding = true;
-   }
-
-   // get user settings for excluded detectors/crystals
+   // get user settings for excluded detectors/crystals, and custom grouping
    if(TGRSIOptions::Get() != nullptr) {
       auto* settings = TGRSIOptions::UserSettings();
       if(settings != nullptr) {
@@ -25,6 +19,9 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
          try {
             fExcludedDetectors = settings->GetIntVector("ExcludedDetector", true);
          } catch(std::out_of_range&) {}
+         try {
+            fCustomGrouping = settings->GetIntVector("CustomGrouping", true);
+         } catch(std::out_of_range&) {}
       } else {
          std::cout << "Failed to find user settings in TGRSIOptions, can't get user settings for excluded detectors/crystals" << std::endl;
       }
@@ -32,7 +29,13 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
       std::cout << "Failed to find TGRSIOptions, can't get user settings for excluded detectors/crystals" << std::endl;
    }
 
-   std::cout << "Creating angles for detectors " << fDistance << " mm from center of array, " << (fAddback ? "" : "not ") << "using addback, " << (fFolding ? "" : "not ") << "using folding, and " << (fGrouping ? "" : "not ") << "using grouping. Any angles less than " << fRounding << " degrees apart will be considered the same." << std::endl;
+	// check that we only use grouping if folding is also enabled, and we do not have any custom grouping information
+   if(fGrouping && !fFolding && fCustomGrouping.empty()) {
+      std::cout << DRED << "Warning, grouping is only possible if folding is also active. Setting folding to true!" << RESET_COLOR << std::endl;
+      fFolding = true;
+   }
+
+  std::cout << "Creating angles for detectors " << fDistance << " mm from center of array, " << (fAddback ? "" : "not ") << "using addback, " << (fFolding ? "" : "not ") << "using folding, and " << (fGrouping ? "" : "not ") << "using grouping. Any angles less than " << fRounding << " degrees apart will be considered the same." << std::endl;
 
    // loop over all possible detector/crystal combinations
    for(int firstDet = 1; firstDet <= 16; ++firstDet) {
@@ -78,134 +81,57 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
       // Which angles are grouped is somewhat arbitrary, this grouping was chosen to get similar numbers of detector combinations and thus statistics for each angle group.
       // Due to the way lower_bound works, we use the highest angle of each group as the angle of that group.
       // This is just for the purpose of this algorithm, when plotting the correct average angle of the group should be used!
+
+		// check if we have custom grouping supplied and its format
+		if(!fCustomGrouping.empty()) {
+			if(fCustomGrouping.size() != fAngles.size()) {
+				std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but we have " << fAngles.size() << " angles!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+			}
+			if(fCustomGrouping[0] != 0) {
+				std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but the first entry is " << fCustomGrouping[0] << ", not 0!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+			}
+			if(!std::is_sorted(fCustomGrouping.begin(), fCustomGrouping.end())) {
+				std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries is not sorted!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+			}
+			auto tmp = fCustomGrouping;
+			auto end = std::unique(tmp.begin(), tmp.end());
+			if(fCustomGrouping.back() != end - tmp.begin() - 1) {
+				std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but the last entry is " << fCustomGrouping[0] << " which does not match the number of unique groups minus one (" << end - tmp.begin() - 1 << ")!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+			}
+		} else if(fDistance == 110.) {
+			fCustomGrouping = { 0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10 };
+		} else if(fDistance == 145.) {
+			fCustomGrouping = { 0, 1, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11 };
+		} else {
+			std::ostringstream str;
+			str << DRED << "No custom grouping supplied and distance is not 110 mm or 145 mm, but " << fDistance << "!" << RESET_COLOR;
+			throw std::runtime_error(str.str());
+		}
+
+		// now we can loop over the grouping vector and the angles and store the largest angle per group in the new groupedAngles vector
+		// we also update our angle map with the new indices
       std::set<double> groupedAngles;
-      // for the angle map we need to update the indices: 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5, 10->5, 11->6, 12->6, 13->6 and so on
-      for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {
-         auto i = std::distance(fAngles.begin(), it);
-         if(fDistance == 110.) {
-            switch(i) {
-            case 0:
-            case 1:
-               // first and second angle are not grouped
-               groupedAngles.insert(*it);
-               break;
-            case 2:
-            case 4:
-            case 6:
-               // three groups of two angles each
-               // 2->2, 4->3, 6->4
-               fAngleMap[*it] -= (i - 2) / 2;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 3->2, 5->3, 7->4
-               fAngleMap[*it] -= (i - 2) / 2 + 1;
-               groupedAngles.insert(*it);
-               break;
-            default:
-               // all others are groups of three
-               //  8->5, 11->6, 14->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 1;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               //  9->5, 12->6, 15->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 2;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 10->5, 13->6, 16->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 3;
-               groupedAngles.insert(*it);
-               break;
-            }
-         } else if(fDistance == 145.) {
-            switch(i) {
-            case 0:
-            case 1:
-            case 2:
-               // first three angles are not grouped
-               groupedAngles.insert(*it);
-               break;
-            case 3:
-            case 5:
-               // two groups of two angles each
-               // 3->3, 5->4
-               fAngleMap[*it] -= (i - 3) / 2;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 4->3, 6->4
-               fAngleMap[*it] -= (i - 3) / 2 + 1;
-               groupedAngles.insert(*it);
-               break;
-            case 16:
-               // two groups of two angles each
-               // 16->8
-               fAngleMap[*it] = 8;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 17->8
-               fAngleMap[*it] = 8;
-               groupedAngles.insert(*it);
-               break;
-            case 24:
-               // two groups of two angles each
-               // 24->11
-               fAngleMap[*it] = 11;
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 25->11
-               fAngleMap[*it] = 11;
-               groupedAngles.insert(*it);
-               break;
-            default:
-               // all others are groups of three
-               //  8->5, 11->6, 14->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 1 + (i < 18 ? 1 : 0);
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               //  9->5, 12->6, 15->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 2 + (i < 18 ? 1 : 0);
-               ++it;
-               if(it == fAngles.end()) {
-                  --it;
-                  groupedAngles.insert(*it);
-                  break;
-               }
-               // 10->5, 13->6, 16->7, ...
-               fAngleMap[*it] -= (i - 5) / 3 * 2 + 3 + (i < 18 ? 1 : 0);
-               groupedAngles.insert(*it);
-               break;
-            }
-         } else {
-            std::cerr << "Sorry, don't know how to group angles at a distance of " << fDistance << ", only 110. or 145. are programmed" << std::endl;
-         }
-      }
+		auto angle = fAngles.begin();
+		double previousAngle = *angle;
+      for(size_t i = 0; i < fCustomGrouping.size(); ++i, ++angle) {
+			if(i != 0 && fCustomGrouping[i] != fCustomGrouping[i-1]) { // we found a new group so we insert the previous angle
+				groupedAngles.insert(previousAngle);
+			}
+			fAngleMap[*angle] = fCustomGrouping[i];
+			previousAngle = *angle;
+		}
+		// add the last angle since we never get to the next group after the last
+		groupedAngles.insert(previousAngle);
+
+		// update the angles to the new grouped angles
       fAngles = groupedAngles;
    }
 }
