@@ -93,8 +93,7 @@ private:
    //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
 
    bool fDescantAncillary{false};   ///< Descant is in the ancillary detector locations
-   bool fDescantWall{false};   ///< Descant is in the wall detector locations
-
+   bool fDescantWall{false};        ///< Descant is in the wall detector locations
 
    bool fTigress{false};   ///< flag for Tigress on/off
    bool fSharc{false};     ///< flag for Sharc on/off
