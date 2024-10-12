@@ -58,6 +58,7 @@ private:
 
    static std::array<TVector3, 71> fPosition;            //!<!
    static std::array<TVector3, 9>  fAncillaryPosition;   //!<!
+   static std::array<TVector3, 60> fWallPosition;   //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TDescant, 1)   // NOLINT(readability-else-after-return)

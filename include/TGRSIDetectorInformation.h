@@ -37,6 +37,8 @@ public:
 
    inline void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
    inline bool DescantAncillary() const { return fDescantAncillary; }
+   inline void SetDescantWall(bool flag = true) { fDescantAncillary = flag; }
+   inline bool DescantWall() const { return fDescantWall; }
 
    inline void SetTigress(bool flag = true) { fTigress = flag; }
    inline void SetSharc(bool flag = true) { fSharc = flag; }
@@ -91,6 +93,8 @@ private:
    //  for more info, see: https://www.triumf.info/wiki/tigwiki/index.php/Detector_Nomenclature
 
    bool fDescantAncillary{false};   ///< Descant is in the ancillary detector locations
+   bool fDescantWall{false};   ///< Descant is in the wall detector locations
+
 
    bool fTigress{false};   ///< flag for Tigress on/off
    bool fSharc{false};     ///< flag for Sharc on/off

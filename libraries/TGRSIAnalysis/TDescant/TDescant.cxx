@@ -37,6 +37,7 @@ std::array<TVector3, 71> TDescant::fPosition = {
    TVector3(-288.6, -325.6, 246.5), TVector3(-188.8, -382.5, 260.9), TVector3(-72.1, -420.4, 260.9),
    TVector3(42.1, -433.0, 246.5), TVector3(220.4, -375.0, 246.5), TVector3(305.4, -297.7, 260.9),
    TVector3(377.5, -198.5, 260.9), TVector3(424.8, -93.8, 246.5)};
+
 std::array<TVector3, 9> TDescant::fAncillaryPosition = {
    // Ancillary detector locations from Evan.
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
@@ -69,6 +70,29 @@ std::array<TVector3, 9> TDescant::fAncillaryPosition = {
    TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (292.5)),
             TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (292.5)),
             TMath::Cos(TMath::DegToRad() * (125.2644)))};
+
+std::array<TVector3, 60> TDescant::fWallPosition = {
+   // Descant detectors in wall configuration
+   TVector3(-922.311, -985.674, -1317.2),  TVector3(-922.311, -492.837, -1317.2), TVector3(-922.311, 0, -1317.2),
+   TVector3(-922.311, 492.837, -1317.2),   TVector3(-922.311, 985.674, -1317.2),  TVector3(-1213.57, -985.674, -1054.94),
+   TVector3(-1213.57, -492.837, -1054.94), TVector3(-1213.57, 0, -1054.94),       TVector3(-1213.57, 492.837, -1054.94),
+   TVector3(-1213.57, 985.674, -1054.94),  TVector3(-1213.57, -985.674, 1054.94), TVector3(-1213.57, -492.837, 1054.94),
+   TVector3(-1213.57, 0, 1054.94),         TVector3(-1213.57, 492.837, 1054.94),  TVector3(-1213.57, 985.674, 1054.94),
+   TVector3(-922.311, -985.674, 1317.2),   TVector3(-922.311, -492.837, 1317.2),  TVector3(-922.311, 0, 1317.2),
+   TVector3(-922.311, 492.837, 1317.2),    TVector3(-922.311, 985.674, 1317.2),   TVector3(-576.256, -985.674, 1501.2),
+   TVector3(-576.256, -492.837, 1501.2),   TVector3(-576.256, 0, 1501.2),         TVector3(-576.256, 492.837, 1501.2),
+   TVector3(-576.256, 985.674, 1501.2),    TVector3(-195.966, -985.674, 1596.01), TVector3(-195.966, -492.837, 1596.01),
+   TVector3(-195.966, 0, 1596.01),         TVector3(-195.966, 492.837, 1596.01),  TVector3(-195.966, 985.674, 1596.01),
+   TVector3(195.966, -985.674, 1596.01),   TVector3(195.966, -492.837, 1596.01),  TVector3(195.966, 0, 1596.01),
+   TVector3(195.966, 492.837, 1596.01),    TVector3(195.966, 985.674, 1596.01),   TVector3(576.256, -985.674, 1501.2),
+   TVector3(576.256, -492.837, 1501.2),    TVector3(576.256, 0, 1501.2),          TVector3(576.256, 492.837, 1501.2),
+   TVector3(576.256, 985.674, 1501.2),     TVector3(922.311, -985.674, 1317.2),   TVector3(922.311, -492.837, 1317.2),
+   TVector3(922.311, 0, 1317.2),           TVector3(922.311, 492.837, 1317.2),    TVector3(922.311, 985.674, 1317.2),
+   TVector3(1213.57, -985.674, 1054.94),   TVector3(1213.57, -492.837, 1054.94),  TVector3(1213.57, 0, 1054.94),
+   TVector3(1213.57, 492.837, 1054.94),    TVector3(1213.57, 985.674, 1054.94),   TVector3(1213.57, -985.674, -1054.94),
+   TVector3(1213.57, -492.837, -1054.94),  TVector3(1213.57, 0, -1054.94),        TVector3(1213.57, 492.837, -1054.94),
+   TVector3(1213.57, 985.674, -1054.94),   TVector3(922.311, -985.674, -1317.2),  TVector3(922.311, -492.837, -1317.2),
+   TVector3(922.311, 0, -1317.2),          TVector3(922.311, 492.837, -1317.2),   TVector3(922.311, 985.674, -1317.2)};
 
 TDescant::TDescant()
 {
@@ -129,7 +153,6 @@ TVector3 TDescant::GetPosition(int DetNbr, double dist)
 {
    // Gets the position vector for detector DetNbr
    // dist is only used when detectors are in the ancillary positions.
-
    if(TRunInfo::GetDetectorInformation() != nullptr && static_cast<TGRSIDetectorInformation*>(TRunInfo::GetDetectorInformation())->DescantAncillary()) {
       if(DetNbr > 8) {
          return {0, 0, 1};
@@ -141,5 +164,12 @@ TVector3 TDescant::GetPosition(int DetNbr, double dist)
    if(DetNbr > 70) {
       return {0, 0, 1};
    }
+   if(TRunInfo::GetDetectorInformation() != nullptr && static_cast<TGRSIDetectorInformation*>(TRunInfo::GetDetectorInformation())->DescantWall()) {
+      if (DetNbr > 60) {
+         return {0, 0, 1};
+      }
+      return fWallPosition[DetNbr];
+   }
+
    return fPosition[DetNbr];
 }

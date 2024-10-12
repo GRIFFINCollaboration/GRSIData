@@ -33,6 +33,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
    if(strchr(opt, 'a') != nullptr) {
       std::ostringstream str;
       str << DBLUE << "\t\tDESCANT in ancillary positions = " << DRED << (DescantAncillary() ? "TRUE" : "FALSE") << RESET_COLOR << std::endl;
+      str << DBLUE << "\t\tDESCANT in wall configuration = " << DRED << (DescantWall() ? "TRUE" : "FALSE") << RESET_COLOR << std::endl;
       str << std::endl;
       str << "\t\tTIGRESS:            " << (Tigress() ? "true" : "false") << std::endl;
       str << "\t\tSHARC:              " << (Sharc() ? "true" : "false") << std::endl;
@@ -91,6 +92,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fRcmp       = false;
 
    fDescantAncillary = false;
+   fDescantWall = false;
 }
 
 void TGRSIDetectorInformation::Set()
