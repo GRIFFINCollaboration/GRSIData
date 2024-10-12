@@ -37,7 +37,7 @@ public:
 
    inline void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
    inline bool DescantAncillary() const { return fDescantAncillary; }
-   inline void SetDescantWall(bool flag = true) { fDescantAncillary = flag; }
+   inline void SetDescantWall(bool flag = true) { fDescantWall = flag; }
    inline bool DescantWall() const { return fDescantWall; }
 
    inline void SetTigress(bool flag = true) { fTigress = flag; }
