@@ -92,7 +92,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fRcmp       = false;
 
    fDescantAncillary = false;
-   fDescantWall = false;
+   fDescantWall      = false;
 }
 
 void TGRSIDetectorInformation::Set()
