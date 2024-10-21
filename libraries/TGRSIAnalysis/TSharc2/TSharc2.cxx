@@ -230,7 +230,6 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
 		double z = -1*fZposUS2; //minus because we are upstream of the reaction target
 		position.SetXYZ(x, y, z);
 		position.RotateZ(-1 * fSectorWidthUS2 * nrots + (fSectorWidthUS2*gRandom->Uniform(-1,1))); //we multiply this one by -1 because the upstream cS2 needs to be rotated the opposite direction. Both cS2 detectors are rotated CW relative to beam, but they are mounted opposite
-
 	}
 
 	
