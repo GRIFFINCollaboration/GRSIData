@@ -79,10 +79,6 @@ cflagsout=no
 libsout=no
 
 while test $# -gt 0; do
-  case "$1" in 
-  -*=*) optarg=${1//[-_a-zA-Z0-9]*=//} ;; #$(echo "$1" | sed 's/[-_a-zA-Z0-9]*=//') ;;
-  esac
-
   case $1 in
     --version)
       ### Output the version number.  If GVersion.h can not be found, give up.
