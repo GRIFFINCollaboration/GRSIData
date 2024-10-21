@@ -81,7 +81,6 @@ libsout=no
 while test $# -gt 0; do
   case "$1" in 
   -*=*) optarg=${1//[-_a-zA-Z0-9]*=//} ;; #$(echo "$1" | sed 's/[-_a-zA-Z0-9]*=//') ;;
-  *)    optarg="" ;;
   esac
 
   case $1 in
@@ -140,7 +139,7 @@ while test $# -gt 0; do
       ;;
     --help)
       ### Print a helpful message...
-      progname=$(basename $0)
+      progname=$(basename "$0")
       echo "Usage: ${progname} [options]"
       echo ""
       echo "  --version       Print the current GRSI Version number."
