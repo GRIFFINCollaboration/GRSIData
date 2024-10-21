@@ -73,8 +73,8 @@ std::array<TVector3, 9> TDescant::fAncillaryPosition = {
 
 std::array<TVector3, 60> TDescant::fWallPosition = {
    // Descant detectors in wall configuration - sorted by detector number
-   TVector3(195.966, 0.000, 1596.010), TVector3(-195.966, 0.000, 1596.010), TVector3(195.966, 492.837, 1596.010), 
-   TVector3(-195.966, 492.837, 1596.010), TVector3(-195.966, -492.837, 1596.010), TVector3(195.966, -492.837, 1596.010), 
+   TVector3(195.966, 0.000, 1596.010), TVector3(-195.966, 0.000, 1596.010), TVector3(195.966, 492.837, 1596.010),
+   TVector3(-195.966, 492.837, 1596.010), TVector3(-195.966, -492.837, 1596.010), TVector3(195.966, -492.837, 1596.010),
    TVector3(576.256, 0.000, 1501.200), TVector3(-576.256, 0.000, 1501.200), TVector3(576.256, 492.837, 1501.200),
    TVector3(-576.256, 492.837, 1501.200), TVector3(-576.256, -492.837, 1501.200), TVector3(576.256, -492.837, 1501.200),
    TVector3(208.851, 1050.481, 1700.946), TVector3(-208.851, 1050.481, 1700.946), TVector3(-208.851, -1050.481, 1700.946),

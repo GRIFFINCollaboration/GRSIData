@@ -56,7 +56,7 @@ private:
    static bool fSetWave;   ///<  Flag for Waveforms ON/OFF
    bool        fHitFlag;   ///<   Is there a Descant hit?
 
-   static std::array<TVector3, 71> fSpherePosition;            //!<!
+   static std::array<TVector3, 71> fSpherePosition;      //!<!
    static std::array<TVector3, 9>  fAncillaryPosition;   //!<!
    static std::array<TVector3, 60> fWallPosition;        //!<!
 
