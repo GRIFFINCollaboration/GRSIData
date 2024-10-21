@@ -158,42 +158,47 @@ void TSharc2::Copy(TObject& rhs) const
 
 TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, double X, double Y, double Z)
 {
-   int    FrontDet = detector;
-   int    FrontStr = frontstrip;
-   int    BackStr  = backstrip;
-   double nrots    = 0.;   // allows us to rotate into correct position
+   int FrontDet = detector;
+   int FrontStr = frontstrip;
+   // int BackDet  = detector;
+   int BackStr = backstrip;
+   double nrots   = 0.; // allows us to rotate into correct position
 
    TVector3 position;
    TVector3 position_offset;
    position_offset.SetXYZ(X, Y, Z);
 
-   //no forward box in SHARC2!!
+   //no forward box in SHARC2!! 
    //We will keep detectors 5-8 for the forward box to keep this consistent with the SHARC-1 class
 
-   if(FrontDet >= 9 && FrontDet <= 12) {   // backward box
-      nrots    = FrontDet - 9;             // edited to make box 9 on the beam left (+x direction).  assuming rotation consistent with TIGRESS (clockwise when looking along beam travel direction)!
+   if(FrontDet >= 9 && FrontDet <= 12) { // backward box
+      nrots    = FrontDet - 9+0.5; // edited to make box 9 on the beam left (+x direction).  assuming rotation consistent with TIGRESS (clockwise when looking along beam travel direction)! plus 0.5 because the BOX detectors are shifted by 45 deg from parallel to lab vertical/horizontal
       double x = fXposUB;
-      double y = fYminUB + (FrontStr + 0.5) * fStripFPitch;   // [(-36.0) - (+36.0)]
-      double z = fZminUB - (BackStr + 0.5) * fStripBPitch;    // [(-5.0) - (-53.0)]
+      double y = fYminUB + (FrontStr + 0.5) * fStripFPitch; // [(-36.0) - (+36.0)]
+      double z = fZminUB - (BackStr + 0.5) * fStripBPitch;  // [(-5.0) - (-53.0)]
       position.SetXYZ(x, y, z);
-      position.RotateZ(TMath::Pi() * nrots / 2.);               //we rotate here because the rotation will be different for the cS2 detectors
-   } else if(FrontDet == 1) {                                   // forward (downstream) compact S2
-                                                                //only 1 up/downstream detector for SHARC-2 instead of the 4 QQQs from SHARC-1. We will set them at detector number 1 and 16
-                                                                //so that we have a few spare detectors in case we want to add e.g. a thick pad behind the downstream S2 later.
-      nrots    = (FrontStr - 10) + 0.5;                         //sector 10 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
-      double x = fXminDS2 + fStripPitchDS2 * (BackStr + 0.5);   //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
-      double y = 0;                                             //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
+      position.RotateZ(TMath::Pi() * nrots / 2.); //we rotate here because the rotation will be different for the cS2 detectors
+   } 
+
+   //only 1 up/downstream detector for SHARC-2 instead of the 4 QQQs from SHARC-1. We will set them at detector number 1 and 16
+   //so that we have a few spare detectors in case we want to add e.g. a thick pad behind the downstream S2 later.
+   else if(FrontDet == 1) { // forward (downstream) compact S2
+      nrots = (BackStr - 7) + 0.5; //sector 7 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
+      double x = fXminDS2 + fStripPitchDS2 * (FrontStr + 0.5); //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
+      double y = 0; //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
       double z = fZposDS2;
       position.SetXYZ(x, y, z);
-      position.RotateZ(fSectorWidthDS2 * nrots);
-   } else if(FrontDet == 16) {                                  // backward (upstream) compact S2
-      nrots    = (FrontStr - 3) + 0.5;                          //sector 3 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
-      double x = fXminUS2 + fStripPitchUS2 * (BackStr + 0.5);   //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
-      double y = 0;                                             //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
-      double z = -1 * fZposUS2;                                 //minus because we are upstream of the reaction target
+      position.RotateZ(fSectorWidthDS2 * nrots + (fSectorWidthDS2*gRandom->Uniform(-1,1))); //the addition does randomization over the sector width
+   } 
+   else if(FrontDet == 16) { // backward (upstream) compact S2
+      nrots = (BackStr - 15) + 0.5; //sector 15 is the sector just clockwise from (+x,y=0). We remove that number to get the nrots needed. We add 0.5 to rotate to the middle of the sector too
+      double x = fXminUS2 + fStripPitchUS2 * (FrontStr + 0.5); //Counting from the inside radius to the outside radius. Add 0.5 to center in the middle of the ring.
+      double y = 0; //we start this with the hit oriented at beam left (+x,y=0). Will rotate afterwards
+      double z = -1*fZposUS2; //minus because we are upstream of the reaction target
       position.SetXYZ(x, y, z);
-      position.RotateZ(-1 * fSectorWidthUS2 * nrots);   //we multiply this one by -1 because the upstream cS2 needs to be rotated the opposite direction. Both cS2 detectors are rotated CW relative to beam, but they are mounted opposite
+      position.RotateZ(-1 * fSectorWidthUS2 * nrots + (fSectorWidthUS2*gRandom->Uniform(-1,1))); //we multiply this one by -1 because the upstream cS2 needs to be rotated the opposite direction. Both cS2 detectors are rotated CW relative to beam, but they are mounted opposite
    }
 
+	
    return (position + position_offset);
 }
