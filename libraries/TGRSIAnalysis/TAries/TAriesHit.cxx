@@ -81,4 +81,3 @@ void TAriesHit::Print(std::ostream& out) const
    str << "Aries hit time:   " << GetTime() << std::endl;
    out << str.str();
 }
-

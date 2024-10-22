@@ -117,10 +117,10 @@ private:
    bool fDante{false};        ///< flag for LaBr on/off
    bool fZeroDegree{false};   ///< flag for Zero Degree Scintillator on/off
    bool fDescant{false};      ///< flag for Descant on/off
-   bool fRcmp{false};   ///< flag for Rcmp on/off
-   bool fAries{false};   ///< flag for Aries on/off
+   bool fRcmp{false};         ///< flag for Rcmp on/off
+   bool fAries{false};        ///< flag for Aries on/off
 
-   bool fBgo{false};    ///< flag for Bgo on/off
+   bool fBgo{false};   ///< flag for Bgo on/off
 
    bool fSortByTriggerId{false};   ///< flag to sort by trigger ID instead of time stamp
 
