@@ -31,7 +31,7 @@ public:
    TAries(TAries&&) noexcept = default;
    TAries& operator=(const TAries&);   //!<!
    TAries& operator=(TAries&&) noexcept = default;
-   ~TAries() override                     = default;
+   ~TAries() override                   = default;
 
    TAriesHit* GetAriesHit(const int& i) const { return static_cast<TAriesHit*>(GetHit(i)); }
 #ifndef __CINT__
@@ -53,7 +53,7 @@ public:
 
    /// \cond CLASSIMP
    ClassDefOverride(TAries, 2)   // Aries Physics structure // NOLINT(readability-else-after-return)
-	/// \endcond
+                                 /// \endcond
 };
 /*! @} */
 #endif
