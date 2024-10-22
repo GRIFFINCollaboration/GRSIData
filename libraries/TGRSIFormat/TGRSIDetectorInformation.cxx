@@ -54,8 +54,9 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       str << "\t\tBGO:                " << (Bgo() ? "true" : "false") << std::endl;
       str << "\t\tEMMA:               " << (Emma() ? "true" : "false") << std::endl;
       str << "\t\tTRIFIC:             " << (Trific() ? "true" : "false") << std::endl;
-      str << "\t\tSHARC2:				" << (Sharc2() ? "true" : "false") << std::endl;
-      str << "\t\tRCMP:				" << (Rcmp() ? "true" : "false") << std::endl;
+      str << "\t\tSHARC2:				  " << (Sharc2() ? "true" : "false") << std::endl;
+      str << "\t\tRCMP:				     " << (Rcmp() ? "true" : "false") << std::endl;
+      str << "\t\tARIES:              " << (Aries() ? "true" : "false") << std::endl;
       str << std::endl;
       std::cout << str.str();
    }
@@ -90,6 +91,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fDescant    = false;
    fBgo        = false;
    fRcmp       = false;
+   fAries      = false;
 
    fDescantAncillary = false;
    fDescantWall      = false;
@@ -163,6 +165,9 @@ void TGRSIDetectorInformation::Set()
          break;
       case TGRSIMnemonic::ESystem::kRcmp:
          SetRcmp();
+         break;
+      case TGRSIMnemonic::ESystem::kAries:
+         SetAries();
          break;
       case TGRSIMnemonic::ESystem::kGeneric:
          SetGeneric();

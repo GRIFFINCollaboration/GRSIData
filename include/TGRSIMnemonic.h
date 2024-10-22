@@ -63,6 +63,7 @@ public:
       kTrific,   //30
       kSharc2,
       kRcmp,
+		kAries,
       kClear
    };
 

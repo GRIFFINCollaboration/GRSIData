@@ -26,6 +26,7 @@
 #include "TTrific.h"
 #include "TSharc2.h"
 #include "TRcmp.h"
+#include "TAries.h"
 
 void TGRSIMnemonic::Clear(Option_t*)
 {
@@ -95,6 +96,8 @@ void TGRSIMnemonic::EnumerateSystem()
       fSystem = ESystem::kSharc2;
    } else if(SystemString() == "RC") {
       fSystem = ESystem::kRcmp;
+   } else if(SystemString() == "AR") {
+      fSystem = ESystem::kAries;
    } else {
       fSystem = ESystem::kClear;
    }
@@ -197,6 +200,7 @@ TClass* TGRSIMnemonic::GetClassType() const
    case ESystem::kTrific: SetClassType(TTrific::Class()); break;
    case ESystem::kSharc2: SetClassType(TSharc2::Class()); break;
    case ESystem::kRcmp: SetClassType(TRcmp::Class()); break;
+   case ESystem::kAries: SetClassType(TAries::Class()); break;
    default: SetClassType(nullptr);
    };
    return TMnemonic::GetClassType();
