@@ -60,9 +60,10 @@ public:
    inline void SetDante(bool flag = true) { fDante = flag; }
    inline void SetZeroDegree(bool flag = true) { fZeroDegree = flag; }
    inline void SetDescant(bool flag = true) { fDescant = flag; }
+   inline void SetRcmp(bool flag = true) { fRcmp = flag; }
+   inline void SetAries(bool flag = true) { fAries = flag; }
 
    inline void SetBgo(bool flag = true) { fBgo = flag; }
-   inline void SetRcmp(bool flag = true) { fRcmp = flag; }
 
    inline bool Tigress() const { return fTigress; }
    inline bool Sharc() const { return fSharc; }
@@ -84,9 +85,10 @@ public:
    inline bool Dante() const { return fDante; }
    inline bool ZeroDegree() const { return fZeroDegree; }
    inline bool Descant() const { return fDescant; }
+   inline bool Rcmp() const { return fRcmp; }
+   inline bool Aries() const { return fAries; }
 
    inline bool Bgo() const { return fBgo; }
-   inline bool Rcmp() const { return fRcmp; }
 
 private:
    //  detector types to switch over in Set()
@@ -115,9 +117,10 @@ private:
    bool fDante{false};        ///< flag for LaBr on/off
    bool fZeroDegree{false};   ///< flag for Zero Degree Scintillator on/off
    bool fDescant{false};      ///< flag for Descant on/off
+   bool fRcmp{false};   ///< flag for Rcmp on/off
+   bool fAries{false};   ///< flag for Aries on/off
 
    bool fBgo{false};    ///< flag for Bgo on/off
-   bool fRcmp{false};   ///< flag for Rcmp on/off
 
    bool fSortByTriggerId{false};   ///< flag to sort by trigger ID instead of time stamp
 
