@@ -44,7 +44,7 @@ public:
    static bool SetWave() { return fSetWave; }   //!<!
 
 private:
-   static bool                     fSetWave;          //  Flag for Waveforms ON/OFF
+   static bool                                      fSetWave;          //  Flag for Waveforms ON/OFF
    static std::array<ROOT::Math::Polar3DVector, 77> fPaddlePosition;   //!<!  Position of each Paddle
 
 public:
