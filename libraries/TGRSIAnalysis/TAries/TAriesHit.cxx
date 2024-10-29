@@ -49,7 +49,8 @@ void TAriesHit::Copy(TObject& obj, bool waveform) const
 TVector3 TAriesHit::GetPosition(Double_t) const
 {
    // Gets the position of the current TAriesHit
-   return TAries::GetPosition(GetDetector());
+   auto vec = TAries::GetPosition(GetDetector());
+   return {vec.X(), vec.Y(), vec.Z()};
 }
 
 TVector3 TAriesHit::GetPosition() const

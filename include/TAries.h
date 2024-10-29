@@ -18,7 +18,7 @@
 #include <vector>
 #include <cstdio>
 
-#include "TVector3.h"
+#include "Math/Vector3D.h"
 
 #include "Globals.h"
 #include "TDetector.h"
@@ -39,13 +39,13 @@ public:
 #endif
    void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 
-   static TVector3 GetPosition(int DetNbr) { return fPaddlePosition[DetNbr]; }   //!<!
+   static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fPaddlePosition[DetNbr]; }   //!<!
 
    static bool SetWave() { return fSetWave; }   //!<!
 
 private:
    static bool                     fSetWave;          //  Flag for Waveforms ON/OFF
-   static std::array<TVector3, 21> fPaddlePosition;   //!<!  Position of each Paddle
+   static std::array<ROOT::Math::Polar3DVector, 77> fPaddlePosition;   //!<!  Position of each Paddle
 
 public:
    void Print(Option_t* opt = "") const override;   //!<!
