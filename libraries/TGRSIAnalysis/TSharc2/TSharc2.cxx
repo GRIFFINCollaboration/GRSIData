@@ -199,6 +199,7 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
    }
 
    return (position + position_offset);
+
 }
 
 //modified from the SHARC-1 class
