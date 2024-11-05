@@ -200,3 +200,32 @@ TVector3 TSharc2::GetPosition(int detector, int frontstrip, int backstrip, doubl
 
    return (position + position_offset);
 }
+
+//modified from the SHARC-1 class
+double TSharc2::GetDetectorThickness(TSharc2Hit& hit, double dist)
+{
+   static std::array<double, 16> fDetectorThickness = {50., 0., 0., 0., 0., 0., 0., 0.,999., 999., 1023., 999., 0., 0., 0., 1004.}; //microns
+   if(dist < 0.0) {
+      dist = fDetectorThickness[hit.GetDetector()-1]; //minus 1 because the array indexes at 0 but SHARC indexes at 1.
+   }
+
+   double phi_90 = fmod(std::fabs(hit.GetPosition().Phi()), TMath::Pi() / 2);
+   double phi_45 = phi_90;
+   if(phi_90 > (TMath::Pi() / 4.)) {
+      phi_45 = TMath::Pi() / 2 - phi_90;
+   }
+
+   if(hit.GetDetector() >= 5 && hit.GetDetector() <= 12) {
+      return dist / (TMath::Sin(hit.GetPosition().Theta()) * TMath::Cos(phi_45));
+   }
+   return std::fabs(dist / (TMath::Cos(hit.GetPosition().Theta())));
+}
+
+double TSharc2::GetDeadLayerThickness(TSharc2Hit& hit)
+{
+   //these are estimated dead layer thicknesses based on the SHARC-1 information. SHARC-1 1000um BB11's have 0.1 um dead layer thickness.
+   //The SHARC-1 QQQ detectors have 0.7 um dead layer thickness, so we will estimate those for the compact S2 detectors
+   //but WE DON'T KNOW the compact S2 dead layer thicknesses!!! these are GUESSES only!
+   static std::array<double, 16> fDeadLayerThickness = {0.7, 0., 0., 0., 0., 0., 0., 0.,0.1, 0.1, 0.1, 0.1, 0., 0., 0., 0.7}; 
+   return GetDetectorThickness(hit, fDeadLayerThickness[hit.GetDetector()-1]); //minus 1 because the array indexes at 0 but SHARC indexes at 1.
+}
