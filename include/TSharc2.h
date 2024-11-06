@@ -70,11 +70,10 @@ private:
    std::vector<TFragment> fBackFragments;    //!
 
 public:
-   static double GetDetectorThickness(TSharc2Hit& hit, double dist=-1.0);   //!
-   static double GetDeadLayerThickness(TSharc2Hit &hit);                   //!
+   static double GetDetectorThickness(TSharc2Hit& hit, double dist = -1.0);   //!
+   static double GetDeadLayerThickness(TSharc2Hit& hit);                      //!
 
 private:
-
    static double fXoffset;   //!<!
    static double fYoffset;   //!<!
    static double fZoffset;   //!<!
