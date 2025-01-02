@@ -32,7 +32,7 @@ find_package(Git REQUIRED)
 #----------------------------------------------------------------------------
 # find the root package (and add COMPONENTS)
 #find_package(ROOT REQUIRED COMPONENTS Gui GuiHtml Minuit Spectrum)
-find_package(ROOT REQUIRED XMLParser)
+find_package(ROOT OPTIONAL_COMPONENTS XMLParser)
 
 if(${ROOT_xml_FOUND})
 	add_compile_options(-DHAS_XML)
