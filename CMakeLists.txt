@@ -90,7 +90,7 @@ add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
 	)
 root_generate_dictionary(G__TGRSIFormat TGRSIDetectorInformation.h TGRSIMnemonic.h TCSM.h TCSMHit.h MODULE TGRSIFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/CMakeLinkDef.h)
-target_link_libraries(TGRSIFormat TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+target_link_libraries(TGRSIFormat TAries TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
 
 add_library(TGRSIDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIDataParser/TGRSIDataParser.cxx
@@ -103,6 +103,13 @@ add_library(TAngularCorrelation SHARED
 	)
 root_generate_dictionary(G__TAngularCorrelation TAngularCorrelation.h MODULE TAngularCorrelation LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAngularCorrelation/LinkDef.h)
 target_link_libraries(TAngularCorrelation TGriffin)
+
+add_library(TAries SHARED
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAries.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAries.cxx
+	)
+root_generate_dictionary(G__TAries TAries.h TAriesHit.h MODULE TAries LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/LinkDef.h)
+target_link_libraries(TAries ${GRSI_LIBRARIES})
 
 add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescant.cxx
@@ -246,7 +253,7 @@ target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegr
 
 ##----------------------------------------------------------------------------
 ## add all executable in util
-set(GRSIDATA_LIBRARIES TAngularCorrelation TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
+set(GRSIDATA_LIBRARIES TAngularCorrelation TAries TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
 set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
