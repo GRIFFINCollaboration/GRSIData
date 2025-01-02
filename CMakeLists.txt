@@ -106,7 +106,7 @@ target_link_libraries(TAngularCorrelation TGriffin)
 
 add_library(TAries SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAries.cxx
-	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAries.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAriesHit.cxx
 	)
 root_generate_dictionary(G__TAries TAries.h TAriesHit.h MODULE TAries LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/LinkDef.h)
 target_link_libraries(TAries ${GRSI_LIBRARIES})
