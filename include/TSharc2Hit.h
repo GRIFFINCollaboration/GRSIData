@@ -83,7 +83,7 @@ public:
    Float_t GetFrontCharge() const
    {
       return TDetectorHit::GetCharge();
-   }                                                                 //!<!  //Charge is now stored after integration.
+   }   //!<!  //Charge is now stored after integration.
    Float_t GetBackCharge() const { return GetBack().GetCharge(); }   //!<!  //Charge is now stored after integration.
    Float_t GetPadCharge() const { return GetPad().GetCharge(); }     //!<!  //Charge is now stored after integration.
 
@@ -98,7 +98,7 @@ public:
    Double_t GetThetaDeg(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const
    {
       return GetTheta(Xoff, Yoff, Zoff) * TMath::RadToDeg();
-   };                                                                                  //!<!
+   };   //!<!
    Double_t GetTheta(double Xoff = 0.0, double Yoff = 0.0, double Zoff = 0.0) const;   //!<!
 
    void SetFront(const TFragment& frag);   //!<!

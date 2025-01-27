@@ -94,7 +94,7 @@ public:
    Double_t GetModifiedAngleFromIndex(Int_t modindex)
    {
       return fModifiedAngles[modindex];
-   }                                                          // returns the angle from the modified index
+   }   // returns the angle from the modified index
    Int_t GetNumGroups() const;                                // returns the number of groups assigned
    Int_t GetNumModIndices() const;                            // returns the number of modified indices
    Int_t GetWeightsSize() const { return fWeights.size(); }   // returns in the size of the fWeights array

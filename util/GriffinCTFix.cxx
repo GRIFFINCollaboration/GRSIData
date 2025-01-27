@@ -163,7 +163,7 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
             largestCrystal1   = crystal1;
          }
       }   //for(int crystal2 = crystal1 + 1; crystal2 < 4; crystal2++)
-   }      // for(int crystal1 = 0; crystal1 < 4; crystal1++)
+   }   // for(int crystal1 = 0; crystal1 < 4; crystal1++)
 
    std::cout << " -------------------- " << std::endl;
    std::cout << " -------------------- " << std::endl;

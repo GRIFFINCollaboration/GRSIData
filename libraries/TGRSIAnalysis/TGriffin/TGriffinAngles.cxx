@@ -68,9 +68,9 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
                // factor 2 to include that the "normal" rounding is +- fRounding
                fAngleCount[static_cast<int>(std::round(angle / fRounding))]++;
             }   // second crystal loop
-         }      //second detector loop
-      }         // first crystal loop
-   }            // first detector loop
+         }   //second detector loop
+      }   // first crystal loop
+   }   // first detector loop
 
    // create map of indices before we group so that we have an index for each (folded) angle
    for(auto it = fAngles.begin(); it != fAngles.end(); ++it) {

@@ -52,7 +52,7 @@ public:
    {
       core.Copy(*this);
       fCoreSet = true;
-   }                                                                        //!<!
+   }   //!<!
    void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); }   //!<!
    //    void AddBGO(const TDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
    // void SetInitalHit(const int &i)     { fFirstSegment = i; }        //!<!
