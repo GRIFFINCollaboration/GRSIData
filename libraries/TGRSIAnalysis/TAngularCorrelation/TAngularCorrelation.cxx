@@ -52,7 +52,7 @@ TH2D* TAngularCorrelation::Create2DSlice(THnSparse* hst, Double_t min, Double_t 
    for(int i = 0; i < 3; i++) {   // goes through all three dimensions of THnSparse and finds the min and max values
       xmin[i] = hst->GetAxis(i)->GetXmin();
       xmax[i] = hst->GetAxis(i)->GetXmax();
-   }                                                // then look for matching axis since energy axis should be the same
+   }   // then look for matching axis since energy axis should be the same
    if(xmin[0] == xmin[1] && xmax[0] == xmax[1]) {   // are 0 and 1 the same? then axis 2 is the index axis
       indexaxis   = 2;
       energy1axis = 0;
