@@ -308,8 +308,8 @@ Int_t TTrific::GetRange()
    if(fRange < std::max(fGridX, fGridY) + 1) {
       if(fRange < fGridX && !fXFragments.empty()) { fRange = fGridX; }   //we need to check if the current range is less than the x grid AND that there is an x-grid hit in this event
       if(fRange < fGridY && !fYFragments.empty()) { fRange = fGridY; }   //we need to check if the current range is less than the y grid AND that there is a y-grid hit in this event
-   }                                                                     //there may be a problem here if fXFragments.size() != 0 (or Y frags too) but all the fragments have E<arb cutoff. However, GetRange() isn't referenced in any other function currently,
-                                                                         //and the likelihood of that occuring is very small I think.
+   }   //there may be a problem here if fXFragments.size() != 0 (or Y frags too) but all the fragments have E<arb cutoff. However, GetRange() isn't referenced in any other function currently,
+   //and the likelihood of that occuring is very small I think.
 
    //flag that we've calculated the range for this event
    fTrificBits.SetBit(ETrificBits::kRangeCalculated, true);

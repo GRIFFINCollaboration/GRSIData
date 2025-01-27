@@ -73,19 +73,19 @@ public:
    {
       SetGlobalBit(ES3GlobalBits::kPreSector, set);
       return set;
-   }                                                                                     //!<!
+   }   //!<!
    static bool SectorPreference() { return TestGlobalBit(ES3GlobalBits::kPreSector); }   //!<!
    static bool SetMultiHit(bool set = true)
    {
       SetGlobalBit(ES3GlobalBits::kMultHit, set);
       return set;
-   }                                                                           //!<!
+   }   //!<!
    static bool MultiHit() { return TestGlobalBit(ES3GlobalBits::kMultHit); }   //!<!
    static bool SetKeepShared(bool set = true)
    {
       SetGlobalBit(ES3GlobalBits::kKeepShared, set);
       return set;
-   }                                                                                //!<!
+   }   //!<!
    static bool KeepShared() { return TestGlobalBit(ES3GlobalBits::kKeepShared); }   //!<!
 
    bool PixelsSet() const { return TestBitNumber(ES3Bits::kPixelsSet); }
