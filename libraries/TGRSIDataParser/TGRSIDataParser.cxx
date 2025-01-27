@@ -1047,7 +1047,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
          }   // switch(eventFrag->GetModuleType())
          break;
       }   // switch(packet)
-   }      // for(;x<size;x++)
+   }   // for(;x<size;x++)
 
    TParsingDiagnostics::Get()->BadFragment(eventFrag->GetDetectorType());
    if(fState == EDataParserState::kGood) {
@@ -1783,8 +1783,8 @@ int TGRSIDataParser::CaenPsdToFragment(uint32_t* data, int size, std::shared_ptr
             ++nofFragments;
             event->IncrementGoodFrags();
          }   // while(w < size)
-      }      // for(uint8_t channel = 0; channel < 16; channel += 2)
-   }         // for(int board = 0; w < size; ++board)
+      }   // for(uint8_t channel = 0; channel < 16; channel += 2)
+   }   // for(int board = 0; w < size; ++board)
 
    return nofFragments;
 }
@@ -1971,8 +1971,8 @@ int TGRSIDataParser::CaenPhaToFragment(uint32_t* data, int size, std::shared_ptr
             ++nofFragments;
             event->IncrementGoodFrags();
          }   // while(w < size)
-      }      // for(uint8_t channel = 0; channel < 16; channel += 2)
-   }         // for(int board = 0; w < size; ++board)
+      }   // for(uint8_t channel = 0; channel < 16; channel += 2)
+   }   // for(int board = 0; w < size; ++board)
 
    return nofFragments;
 }
@@ -2073,7 +2073,7 @@ int TGRSIDataParser::EmmaMadcDataToFragment(const uint32_t* const data, int size
          break;
       default: break;
       }   // end swich
-   }      // end for read backwards
+   }   // end for read backwards
 
    return numFragsFound;
 }
