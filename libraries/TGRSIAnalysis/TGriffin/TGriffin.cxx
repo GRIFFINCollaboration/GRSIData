@@ -128,7 +128,7 @@ void TGriffin::Copy(TObject& rhs) const
    TSuppressed::Copy(rhs);
 
    // no need to copy low gain, this is already taken care of by TDetector::Copy (called by TSuppressed::Copy)
-   static_cast<TGriffin&>(rhs).fGriffinHighGainHits.resize(fGriffinHighGainHits.size());
+   static_cast<TGriffin&>(rhs).fGriffinHighGainHits.resize(fGriffinHighGainHits.size(), nullptr);
    for(size_t i = 0; i < fGriffinHighGainHits.size(); ++i) {
       static_cast<TGriffin&>(rhs).fGriffinHighGainHits[i] = new TGriffinHit(*static_cast<TGriffinHit*>(fGriffinHighGainHits[i]));
    }
