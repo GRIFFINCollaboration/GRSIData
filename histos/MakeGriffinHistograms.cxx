@@ -259,13 +259,9 @@ extern "C" void MakeAnalysisHistograms(TRuntimeObjects& obj)
       }
    }
    if(grif != nullptr) {
-      for(auto g1 = 0; g1 < grif->GetLowGainMultiplicity(); ++g1) {
-         obj.FillHistogram("HitPatterns", "gHP_lg", 65, 0, 65, grif->GetGriffinLowGainHit(g1)->GetArrayNumber());
-         obj.FillHistogram("GRIFFIN", "gE_lg", 5000, 0, 5000, grif->GetGriffinLowGainHit(g1)->GetEnergy(), 65, 0, 65, grif->GetGriffinLowGainHit(g1)->GetArrayNumber());
-      }
-      for(auto g1 = 0; g1 < grif->GetHighGainMultiplicity(); ++g1) {
-         obj.FillHistogram("HitPatterns", "gHP_hg", 65, 0, 65, grif->GetGriffinHighGainHit(g1)->GetArrayNumber());
-         obj.FillHistogram("GRIFFIN", "gE_hg", 5000, 0, 5000, grif->GetGriffinHighGainHit(g1)->GetEnergy(), 65, 0, 65, grif->GetGriffinHighGainHit(g1)->GetArrayNumber());
+      for(auto g1 = 0; g1 < grif->GetMultiplicity(); ++g1) {
+         obj.FillHistogram("HitPatterns", "gHP", 65, 0, 65, grif->GetGriffinHit(g1)->GetArrayNumber());
+         obj.FillHistogram("GRIFFIN", "gE", 5000, 0, 5000, grif->GetGriffinHit(g1)->GetEnergy(), 65, 0, 65, grif->GetGriffinHit(g1)->GetArrayNumber());
       }
    }
 }
