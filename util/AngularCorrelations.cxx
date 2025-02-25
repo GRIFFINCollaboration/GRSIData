@@ -100,6 +100,7 @@ int main(int argc, char** argv)
    // open the input root file and read any settings stored there, then add the ones potentially read in from command line
    if(inputFile.empty()) {
       std::cerr << "Need an input file!" << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -107,6 +108,7 @@ int main(int argc, char** argv)
 
    if(!input.IsOpen()) {
       std::cerr << "Failed to open input file " << inputFile << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -125,6 +127,7 @@ int main(int argc, char** argv)
    // check that we got settings either from the root file or a path provided on command line
    if(settings == nullptr || settings->empty()) {
       std::cerr << "Failed to get user settings from input file." << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -243,21 +246,25 @@ int main(int argc, char** argv)
    // check if all necessary settings have been provided
    if(projGateLow >= projGateHigh) {
       std::cerr << "Need a projection gate with a low edge that is smaller than the high edge, " << projGateLow << " >= " << projGateHigh << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
    if(peakLow >= peakHigh) {
       std::cerr << "Need a fit range with a low edge that is smaller than the high edge, " << peakLow << " >= " << peakHigh << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
    if(peakPos >= peakHigh || peakPos <= peakLow) {
       std::cerr << "Need a peak within the fit range, " << peakPos << " not within " << peakLow << " - " << peakHigh << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
    if(timeRandomNorm <= 0.) {
       std::cerr << "Need a positive normalization factor for time random subtraction" << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -265,6 +272,7 @@ int main(int argc, char** argv)
    // so we only need to check that the vectors aren't empty (sizes should always be the same, but we check anyway)
    if(bgLow.empty() || bgLow.size() != bgHigh.size()) {
       std::cerr << "Background gate information missing, either no low/high edges or a mismatching amount of low and high edges: " << bgLow.size() << " low edges, and " << bgHigh.size() << " high edges" << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -273,6 +281,7 @@ int main(int argc, char** argv)
 
    if(angles == nullptr) {
       std::cerr << "Failed to find 'GriffinAngles' in '" << inputFile << "'" << std::endl;
+      std::cout << parser << std::endl;
       return 1;
    }
 
@@ -309,16 +318,19 @@ int main(int argc, char** argv)
       auto* prompt = static_cast<TH2*>(input.Get(Form("AngularCorrelation%d", i)));
       if(prompt == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelation%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+			std::cout << parser << std::endl;
          return 1;
       }
       auto* bg = static_cast<TH2*>(input.Get(Form("AngularCorrelationBG%d", i)));
       if(bg == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelationBG%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+			std::cout << parser << std::endl;
          return 1;
       }
       auto* mixed = static_cast<TH2*>(input.Get(Form("AngularCorrelationMixed%d", i)));
       if(mixed == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelationMixed%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+			std::cout << parser << std::endl;
          return 1;
       }
 
