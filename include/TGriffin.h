@@ -70,7 +70,7 @@ public:
    Short_t      GetAddbackMultiplicity();
    TGriffinHit* GetAddbackHit(const int& i);
    bool         IsAddbackSet() const;
-   void         ResetAddback();                                   //!<!
+   void         ResetAddback();   //!<!
    UShort_t     GetNAddbackFrags(const size_t& idx);
 
 #if !defined(__CINT__) && !defined(__CLING__)
@@ -105,16 +105,16 @@ private:
    int64_t                         fCycleStart;    //!<!  The start of the cycle
    mutable TTransientBits<UChar_t> fGriffinBits;   // Transient member flags
 
-   mutable std::vector<TDetectorHit*> fAddbackHits;     //!<! Used to create addback hits on the fly
-   mutable std::vector<UShort_t>      fAddbackFrags;    //!<! Number of crystals involved in creating in the addback hit
+   mutable std::vector<TDetectorHit*> fAddbackHits;    //!<! Used to create addback hits on the fly
+   mutable std::vector<UShort_t>      fAddbackFrags;   //!<! Number of crystals involved in creating in the addback hit
 
-   std::vector<TDetectorHit*> fSuppressedHits;    //!<!  The set of suppressed crystal hits
+   std::vector<TDetectorHit*> fSuppressedHits;   //!<!  The set of suppressed crystal hits
 
-   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;     //!<! Used to create suppressed addback hits on the fly
-   mutable std::vector<UShort_t>      fSuppressedAddbackFrags;    //!<! Number of crystals involved in creating in the suppressed addback hit
+   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;    //!<! Used to create suppressed addback hits on the fly
+   mutable std::vector<UShort_t>      fSuppressedAddbackFrags;   //!<! Number of crystals involved in creating in the suppressed addback hit
 
 public:
-   static bool      SetCoreWave() { return fSetCoreWave; }   //!<!
+   static bool SetCoreWave() { return fSetCoreWave; }   //!<!
 
 private:
    static std::array<TVector3, 17> fCloverPosition;                            //!<! Position of each HPGe Clover

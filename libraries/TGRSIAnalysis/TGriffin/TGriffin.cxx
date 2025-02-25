@@ -39,7 +39,7 @@ bool DefaultGriffinSuppression(const TDetectorHit* hit, const TDetectorHit* bgoH
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TGriffin::fSuppressionCriterion = DefaultGriffinSuppression;
 
-bool                TGriffin::fSetCoreWave     = false;
+bool TGriffin::fSetCoreWave = false;
 
 // This seems unnecessary, and why 17?;//  they are static members, and need
 //  to be defined outside the header
@@ -243,11 +243,11 @@ void TGriffin::SetCrossTalk(const bool flag) const
 
 TGriffinHit* TGriffin::GetGriffinHit(const int& i)
 {
-	/// Get Griffin hit indicated by index i.
-	/// Throws an out of range exception if the index is out of the range of the hit vector.
-	/// Applies cross-talk corrections if they haven't already been applied and are enabled.
-	/// Note: This is different from using TDetector::GetHit and casting the result to a `TGriffinHit*`
-	/// as in that case no cross-talk corrections are applied.
+   /// Get Griffin hit indicated by index i.
+   /// Throws an out of range exception if the index is out of the range of the hit vector.
+   /// Applies cross-talk corrections if they haven't already been applied and are enabled.
+   /// Note: This is different from using TDetector::GetHit and casting the result to a `TGriffinHit*`
+   /// as in that case no cross-talk corrections are applied.
    try {
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
@@ -270,7 +270,7 @@ Short_t TGriffin::GetAddbackMultiplicity()
       // Calculate Cross Talk on each hit
       FixCrossTalk();
    }
-   auto& hitVector  = Hits();
+   auto& hitVector = Hits();
    if(hitVector.empty()) {
       return 0;
    }
@@ -325,8 +325,8 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
       auto* hit = new TGriffinHit(*frag);
       Hits().push_back(hit);
    } break;
-	case TMnemonic::EMnemonic::kB:
-	   break;
+   case TMnemonic::EMnemonic::kB:
+      break;
    default:
       std::cout << "output sensor " << static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->OutputSensor()) << ", skipping it" << std::endl;
       break;
@@ -567,7 +567,7 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
       // Calculate Cross Talk on each hit
       FixCrossTalk();
    }
-   auto& hitVector  = Hits();
+   auto& hitVector = Hits();
    if(hitVector.empty()) {
       return 0;
    }
