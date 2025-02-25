@@ -318,19 +318,19 @@ int main(int argc, char** argv)
       auto* prompt = static_cast<TH2*>(input.Get(Form("AngularCorrelation%d", i)));
       if(prompt == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelation%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
-			std::cout << parser << std::endl;
+         std::cout << parser << std::endl;
          return 1;
       }
       auto* bg = static_cast<TH2*>(input.Get(Form("AngularCorrelationBG%d", i)));
       if(bg == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelationBG%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
-			std::cout << parser << std::endl;
+         std::cout << parser << std::endl;
          return 1;
       }
       auto* mixed = static_cast<TH2*>(input.Get(Form("AngularCorrelationMixed%d", i)));
       if(mixed == nullptr) {
          std::cerr << "Failed to find histogram '" << Form("AngularCorrelationMixed%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
-			std::cout << parser << std::endl;
+         std::cout << parser << std::endl;
          return 1;
       }
 
