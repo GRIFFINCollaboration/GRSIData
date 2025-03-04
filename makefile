@@ -10,7 +10,7 @@ INCLUDES   = include
 CFLAGS     = -g -O3 -Wall -Wextra -pedantic -Wno-unknown-pragmas -Wno-unused-function -Wshadow
 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
@@ -86,24 +86,22 @@ INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdi
 CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lTMVA
+LINKFLAGS += $(shell root-config --glibs) -lTMVA
 ifeq ($(PROOF_INSTALLED),yes)
 	LINKFLAGS += -lProof
 endif
 LINKFLAGS += $(shell grsi-config --all-libs)
 #LINKFLAGS += $(shell grsi-config --GRSIData-libs)
 
-# RCFLAGS are being used for rootcint
+# RCFLAGS are being used for rootcint, don't add it to the LINKFLAGS, that's already taken care of by grsi-config --all-libs
 ifeq ($(MATHMORE_INSTALLED),yes)
   CFLAGS += -DHAS_MATHMORE
   RCFLAGS += -DHAS_MATHMORE
-  LINKFLAGS += -lMathMore
 endif
 
 ifeq ($(XML_INSTALLED),yes)
   CFLAGS += -DHAS_XML
   RCFLAGS += -DHAS_XML
-  LINKFLAGS += -lXMLParser -lXMLIO
 endif
 
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
