@@ -62,6 +62,7 @@ public:
    inline void SetDescant(bool flag = true) { fDescant = flag; }
    inline void SetRcmp(bool flag = true) { fRcmp = flag; }
    inline void SetAries(bool flag = true) { fAries = flag; }
+   inline void SetDemand(bool flag = true) { fDemand = flag; }
 
    inline void SetBgo(bool flag = true) { fBgo = flag; }
 
@@ -87,6 +88,7 @@ public:
    inline bool Descant() const { return fDescant; }
    inline bool Rcmp() const { return fRcmp; }
    inline bool Aries() const { return fAries; }
+   inline bool Demand() const { return fDemand; }
 
    inline bool Bgo() const { return fBgo; }
 
@@ -119,6 +121,7 @@ private:
    bool fDescant{false};      ///< flag for Descant on/off
    bool fRcmp{false};         ///< flag for Rcmp on/off
    bool fAries{false};        ///< flag for Aries on/off
+   bool fDemand{false};       ///< flag for Demand on/off
 
    bool fBgo{false};   ///< flag for Bgo on/off
 
