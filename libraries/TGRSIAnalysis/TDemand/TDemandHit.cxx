@@ -56,7 +56,7 @@ void TDemandHit::Print(std::ostream& out) const
 
 TVector3 TDemandHit::GetPosition(Double_t) const
 {
-   return TVector3(0,0,0); //currently does nothing
+   return TVector3(0, 0, 0);   //currently does nothing
 }
 
 TVector3 TDemandHit::GetPosition() const

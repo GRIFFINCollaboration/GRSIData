@@ -22,7 +22,7 @@ public:
    TDemand(TDemand&&) noexcept = default;
    TDemand& operator=(const TDemand&);   //!<!
    TDemand& operator=(TDemand&&) noexcept = default;
-   ~TDemand() override                   = default;
+   ~TDemand() override                    = default;
 
    TDemandHit* GetDemandHit(const int& i) const { return static_cast<TDemandHit*>(GetHit(i)); }
 
