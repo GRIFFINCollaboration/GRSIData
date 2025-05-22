@@ -118,6 +118,13 @@ add_library(TDescant SHARED
 root_generate_dictionary(G__TDescant TDescant.h TDescantHit.h MODULE TDescant LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/LinkDef.h)
 target_link_libraries(TDescant ${GRSI_LIBRARIES})
 
+add_library(TDemand SHARED
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/TDemand.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/TDemandHit.cxx
+	)
+root_generate_dictionary(G__TDemand TDemand.h TDemandHit.h MODULE TDemand LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/LinkDef.h)
+target_link_libraries(TDemand ${GRSI_LIBRARIES})
+
 add_library(TEmma SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/TEmma.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/TEmmaHit.cxx
