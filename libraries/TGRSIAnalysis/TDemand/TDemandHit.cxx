@@ -5,7 +5,7 @@
 #include "TGRSIOptions.h"
 
 /// \cond CLASSIMP
-ClassImp(TDemandHit)
+//ClassImp(TDemandHit)
 /// \endcond
 
 TDemandHit::TDemandHit()
@@ -85,3 +85,4 @@ TVector3 TDemandHit::GetPosition() const
 {
    return GetPosition(GetDefaultDistance());
 }
+
