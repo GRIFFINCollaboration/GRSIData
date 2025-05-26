@@ -22,7 +22,7 @@ public:
    TDemandHit(TDemandHit&&) noexcept            = default;
    TDemandHit& operator=(const TDemandHit&)     = default;
    TDemandHit& operator=(TDemandHit&&) noexcept = default;
-   explicit TDemandHit(const TFragment& frag) { frag.Copy(*this); }
+   explicit TDemandHit(const TFragment& frag);
    ~TDemandHit() override = default;
 
 private:
