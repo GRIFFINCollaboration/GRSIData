@@ -21,6 +21,7 @@ TDemandHit::TDemandHit(const TDemandHit& rhs) : TDetectorHit(rhs)
 void TDemandHit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);
+   TDetectorHit::CopyWave(rhs);
    static_cast<TDemandHit&>(rhs).fFilter = fFilter;
 }
 
