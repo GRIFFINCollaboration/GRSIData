@@ -22,6 +22,7 @@ TDemandHit::TDemandHit(const TDemandHit& rhs) : TDetectorHit(rhs)
 TDemandHit::TDemandHit(const TFragment& frag)
 {
    frag.Copy(*this);
+   frag.CopyWave(*this);
    /*if(TDemandHit::SetWave()) {
       if(frag.GetWaveform()->empty()) {
          std::cout << "Warning, TDemandHit::SetWave() set, but data waveform size is zero!" << std::endl;
