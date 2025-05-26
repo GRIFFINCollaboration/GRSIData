@@ -85,4 +85,3 @@ TVector3 TDemandHit::GetPosition() const
 {
    return GetPosition(GetDefaultDistance());
 }
-
