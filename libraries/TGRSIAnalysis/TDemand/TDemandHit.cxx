@@ -1,6 +1,13 @@
 #include "TDemand.h"
 #include "TDemandHit.h"
 #include "Globals.h"
+#include "TClass.h"
+
+/// \cond CLASSIMP
+ClassImp(TDemandHit)
+/// \endcond
+
+
 
 TDemandHit::TDemandHit()
 {
