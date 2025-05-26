@@ -9,7 +9,7 @@
 #include "TMath.h"
 
 /// \cond CLASSIMP
-ClassImp(TDemand)
+//ClassImp(TDemand)
 /// \endcond
 
 //==========================================================================//

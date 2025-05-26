@@ -33,8 +33,6 @@ public:
 
    static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fDetectorPosition[DetNbr]; }   //!<!
 
-   static bool SetWave() { return fSetWave; }   //!<!
-
 private:
    static bool                                     fSetCoreWave;        //!<!  Flag for Waveforms ON/OFF
    static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition;   //!<!  Position of each detector (plus one default position)
