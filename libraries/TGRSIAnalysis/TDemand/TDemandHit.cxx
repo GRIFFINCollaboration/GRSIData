@@ -2,6 +2,7 @@
 #include "TDemandHit.h"
 #include "Globals.h"
 #include "TClass.h"
+#include "TGRSIOptions.h"
 
 /// \cond CLASSIMP
 ClassImp(TDemandHit)
