@@ -106,6 +106,7 @@ void TTigress::Clear(Option_t* opt)
    fAddbackFrags.clear();
    fBgos.clear();
    fTigressBits = 0;
+   fTigressBits.SetBit(ETigressBits::kAddbackSet, false);
 }
 
 void TTigress::Print(Option_t*) const
