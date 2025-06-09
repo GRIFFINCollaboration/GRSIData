@@ -37,7 +37,7 @@ public:
 
 private:
    static bool                                     fSetCoreWave;        //!<!  Flag for Waveforms ON/OFF
-   static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition;   //!<!  Position of each detector (plus one default position)
+   //static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition;   //!<!  Position of each detector (plus one default position)
 
 public:
    static bool SetCoreWave() { return fSetCoreWave; }   //!<!
