@@ -70,7 +70,7 @@ TVector3 TDemand::GetPosition(const TDemandHit& hit){
    return TDemand::GetPosition(hit.GetDetector());
 }
 
-TVector3 TDemand::GetPosition(int DetNbr) const
+TVector3 TDemand::GetPosition(int DetNbr) 
 {
    if (1 > DetNbr || 6 < DetNbr){ //if detector number is not 1,2,3,4,5,6, then return a 0 vector
       return TVector3(0,0,0);
