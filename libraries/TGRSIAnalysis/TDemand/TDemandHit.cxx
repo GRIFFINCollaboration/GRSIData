@@ -8,7 +8,6 @@
 //ClassImp(TDemandHit)
 /// \endcond
 
-
 TDemandHit::TDemandHit()
 {
    Clear();

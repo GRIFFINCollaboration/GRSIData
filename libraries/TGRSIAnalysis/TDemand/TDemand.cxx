@@ -19,12 +19,9 @@
 //==========================================================================//
 
 //approximate (x,y,z) of the TDemand OGS detectors. Using TIGRESS coordinate system.
-const std::array<double,6> TDemand::fXPositions= {55.5,43.5,-43.5,-55.5,-43.5,43.5};
-const std::array<double,6> TDemand::fYPositions= {0,45.5,45.5,0,-45.5,-45.5};
-const std::array<double,6> TDemand::fZPositions= {-93.9,-93.9,-93.9,-93.9,-93.9,-93.9};
-
-
-
+const std::array<double, 6> TDemand::fXPositions = {55.5, 43.5, -43.5, -55.5, -43.5, 43.5};
+const std::array<double, 6> TDemand::fYPositions = {0, 45.5, 45.5, 0, -45.5, -45.5};
+const std::array<double, 6> TDemand::fZPositions = {-93.9, -93.9, -93.9, -93.9, -93.9, -93.9};
 
 TDemand::TDemand()
 {
@@ -66,17 +63,18 @@ void TDemand::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
    AddHit(hit);
 }
 
-TVector3 TDemand::GetPosition(const TDemandHit& hit){
+TVector3 TDemand::GetPosition(const TDemandHit& hit)
+{
    return TDemand::GetPosition(hit.GetDetector());
 }
 
-TVector3 TDemand::GetPosition(int DetNbr) 
+TVector3 TDemand::GetPosition(int DetNbr)
 {
-   if (1 > DetNbr || 6 < DetNbr){ //if detector number is not 1,2,3,4,5,6, then return a 0 vector
-      return TVector3(0,0,0);
+   if(1 > DetNbr || 6 < DetNbr) {   //if detector number is not 1,2,3,4,5,6, then return a 0 vector
+      return TVector3(0, 0, 0);
    }
 
-   else{
-      return TVector3(fXPositions[DetNbr-1],fYPositions[DetNbr-1],fZPositions[DetNbr-1]); //-1 because we index the detectors at 1 but the vector at 0
+   else {
+      return TVector3(fXPositions[DetNbr - 1], fYPositions[DetNbr - 1], fZPositions[DetNbr - 1]);   //-1 because we index the detectors at 1 but the vector at 0
    }
 }
