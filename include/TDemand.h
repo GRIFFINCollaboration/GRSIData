@@ -25,6 +25,8 @@ public:
    ~TDemand() override                    = default;
 
    TDemandHit* GetDemandHit(const int& i) const { return static_cast<TDemandHit*>(GetHit(i)); }
+   static TVector3 GetPosition(int DetNbr); //!<!
+   static TVector3 GetPosition(const TDemandHit&); //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;

@@ -17,6 +17,15 @@
 //==========================================================================//
 //==========================================================================//
 //==========================================================================//
+
+//approximate (x,y,z) of the TDemand OGS detectors. Using TIGRESS coordinate system.
+const std::array<TDemand::fXPositions,6> = {55.5,43.5,-43.5,-55.5,-43.5,43.5};
+const std::array<TDemand::fYPositions,6> = {0,45.5,45.5,0,-45.5,-45.5};
+const std::array<TDemand::fZPositions,6> = {-93.9,-93.9,-93.9,-93.9,-93.9,-93.9};
+
+
+
+
 TDemand::TDemand()
 {
    Clear();
@@ -55,4 +64,19 @@ void TDemand::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel
 {
    auto* hit = new TDemandHit(*frag);
    AddHit(hit);
+}
+
+TVector3 TDemand::GetPosition(const TDemandHit& hit){
+   return TDemand::GetPosition(hit.GetDetector());
+}
+
+TVector3 TDemand::GetPosition(int DetNbr) const
+{
+   if (1 > DetNbr || 6 < DetNbr){ //if detector number is not 1,2,3,4,5,6, then return a 0 vector
+      return TVector3(0,0,0);
+   }
+
+   else{
+      return TVector3(fXPositions[DetNbr-1],fYPositions[DetNbr-1],fZPositions[DetNbr-1]); //-1 because we index the detectors at 1 but the vector at 0
+   }
 }

@@ -8,6 +8,7 @@
 //ClassImp(TDemandHit)
 /// \endcond
 
+
 TDemandHit::TDemandHit()
 {
    Clear();
@@ -77,12 +78,19 @@ void TDemandHit::Print(std::ostream& out) const
    out << str.str();
 }
 
-TVector3 TDemandHit::GetPosition(Double_t) const
+TVector3 TDemandHit::GetPosition(int DetNbr) const
 {
-   return TVector3(0, 0, 0);   //currently does nothing
+
+   if (1 > DetNbr || 6 < DetNbr){ //if detector number is not 1,2,3,4,5,6, then return a 0 vector
+      return TVector3(0,0,0);
+   }
+
+   else{
+      return TVector3(fXPositions[DetNbr-1],fYPositions[DetNbr-1],fZPositions[DetNbr-1]); //-1 because we index the detectors at 1 but the vector at 0
+   }
 }
 
 TVector3 TDemandHit::GetPosition() const
 {
-   return GetPosition(GetDefaultDistance());
+   return TDemand::GetPosition(*this);
 }
