@@ -21,7 +21,7 @@
 //approximate (x,y,z) of the TDemand OGS detectors. Using TIGRESS coordinate system.
 const std::array<double, 6> TDemand::fXPositions = {55.5, 43.5, -43.5, -55.5, -43.5, 43.5};
 const std::array<double, 6> TDemand::fYPositions = {0, 45.5, 45.5, 0, -45.5, -45.5};
-const std::array<double, 6> TDemand::fZPositions = {-93.9, -93.9, -93.9, -93.9, -93.9, -93.9};
+const std::array<double, 6> TDemand::fZPositions = {93.9, 93.9, 93.9, 93.9, 93.9, 93.9};
 
 TDemand::TDemand()
 {
