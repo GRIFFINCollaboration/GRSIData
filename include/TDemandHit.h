@@ -39,12 +39,12 @@ public:
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t);   //!<!
 
-   void     Clear(Option_t* opt = "") override;          //!<!
-   void     Print(Option_t* opt = "") const override;    //!<!
-   void     Print(std::ostream& out) const override;     //!<!
-   void     Copy(TObject&) const override;               //!<!
-   void     Copy(TObject&, bool) const override;         //!<!
-   TVector3 GetPosition() const override;                //!<!
+   void     Clear(Option_t* opt = "") override;         //!<!
+   void     Print(Option_t* opt = "") const override;   //!<!
+   void     Print(std::ostream& out) const override;    //!<!
+   void     Copy(TObject&) const override;              //!<!
+   void     Copy(TObject&, bool) const override;        //!<!
+   TVector3 GetPosition() const override;               //!<!
 
 private:
    Double_t GetDefaultDistance() const { return 0.0; }

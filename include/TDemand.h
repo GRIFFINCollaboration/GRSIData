@@ -24,9 +24,9 @@ public:
    TDemand& operator=(TDemand&&) noexcept = default;
    ~TDemand() override                    = default;
 
-   TDemandHit* GetDemandHit(const int& i) const { return static_cast<TDemandHit*>(GetHit(i)); }
-   static TVector3 GetPosition(int DetNbr); //!<!
-   static TVector3 GetPosition(const TDemandHit&); //!<!
+   TDemandHit*     GetDemandHit(const int& i) const { return static_cast<TDemandHit*>(GetHit(i)); }
+   static TVector3 GetPosition(int DetNbr);          //!<!
+   static TVector3 GetPosition(const TDemandHit&);   //!<!
 
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;
@@ -36,14 +36,13 @@ public:
    //static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fDetectorPosition[DetNbr]; }   //!<!
 
 private:
-   static bool                                     fSetCoreWave;        //!<!  Flag for Waveforms ON/OFF
+   static bool fSetCoreWave;   //!<!  Flag for Waveforms ON/OFF
    //static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition;   //!<!  Position of each detector (plus one default position)
 
    //physical information
-   static const std::array<double,6> fXPositions; //!
-   static const std::array<double,6> fYPositions; //!
-   static const std::array<double,6> fZPositions; //!
-
+   static const std::array<double, 6> fXPositions;   //!
+   static const std::array<double, 6> fYPositions;   //!
+   static const std::array<double, 6> fZPositions;   //!
 
 public:
    static bool SetCoreWave() { return fSetCoreWave; }   //!<!
