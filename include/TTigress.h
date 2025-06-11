@@ -58,6 +58,7 @@ public:
    static TVector3 GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 0., bool smear = false);   //!<!
    static TVector3 GetPosition(const TTigressHit&, double dist = 0., bool smear = false);                   //!<!
 
+   std::vector<TBgoHit>       fBgos;
    void     AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }        //!<!
    Short_t  GetBGOMultiplicity() const { return fBgos.size(); }   //!<!
    int      GetNBGOs() const { return fBgos.size(); }             //!<!
@@ -129,7 +130,6 @@ private:
 
    std::vector<TDetectorHit*> fAddbackHits;    //!<! Used to create addback hits on the fly
    std::vector<UShort_t>      fAddbackFrags;   //!<! Number of crystals involved in creating in the addback hit
-   std::vector<TBgoHit>       fBgos;
 
    static void BuildVectors();   //!<!
 
