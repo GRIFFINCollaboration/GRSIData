@@ -58,12 +58,12 @@ public:
    static TVector3 GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 0., bool smear = false);   //!<!
    static TVector3 GetPosition(const TTigressHit&, double dist = 0., bool smear = false);                   //!<!
 
-   std::vector<TBgoHit>       fBgos;
-   void     AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }        //!<!
-   Short_t  GetBGOMultiplicity() const { return fBgos.size(); }   //!<!
-   int      GetNBGOs() const { return fBgos.size(); }             //!<!
-   TBgoHit  GetBGO(int& i) const { return fBgos.at(i); }          //!<!
-   TBgoHit& GetBGO(int& i) { return fBgos.at(i); }                //!<!
+   std::vector<TBgoHit> fBgos;
+   void                 AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }        //!<!
+   Short_t              GetBGOMultiplicity() const { return fBgos.size(); }   //!<!
+   int                  GetNBGOs() const { return fBgos.size(); }             //!<!
+   TBgoHit              GetBGO(int& i) const { return fBgos.at(i); }          //!<!
+   TBgoHit&             GetBGO(int& i) { return fBgos.at(i); }                //!<!
 
    Int_t        GetAddbackMultiplicity();
    TTigressHit* GetAddbackHit(const int&);
