@@ -33,11 +33,9 @@ public:
 #endif
    void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 
-   //static ROOT::Math::Polar3DVector GetPosition(int DetNbr) { return fDetectorPosition[DetNbr]; }   //!<!
 
 private:
    static bool fSetCoreWave;   //!<!  Flag for Waveforms ON/OFF
-   //static std::array<ROOT::Math::Polar3DVector, 6> fDetectorPosition;   //!<!  Position of each detector (plus one default position)
 
    //physical information
    static const std::array<double, 6> fXPositions;   //!
