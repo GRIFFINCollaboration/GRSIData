@@ -33,7 +33,6 @@ public:
 #endif
    void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 
-
 private:
    static bool fSetCoreWave;   //!<!  Flag for Waveforms ON/OFF
 
