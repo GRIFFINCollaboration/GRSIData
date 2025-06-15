@@ -86,7 +86,7 @@ int TGRSIDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
             frags = CaenPhaToFragment(reinterpret_cast<uint32_t*>(ptr), banksize, event);
          } else {
             std::cout << DRED << std::endl
-                      << "Unknown bank in midas event #" << event->GetSerialNumber() << ", event ID 3, bank list " << event->GetBankList() << RESET_COLOR << std::endl;
+                      << "Unknown bank in midas event #" << event->GetSerialNumber() << ", event ID 3, bank list \"" << event->GetBankList() << "\"" << RESET_COLOR << std::endl;
          }
          break;
       case 4:

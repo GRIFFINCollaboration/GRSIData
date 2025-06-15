@@ -202,7 +202,7 @@ html: all
 	@$(RM) tempfile.out
 
 clean:
-	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
+	@printf "\n$(WARN_COLOR)Cleaning up GRSIData$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build lib
 	@-$(RM) -f $(EXECUTABLES)
 	@-$(RM) -rf libraries/*.so libraries/*.pcm #this is here for cleaning up libraries from pre GRSI 3.0
