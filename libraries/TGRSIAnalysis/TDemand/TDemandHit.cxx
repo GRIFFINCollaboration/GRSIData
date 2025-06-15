@@ -16,6 +16,7 @@ TDemandHit::TDemandHit()
 TDemandHit::TDemandHit(const TDemandHit& rhs) : TDetectorHit(rhs)
 {
    Clear();
+
    rhs.Copy(*this);
 }
 
@@ -23,6 +24,10 @@ TDemandHit::TDemandHit(const TFragment& frag)
 {
    frag.Copy(*this);
    frag.CopyWave(*this);
+
+   SetCcShort(frag.GetCcShort());
+   SetCcLong(frag.GetCcLong());
+   
    /*if(TDemandHit::SetWave()) {
       if(frag.GetWaveform()->empty()) {
          std::cout << "Warning, TDemandHit::SetWave() set, but data waveform size is zero!" << std::endl;
@@ -40,6 +45,8 @@ void TDemandHit::Copy(TObject& rhs) const
    TDetectorHit::Copy(rhs);
    TDetectorHit::CopyWave(rhs);
    static_cast<TDemandHit&>(rhs).fFilter = fFilter;
+   static_cast<TDemandHit&>(rhs).fCcShort    = fCcShort;
+   static_cast<TDemandHit&>(rhs).fCcLong     = fCcLong;
 }
 
 void TDemandHit::Copy(TObject& rhs, bool waveform) const
@@ -61,6 +68,8 @@ void TDemandHit::Clear(Option_t* opt)
 {
    TDetectorHit::Clear(opt);   // clears the base (address, position and waveform)
    fFilter = 0;
+   fCcShort = 0;
+   fCcLong  = 0;
 }
 
 void TDemandHit::Print(Option_t*) const
