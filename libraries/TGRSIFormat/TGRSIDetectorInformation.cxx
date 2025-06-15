@@ -57,6 +57,7 @@ void TGRSIDetectorInformation::Print(Option_t* opt) const
       str << "\t\tSHARC2:				  " << (Sharc2() ? "true" : "false") << std::endl;
       str << "\t\tRCMP:				     " << (Rcmp() ? "true" : "false") << std::endl;
       str << "\t\tARIES:              " << (Aries() ? "true" : "false") << std::endl;
+      str << "\t\tDemand:             " << (Demand() ? "true" : "false") << std::endl;
       str << std::endl;
       std::cout << str.str();
    }
@@ -92,6 +93,7 @@ void TGRSIDetectorInformation::Clear(Option_t*)
    fBgo        = false;
    fRcmp       = false;
    fAries      = false;
+   fDemand     = false;
 
    fDescantAncillary = false;
    fDescantWall      = false;
@@ -168,6 +170,9 @@ void TGRSIDetectorInformation::Set()
          break;
       case TGRSIMnemonic::ESystem::kAries:
          SetAries();
+         break;
+      case TGRSIMnemonic::ESystem::kDemand:
+         SetDemand();
          break;
       case TGRSIMnemonic::ESystem::kGeneric:
          SetGeneric();

@@ -64,6 +64,7 @@ public:
       kSharc2,
       kRcmp,
       kAries,
+      kDemand,
       kClear
    };
 

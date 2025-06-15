@@ -27,6 +27,7 @@
 #include "TSharc2.h"
 #include "TRcmp.h"
 #include "TAries.h"
+#include "TDemand.h"
 
 void TGRSIMnemonic::Clear(Option_t*)
 {
@@ -98,6 +99,8 @@ void TGRSIMnemonic::EnumerateSystem()
       fSystem = ESystem::kRcmp;
    } else if(SystemString() == "AR") {
       fSystem = ESystem::kAries;
+   } else if(SystemString() == "DM") {
+      fSystem = ESystem::kDemand;
    } else {
       fSystem = ESystem::kClear;
    }
@@ -201,6 +204,7 @@ TClass* TGRSIMnemonic::GetClassType() const
    case ESystem::kSharc2: SetClassType(TSharc2::Class()); break;
    case ESystem::kRcmp: SetClassType(TRcmp::Class()); break;
    case ESystem::kAries: SetClassType(TAries::Class()); break;
+   case ESystem::kDemand: SetClassType(TDemand::Class()); break;
    default: SetClassType(nullptr);
    };
    return TMnemonic::GetClassType();
