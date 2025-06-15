@@ -27,8 +27,8 @@ public:
 
 private:
    Int_t fFilter{0};
-   Int_t fCcShort{0}; ///< the short integration, long integration is stored in fCharge
-   Int_t fCcLong{0}; ///< this is actually the overflow bit of the energy!
+   Int_t fCcShort{0};   ///< the short integration, long integration is stored in fCharge
+   Int_t fCcLong{0};    ///< this is actually the overflow bit of the energy!
 
 public:
    /////////////////////////  Setters  /////////////////////////////////////
@@ -39,8 +39,8 @@ public:
 
    /////////////////////////  Getters  /////////////////////////////////////
    inline Int_t GetFilterPattern() const { return fFilter; }   //!<!
-   inline Int_t                 GetCcShort() const { return fCcShort; }        //!<!
-   inline Int_t                 GetCcLong() const { return fCcLong; }          //!<!
+   inline Int_t GetCcShort() const { return fCcShort; }        //!<!
+   inline Int_t GetCcLong() const { return fCcLong; }          //!<!
 
    /////////////////////////  TChannel Helpers /////////////////////////////////////
    bool InFilter(Int_t);   //!<!
