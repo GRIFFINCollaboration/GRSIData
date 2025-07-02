@@ -281,11 +281,11 @@ add_dependencies(GRSIData ${UTIL_NAMES})
 # PROJECT_SOURCE_DIR is the _deps/grsidata-src directory
 add_custom_target(GRSIDataVersion
 	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
-	                 -D DST=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
+	                 -D DST=${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
-						  BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
-						  COMMENT "Generating ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
+						  BYPRODUCTS ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+						  COMMENT "Generating ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
   )
 
 #----------------------------------------------------------------------------
