@@ -81,7 +81,7 @@ add_library(TMidas SHARED
 	)
 root_generate_dictionary(G__TMidas TXMLOdb.h TMidasEvent.h TMidasFile.h MODULE TMidas LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TMidas/LinkDef.h OPTIONS ${CLING_OPTIONS})
 target_link_libraries(TMidas TGRSIFormat ${ROOT_LIBRARIES})
-add_dependencies(TMidas GRSIDataVersion)
+add_dependencies(TMidas GRSIDataVersionCompile GRSIDataVersionBuild)
 
 add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/TGRSIDetectorInformation.cxx
