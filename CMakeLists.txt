@@ -279,14 +279,22 @@ add_dependencies(GRSIData ${UTIL_NAMES})
 # custom target to generate the version header
 # CMAKE_SOURCE_DIR is the GRSISort directory
 # PROJECT_SOURCE_DIR is the _deps/grsidata-src directory
-add_custom_target(GRSIDataVersion
+add_custom_target(GRSIDataVersionCompile
 	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
 	                 -D DST=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
 						  BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
 						  COMMENT "Generating ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
-						  file(COPY ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h DESTINATION ${CMAKE_BINARY_DIR}/include/)
+  )
+# couldn't figure out how to copy the file after generating it, so we generate it twice, once (above) in the _deps directory for other files to be compiled against, and once (below) in the build directory
+add_custom_target(GRSIDataVersionBuild
+	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
+	                 -D DST=${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+                    -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                    -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+						  BYPRODUCTS ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+						  COMMENT "Generating ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
   )
 
 #----------------------------------------------------------------------------
