@@ -284,6 +284,8 @@ add_custom_target(GRSIDataVersion
 	                 -D DST=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+						  BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
+						  COMMENT "Generating ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
   )
 
 #----------------------------------------------------------------------------
