@@ -81,7 +81,7 @@ add_library(TMidas SHARED
 	)
 root_generate_dictionary(G__TMidas TXMLOdb.h TMidasEvent.h TMidasFile.h MODULE TMidas LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TMidas/LinkDef.h OPTIONS ${CLING_OPTIONS})
 target_link_libraries(TMidas TGRSIFormat ${ROOT_LIBRARIES})
-add_dependencies(TMidas GRSIDataVersion)
+add_dependencies(TMidas GRSIDataVersionCompile GRSIDataVersionBuild)
 
 add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/TGRSIDetectorInformation.cxx
@@ -279,11 +279,22 @@ add_dependencies(GRSIData ${UTIL_NAMES})
 # custom target to generate the version header
 # CMAKE_SOURCE_DIR is the GRSISort directory
 # PROJECT_SOURCE_DIR is the _deps/grsidata-src directory
-add_custom_target(GRSIDataVersion
+add_custom_target(GRSIDataVersionCompile
 	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
 	                 -D DST=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+						  BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h
+						  COMMENT "Generating ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
+  )
+# couldn't figure out how to copy the file after generating it, so we generate it twice, once (above) in the _deps directory for other files to be compiled against, and once (below) in the build directory
+add_custom_target(GRSIDataVersionBuild
+	${CMAKE_COMMAND} -D SRC=${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in
+	                 -D DST=${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+                    -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                    -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+						  BYPRODUCTS ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h
+						  COMMENT "Generating ${CMAKE_BINARY_DIR}/include/GRSIDataVersion.h from ${PROJECT_SOURCE_DIR}/include/GRSIDataVersion.h.in"
   )
 
 #----------------------------------------------------------------------------
