@@ -146,7 +146,7 @@ while test $# -gt 0; do
     *)
       ### Give an error
       echo "Unknown argument \"$1\"!" 1>&2
-      echo "$usage" 1>&2
+      PrintHelp
       exit 1
       ;;
    esac
