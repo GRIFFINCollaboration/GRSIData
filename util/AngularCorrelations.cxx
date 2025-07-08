@@ -68,6 +68,8 @@ int main(int argc, char** argv)
    double      peakLow        = -1.;
    double      peakHigh       = -1.;
    std::string baseName       = "AngularCorrelation";
+   std::string bgName         = baseName + "BG";
+   std::string mixedName      = baseName + "Mixed";
    std::string inputFile;
    std::string theoryFile;
    std::string outputFile = "AngularCorrelations.root";
@@ -82,6 +84,8 @@ int main(int argc, char** argv)
    parser.option("background-high bg-high", &projBgHigh, true).description("High edge of background gate (for multiple gates use settings file).");
    parser.option("time-random-normalization", &timeRandomNorm, true).description("Normalization factor for subtraction of time-random matrix. If negative (default) it will be calculated automatically.");
    parser.option("base-name", &baseName, true).description("Base name of matrices.").default_value("AngularCorrelation");
+   parser.option("background-name", &bgName, true).description("Name of backround matrices.").default_value("AngularCorrelationBG");
+   parser.option("mixed-name", &mixedName, true).description("Name of mixed matrices.").default_value("AngularCorrelationMixed");
    parser.option("peak-pos peak", &peakPos, true).description("Peak position (for multiple peaks use settings file).");
    parser.option("peak-low", &peakLow, true).description("Low edge of peak fit.");
    parser.option("peak-high", &peakHigh, true).description("High edge of peak fit.");
@@ -315,21 +319,21 @@ int main(int argc, char** argv)
    // loop over all matrices
    for(int i = 0; i < angles->NumberOfAngles(); ++i) {
       // get the three histograms we need: prompt, time random, and event mixed
-      auto* prompt = static_cast<TH2*>(input.Get(Form("AngularCorrelation%d", i)));
+      auto* prompt = static_cast<TH2*>(input.Get(Form("%s%d", baseName.c_str(), i)));
       if(prompt == nullptr) {
-         std::cerr << "Failed to find histogram '" << Form("AngularCorrelation%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+         std::cerr << "Failed to find histogram '" << Form("%s%d", baseName.c_str(), i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
          std::cout << parser << std::endl;
          return 1;
       }
-      auto* bg = static_cast<TH2*>(input.Get(Form("AngularCorrelationBG%d", i)));
+      auto* bg = static_cast<TH2*>(input.Get(Form("%s%d", bgName.c_str(), i)));
       if(bg == nullptr) {
-         std::cerr << "Failed to find histogram '" << Form("AngularCorrelationBG%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+         std::cerr << "Failed to find histogram '" << Form("%s%d", bgName.c_str(), i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
          std::cout << parser << std::endl;
          return 1;
       }
-      auto* mixed = static_cast<TH2*>(input.Get(Form("AngularCorrelationMixed%d", i)));
+      auto* mixed = static_cast<TH2*>(input.Get(Form("%s%d", mixedName.c_str(), i)));
       if(mixed == nullptr) {
-         std::cerr << "Failed to find histogram '" << Form("AngularCorrelationMixed%d", i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
+         std::cerr << "Failed to find histogram '" << Form("%s%d", mixedName.c_str(), i) << "', should have " << angles->NumberOfAngles() << " angles in total!" << std::endl;
          std::cout << parser << std::endl;
          return 1;
       }
