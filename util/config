@@ -64,11 +64,20 @@ else
 	cflags="-std=c++11 -I$incdir"
 fi
 
-usage="\
-Usage: grsi-config [--version] [--incdir] [--cflags] [--libs] [--help]"
+PrintHelp () {
+      ### Print a helpful message...
+      progname=$(basename "$0")
+      echo "Usage: ${progname} [options]"
+      echo ""
+      echo "  --version       Print the current GRSIData Version number."
+      echo "  --incdir        Print header path."
+      echo "  --cflags        Print compiler flags and header path."
+      echo "  --libs          Print libdir + libraries."
+      echo "  --help          Print what you see here."
+}
 
 if test $# -eq 0; then
-  echo "${usage}" 1>&2
+  PrintHelp
   exit 1
 fi
 
@@ -134,15 +143,7 @@ while test $# -gt 0; do
 		done
       ;;
     --help)
-      ### Print a helpful message...
-      progname=$(basename "$0")
-      echo "Usage: ${progname} [options]"
-      echo ""
-      echo "  --version       Print the current GRSI Version number."
-      echo "  --incdir        Print header path."
-      echo "  --cflags        Print compiler flags and header path."
-      echo "  --libs          Print libdir + libraries."
-      echo "  --help          Print what you see here."
+			PrintHelp
       exit 0
       ;;
     *)
