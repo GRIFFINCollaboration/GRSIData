@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <fstream>
 
 #include "TFile.h"
 #include "TH2.h"
@@ -21,6 +22,7 @@
 #include "TGriffinAngles.h"
 #include "TPeakFitter.h"
 #include "TRWPeak.h"
+#include "TRedirect.h"
 
 TGraph*             MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
@@ -142,6 +144,10 @@ int main(int argc, char** argv)
    if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
    if(peakLow == -1.) { peakLow = settings->GetDouble("Peak.Low"); }
    if(peakHigh == -1.) { peakHigh = settings->GetDouble("Peak.High"); }
+	if(baseName == "AngularCorrelation") { baseName = settings->GetString("Histograms.BaseName", "AngularCorrelation"); }
+	if(bgName == "AngularCorrelationBG") { bgName = settings->GetString("Histograms.BackgroundName", "AngularCorrelationBG"); }
+	if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
+
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
    std::vector<double> bgPeakPos;
    std::vector<double> bgLow;
@@ -211,6 +217,12 @@ int main(int argc, char** argv)
          bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i]) / 2.;
          if(output) { std::cout << bgPeakParameter[i] << std::endl; }
       }
+		// if we don't have limits for the peak position, fix it
+		if(i == 1 && peakParameterLow[i] == 0. && peakParameterHigh[i] == -1.) {
+			peakParameter[i] = peakPos;
+			peakParameterLow[i] = peakPos;
+			peakParameterHigh[i] = peakPos;
+		}
    }
    // parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
    // same idea as above, lower limit = higher limit means fixed parameter, higher limit < lower limit means parameter not set
@@ -289,6 +301,10 @@ int main(int argc, char** argv)
       return 1;
    }
 
+	// get the log file name from the output file name
+	auto logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
+	std::ofstream logFile(logFileName.c_str());
+
    // --------------------------------------------------------------------------------
    // Create the angular distribution.
    // --------------------------------------------------------------------------------
@@ -363,14 +379,17 @@ int main(int argc, char** argv)
       projMixed->Add(projMixedBg, -(mixed->GetYaxis()->FindBin(projGateHigh) - mixed->GetYaxis()->FindBin(projGateLow) + 1) / mixedBgGateWidth);
 
       // fit the projections, we create separate peak fitters and peaks for the prompt and mixed histograms
+
       TPeakFitter pf(peakLow, peakHigh);
       TRWPeak     peak(peakPos);
       for(size_t p = 0; p < peakParameterLow.size(); ++p) {
          if(peakParameterLow[p] == peakParameterHigh[p]) {
             peak.GetFitFunction()->FixParameter(p, peakParameter[p]);
+				logFile << i << ": Fixed peak parameter " << p << " to " << peakParameter[p] << " (because " << peakParameterLow[p] << " == " << peakParameterHigh[p] << ")" << std::endl;
          } else if(peakParameterLow[p] < peakParameterHigh[p]) {
             peak.GetFitFunction()->SetParameter(p, peakParameter[p]);
             peak.GetFitFunction()->SetParLimits(p, peakParameterLow[p], peakParameterHigh[p]);
+				logFile << i << ": Limiting peak parameter " << p << " = " << peakParameter[p] << " to " << peakParameterLow[p] << " - " << peakParameterHigh[p] << std::endl;
          }
       }
       pf.AddPeak(&peak);
@@ -379,9 +398,11 @@ int main(int argc, char** argv)
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
+					logFile << i << ": Fixed background peak parameter " << p << " to " << bgPeakParameter[p] << " (because " << bgPeakParameterLow[p] << " == " << bgPeakParameterHigh[p] << ")" << std::endl;
             } else if(bgPeakParameterLow[p] < bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
                bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
+					logFile << i << ": Limiting background peak parameter " << p << " = " << bgPeakParameter[p] << " to " << bgPeakParameterLow[p] << " - " << bgPeakParameterHigh[p] << std::endl;
             }
          }
          pf.AddPeak(bgP);
@@ -389,21 +410,34 @@ int main(int argc, char** argv)
       for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
          if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
             pf.GetBackground()->FixParameter(p, backgroundParameter[p]);
+				logFile << i << ": Fixed background parameter " << p << " to " << backgroundParameter[p] << " (because " << backgroundParameterLow[p] << " == " << backgroundParameterHigh[p] << ")" << std::endl;
          } else if(backgroundParameterLow[p] < backgroundParameterHigh[p]) {
             pf.GetBackground()->SetParameter(p, backgroundParameter[p]);
             pf.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
+				logFile << i << ": Limiting background parameter " << p << " = " << backgroundParameter[p] << " to " << backgroundParameterLow[p] << " - " << backgroundParameterHigh[p] << std::endl;
          }
       }
-      pf.Fit(proj, "qretryfit");
+		{
+			TRedirect redirect("/dev/null");
+			pf.Fit(proj, "qretryfit");
+		}
+
+      logFile << i << ": peak fit done, got: " << std::endl
+              << "    centroid " << peak.Centroid() << " +- " << peak.CentroidErr() << std::endl
+              << "    area " << peak.Area() << " +- " << peak.AreaErr() << std::endl
+              << "    FWHM " << peak.FWHM() << " +- " << peak.FWHMErr() << std::endl
+				  << "    reduced chi^2 " << peak.GetReducedChi2() << std::endl;
 
       TPeakFitter pfMixed(peakLow, peakHigh);
       TRWPeak     peakMixed(peakPos);
       for(size_t p = 0; p < peakParameterLow.size(); ++p) {
          if(peakParameterLow[p] == peakParameterHigh[p]) {
             peakMixed.GetFitFunction()->FixParameter(p, peakParameter[p]);
+				logFile << i << ": Fixed peak parameter " << p << " to " << peakParameter[p] << " (because " << peakParameterLow[p] << " == " << peakParameterHigh[p] << ")" << std::endl;
          } else if(peakParameterLow[p] < peakParameterHigh[p]) {
             peakMixed.GetFitFunction()->SetParameter(p, peakParameter[p]);
             peakMixed.GetFitFunction()->SetParLimits(p, peakParameterLow[p], peakParameterHigh[p]);
+				logFile << i << ": Limiting peak parameter " << p << " = " << peakParameter[p] << " to " << peakParameterLow[p] << " - " << peakParameterHigh[p] << std::endl;
          }
       }
       pfMixed.AddPeak(&peakMixed);
@@ -412,9 +446,11 @@ int main(int argc, char** argv)
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
+					logFile << i << ": Fixed background peak parameter " << p << " to " << bgPeakParameter[p] << " (because " << bgPeakParameterLow[p] << " == " << bgPeakParameterHigh[p] << ")" << std::endl;
             } else if(bgPeakParameterLow[p] < bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
                bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
+					logFile << i << ": Limiting background peak parameter " << p << " = " << bgPeakParameter[p] << " to " << bgPeakParameterLow[p] << " - " << bgPeakParameterHigh[p] << std::endl;
             }
          }
          pfMixed.AddPeak(bgP);
@@ -422,12 +458,23 @@ int main(int argc, char** argv)
       for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
          if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
             pfMixed.GetBackground()->FixParameter(p, backgroundParameter[p]);
+				logFile << i << ": Fixed background parameter " << p << " to " << backgroundParameter[p] << " (because " << backgroundParameterLow[p] << " == " << backgroundParameterHigh[p] << ")" << std::endl;
          } else if(backgroundParameterLow[p] < backgroundParameterHigh[p]) {
             pfMixed.GetBackground()->SetParameter(p, backgroundParameter[p]);
             pfMixed.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
+				logFile << i << ": Limiting background parameter " << p << " = " << backgroundParameter[p] << " to " << backgroundParameterLow[p] << " - " << backgroundParameterHigh[p] << std::endl;
          }
       }
-      pfMixed.Fit(projMixed, "qretryfit");
+		{
+			TRedirect redirect("/dev/null");
+			pfMixed.Fit(projMixed, "qretryfit");
+		}
+
+      logFile << i << ": mixed peak fit done, got: " << std::endl
+              << "    centroid " << peakMixed.Centroid() << " +- " << peakMixed.CentroidErr() << std::endl
+              << "    area " << peakMixed.Area() << " +- " << peakMixed.AreaErr() << std::endl
+              << "    FWHM " << peakMixed.FWHM() << " +- " << peakMixed.FWHMErr() << std::endl
+				  << "    reduced chi^2 " << peakMixed.GetReducedChi2() << std::endl;
 
       // save the fitted histograms to the output file and the areas of the peaks
       fitDir->cd();
