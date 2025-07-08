@@ -4,10 +4,6 @@
 #include "TClass.h"
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-//ClassImp(TDemandHit)
-/// \endcond
-
 TDemandHit::TDemandHit()
 {
    Clear();
