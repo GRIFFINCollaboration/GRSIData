@@ -144,9 +144,9 @@ int main(int argc, char** argv)
    if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
    if(peakLow == -1.) { peakLow = settings->GetDouble("Peak.Low"); }
    if(peakHigh == -1.) { peakHigh = settings->GetDouble("Peak.High"); }
-	if(baseName == "AngularCorrelation") { baseName = settings->GetString("Histograms.BaseName", "AngularCorrelation"); }
-	if(bgName == "AngularCorrelationBG") { bgName = settings->GetString("Histograms.BackgroundName", "AngularCorrelationBG"); }
-	if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
+   if(baseName == "AngularCorrelation") { baseName = settings->GetString("Histograms.BaseName", "AngularCorrelation"); }
+   if(bgName == "AngularCorrelationBG") { bgName = settings->GetString("Histograms.BackgroundName", "AngularCorrelationBG"); }
+   if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
    std::vector<double> bgPeakPos;
@@ -217,12 +217,12 @@ int main(int argc, char** argv)
          bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i]) / 2.;
          if(output) { std::cout << bgPeakParameter[i] << std::endl; }
       }
-		// if we don't have limits for the peak position, fix it
-		if(i == 1 && peakParameterLow[i] == 0. && peakParameterHigh[i] == -1.) {
-			peakParameter[i] = peakPos;
-			peakParameterLow[i] = peakPos;
-			peakParameterHigh[i] = peakPos;
-		}
+      // if we don't have limits for the peak position, fix it
+      if(i == 1 && peakParameterLow[i] == 0. && peakParameterHigh[i] == -1.) {
+         peakParameter[i]     = peakPos;
+         peakParameterLow[i]  = peakPos;
+         peakParameterHigh[i] = peakPos;
+      }
    }
    // parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
    // same idea as above, lower limit = higher limit means fixed parameter, higher limit < lower limit means parameter not set
@@ -301,9 +301,9 @@ int main(int argc, char** argv)
       return 1;
    }
 
-	// get the log file name from the output file name
-	auto logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
-	std::ofstream logFile(logFileName.c_str());
+   // get the log file name from the output file name
+   auto          logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
+   std::ofstream logFile(logFileName.c_str());
 
    // --------------------------------------------------------------------------------
    // Create the angular distribution.
@@ -414,10 +414,10 @@ int main(int argc, char** argv)
             pf.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
          }
       }
-		{
-			TRedirect redirect("/dev/null");
-			pf.Fit(proj, "qretryfit");
-		}
+      {
+         TRedirect redirect("/dev/null");
+         pf.Fit(proj, "qretryfit");
+      }
 
       logFile << std::setw(2) << i << "    p    "
               << std::setw(10) << peak.Centroid() << " +- " << std::setw(10) << peak.CentroidErr() << "    "
@@ -456,10 +456,10 @@ int main(int argc, char** argv)
             pfMixed.GetBackground()->SetParLimits(p, backgroundParameterLow[p], backgroundParameterHigh[p]);
          }
       }
-		{
-			TRedirect redirect("/dev/null");
-			pfMixed.Fit(projMixed, "qretryfit");
-		}
+      {
+         TRedirect redirect("/dev/null");
+         pfMixed.Fit(projMixed, "qretryfit");
+      }
 
       logFile << std::setw(2) << i << "    m    "
               << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "    " 
