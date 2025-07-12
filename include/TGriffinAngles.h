@@ -79,8 +79,8 @@ private:
    std::map<int, int>    fAngleCount;          ///< Maps angles (divided by rounding and cast to integers) to number of combinations contributing to it.
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffinAngles, 4)   // NOLINT(readability-else-after-return)
-                                         /// \endcond
+   ClassDefOverride(TGriffinAngles, 5)   // NOLINT(readability-else-after-return)
+   /// \endcond
 };
 /*! @} */
 #endif
