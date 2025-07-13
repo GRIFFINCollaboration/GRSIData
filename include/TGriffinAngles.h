@@ -23,6 +23,8 @@
 #include "TNamed.h"
 #include "TGraphErrors.h"
 
+#include "Globals.h"
+
 class TGriffinAngles : public TNamed {
 public:
    explicit TGriffinAngles(double distance = 145., bool folding = false, bool grouping = false, bool addback = true);
@@ -65,7 +67,11 @@ public:
    static double Rounding() { return fRounding; }
    static void   Rounding(const double& val) { fRounding = val; }
 
+	static EVerbosity Verbosity() { return fVerbosity; }
+	static void Verbosity(const EVerbosity& val) { fVerbosity = val; }
+
 private:
+	static EVerbosity		 fVerbosity;           ///< verbosity level
    double                fDistance{145.};      ///< distance of detector from center of array in mmm
    bool                  fFolding{false};      ///< flag indicating whether we fold our distribution around 90 degree
    bool                  fGrouping{false};     ///< flag indicating whether we group close angles together
