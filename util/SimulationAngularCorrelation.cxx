@@ -103,8 +103,9 @@ int main(int argc, char** argv)
 		}
 	}
 
+	TUserSettings settings;
 	if(!settingsFile.empty()) {
-		TUserSettings settings(settingsFile);
+		settings.ReadSettings(settingsFile);
 		
 		if(inputFilenames[0].empty()) {
 			inputFilenames[0] = settings.GetStringVector("Coefficient.000.Files");
@@ -421,6 +422,8 @@ int main(int argc, char** argv)
 
 		graph[c].Write();
 	} // end of coeff. loop
+
+	settings.Write();
 
 	output.Close();
 
