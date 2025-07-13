@@ -33,23 +33,26 @@ int main(int argc, char** argv)
 
 	for(int i = 1; i < argc; ++i) {
       if(strncmp(argv[i], "-if", 2) == 0) {
+			// check which coefficent this is for
+			int coefficent = -1;
+			if(strcmp(&argv[i][3], "000") == 0) {
+				coefficent = 0;
+			} else if(strcmp(&argv[i][3], "010") == 0) {
+				coefficent = 1;
+			} else if(strcmp(&argv[i][3], "100") == 0) {
+				coefficent = 2;
+			} else {
+				std::cerr << "Unknown -if* command line flag " << argv[i] << ", should be -if000, -if010, or -if100!" << std::endl;
+				printUsage = true;
+				break;
+			}
          // if we have another argument, check if it starts with '-'
          while(i + 1 < argc) {
             if(argv[i + 1][0] == '-') {
                break;
             }
             // if we get here we can add the next argument to the list of file names
-				if(strcmp(&argv[i][3], "000") == 0) {
-					inputFilenames[0].emplace_back(argv[++i]);
-				} else if(strcmp(&argv[i][3], "010") == 0) {
-					inputFilenames[1].emplace_back(argv[++i]);
-				} else if(strcmp(&argv[i][3], "100") == 0) {
-					inputFilenames[2].emplace_back(argv[++i]);
-				} else {
-					std::cerr << "Unknown command line flag " << argv[i] << "!" << std::endl;
-					printUsage = true;
-					break;
-				}
+				inputFilenames[coefficent].emplace_back(argv[++i]);
          }
 		} else if(strcmp(argv[i], "-of") == 0) {
          if(i + 1 < argc) {
