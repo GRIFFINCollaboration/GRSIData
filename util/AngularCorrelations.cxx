@@ -421,9 +421,9 @@ int main(int argc, char** argv)
 
       logFile << std::setw(2) << i << "    p    "
               << std::setw(10) << peak.Centroid() << " +- " << std::setw(10) << peak.CentroidErr() << "    "
-				  << std::setw(10) << peak.Area() << " +- " << std::setw(10) << peak.AreaErr() << "    "
-				  << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
-				  << std::setw(10) << peak.GetReducedChi2() << std::endl;
+              << std::setw(10) << peak.Area() << " +- " << std::setw(10) << peak.AreaErr() << "    "
+              << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
+              << std::setw(10) << peak.GetReducedChi2() << std::endl;
 
       TPeakFitter pfMixed(peakLow, peakHigh);
       TRWPeak     peakMixed(peakPos);
@@ -462,10 +462,10 @@ int main(int argc, char** argv)
       }
 
       logFile << std::setw(2) << i << "    m    "
-              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "    " 
-				  << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    " 
-				  << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    " 
-				  << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
+              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "    "
+              << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    "
+              << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    "
+              << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
 
       // save the fitted histograms to the output file and the areas of the peaks
       fitDir->cd();
