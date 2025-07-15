@@ -24,7 +24,7 @@
 #include "TRWPeak.h"
 #include "TRedirect.h"
 
-TGraph*             MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters);
+TGraph*             MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 double GetYError(TGraphErrors* graph, const double& x)
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
    if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
-   std::vector<double> bgPeakPos;
+   std::vector<std::tuple<double, double, double>> bgPeakPos; // position, low, high
    std::vector<double> bgLow;
    std::vector<double> bgHigh;
    // we only fill the background gates from the settings if there were none provided on the command line
@@ -176,12 +176,15 @@ int main(int argc, char** argv)
    // we loop until we fail to find an entry
    for(int i = 1;; ++i) {
       try {
-         auto pos = settings->GetDouble(Form("BackgroundPeak.Position.%d", i), true);
+         auto pos = settings->GetDouble(Form("Background.Peak.%d.Position", i), true);
          if(pos <= peakLow || pos >= peakHigh) {
             std::cout << i << ". background peak outside of fit range: " << pos << " <= " << peakLow << " or " << pos << " >= " << peakHigh << std::endl;
             break;
          }
-         bgPeakPos.push_back(pos);
+			// read low and high limit for this background peak, defaults to -1 if not set in the settings file
+         auto low = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
+         auto high = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
+         bgPeakPos.push_back(std::make_tuple(pos, low, high));
       } catch(std::out_of_range& e) {
          break;
       }
@@ -200,9 +203,9 @@ int main(int argc, char** argv)
       peakParameter[i]       = settings->GetDouble(Form("Peak.Parameter.%d", static_cast<int>(i)), -2.);
       peakParameterLow[i]    = settings->GetDouble(Form("Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
       peakParameterHigh[i]   = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
-      bgPeakParameter[i]     = settings->GetDouble(Form("BackgroundPeak.Parameter.%d", static_cast<int>(i)), -2.);
-      bgPeakParameterLow[i]  = settings->GetDouble(Form("BackgroundPeak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      bgPeakParameterHigh[i] = settings->GetDouble(Form("BackgroundPeak.Parameter.%d.High", static_cast<int>(i)), -1.);
+      bgPeakParameter[i]     = settings->GetDouble(Form("Background.Peak.Parameter.%d", static_cast<int>(i)), -2.);
+      bgPeakParameterLow[i]  = settings->GetDouble(Form("Background.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
+      bgPeakParameterHigh[i] = settings->GetDouble(Form("Background.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
       // check that the result makes sense, i.e. if the limits are in the righ order that the parameter itself is within the limits
       // only output a warning that the parameter is changed if it's not the default value
       if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
@@ -395,7 +398,11 @@ int main(int argc, char** argv)
       }
       pf.AddPeak(&peak);
       for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(bgPeak);
+         auto* bgP = new TRWPeak(std::get<0>(bgPeak));
+			// if we have limits for the position of this peak, apply them
+			if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+				bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
+			}
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -419,8 +426,8 @@ int main(int argc, char** argv)
          pf.Fit(proj, "qretryfit");
       }
 
-      logFile << std::setw(2) << i << "    p    "
-              << std::setw(10) << peak.Centroid() << " +- " << std::setw(10) << peak.CentroidErr() << "    "
+      logFile << std::setw(2) << i << "    p  "
+              << std::setw(10) << peak.Centroid() << " +- " << std::setw(10) << peak.CentroidErr() << "        "
 				  << std::setw(10) << peak.Area() << " +- " << std::setw(10) << peak.AreaErr() << "    "
 				  << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
 				  << std::setw(10) << peak.GetReducedChi2() << std::endl;
@@ -462,7 +469,7 @@ int main(int argc, char** argv)
       }
 
       logFile << std::setw(2) << i << "    m    "
-              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "    " 
+              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "        " 
 				  << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    " 
 				  << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    " 
 				  << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
@@ -541,8 +548,8 @@ int main(int argc, char** argv)
       if(theory.IsOpen()) {
          // read graphs from file
          auto* z0 = static_cast<TGraphErrors*>(theory.Get("graph000"));
-         auto* z2 = static_cast<TGraphErrors*>(theory.Get("graph010"));
-         auto* z4 = static_cast<TGraphErrors*>(theory.Get("graph100"));
+         auto* z2 = static_cast<TGraphErrors*>(theory.Get("graph100"));
+         auto* z4 = static_cast<TGraphErrors*>(theory.Get("graph010"));
 
          if(z0 != nullptr && z2 != nullptr && z4 != nullptr && z0->GetN() == z2->GetN() && z0->GetN() == z4->GetN()) {
             // check if the sizes of the provided graphs match what we expect:
@@ -557,28 +564,33 @@ int main(int argc, char** argv)
                std::vector<TGraph*>             spin;
                std::vector<double>              spinLabel;
                std::vector<std::vector<double>> parameters;
+               logFile << std::endl;
                // first check which of the vectors we iterate over
                if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
+						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << " - " << twoJLow.back() << std::endl;
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back()));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
+						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << " - " << twoJMiddle.back() << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back()));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
+						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << " - " << twoJHigh.back() << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJHigh) {
                      parameters.emplace_back();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else {
+						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
-                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back()));
+                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
 
@@ -702,6 +714,7 @@ int main(int argc, char** argv)
 
    output.Close();
    input.Close();
+	logFile.close();
 
    return 0;
 }
@@ -753,8 +766,10 @@ private:
    TGraphErrors* fZ4{nullptr};
 };
 
-TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters)
+TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
+	logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
+	logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
    TGraph*           result = nullptr;
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
@@ -870,6 +885,7 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
             minChi2 = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
             bestParameters.assign(fitResult.GetParams(), fitResult.GetParams() + nPar);
          }
+			logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
       }
    }
    return result;
