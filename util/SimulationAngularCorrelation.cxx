@@ -31,6 +31,7 @@ int main(int argc, char** argv)
 	int verboseLevel = 0;
 	std::string settingsFile;
 
+	// read command line arguments
 	for(int i = 1; i < argc; ++i) {
       if(strncmp(argv[i], "-if", 2) == 0) {
 			// check which coefficent this is for
@@ -106,6 +107,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+	// try to read user settings
 	TUserSettings settings;
 	if(!settingsFile.empty()) {
 		settings.ReadSettings(settingsFile);
@@ -119,26 +121,31 @@ int main(int argc, char** argv)
 		if(inputFilenames[2].empty()) {
 			inputFilenames[2] = settings.GetStringVector("Coefficient.100.Files");
 		}
-		outputFilename = settings.GetString("OutputFilename", "SimulatedAngularCorrelation.root");
+		if(outputFilename == "SimulatedAngularCorrelation.root") {
+			outputFilename = settings.GetString("OutputFilename", "SimulatedAngularCorrelation.root");
+		} else {
+			std::cout << "Output filename has already been set to \"" << outputFilename << "\" via command line, ignoring settings file for this." << std::endl;
+		}
 		if(gateEnergy != 0.) {
-			std::cerr << "Warning, already got gate energy " << gateEnergy << ", this will be overwritten by the settings file!" << std::endl;
+			std::cerr << "Warning, already got gate energy " << gateEnergy << ", this could be overwritten by the settings file!" << std::endl;
 		}
-		gateEnergy = settings.GetDouble("Energy.Gate", 0.);
+		gateEnergy = settings.GetDouble("Energy.Gate", gateEnergy);
 		if(fitEnergy != 0.) {
-			std::cerr << "Warning, already got fit energy " << fitEnergy << ", this will be overwritten by the settings file!" << std::endl;
+			std::cerr << "Warning, already got fit energy " << fitEnergy << ", this could be overwritten by the settings file!" << std::endl;
 		}
-		fitEnergy = settings.GetDouble("Energy.Fit", 0.);
+		fitEnergy = settings.GetDouble("Energy.Fit", fitEnergy);
+		// GetBool doesn't have a default version, so catch any errors
 		try {
 			addback = settings.GetBool("Addback", true);
 		} catch(std::out_of_range& e) { }
 		try {
 			singleCrystal = settings.GetBool("SingleCrystal", true);
 		} catch(std::out_of_range& e) { }
-		distance = settings.GetDouble("Distance", 145.);
-		bins = settings.GetInt("Bins", 2000);;
-		minEnergy = settings.GetDouble("Energy.Minimum", 0.);
-		maxEnergy = settings.GetDouble("Energy.Minimum", 2000.);
-		verboseLevel = settings.GetInt("Verbosity", 0);;
+		distance = settings.GetDouble("Distance", distance);
+		bins = settings.GetInt("Bins", bins);
+		minEnergy = settings.GetDouble("Energy.Minimum", minEnergy);
+		maxEnergy = settings.GetDouble("Energy.Minimum", maxEnergy);
+		verboseLevel = settings.GetInt("Verbosity", verboseLevel);
 	}
 
 	if(!printUsage && (inputFilenames[0].empty() || inputFilenames[1].empty() || inputFilenames[2].empty())) {
@@ -198,14 +205,6 @@ int main(int argc, char** argv)
 
 	std::array<std::vector<TH2D*>, 3> hists;
 	std::array<TGraphErrors, 3> graph;
-	for(int c = 0; c < 3; ++c) {
-		hists[c].resize(angles.NumberOfAngles());
-		for(auto angle = angles.begin(); angle != angles.end(); ++angle) {
-			int i = std::distance(angles.begin(), angle);
-			hists[c][i] = new TH2D(Form("AngularCorrelation%d_%d", c, i), Form("%.1f^{o}: Simulated suppressed #gamma-#gamma %s", *angle, conditions.c_str()), bins, minEnergy, maxEnergy, bins, minEnergy, maxEnergy);
-		}
-		graph[c].Set(angles.NumberOfAngles());
-	}
 
 	graph[0].SetName("graph000");
 	graph[0].SetTitle(Form("Simulated angular correlation coeff. 000, using %s;angle [#circ]", conditions.c_str()));
@@ -218,6 +217,14 @@ int main(int argc, char** argv)
 
 	// loop over the three coefficents
 	for(int c = 0; c < 3; ++c) {
+		// resize and allocate histograms and graphs
+		hists[c].resize(angles.NumberOfAngles());
+		for(auto angle = angles.begin(); angle != angles.end(); ++angle) {
+			int i = std::distance(angles.begin(), angle);
+			hists[c][i] = new TH2D(Form("AngularCorrelation%d_%d", c, i), Form("%.1f^{o}: Simulated suppressed #gamma-#gamma %s", *angle, conditions.c_str()), bins, minEnergy, maxEnergy, bins, minEnergy, maxEnergy);
+		}
+		graph[c].Set(angles.NumberOfAngles());
+
 		// add all input files to the chain and set the branch addresses
 		TChain chain("ntuple");
 
@@ -324,8 +331,8 @@ int main(int argc, char** argv)
 					}
 				}
 
-				griffin.Clear();
-				grifBgo.Clear();
+				griffin.Clear("a");
+				grifBgo.Clear("a");
 				fragments.clear();
 			}
 			switch(systemID) {
@@ -408,13 +415,6 @@ int main(int argc, char** argv)
 				std::cout << std::setw(10) << angle.first << " found " << std::setw(8) << angle.second << " times" << std::endl;
 			}
 		}
-		for(auto* hist : hists[c]) {
-			hist->Write();
-		}
-
-		if(verboseLevel > 0) {
-			std::cout << "done writing histograms" << std::endl;
-		}
 
 		// create the graphs by getting the bin contents of the 2D matrix
 		for(size_t i = 0; i < hists[c].size(); ++i) {
@@ -423,7 +423,17 @@ int main(int argc, char** argv)
 			graph[c].SetPointError(i, 0., TMath::Sqrt(counts)/angles.Count(angles.Angle(i)));
 		}
 
+		// write histograms and graph
+		for(auto* hist : hists[c]) {
+			hist->Write();
+			delete hist;
+		}
+
 		graph[c].Write();
+
+		if(verboseLevel > 0) {
+			std::cout << c << ": done writing histograms and graph" << std::endl;
+		}
 	} // end of coeff. loop
 
 	settings.Write();
