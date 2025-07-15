@@ -444,7 +444,11 @@ int main(int argc, char** argv)
       }
       pfMixed.AddPeak(&peakMixed);
       for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(bgPeak);
+         auto* bgP = new TRWPeak(std::get<0>(bgPeak));
+			// if we have limits for the position of this peak, apply them
+			if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+				bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
+			}
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
