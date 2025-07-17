@@ -155,9 +155,9 @@ int main(int argc, char** argv)
    if(outputFile == "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
-   std::vector<std::tuple<double, double, double>> bgPeakPos; // position, low, high
-   std::vector<double> bgLow;
-   std::vector<double> bgHigh;
+   std::vector<std::tuple<double, double, double>> bgPeakPos;   // position, low, high
+   std::vector<double>                             bgLow;
+   std::vector<double>                             bgHigh;
    // we only fill the background gates from the settings if there were none provided on the command line
    if(projBgLow == -1. || projBgHigh == -1. || projBgLow >= projBgHigh) {
       for(int i = 1;; ++i) {
@@ -187,8 +187,8 @@ int main(int argc, char** argv)
             std::cout << i << ". background peak outside of fit range: " << pos << " <= " << peakLow << " or " << pos << " >= " << peakHigh << std::endl;
             break;
          }
-			// read low and high limit for this background peak, defaults to -1 if not set in the settings file
-         auto low = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
+         // read low and high limit for this background peak, defaults to -1 if not set in the settings file
+         auto low  = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
          auto high = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
          bgPeakPos.push_back(std::make_tuple(pos, low, high));
       } catch(std::out_of_range& e) {
@@ -405,10 +405,10 @@ int main(int argc, char** argv)
       pf.AddPeak(&peak);
       for(auto bgPeak : bgPeakPos) {
          auto* bgP = new TRWPeak(std::get<0>(bgPeak));
-			// if we have limits for the position of this peak, apply them
-			if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
-				bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
-			}
+         // if we have limits for the position of this peak, apply them
+         if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+            bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
+         }
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -434,9 +434,9 @@ int main(int argc, char** argv)
 
       logFile << std::setw(2) << i << "    p  "
               << std::setw(10) << peak.Centroid() << " +- " << std::setw(10) << peak.CentroidErr() << "        "
-				  << std::setw(10) << peak.Area() << " +- " << std::setw(10) << peak.AreaErr() << "    "
-				  << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
-				  << std::setw(10) << peak.GetReducedChi2() << std::endl;
+              << std::setw(10) << peak.Area() << " +- " << std::setw(10) << peak.AreaErr() << "    "
+              << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
+              << std::setw(10) << peak.GetReducedChi2() << std::endl;
 
       TPeakFitter pfMixed(peakLow, peakHigh);
       TRWPeak     peakMixed(peakPos);
@@ -451,10 +451,10 @@ int main(int argc, char** argv)
       pfMixed.AddPeak(&peakMixed);
       for(auto bgPeak : bgPeakPos) {
          auto* bgP = new TRWPeak(std::get<0>(bgPeak));
-			// if we have limits for the position of this peak, apply them
-			if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
-				bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
-			}
+         // if we have limits for the position of this peak, apply them
+         if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+            bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
+         }
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -479,10 +479,10 @@ int main(int argc, char** argv)
       }
 
       logFile << std::setw(2) << i << "    m    "
-              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "        " 
-				  << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    " 
-				  << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    " 
-				  << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
+              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "        "
+              << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    "
+              << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    "
+              << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
 
       // save the fitted histograms to the output file and the areas of the peaks
       fitDir->cd();
@@ -546,8 +546,8 @@ int main(int argc, char** argv)
 #endif
    }
 
-	// change to output file
-	output.cd();
+   // change to output file
+   output.cd();
 
    // --------------------------------------------------------------------------------
    // If a theory/simulation file has been provided, we use the a2/a4 and mixing
@@ -580,33 +580,33 @@ int main(int argc, char** argv)
                logFile << std::endl;
                // first check which of the vectors we iterate over
                if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
-						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << " - " << twoJLow.back() << std::endl;
+                  logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << " - " << twoJLow.back() << std::endl;
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
-							output.cd();
+                     output.cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
-						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << " - " << twoJMiddle.back() << ", low 2J = " << twoJLow.at(0) << std::endl;
+                  logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << " - " << twoJMiddle.back() << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
-							output.cd();
+                     output.cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
-						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << " - " << twoJHigh.back() << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
+                  logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << " - " << twoJHigh.back() << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJHigh) {
                      parameters.emplace_back();
-							output.cd();
+                     output.cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else {
-						logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
+                  logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
-						output.cd();
+                  output.cd();
                   spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
@@ -677,7 +677,7 @@ int main(int argc, char** argv)
                spin[first]->GetHistogram()->GetYaxis()->CenterTitle();
 
                // write graphs and canvas to output file
-					output.cd();
+               output.cd();
                z0->Write("graph000");
                z2->Write("graph010");
                z4->Write("graph100");
@@ -703,7 +703,7 @@ int main(int argc, char** argv)
                   output.WriteObject(&parameters[i], Form("Parameters%d", static_cast<int>(i)));
                }
 
-					output.cd();
+               output.cd();
                auto a2a4Parameters = A2a4Method(angularDistribution, z0, z2, z4);
                output.WriteObject(&a2a4Parameters, "ParametersA2a4Fit");
             } else {   // if(z0->GetN() == angularDistribution->GetN() || ((angles->Grouping() || angles->Folding) && z0->GetN() == (angles->Addback() ? 49:51)))
@@ -731,7 +731,7 @@ int main(int argc, char** argv)
 
    output.Close();
    input.Close();
-	logFile.close();
+   logFile.close();
 
    return 0;
 }
@@ -785,10 +785,10 @@ private:
 
 TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* residual, const std::vector<double>& parameters, const std::vector<double>& errors, const double& redChiSquare, const char* extraText = nullptr)
 {
-	/// This function plots the data with the fit and residuals on the currently active canvas.
-	
-	// suppress any error messages
-	TRedirect redirect("/dev/null");
+   /// This function plots the data with the fit and residuals on the currently active canvas.
+
+   // suppress any error messages
+   TRedirect redirect("/dev/null");
 
    // This text box will display the fit statistics
    // with the margins of the pads, the center in x is at 0.55 (0.545 to be exact_, so we center around that point
@@ -797,17 +797,17 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    stats->SetTextSize(20);
    stats->SetFillStyle(0);
    stats->SetBorderSize(0);
-	for(int p = 0; p < 3; ++p) {
-		if(errors[p] != 0.) {
-			stats->AddText(Form("a_{%d} = %f #pm %f", 2*p, parameters[p], errors[p]));
-		} else {
-			stats->AddText(Form("a_{%d} = %f", 2*p, parameters[p]));
-		}
-	}
+   for(int p = 0; p < 3; ++p) {
+      if(errors[p] != 0.) {
+         stats->AddText(Form("a_{%d} = %f #pm %f", 2 * p, parameters[p], errors[p]));
+      } else {
+         stats->AddText(Form("a_{%d} = %f", 2 * p, parameters[p]));
+      }
+   }
    stats->AddText(Form("#chi^{2}/NDF = %.2f", redChiSquare));
-	if(extraText != nullptr) {
-		stats->AddText(extraText);
-	}
+   if(extraText != nullptr) {
+      stats->AddText(extraText);
+   }
 
    // create canvas and two pads (big one for comparison and small one for residuals)
    // wider left margin for y-axis labels and title
@@ -866,13 +866,13 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    auto* zeroLine = new TLine(residual->GetXaxis()->GetXmin(), 0., residual->GetXaxis()->GetXmax(), 0.);
    zeroLine->Draw("same");
 
-	return multiGraph;
+   return multiGraph;
 }
 
 TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
-	logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
-	logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
+   logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
+   logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
    TGraph*           result = nullptr;
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
@@ -937,7 +937,7 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
 
    // delta runs from -infinity to infinity (unless constrained by known physics)
    // in this case, it then makes more sense to sample evenly from tan^{-1}(delta)
-	
+
    // mixing for the high-middle transition
    double mixingAngle1Minimum = -TMath::Pi() / 2;
    double mixingAngle1Maximum = TMath::Pi() / 2;
@@ -959,11 +959,11 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
       steps2              = 1;
    }
 
-   result         = new TGraph(steps1);
-   double minChi2 = 1e6;
-	std::vector<double> bestErrors;
-	double bestMixingAngle1 = 0.;
-	double bestMixingAngle2 = 0.;
+   result                      = new TGraph(steps1);
+   double              minChi2 = 1e6;
+   std::vector<double> bestErrors;
+   double              bestMixingAngle1 = 0.;
+   double              bestMixingAngle2 = 0.;
    for(int i = 0; i < steps1; i++) {
       double mixangle1 = mixingAngle1Minimum + i * stepSize1;
       double delta1    = TMath::Tan(mixangle1);
@@ -986,56 +986,56 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
          }
          auto fitResult = fitter.Result();
          // MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
-			double chi2 = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
-			// is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
-			// and what if both angles have multiple steps?
+         double chi2 = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
+         // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
+         // and what if both angles have multiple steps?
          result->SetPoint(i, mixangle1, chi2);
          if(chi2 < minChi2) {
-            minChi2 = chi2;
-            bestParameters = fitResult.Parameters();
-            bestErrors = fitResult.Errors();
-				bestMixingAngle1 = mixangle1;
-				bestMixingAngle2 = mixangle2;
+            minChi2          = chi2;
+            bestParameters   = fitResult.Parameters();
+            bestErrors       = fitResult.Errors();
+            bestMixingAngle1 = mixangle1;
+            bestMixingAngle2 = mixangle2;
          }
-			logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
+         logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
       }
    }
 
-	// find mixing ratio with minimum chi2 and its uncertainty
-	auto minIndex = TMath::LocMin(result->GetN(), result->GetY());
-	double x1 = std::numeric_limits<double>::quiet_NaN();
-	double x2 = std::numeric_limits<double>::quiet_NaN();
-	double y1 = std::numeric_limits<double>::quiet_NaN();
-	double y2 = std::numeric_limits<double>::quiet_NaN();
-	for(int i = minIndex; i < result->GetN(); ++i) {
-		if(result->GetPointY(i) > minChi2 + 1.) {
-			x1 = result->GetPointX(i);
-			x2 = result->GetPointX(i - 1);
-			y1 = result->GetPointY(i);
-			y2 = result->GetPointY(i - 1);
-			break;
-		}
-	}
-	double upperLimit = std::numeric_limits<double>::quiet_NaN();
-	if(!std::isnan(x1)) {
-		upperLimit = x1 - (x2 - x1)/(y2 - y1) * y1 + (x2 - x1)/(y2 - y1) * (minChi2 + 1.);
-	}
-	x1 = std::numeric_limits<double>::quiet_NaN();
-	for(int i = minIndex; i >= 0; --i) {
-		if(result->GetPointY(i) > minChi2 + 1.) {
-			x1 = result->GetPointX(i);
-			x2 = result->GetPointX(i + 1);
-			y1 = result->GetPointY(i);
-			y2 = result->GetPointY(i + 1);
-			break;
-		}
-	}
-	double lowerLimit = std::numeric_limits<double>::quiet_NaN();
-	if(!std::isnan(x1)) {
-		lowerLimit = x1 - (x2 - x1)/(y2 - y1) * y1 + (x2 - x1)/(y2 - y1) * (minChi2 + 1.);
-	}
+   // find mixing ratio with minimum chi2 and its uncertainty
+   auto   minIndex = TMath::LocMin(result->GetN(), result->GetY());
+   double x1       = std::numeric_limits<double>::quiet_NaN();
+   double x2       = std::numeric_limits<double>::quiet_NaN();
+   double y1       = std::numeric_limits<double>::quiet_NaN();
+   double y2       = std::numeric_limits<double>::quiet_NaN();
+   for(int i = minIndex; i < result->GetN(); ++i) {
+      if(result->GetPointY(i) > minChi2 + 1.) {
+         x1 = result->GetPointX(i);
+         x2 = result->GetPointX(i - 1);
+         y1 = result->GetPointY(i);
+         y2 = result->GetPointY(i - 1);
+         break;
+      }
+   }
+   double upperLimit = std::numeric_limits<double>::quiet_NaN();
+   if(!std::isnan(x1)) {
+      upperLimit = x1 - (x2 - x1) / (y2 - y1) * y1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1.);
+   }
+   x1 = std::numeric_limits<double>::quiet_NaN();
+   for(int i = minIndex; i >= 0; --i) {
+      if(result->GetPointY(i) > minChi2 + 1.) {
+         x1 = result->GetPointX(i);
+         x2 = result->GetPointX(i + 1);
+         y1 = result->GetPointY(i);
+         y2 = result->GetPointY(i + 1);
+         break;
+      }
+   }
+   double lowerLimit = std::numeric_limits<double>::quiet_NaN();
+   if(!std::isnan(x1)) {
+      lowerLimit = x1 - (x2 - x1) / (y2 - y1) * y1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1.);
+   }
 
-	// plot the best fit, if there are multiple minima this is most likely the first one found
+   // plot the best fit, if there are multiple minima this is most likely the first one found
    auto* fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
    for(int i = 0; i < fit->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
@@ -1056,112 +1056,112 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
       residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
    }
 
-   auto* canvas = new TCanvas;
-	TMultiGraph* multiGraph = nullptr;
+   auto*        canvas     = new TCanvas;
+   TMultiGraph* multiGraph = nullptr;
 
-	if(steps1 == 1 && steps2 == 1) {
-		std::cout << "Analyzed cascade " << twoJhigh/2. << " -> " << twoJmid/2. << " -> " << twoJlow/2. << ": red. chi^2 " << std::setw(12) << minChi2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-		multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
-	} else {
-		if(steps1 == 1) {
-			std::cout << "Varied mixing angle for cascade " << twoJhigh/2. << " -> " << twoJmid/2. << " -> " << twoJlow/2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-			multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f", bestMixingAngle2));
-		} else if(steps2 == 1) {
-			std::cout << "Varied mixing angle for cascade " << twoJhigh/2. << " -> " << twoJmid/2. << " -> " << twoJlow/2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-			multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - lowerLimit, upperLimit - bestMixingAngle1));
-		} else {
-			std::cout << "Varied mixing angle for cascade " << twoJhigh/2. << " -> " << twoJmid/2. << " -> " << twoJlow/2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-			multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f/%f", bestMixingAngle1, bestMixingAngle2));
-		}
-	}
+   if(steps1 == 1 && steps2 == 1) {
+      std::cout << "Analyzed cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": red. chi^2 " << std::setw(12) << minChi2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+      multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
+   } else {
+      if(steps1 == 1) {
+         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f", bestMixingAngle2));
+      } else if(steps2 == 1) {
+         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - lowerLimit, upperLimit - bestMixingAngle1));
+      } else {
+         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f/%f", bestMixingAngle1, bestMixingAngle2));
+      }
+   }
 
-	fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-	residual->Write(Form("Residual%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-	multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-	canvas->Write(Form("Canvas%d_%d_%d", twoJhigh, twoJmid, twoJlow));
+   fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh, twoJmid, twoJlow));
+   residual->Write(Form("Residual%d_%d_%d", twoJhigh, twoJmid, twoJlow));
+   multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh, twoJmid, twoJlow));
+   canvas->Write(Form("Canvas%d_%d_%d", twoJhigh, twoJmid, twoJlow));
 
-	return result;
+   return result;
 }
 
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4)
 {
-	/// This method does a free fit of a_0, a_2, and a_4 to get the best possible result.
-	/// The resulting parameters do not necessarily correspond to a meaningful physical result.
+   /// This method does a free fit of a_0, a_2, and a_4 to get the best possible result.
+   /// The resulting parameters do not necessarily correspond to a meaningful physical result.
 
-	assert(data->GetN() == z0->GetN());
-	assert(data->GetN() == z2->GetN());
-	assert(data->GetN() == z4->GetN());
-	// create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
-	// this is to get initial conditions for our fit
-	auto* cosTheta = new TGraphErrors(*data);
-	auto* x        = cosTheta->GetX();
-	for(int i = 0; i < cosTheta->GetN(); ++i) {
-		x[i] = TMath::Cos(x[i] / 180. * TMath::Pi());
-	}
+   assert(data->GetN() == z0->GetN());
+   assert(data->GetN() == z2->GetN());
+   assert(data->GetN() == z4->GetN());
+   // create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
+   // this is to get initial conditions for our fit
+   auto* cosTheta = new TGraphErrors(*data);
+   auto* x        = cosTheta->GetX();
+   for(int i = 0; i < cosTheta->GetN(); ++i) {
+      x[i] = TMath::Cos(x[i] / 180. * TMath::Pi());
+   }
 
-	int   nPar     = 3;
-	auto* legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
-	legendre->SetParNames("a_{0}", "a_{2}", "a_{4}");
-	legendre->SetParameters(1., 0.5, 0.5);
-	cosTheta->Fit(legendre, "QN0");
+   int   nPar     = 3;
+   auto* legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
+   legendre->SetParNames("a_{0}", "a_{2}", "a_{4}");
+   legendre->SetParameters(1., 0.5, 0.5);
+   cosTheta->Fit(legendre, "QN0");
 
-	// the actual fitting
-	Ac                ac(data, z0, z2, z4);
-	ROOT::Fit::Fitter fitter;
-	fitter.SetFCN(nPar, ac);
-	// this is a good guess for the initial scale
-	fitter.Config().ParSettings(0) = ROOT::Fit::ParameterSettings("a_{0}", data->GetMaximum() / z0->GetMaximum(), 0.0001, -10., 10.);
-	for(int i = 1; i < nPar; ++i) {
-		// parameter settings arguments are parameter name, initial value, step size, minimum, and maximum
-		fitter.Config().ParSettings(i) = ROOT::Fit::ParameterSettings(Form("a_{%d}", 2 * i), legendre->GetParameter(i), 0.0001, -10., 10.);
-	}
-	fitter.Config().MinimizerOptions().SetPrintLevel(0);
-	fitter.Config().SetMinimizer("Minuit2", "Migrad");   // or simplex?
-	if(!fitter.FitFCN()) {
-		std::cerr << "Fit failed" << std::endl;
-		return {};
-	}
+   // the actual fitting
+   Ac                ac(data, z0, z2, z4);
+   ROOT::Fit::Fitter fitter;
+   fitter.SetFCN(nPar, ac);
+   // this is a good guess for the initial scale
+   fitter.Config().ParSettings(0) = ROOT::Fit::ParameterSettings("a_{0}", data->GetMaximum() / z0->GetMaximum(), 0.0001, -10., 10.);
+   for(int i = 1; i < nPar; ++i) {
+      // parameter settings arguments are parameter name, initial value, step size, minimum, and maximum
+      fitter.Config().ParSettings(i) = ROOT::Fit::ParameterSettings(Form("a_{%d}", 2 * i), legendre->GetParameter(i), 0.0001, -10., 10.);
+   }
+   fitter.Config().MinimizerOptions().SetPrintLevel(0);
+   fitter.Config().SetMinimizer("Minuit2", "Migrad");   // or simplex?
+   if(!fitter.FitFCN()) {
+      std::cerr << "Fit failed" << std::endl;
+      return {};
+   }
 
-	// get the fit result and print chi^2 and parameters
-	auto fitResult = fitter.Result();
-	// MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
-	std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
-	auto parameters = fitResult.Parameters();
-	auto errors     = fitResult.Errors();
-	std::cout << "Parameters a_0: " << parameters[0] << " +- " << errors[0] << ", a_2: " << parameters[1] << " +- " << errors[1] << ", a_4: " << parameters[2] << " +- " << errors[2] << std::endl;
-	TMatrixD covariance(nPar, nPar);
-	fitResult.GetCovarianceMatrix(covariance);
+   // get the fit result and print chi^2 and parameters
+   auto fitResult = fitter.Result();
+   // MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
+   std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
+   auto parameters = fitResult.Parameters();
+   auto errors     = fitResult.Errors();
+   std::cout << "Parameters a_0: " << parameters[0] << " +- " << errors[0] << ", a_2: " << parameters[1] << " +- " << errors[1] << ", a_4: " << parameters[2] << " +- " << errors[2] << std::endl;
+   TMatrixD covariance(nPar, nPar);
+   fitResult.GetCovarianceMatrix(covariance);
 
-	// create fit and residual graphs
-	auto* fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
-	for(int i = 0; i < fit->GetN(); ++i) {
+   // create fit and residual graphs
+   auto* fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
+   for(int i = 0; i < fit->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-		fit->SetPointY(i, parameters[0] * ((1. - parameters[1] - parameters[2]) * z0->GetPointY(i) + parameters[1] * z2->GetPointY(i) + parameters[2] * z4->GetPointY(i)));
+      fit->SetPointY(i, parameters[0] * ((1. - parameters[1] - parameters[2]) * z0->GetPointY(i) + parameters[1] * z2->GetPointY(i) + parameters[2] * z4->GetPointY(i)));
 #else
-		fit->SetPoint(i, fit->GetX()[i], parameters[0] * ((1. - parameters[1] - parameters[2]) * z0->GetY()[i] + parameters[1] * z2->GetY()[i] + parameters[2] * z4->GetY()[i]));
+      fit->SetPoint(i, fit->GetX()[i], parameters[0] * ((1. - parameters[1] - parameters[2]) * z0->GetY()[i] + parameters[1] * z2->GetY()[i] + parameters[2] * z4->GetY()[i]));
 #endif
-		fit->SetPointError(i, 0., std::abs(parameters[0]) * TMath::Sqrt(TMath::Power((1. - parameters[1] - parameters[2]) * z0->GetErrorY(i), 2) + TMath::Power(parameters[1] * z2->GetErrorY(i), 2) + TMath::Power(parameters[2] * z4->GetErrorY(i), 2)));
-	}
+      fit->SetPointError(i, 0., std::abs(parameters[0]) * TMath::Sqrt(TMath::Power((1. - parameters[1] - parameters[2]) * z0->GetErrorY(i), 2) + TMath::Power(parameters[1] * z2->GetErrorY(i), 2) + TMath::Power(parameters[2] * z4->GetErrorY(i), 2)));
+   }
 
-	auto* residual = static_cast<TGraphErrors*>(data->Clone("residual"));
-	for(int i = 0; i < residual->GetN(); ++i) {
+   auto* residual = static_cast<TGraphErrors*>(data->Clone("residual"));
+   for(int i = 0; i < residual->GetN(); ++i) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-		residual->SetPointY(i, data->GetPointY(i) - fit->GetPointY(i));
+      residual->SetPointY(i, data->GetPointY(i) - fit->GetPointY(i));
 #else
-		residual->SetPoint(i, residual->GetX()[i], data->GetY()[i] - fit->GetY()[i]);
+      residual->SetPoint(i, residual->GetX()[i], data->GetY()[i] - fit->GetY()[i]);
 #endif
-		residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
-	}
+      residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
+   }
 
-	double redChiSquare =  fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
+   double redChiSquare = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
 
-	auto* canvas = new TCanvas;
-	auto* multiGraph = PlotCanvas(data, fit, residual, parameters, errors, redChiSquare);
+   auto* canvas     = new TCanvas;
+   auto* multiGraph = PlotCanvas(data, fit, residual, parameters, errors, redChiSquare);
 
-	fit->Write("A2a4Fit");
-	residual->Write("Residual");
-	multiGraph->Write("FitComparison");
-	canvas->Write("A2a4Canvas");
+   fit->Write("A2a4Fit");
+   residual->Write("Residual");
+   multiGraph->Write("FitComparison");
+   canvas->Write("A2a4Canvas");
 
-	return parameters;
+   return parameters;
 }
