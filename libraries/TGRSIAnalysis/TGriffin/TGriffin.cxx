@@ -276,11 +276,7 @@ Short_t TGriffin::GetAddbackMultiplicity()
    }
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
-      for(auto& hit : fAddbackHits) {
-         delete hit;
-      }
-      fAddbackHits.clear();
-      fAddbackFrags.clear();
+      ResetAddback();
    }
    if(fAddbackHits.empty()) {
       CreateAddback(hitVector, fAddbackHits, fAddbackFrags);
@@ -516,10 +512,7 @@ Short_t TGriffin::GetSuppressedMultiplicity(const TBgo* bgo)
    }
    // if the suppressed has been reset, clear the suppressed hits
    if(!IsSuppressed()) {
-      for(auto& hit : fSuppressedHits) {
-         delete hit;
-      }
-      fSuppressedHits.clear();
+      ResetSuppressed();
    }
    if(fSuppressedHits.empty()) {
       CreateSuppressed(bgo, hitVector, fSuppressedHits);
@@ -573,11 +566,7 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    }
    // if the addback has been reset, clear the addback hits
    if(!IsSuppressedAddbackSet()) {
-      for(auto& hit : fSuppressedAddbackHits) {
-         delete hit;
-      }
-      fSuppressedAddbackHits.clear();
-      fSuppressedAddbackFrags.clear();
+      ResetSuppressedAddback();
    }
    if(fSuppressedAddbackHits.empty()) {
       CreateSuppressedAddback(bgo, hitVector, fSuppressedAddbackHits, fSuppressedAddbackFrags);
