@@ -426,61 +426,61 @@ void TGriffinAngles::Print(Option_t*) const
 
 void TGriffinAngles::Add(TGriffinAngles* griffinAngles)
 {
-	if(fDistance != griffinAngles->fDistance) {
-		std::cerr << "Warning, merging files with different Griffin distances " << fDistance << " != " << griffinAngles->fDistance << std::endl;
-	}
-	if(fFolding != griffinAngles->fFolding) {
-		std::cerr << "Warning, merging files with different folding settings " << ( fFolding ? "true" : "false")  << " != " << ( griffinAngles->fFolding ? "true" : "false")  << std::endl;
-	}
-	if(fGrouping != griffinAngles->fGrouping) {
-		std::cerr << "Warning, merging files with different grouping settings " << ( fGrouping ? "true" : "false")  << " != " << ( griffinAngles->fGrouping ? "true" : "false")  << std::endl;
-	}
-	if(fAddback != griffinAngles->fAddback) {
-		std::cerr << "Warning, merging files with different addback settings " << ( fAddback ? "true" : "false")  << " != " << ( griffinAngles->fAddback ? "true" : "false")  << std::endl;
-	}
-	if(fRounding != griffinAngles->fRounding) {
-		std::cerr << "Warning, merging files with different rounding " << fRounding << " != " << griffinAngles->fRounding << std::endl;
-	}
-	if(fExcludedDetectors != griffinAngles->fExcludedDetectors) {
-		std::cerr << "Warning, merging files with different detectors excluded < ";
-		for(auto det : fExcludedDetectors) { std::cerr << det << " "; }
-		std::cerr << "> != < ";
-		for(auto det : griffinAngles->fExcludedDetectors) { std::cerr << det << " "; }
-		std::cerr << ">" << std::endl;
-	}
-	if(fExcludedCrystals != griffinAngles->fExcludedCrystals) {
-		std::cerr << "Warning, merging files with different crystals excluded < ";
-		for(auto cry : fExcludedCrystals) { std::cerr << cry << " "; }
-		std::cerr << "> != < ";
-		for(auto cry : griffinAngles->fExcludedCrystals) { std::cerr << cry << " "; }
-		std::cerr << ">" << std::endl;
-	}
-	if(fCustomGrouping != griffinAngles->fCustomGrouping) {
-		std::cerr << "Warning, merging files with different custom grouping < ";
-		for(auto group : fCustomGrouping) { std::cerr << group << " "; }
-		std::cerr << "> != < ";
-		for(auto group : griffinAngles->fCustomGrouping) { std::cerr << group << " "; }
-		std::cerr << ">" << std::endl;
-	}
-	if(fAngles != griffinAngles->fAngles) {
-		std::cerr << "Warning, merging files with different angles < ";
-		for(auto angle : fAngles) { std::cerr << angle << " "; }
-		std::cerr << "> != < ";
-		for(auto angle : griffinAngles->fAngles) { std::cerr << angle << " "; }
-		std::cerr << ">" << std::endl;
-	}
-	if(fAngleMap != griffinAngles->fAngleMap) {
-		std::cerr << "Warning, merging files with different angle maps < ";
-		for(auto angle : fAngleMap) { std::cerr << angle.first << "/" << angle.second << " "; }
-		std::cerr << "> != < ";
-		for(auto angle : griffinAngles->fAngleMap) { std::cerr << angle.first << "/" << angle.second << " "; }
-		std::cerr << ">" << std::endl;
-	}
-	if(fAngleCount != griffinAngles->fAngleCount) {
-		std::cerr << "Warning, merging files with different angle counts < ";
-		for(auto angle : fAngleCount) { std::cerr << angle.first << "/" << angle.second << " "; }
-		std::cerr << "> != < ";
-		for(auto angle : griffinAngles->fAngleCount) { std::cerr << angle.first << "/" << angle.second << " "; }
-		std::cerr << ">" << std::endl;
-	}
+   if(fDistance != griffinAngles->fDistance) {
+      std::cerr << "Warning, merging files with different Griffin distances " << fDistance << " != " << griffinAngles->fDistance << std::endl;
+   }
+   if(fFolding != griffinAngles->fFolding) {
+      std::cerr << "Warning, merging files with different folding settings " << (fFolding ? "true" : "false") << " != " << (griffinAngles->fFolding ? "true" : "false") << std::endl;
+   }
+   if(fGrouping != griffinAngles->fGrouping) {
+      std::cerr << "Warning, merging files with different grouping settings " << (fGrouping ? "true" : "false") << " != " << (griffinAngles->fGrouping ? "true" : "false") << std::endl;
+   }
+   if(fAddback != griffinAngles->fAddback) {
+      std::cerr << "Warning, merging files with different addback settings " << (fAddback ? "true" : "false") << " != " << (griffinAngles->fAddback ? "true" : "false") << std::endl;
+   }
+   if(fRounding != griffinAngles->fRounding) {
+      std::cerr << "Warning, merging files with different rounding " << fRounding << " != " << griffinAngles->fRounding << std::endl;
+   }
+   if(fExcludedDetectors != griffinAngles->fExcludedDetectors) {
+      std::cerr << "Warning, merging files with different detectors excluded < ";
+      for(auto det : fExcludedDetectors) { std::cerr << det << " "; }
+      std::cerr << "> != < ";
+      for(auto det : griffinAngles->fExcludedDetectors) { std::cerr << det << " "; }
+      std::cerr << ">" << std::endl;
+   }
+   if(fExcludedCrystals != griffinAngles->fExcludedCrystals) {
+      std::cerr << "Warning, merging files with different crystals excluded < ";
+      for(auto cry : fExcludedCrystals) { std::cerr << cry << " "; }
+      std::cerr << "> != < ";
+      for(auto cry : griffinAngles->fExcludedCrystals) { std::cerr << cry << " "; }
+      std::cerr << ">" << std::endl;
+   }
+   if(fCustomGrouping != griffinAngles->fCustomGrouping) {
+      std::cerr << "Warning, merging files with different custom grouping < ";
+      for(auto group : fCustomGrouping) { std::cerr << group << " "; }
+      std::cerr << "> != < ";
+      for(auto group : griffinAngles->fCustomGrouping) { std::cerr << group << " "; }
+      std::cerr << ">" << std::endl;
+   }
+   if(fAngles != griffinAngles->fAngles) {
+      std::cerr << "Warning, merging files with different angles < ";
+      for(auto angle : fAngles) { std::cerr << angle << " "; }
+      std::cerr << "> != < ";
+      for(auto angle : griffinAngles->fAngles) { std::cerr << angle << " "; }
+      std::cerr << ">" << std::endl;
+   }
+   if(fAngleMap != griffinAngles->fAngleMap) {
+      std::cerr << "Warning, merging files with different angle maps < ";
+      for(auto angle : fAngleMap) { std::cerr << angle.first << "/" << angle.second << " "; }
+      std::cerr << "> != < ";
+      for(auto angle : griffinAngles->fAngleMap) { std::cerr << angle.first << "/" << angle.second << " "; }
+      std::cerr << ">" << std::endl;
+   }
+   if(fAngleCount != griffinAngles->fAngleCount) {
+      std::cerr << "Warning, merging files with different angle counts < ";
+      for(auto angle : fAngleCount) { std::cerr << angle.first << "/" << angle.second << " "; }
+      std::cerr << "> != < ";
+      for(auto angle : griffinAngles->fAngleCount) { std::cerr << angle.first << "/" << angle.second << " "; }
+      std::cerr << ">" << std::endl;
+   }
 }

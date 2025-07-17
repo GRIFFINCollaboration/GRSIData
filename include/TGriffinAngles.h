@@ -68,7 +68,7 @@ public:
    Long64_t Merge(TCollection* list)
    {
       for(auto* griffinAngles : *list) { Add(static_cast<TGriffinAngles*>(griffinAngles)); }
-		return 0;
+      return 0;
    }
 
    static double Rounding() { return fRounding; }
@@ -78,7 +78,7 @@ public:
    static void       Verbosity(const EVerbosity& val) { fVerbosity = val; }
 
 private:
-	void Add(TGriffinAngles* griffinAngles);
+   void Add(TGriffinAngles* griffinAngles);
 
    static EVerbosity     fVerbosity;           ///< verbosity level
    double                fDistance{145.};      ///< distance of detector from center of array in mmm
