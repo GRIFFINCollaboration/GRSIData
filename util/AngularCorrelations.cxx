@@ -152,7 +152,7 @@ int main(int argc, char** argv)
          theoryFile = settings->GetString("Theory", true);
       } catch(std::exception&) {}
    }
-   if(outputFile = "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
+   if(outputFile == "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
    std::vector<std::tuple<double, double, double>> bgPeakPos; // position, low, high

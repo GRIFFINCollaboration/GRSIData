@@ -20,6 +20,7 @@
 #include <map>
 #include <functional>
 
+#include "TCollection.h"
 #include "TNamed.h"
 #include "TGraphErrors.h"
 
@@ -64,6 +65,12 @@ public:
 
    void Print(Option_t* = "") const override;
 
+   Long64_t Merge(TCollection* list)
+   {
+      for(auto* griffinAngles : *list) { Add(static_cast<TGriffinAngles*>(griffinAngles)); }
+		return 0;
+   }
+
    static double Rounding() { return fRounding; }
    static void   Rounding(const double& val) { fRounding = val; }
 
@@ -71,6 +78,8 @@ public:
    static void       Verbosity(const EVerbosity& val) { fVerbosity = val; }
 
 private:
+	void Add(TGriffinAngles* griffinAngles);
+
    static EVerbosity     fVerbosity;           ///< verbosity level
    double                fDistance{145.};      ///< distance of detector from center of array in mmm
    bool                  fFolding{false};      ///< flag indicating whether we fold our distribution around 90 degree
