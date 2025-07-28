@@ -15,16 +15,37 @@ bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TLaBr::fSuppressionCriterion = DefaultLaBrSuppression;
 
 std::array<TVector3, 9> TLaBr::fPosition = {
-   // These positions should be updated (they are currently SCEPTAR-ish)
-   TVector3(0, 0, 1),
-   TVector3(14.3025, 4.6472, 22.8096),
-   TVector3(0, 15.0386, 22.8096),
-   TVector3(-14.3025, 4.6472, 22.8096),
-   TVector3(-8.8395, -12.1665, 22.8096),
-   TVector3(8.8395, -12.1665, 22.8096),
-   TVector3(19.7051, 6.4026, 6.2123),
-   TVector3(0, 20.7192, 6.2123),
-   TVector3(-19.7051, 6.4026, 6.2123),
+   // Ancillary detector locations from Evan.
+   TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
+            TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
+            TMath::Cos(TMath::DegToRad() * (0.0))),
+   // Downstream detectors
+   TVector3(TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Cos(TMath::DegToRad() * (22.5)),
+            TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Sin(TMath::DegToRad() * (22.5)),
+            TMath::Cos(TMath::DegToRad() * (54.73561))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Cos(TMath::DegToRad() * (112.5)),
+            TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Sin(TMath::DegToRad() * (112.5)),
+            TMath::Cos(TMath::DegToRad() * (54.73561))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Cos(TMath::DegToRad() * (202.5)),
+            TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Sin(TMath::DegToRad() * (202.5)),
+            TMath::Cos(TMath::DegToRad() * (54.73561))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Cos(TMath::DegToRad() * (292.5)),
+            TMath::Sin(TMath::DegToRad() * (54.73561)) * TMath::Sin(TMath::DegToRad() * (292.5)),
+            TMath::Cos(TMath::DegToRad() * (54.73561))),
+
+   // Upstream detectors
+   TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (22.5)),
+            TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (22.5)),
+            TMath::Cos(TMath::DegToRad() * (125.2644))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (112.5)),
+            TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (112.5)),
+            TMath::Cos(TMath::DegToRad() * (125.2644))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (202.5)),
+            TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (202.5)),
+            TMath::Cos(TMath::DegToRad() * (125.2644))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (292.5)),
+            TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (292.5)),
+            TMath::Cos(TMath::DegToRad() * (125.2644)))
 };
 
 TLaBr::TLaBr()
