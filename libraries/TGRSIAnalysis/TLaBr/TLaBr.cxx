@@ -45,8 +45,7 @@ std::array<TVector3, 9> TLaBr::fPosition = {
             TMath::Cos(TMath::DegToRad() * (125.2644))),
    TVector3(TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Cos(TMath::DegToRad() * (292.5)),
             TMath::Sin(TMath::DegToRad() * (125.2644)) * TMath::Sin(TMath::DegToRad() * (292.5)),
-            TMath::Cos(TMath::DegToRad() * (125.2644)))
-};
+            TMath::Cos(TMath::DegToRad() * (125.2644)))};
 
 TLaBr::TLaBr()
 {
