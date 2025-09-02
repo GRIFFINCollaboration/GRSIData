@@ -11,6 +11,7 @@
 #include "TDetector.h"
 #include "TS3Hit.h"
 #include "TChannel.h"
+#include "TMnemonic.h"
 
 class TS3 : public TDetector {
 public:

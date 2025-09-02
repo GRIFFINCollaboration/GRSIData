@@ -13,8 +13,8 @@
 #include "TFragment.h"
 #include "TChannel.h"
 #include "TPulseAnalyzer.h"
-
 #include "TDetectorHit.h"
+#include "TMnemonic.h"
 
 class TTipHit : public TDetectorHit {
 public:

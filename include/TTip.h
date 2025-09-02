@@ -18,6 +18,7 @@
 #include "Globals.h"
 #include "TDetector.h"
 #include "TTipHit.h"
+#include "TMnemonic.h"
 
 class TTip : public TDetector {
 public:

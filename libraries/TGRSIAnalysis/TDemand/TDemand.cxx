@@ -67,10 +67,8 @@ TVector3 TDemand::GetPosition(const TDemandHit& hit)
 TVector3 TDemand::GetPosition(int DetNbr)
 {
    if(1 > DetNbr || 6 < DetNbr) {   //if detector number is not 1,2,3,4,5,6, then return a 0 vector
-      return TVector3(0, 0, 0);
+      return {0, 0, 0};
    }
 
-   else {
-      return TVector3(fXPositions[DetNbr - 1], fYPositions[DetNbr - 1], fZPositions[DetNbr - 1]);   //-1 because we index the detectors at 1 but the vector at 0
-   }
+   return {fXPositions[DetNbr - 1], fYPositions[DetNbr - 1], fZPositions[DetNbr - 1]};   //-1 because we index the detectors at 1 but the vector at 0
 }

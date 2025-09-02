@@ -4,6 +4,8 @@
 #include "TRandom.h"
 #include "TMath.h"
 
+#include "TMnemonic.h"
+
 ////////////////////////////////////////////////////////////
 //
 // TEmma

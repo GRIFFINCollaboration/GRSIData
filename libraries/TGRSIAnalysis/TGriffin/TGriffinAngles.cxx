@@ -426,6 +426,7 @@ void TGriffinAngles::Print(Option_t*) const
 
 void TGriffinAngles::Add(TGriffinAngles* griffinAngles)
 {
+   // rounding is a static member, so no need to compare that (same for verbosity level)
    if(fDistance != griffinAngles->fDistance) {
       std::cerr << "Warning, merging files with different Griffin distances " << fDistance << " != " << griffinAngles->fDistance << std::endl;
    }
@@ -437,9 +438,6 @@ void TGriffinAngles::Add(TGriffinAngles* griffinAngles)
    }
    if(fAddback != griffinAngles->fAddback) {
       std::cerr << "Warning, merging files with different addback settings " << (fAddback ? "true" : "false") << " != " << (griffinAngles->fAddback ? "true" : "false") << std::endl;
-   }
-   if(fRounding != griffinAngles->fRounding) {
-      std::cerr << "Warning, merging files with different rounding " << fRounding << " != " << griffinAngles->fRounding << std::endl;
    }
    if(fExcludedDetectors != griffinAngles->fExcludedDetectors) {
       std::cerr << "Warning, merging files with different detectors excluded < ";

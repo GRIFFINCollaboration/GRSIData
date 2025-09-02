@@ -8,6 +8,7 @@
 #include <cstdio>
 #include "TFragment.h"
 #include "TDetectorHit.h"
+#include "TMnemonic.h"
 
 class TS3Hit : public TDetectorHit {
 public:

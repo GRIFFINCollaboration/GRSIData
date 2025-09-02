@@ -14,6 +14,7 @@
 #include "THnSparse.h"
 #include "TGraphAsymmErrors.h"
 #include "TPeak.h"
+#include "TCanvas.h"
 
 class TAngularCorrelation : public TObject {
 private:

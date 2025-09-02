@@ -137,10 +137,10 @@ int main(int argc, char** argv)
       // GetBool doesn't have a default version, so catch any errors
       try {
          addback = settings.GetBool("Addback", true);
-      } catch(std::out_of_range& e) {}
+      } catch(std::out_of_range&) {}
       try {
          singleCrystal = settings.GetBool("SingleCrystal", true);
-      } catch(std::out_of_range& e) {}
+      } catch(std::out_of_range&) {}
       distance     = settings.GetDouble("Distance", distance);
       bins         = settings.GetInt("Bins", bins);
       minEnergy    = settings.GetDouble("Energy.Minimum", minEnergy);
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
       // add all input files to the chain and set the branch addresses
       TChain chain("ntuple");
 
-      for(auto filename : inputFilenames[c]) {
+      for(const auto& filename : inputFilenames[c]) {
          chain.Add(filename.c_str());
       }
 
@@ -251,18 +251,19 @@ int main(int argc, char** argv)
       std::string mnemonic;
       std::string crystalColor = "BGRW";
       TChannel*   channel      = nullptr;
-      long int    nEntries     = chain.GetEntries();
+      int64_t     nEntries     = chain.GetEntries();
       if(verboseLevel > 1) {
          std::cout << "Starting loop over " << nEntries << " entries, using angles:" << std::endl;
          angles.Print();
       }
       std::map<double, int> unknownAngles;
-      for(long int e = 0; e < nEntries; ++e) {
+      for(int64_t e = 0; e < nEntries; ++e) {
          int status = chain.GetEntry(e);
          if(status == -1) {
             std::cerr << "Error occured, couldn't read entry " << e << " from tree " << chain.GetName() << " in file " << chain.GetFile()->GetName() << std::endl;
             continue;
-         } else if(status == 0) {
+         }
+         if(status == 0) {
             std::cerr << "Error occured, entry " << e << " in tree " << chain.GetName() << " in file " << chain.GetFile()->GetName() << " doesn't exist" << std::endl;
             break;
          }
@@ -357,7 +358,7 @@ int main(int argc, char** argv)
             if(depEnergy > fragments[address].GetCharge()) {
                // timestamp is in 10 ns units, cfd is 10/16th of a nanosecond units and replaces the lowest 18 bits of the timestamp
                // so we multiply the time by 16e8, and use only the lowest 22 bits
-               fragments[address].SetTimeStamp(time * 1e8);
+               fragments[address].SetTimeStamp(static_cast<Long64_t>(time * 1e8));
                fragments[address].SetCfd(static_cast<int>(time * 16e8) & 0x3fffff);
             }
             fragments[address].SetCharge(fragments[address].GetCharge() + static_cast<float>(depEnergy));
@@ -366,7 +367,7 @@ int main(int argc, char** argv)
             }
          } else {
             fragments[address].SetAddress(address);
-            fragments[address].SetTimeStamp(time * 1e8);
+            fragments[address].SetTimeStamp(static_cast<Long64_t>(time * 1e8));
             fragments[address].SetCfd(static_cast<int>(time * 16e8) & 0x3fffff);
             fragments[address].SetCharge(static_cast<float>(depEnergy));
             channel = TChannel::GetChannel(address);
@@ -408,7 +409,7 @@ int main(int argc, char** argv)
          std::cout << "coeff. " << c << ": done looping over the tree and creating histograms" << std::endl;
       }
 
-      if(unknownAngles.size() > 0) {
+      if(!unknownAngles.empty()) {
          std::cout << unknownAngles.size() << " unknown angles:" << std::endl;
          for(auto& angle : unknownAngles) {
             std::cout << std::setw(10) << angle.first << " found " << std::setw(8) << angle.second << " times" << std::endl;

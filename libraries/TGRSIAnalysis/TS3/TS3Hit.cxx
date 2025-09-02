@@ -5,6 +5,7 @@
 #include "TS3.h"
 #include "TPulseAnalyzer.h"
 #include "TGRSIMnemonic.h"
+#include "TMnemonic.h"
 
 TS3Hit::TS3Hit()
 {

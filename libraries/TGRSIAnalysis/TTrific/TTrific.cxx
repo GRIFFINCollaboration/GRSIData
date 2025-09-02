@@ -2,6 +2,7 @@
 #include "TTrific.h"
 #include "TRandom.h"
 #include "TMath.h"
+#include "TMnemonic.h"
 
 //declaration of static variables that won't change from event to event
 Int_t TTrific::fGridX = 0;
@@ -316,27 +317,3 @@ Int_t TTrific::GetRange()
 
    return fRange;
 }
-
-/*
-TVector2 TTrific::GetEdESimple()
-{
-	//this will calculate a simple E vs dE based only on the energies in the grids at the start and end of trific 
-
-	double dE = 0.;
-	double E = 0.;
-
-	for (auto hit: fSingFragments){
-		if (hit->GetEnergy() < 3) continue; //arbitrary threshold to avoid E<0 events.
-		if (hit->GetDetector() < 6){
-			dE += hit->GetEnergy();
-		} 
-		else if (hit->GetDetector() > 18 && hit->GetDetector() < 23){
-			 E += hit->GetEnergy();
-		}
-	}
-
-	TVector2 EdE;
-	EdE.Set(E,dE);
-
-	return EdE;
-}*/

@@ -23,6 +23,7 @@
 #include "TPeakFitter.h"
 #include "TRWPeak.h"
 #include "TRedirect.h"
+#include "TGRSIFunctions.h"
 
 TGraph*             MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
@@ -150,7 +151,7 @@ int main(int argc, char** argv)
    if(theoryFile.empty()) {
       try {
          theoryFile = settings->GetString("Theory", true);
-      } catch(std::exception&) {}
+      } catch(std::out_of_range&) {}
    }
    if(outputFile == "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
 
@@ -170,7 +171,7 @@ int main(int argc, char** argv)
             }
             bgLow.push_back(low);
             bgHigh.push_back(high);
-         } catch(std::out_of_range& e) {
+         } catch(std::out_of_range&) {
             break;
          }
       }
@@ -190,8 +191,8 @@ int main(int argc, char** argv)
          // read low and high limit for this background peak, defaults to -1 if not set in the settings file
          auto low  = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
          auto high = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
-         bgPeakPos.push_back(std::make_tuple(pos, low, high));
-      } catch(std::out_of_range& e) {
+         bgPeakPos.emplace_back(pos, low, high);
+      } catch(std::out_of_range&) {
          break;
       }
    }

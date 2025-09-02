@@ -3,10 +3,10 @@ This script is a derivative of the ComptonMatrices.c file.  It is called lean be
 many of the portions that were simply for comparing different methods.  As I have essentially settled
 on one method, these additional steps are just bloating.  Part of this fact means that I no longer
 do any weighting other that event mixing, and I also no longer include the metzger Nparallel/Nperpendicular
-method of Compton polarimetry.  This script only includes the portions that I believe would be useful for 
-actual implementation of this code.  To use this you should only need to ensure the output directory/name 
+method of Compton polarimetry.  This script only includes the portions that I believe would be useful for
+actual implementation of this code.  To use this you should only need to ensure the output directory/name
 is appropriate, you will need to make sure the max entries is set, and you need to ensure everything is as
-expected in the Parameter Setup section. 
+expected in the Parameter Setup section.
 
 Compile:
 g++ LeanComptonMatrices.c -std=c++0x -I$GRSISYS/include -L$GRSISYS/libraries `grsi-config --cflags --all-libs` `root-config --cflags --libs` -lTreePlayer -lMathMore -lSpectrum -o MakeComptonMatrices
