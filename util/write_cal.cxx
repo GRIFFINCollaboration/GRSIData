@@ -27,9 +27,6 @@
 #include <vector>
 #include <string>
 
-constexpr int FirstChannel = 84;
-constexpr int LastChannel  = 91;
-
 int main(int argc, char** argv)
 {
    if(argc == 1) {
@@ -37,24 +34,27 @@ int main(int argc, char** argv)
       return 1;
    }
 
-   std::cout << std::endl
-             << "WARNING: This script assumes that the TACs are in channels " << FirstChannel << " - " << LastChannel << " (which are the default). Should have they been assigned to other channel numbers, the script should be edited acordingly" << std::endl
-             << std::endl;
-
    auto* file = new TFile(argv[1]);
 
    auto* AnalysisTree = static_cast<TTree*>(file->Get("AnalysisTree"));
 
    TChannel::ReadCalFromTree(AnalysisTree);
 
-   TChannel* channel = nullptr;
-
    std::array<double, 8> offset;
 
-   for(int n = FirstChannel; n <= LastChannel; n++) {
-      channel                  = TChannel::GetChannelByNumber(n);
-      offset[n - FirstChannel] = static_cast<double>(channel->GetTimeOffset());
-      std::cout << "Current TAC offset in the calfile:  " << offset[n - FirstChannel] << " for channel #" << n << std::endl;
+   int i = 0;
+   int curr = 0;
+   while(curr < 8) {
+      auto* channel = TChannel::GetChannelByNumber(++i);
+      if(channel == nullptr) {
+         break;
+      }
+      if(channel->GetClassType() != TTAC::Class()) {
+         continue;
+      }
+      offset[curr] = static_cast<double>(channel->GetTimeOffset());
+      std::cout << "Current TAC offset in the calfile:  " << offset[curr] << " for channel #" << i << std::endl;
+      ++curr;
    }
 
    TLaBr*    labr = nullptr;
