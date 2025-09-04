@@ -2,28 +2,30 @@
 #include <algorithm>
 #include <vector>
 #include <string>
-#include <TFile.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <THStack.h>
-#include <TSpectrum.h>
-#include <TGraph.h>
-#include <TGraphErrors.h>
-#include <TMultiGraph.h>
-#include <TF1.h>
-#include <TCanvas.h>
-#include <TList.h>
-#include <TMinuit.h>
-#include <TFragment.h>
-#include <TGriffin.h>
-#include <TGriffinHit.h>
-#include <TChannel.h>
-#include <TPeak.h>
-#include <TBranch.h>
-#include <TGaxis.h>
-#include <TStyle.h>
-#include <TLegend.h>
-#include <TSystem.h>
+#include <fstream>
+
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "THStack.h"
+#include "TSpectrum.h"
+#include "TGraph.h"
+#include "TGraphErrors.h"
+#include "TMultiGraph.h"
+#include "TF1.h"
+#include "TCanvas.h"
+#include "TList.h"
+#include "TMinuit.h"
+#include "TFragment.h"
+#include "TGriffin.h"
+#include "TGriffinHit.h"
+#include "TChannel.h"
+#include "TPeak.h"
+#include "TBranch.h"
+#include "TGaxis.h"
+#include "TStyle.h"
+#include "TLegend.h"
+#include "TSystem.h"
 
 enum class EType { kMaxBin,
                    kTPeak,

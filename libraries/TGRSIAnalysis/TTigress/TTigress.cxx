@@ -9,6 +9,7 @@
 
 #include "TGRSIOptions.h"
 #include "TSortingDiagnostics.h"
+#include "TMnemonic.h"
 
 double TTigress::fTargetOffset = 0.;
 double TTigress::fRadialOffset = 0.;

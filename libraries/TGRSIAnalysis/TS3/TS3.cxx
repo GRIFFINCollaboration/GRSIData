@@ -5,6 +5,7 @@
 #include "TMath.h"
 
 #include "TGRSIOptions.h"
+#include "TMnemonic.h"
 
 int TS3::fRingNumber   = 24;
 int TS3::fSectorNumber = 32;
