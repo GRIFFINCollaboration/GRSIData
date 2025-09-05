@@ -253,15 +253,10 @@ add_library(TZeroDegree SHARED
 root_generate_dictionary(G__TZeroDegree TZeroDegree.h TZeroDegreeHit.h MODULE TZeroDegree LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TZeroDegree/LinkDef.h)
 target_link_libraries(TZeroDegree ${GRSI_LIBRARIES})
 
-add_library(MakeGriffinHistograms SHARED
-	${PROJECT_SOURCE_DIR}/histos/MakeGriffinHistograms.cxx
-	)
-target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegree)
-
 ##----------------------------------------------------------------------------
 ## add all executable in util
-set(GRSIDATA_LIBRARIES TAngularCorrelation TAries TDescant TDemand TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
-set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
+set(GRSIDATA_LIBRARIES TAngularCorrelation TAries TDescant TDemand TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
 	target_link_libraries(${UTIL} ${ROOT_LIBRARIES} ${GRSI_LIBRARIES} ${GRSIDATA_LIBRARIES} ${X11_LIBRARIES} ${X11_Xpm_LIB})
