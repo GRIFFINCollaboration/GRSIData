@@ -53,7 +53,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
                // exclude hits in the same crystal or, if addback is enabled, in the same detector
                if(firstDet == secondDet && (firstCry == secondCry || fAddback)) { continue; }
                double angle = TGriffin::GetPosition(firstDet, firstCry, fDistance).Angle(TGriffin::GetPosition(secondDet, secondCry, fDistance)) * 180. / TMath::Pi();
-               if(fVerbosity == kAll) {
+               if(fVerbosity == EVerbosity::kAll) {
                   std::cout << "det./cry. " << firstDet << "/" << firstCry << " with  " << secondDet << "/" << secondCry << ", at " << fDistance << " mm = " << angle << std::endl;
                }
                // if folding is enable we fold the distribution at 90 degree and only use angles between 0 and 90 degree
@@ -73,7 +73,7 @@ TGriffinAngles::TGriffinAngles(double distance, bool folding, bool grouping, boo
                // the key is integer, so by dividing by rounding and then casting to integer we can avoid duplicates close to each other
                // factor 2 to include that the "normal" rounding is +- fRounding
                fAngleCount[static_cast<int>(std::round(angle / fRounding))]++;
-               if(fVerbosity == kAll) {
+               if(fVerbosity == EVerbosity::kAll) {
                   std::cout << "after folding and rounding: angle " << angle << ", counts " << fAngleCount[static_cast<int>(std::round(angle / fRounding))] << std::endl;
                }
             }   // second crystal loop
