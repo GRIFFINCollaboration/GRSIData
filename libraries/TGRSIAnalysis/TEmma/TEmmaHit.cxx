@@ -1,6 +1,5 @@
 #include "TEmma.h"
 #include "TEmmaHit.h"
-#include "Globals.h"
 
 double TEmmaHit::fLdelay = 40;
 double TEmmaHit::fRdelay = 20;

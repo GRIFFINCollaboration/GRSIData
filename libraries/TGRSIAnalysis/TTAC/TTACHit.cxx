@@ -1,11 +1,7 @@
 #include "TTACHit.h"
 
 #include <iostream>
-#include <algorithm>
 #include <climits>
-
-#include "Globals.h"
-#include "TTAC.h"
 
 TTACHit::TTACHit()
 {

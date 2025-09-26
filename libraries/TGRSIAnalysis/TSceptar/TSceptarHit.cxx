@@ -4,9 +4,7 @@
 #include <algorithm>
 #include <climits>
 
-#include "Globals.h"
 #include "TSceptar.h"
-#include "TGRSIOptions.h"
 
 TSceptarHit::TSceptarHit()
 {

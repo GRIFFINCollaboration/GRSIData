@@ -1,5 +1,4 @@
 #include "TSiLi.h"
-#include "TGRSIOptions.h"
 
 // Having these in Clear() caused issues as functions can be called abstract with out initialising a TSiLi
 int    TSiLi::fRingNumber     = 10;

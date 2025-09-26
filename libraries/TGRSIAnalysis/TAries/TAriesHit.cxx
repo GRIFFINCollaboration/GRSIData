@@ -1,12 +1,9 @@
 #include "TAriesHit.h"
 
 #include <iostream>
-#include <algorithm>
 #include <climits>
 
-#include "Globals.h"
 #include "TAries.h"
-#include "TGRSIOptions.h"
 
 TAriesHit::TAriesHit()
 {

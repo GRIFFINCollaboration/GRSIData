@@ -1,13 +1,11 @@
 #include <iostream>
 #include <climits>
 
-#include "TRandom.h"
 #include "TMath.h"
 
 #include "TDescant.h"
 #include "TRunInfo.h"
 #include "TGRSIDetectorInformation.h"
-#include "TGRSIOptions.h"
 
 bool TDescant::fSetWave = false;
 

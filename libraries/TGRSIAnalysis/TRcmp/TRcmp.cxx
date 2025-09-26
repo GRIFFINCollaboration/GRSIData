@@ -3,14 +3,7 @@
 #include "TRcmp.h"
 
 #include <cstdlib>
-#include "TRandom.h"
-#include "TClass.h"
 #include <cmath>
-#include "TMath.h"
-
-#include "TGRSIOptions.h"
-
-// function implementations are below
 
 TRcmp::TRcmp()
 {
