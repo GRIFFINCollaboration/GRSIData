@@ -1062,6 +1062,7 @@ void TMidasFile::SetTIGDAQOdb()   // Basically a copy of the GRIFFIN one without
          tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
          tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
          if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); }   //Assuming this means quad terms won't be added if not there.
+         TChannel::AddChannel(tempChan, "overwrite");
       }
       std::cout << TChannel::GetNumberOfChannels() << "\t TChannels created." << std::endl;
    } else {
