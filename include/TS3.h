@@ -64,7 +64,7 @@ public:
       fFrontBackTime = time;
       SetPixels(false);
    }   ///< Set absolute allow time difference
-   static Int_t  GetFrontBackTime() { return fFrontBackTime; }     //!<!
+   static Int_t  GetFrontBackTime() { return fFrontBackTime; }       //!<!
    static double GetFrontBackEnergy() { return fFrontBackEnergy; }   //!<!
    static double GetFrontBackOffset() { return fFrontBackOffset; }   //!<!
 
