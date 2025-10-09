@@ -9,7 +9,6 @@
 #include <vector>
 #include <cstdio>
 #include <functional>
-//#include <tuple>
 
 #include "TBits.h"
 #include "TVector3.h"
