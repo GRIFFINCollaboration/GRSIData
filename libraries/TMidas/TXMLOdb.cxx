@@ -22,6 +22,7 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
    } else {
       fParser->ParseBuffer(buffer, size);
    }
+   input.close();
    fDoc = fParser->GetXMLDocument();
    if(fDoc == nullptr) {
       std::runtime_error("XmlOdb::XmlOdb: Malformed ODB dump: cannot get XML document");
