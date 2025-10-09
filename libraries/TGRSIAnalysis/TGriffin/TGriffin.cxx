@@ -4,7 +4,6 @@
 #include <iostream>
 #include <iomanip>
 
-#include "TRandom.h"
 #include "TMath.h"
 #include "TInterpreter.h"
 #include "TMnemonic.h"
@@ -233,12 +232,12 @@ bool TGriffin::IsCrossTalkSet() const
 
 void TGriffin::SetAddback(const bool flag) const
 {
-   return SetBitNumber(EGriffinBits::kIsAddbackSet, flag);
+   SetBitNumber(EGriffinBits::kIsAddbackSet, flag);
 }
 
 void TGriffin::SetCrossTalk(const bool flag) const
 {
-   return SetBitNumber(EGriffinBits::kIsCrossTalkSet, flag);
+   SetBitNumber(EGriffinBits::kIsCrossTalkSet, flag);
 }
 
 TGriffinHit* TGriffin::GetGriffinHit(const int& i)
@@ -311,7 +310,7 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    }
 
    if(mnemonic->SubSystem() != TMnemonic::EMnemonic::kG) {
-      std::cerr << __PRETTY_FUNCTION__ << ": not a GRIFFIN detector: " << static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->SubSystem()) << std::endl;   // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+      std::cerr << __PRETTY_FUNCTION__ << ": not a GRIFFIN detector: " << static_cast<std::underlying_type_t<TMnemonic::EMnemonic>>(mnemonic->SubSystem()) << std::endl;   // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
       return;
    }
 
@@ -324,7 +323,7 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    case TMnemonic::EMnemonic::kB:
       break;
    default:
-      std::cout << "output sensor " << static_cast<std::underlying_type<TMnemonic::EMnemonic>::type>(mnemonic->OutputSensor()) << ", skipping it" << std::endl;
+      std::cout << "output sensor " << static_cast<std::underlying_type_t<TMnemonic::EMnemonic>>(mnemonic->OutputSensor()) << ", skipping it" << std::endl;
       break;
    };
 }
@@ -524,7 +523,7 @@ Short_t TGriffin::GetSuppressedMultiplicity(const TBgo* bgo)
 
 void TGriffin::SetSuppressed(const bool flag) const
 {
-   return SetBitNumber(EGriffinBits::kIsSuppressed, flag);
+   SetBitNumber(EGriffinBits::kIsSuppressed, flag);
 }
 
 void TGriffin::ResetSuppressed()
@@ -578,7 +577,7 @@ Short_t TGriffin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 
 void TGriffin::SetSuppressedAddback(const bool flag) const
 {
-   return SetBitNumber(EGriffinBits::kIsSuppressedAddbackSet, flag);
+   SetBitNumber(EGriffinBits::kIsSuppressedAddbackSet, flag);
 }
 
 void TGriffin::ResetSuppressedAddback()

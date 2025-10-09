@@ -1,6 +1,5 @@
 #include "TTrific.h"
 #include "TTrificHit.h"
-#include "Globals.h"
 
 TTrificHit::TTrificHit()
 {

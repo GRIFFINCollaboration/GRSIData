@@ -1,7 +1,5 @@
 #include "TTigressHit.h"
 
-#include "TClass.h"
-
 #include "TTigress.h"
 
 TTigressHit::TTigressHit()

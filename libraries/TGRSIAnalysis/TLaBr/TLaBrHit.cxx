@@ -1,10 +1,8 @@
 #include "TLaBrHit.h"
 
 #include <iostream>
-#include <algorithm>
 #include <climits>
 
-#include "Globals.h"
 #include "TLaBr.h"
 
 TLaBrHit::TLaBrHit()

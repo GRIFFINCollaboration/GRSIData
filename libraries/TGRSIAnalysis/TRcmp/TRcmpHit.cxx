@@ -1,12 +1,8 @@
 #include <iostream>
-#include <vector>
-#include "TRcmp.h"
 #include "TRcmpHit.h"
 
 #include <cstdlib>
 #include <cmath>
-#include "TMath.h"
-#include "Globals.h"
 
 // function implementations are below
 

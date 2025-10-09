@@ -6,7 +6,6 @@
 #include "TGRSIDataParser.h"
 #include "GRSIDataVersion.h"
 #include "TChannel.h"
-#include "TGRSIMnemonic.h"
 
 extern "C" TMidasFile* CreateFile(std::string& fileName) { return new TMidasFile(fileName.c_str()); }
 extern "C" void        DestroyFile(TMidasFile* obj) { delete obj; }

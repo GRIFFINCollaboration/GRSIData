@@ -83,9 +83,20 @@ void TLaBr::Copy(TObject& rhs) const
    // Copies a TLaBr
    TSuppressed::Copy(rhs);
 
-   static_cast<TLaBr&>(rhs).fSuppressedHits.resize(fSuppressedHits.size());
+   auto& suppressedHits = static_cast<TLaBr&>(rhs).fSuppressedHits;
+   if(suppressedHits.size() > fSuppressedHits.size()) {
+      for(size_t i = fSuppressedHits.size(); i < suppressedHits.size(); ++i) {
+         delete suppressedHits[i];
+      }
+      suppressedHits.resize(fSuppressedHits.size());
+   } else if(suppressedHits.size() < fSuppressedHits.size()) {
+      // right-hand side has less hits, that means there is at least one we can use to determine the type
+      // we need to use IsA()->New() to make a new hit of whatever derived type this actually is
+      suppressedHits.resize(fSuppressedHits.size(), static_cast<TDetectorHit*>(fSuppressedHits[0]->IsA()->New()));
+   }
+   // we have now ensured that the size of the two vectors is the same, so we can copy the contents of the hits
    for(size_t i = 0; i < fSuppressedHits.size(); ++i) {
-      static_cast<TLaBr&>(rhs).fSuppressedHits[i] = new TLaBrHit(*static_cast<TLaBrHit*>(fSuppressedHits[i]));
+      fSuppressedHits[i]->Copy(*(suppressedHits[i]), true);
    }
    static_cast<TLaBr&>(rhs).fLaBrBits = 0;
 }
@@ -116,7 +127,7 @@ bool TLaBr::IsSuppressed() const
 
 void TLaBr::SetSuppressed(const bool flag)
 {
-   return SetBitNumber(ELaBrBits::kIsSuppressed, flag);
+   SetBitNumber(ELaBrBits::kIsSuppressed, flag);
 }
 
 void TLaBr::ResetSuppressed()

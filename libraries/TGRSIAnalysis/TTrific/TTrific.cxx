@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <iostream>
 #include "TTrific.h"
-#include "TRandom.h"
 #include "TMath.h"
 #include "TMnemonic.h"
 
@@ -297,7 +297,7 @@ Int_t TTrific::GetRange()
 
    //first we'll check the single grid fragment, since there are more of them and they extend further
    for(auto* hit : fSingFragments) {
-      if(hit->GetDetector() > fRange) { fRange = hit->GetDetector(); }
+      fRange = std::max(hit->GetDetector(), fRange);
    }
    //check if the range is less than the furthest position grid. If so, we need to check that the range isn't at the x or y grid
    //this was changed because there is no guarantee that the x and y grids will stay at positions 3 and 5, so this is generic

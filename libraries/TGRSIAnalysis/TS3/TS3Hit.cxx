@@ -33,7 +33,6 @@ void TS3Hit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);
 
-   // static_cast<TS3Hit&>(rhs).fLed          = fLed;
    static_cast<TS3Hit&>(rhs).fRing         = fRing;
    static_cast<TS3Hit&>(rhs).fSector       = fSector;
    static_cast<TS3Hit&>(rhs).fIsDownstream = fIsDownstream;

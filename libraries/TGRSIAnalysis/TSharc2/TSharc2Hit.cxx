@@ -1,9 +1,6 @@
 #include "TSharc2Hit.h"
 
-#include "TClass.h"
-
 #include "TSharc2.h"
-#include "TChannel.h"
 
 TSharc2Hit::TSharc2Hit()
 {
@@ -19,8 +16,8 @@ TSharc2Hit::TSharc2Hit(const TSharc2Hit& rhs) : TDetectorHit(rhs)
 void TSharc2Hit::Copy(TObject& rhs) const
 {
    TDetectorHit::Copy(rhs);
-   static_cast<const TDetectorHit&>(fBackHit).Copy(static_cast<TObject&>(static_cast<TSharc2Hit&>(rhs).fBackHit));
-   static_cast<const TDetectorHit&>(fPadHit).Copy(static_cast<TObject&>(static_cast<TSharc2Hit&>(rhs).fPadHit));
+   fBackHit.Copy(static_cast<TObject&>(static_cast<TSharc2Hit&>(rhs).fBackHit));
+   fPadHit.Copy(static_cast<TObject&>(static_cast<TSharc2Hit&>(rhs).fPadHit));
 }
 
 void TSharc2Hit::Copy(TObject& rhs, bool waveform) const

@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "TRandom.h"
-#include "TMath.h"
 #include "TClass.h"
 #include "TInterpreter.h"
 
@@ -70,10 +69,10 @@ bool DefaultSuppression(TDetectorHit* tig, TBgoHit& bgo)
 
 std::function<bool(TDetectorHit*, TBgoHit&)> TTigress::fSuppressionCriterion = DefaultSuppression;
 
-std::underlying_type<TTigress::ETigressGlobalBits>::type operator|(TTigress::ETigressGlobalBits lhs, TTigress::ETigressGlobalBits rhs)
+std::underlying_type_t<TTigress::ETigressGlobalBits> operator|(TTigress::ETigressGlobalBits lhs, TTigress::ETigressGlobalBits rhs)
 {
-   return static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(lhs) |
-          static_cast<std::underlying_type<TTigress::ETigressGlobalBits>::type>(rhs);
+   return static_cast<std::underlying_type_t<TTigress::ETigressGlobalBits>>(lhs) |
+          static_cast<std::underlying_type_t<TTigress::ETigressGlobalBits>>(rhs);
 }
 
 TTigress::TTigress()
@@ -89,9 +88,23 @@ TTigress::TTigress(const TTigress& rhs) : TDetector(rhs)
 void TTigress::Copy(TObject& rhs) const
 {
    TDetector::Copy(rhs);
-   static_cast<TTigress&>(rhs).fAddbackHits.resize(fAddbackHits.size());
+   // to copy the hits without creating a memory leak we need to check
+   // if the right-hand side has more hits than this
+   // if so, we need to delete the hits pointed to by the right-hand side
+   auto& addbackHits = static_cast<TTigress&>(rhs).fAddbackHits;
+   if(addbackHits.size() > fAddbackHits.size()) {
+      for(size_t i = fAddbackHits.size(); i < addbackHits.size(); ++i) {
+         delete addbackHits[i];
+      }
+      addbackHits.resize(fAddbackHits.size());
+   } else if(addbackHits.size() < fAddbackHits.size()) {
+      // right-hand side has less hits, that means there is at least one we can use to determine the type
+      // we need to use IsA()->New() to make a new hit of whatever derived type this actually is
+      addbackHits.resize(fAddbackHits.size(), static_cast<TDetectorHit*>(fAddbackHits[0]->IsA()->New()));
+   }
+   // we have now ensured that the size of the two vectors is the same, so we can copy the contents of the hits
    for(size_t i = 0; i < fAddbackHits.size(); ++i) {
-      static_cast<TTigress&>(rhs).fAddbackHits[i] = new TTigressHit(*static_cast<TTigressHit*>(fAddbackHits[i]));
+      fAddbackHits[i]->Copy(*(addbackHits[i]), true);
    }
    static_cast<TTigress&>(rhs).fAddbackFrags = fAddbackFrags;
    static_cast<TTigress&>(rhs).fBgos         = fBgos;

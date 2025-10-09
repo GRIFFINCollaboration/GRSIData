@@ -1,6 +1,5 @@
 #include "TPaces.h"
 #include "TPacesHit.h"
-#include "Globals.h"
 
 TPacesHit::TPacesHit()
 {

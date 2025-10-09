@@ -4,11 +4,8 @@
 #include <algorithm>
 #include <climits>
 
-#include "Globals.h"
 #include "TDescant.h"
 #include "TGRSIOptions.h"
-#include "TChannel.h"
-#include "GValue.h"
 
 TDescantHit::TDescantHit()
 {

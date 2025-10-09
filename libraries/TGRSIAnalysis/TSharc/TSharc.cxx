@@ -182,8 +182,6 @@ void TSharc::Print(std::ostream& out) const
 
 void TSharc::Copy(TObject& rhs) const
 {
-   // if(!rhs.InheritsFrom("TSharc"))
-   //  return;
    TDetector::Copy(rhs);
 }
 

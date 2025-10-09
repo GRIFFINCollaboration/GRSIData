@@ -9,12 +9,8 @@
 #include <ctime>
 #include <cstring>
 #include <cassert>
-#include <sstream>
 
 #include "TMidasEvent.h"
-#include "TGRSIOptions.h"
-#include "TRunInfo.h"
-#include "TXMLOdb.h"
 
 TMidasEvent::TMidasEvent()
    : fData(nullptr), fBanksN(0), fBankList(nullptr), fAllocatedByUs(false)
@@ -39,8 +35,6 @@ void TMidasEvent::Copy(TObject& rhs) const
 
    static_cast<TMidasEvent&>(rhs).fBanksN   = fBanksN;
    static_cast<TMidasEvent&>(rhs).fBankList = nullptr;
-   // if(fBankList) static_cast<TMidasEvent&>(rhs).fBankList    = strdup(fBankList);
-   // assert(static_cast<TMidasEvent&>(rhs).fBankList);
 }
 
 TMidasEvent::TMidasEvent(const TMidasEvent& rhs) : TRawEvent(rhs)
@@ -67,11 +61,11 @@ TMidasEvent& TMidasEvent::operator=(const TMidasEvent& rhs)
 void TMidasEvent::Clear(Option_t*)
 {
    // Clears the TMidasEvent.
-   delete fBankList;
+   std::free(fBankList);
    fBankList = nullptr;
 
    if(fAllocatedByUs) {
-      delete fData;
+      std::free(fData);
    }
    fData = nullptr;
 

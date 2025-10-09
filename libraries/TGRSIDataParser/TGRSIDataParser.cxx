@@ -1511,6 +1511,7 @@ int TGRSIDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3);   // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerLowTS;
       failedWord = x;
+      delete scalerEvent;
       throw TGRSIDataParserException(fState, failedWord, false);
    }
    // followed by four scaler words (32 bits each)
@@ -1519,6 +1520,7 @@ int TGRSIDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
          TParsingDiagnostics::Get()->BadFragment(-3);   // use detector type -3 for scaler data
          fState     = EDataParserState::kBadScalerValue;
          failedWord = x;
+         delete scalerEvent;
          throw TGRSIDataParserException(fState, failedWord, false);
       }
    }
@@ -1528,6 +1530,7 @@ int TGRSIDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3);   // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerHighTS;
       failedWord = x;
+      delete scalerEvent;
       throw TGRSIDataParserException(fState, failedWord, false);
    }
 
@@ -1541,10 +1544,12 @@ int TGRSIDataParser::GriffinDataToScalerEvent(uint32_t* data, int address)
       TParsingDiagnostics::Get()->BadFragment(-3);   // use detector type -3 for scaler data
       fState     = EDataParserState::kBadScalerType;
       failedWord = x;
+      delete scalerEvent;
       throw TGRSIDataParserException(fState, failedWord, false);
    }
 
    TParsingDiagnostics::Get()->GoodFragment(-3);   // use detector type -3 for scaler data
+
    return x;
 }
 

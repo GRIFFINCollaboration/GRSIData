@@ -4,11 +4,7 @@
 #include <algorithm>
 #include <climits>
 
-#include "Globals.h"
-#include "TZeroDegree.h"
 #include "TGRSIOptions.h"
-#include "TChannel.h"
-#include "GValue.h"
 
 TZeroDegreeHit::TZeroDegreeHit()
 {

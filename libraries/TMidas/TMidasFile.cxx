@@ -27,7 +27,7 @@ TMidasFile::TMidasFile()
    : fOdb(nullptr)
 #endif
 {
-   // Default Constructor
+   /// Default Constructor
    uint32_t endian = 0x12345678;
    fDoByteSwap     = *reinterpret_cast<char*>(&endian) != 0x78;
 }
@@ -48,9 +48,13 @@ TMidasFile::TMidasFile(const char* filename, TRawFile::EOpenType open_type) : TM
 
 TMidasFile::~TMidasFile()
 {
-   // Default dtor. It closes the read in midas file as well as the output midas file.
+   /// Default dtor. It closes the read in midas file as well as the output midas file.
    Close();
    OutClose();
+   fOdbEvent.reset();
+#ifdef HAS_XML
+   delete fOdb;
+#endif
 }
 
 std::string TMidasFile::Status(bool)
@@ -62,7 +66,7 @@ std::string TMidasFile::Status(bool)
 
 static int hasSuffix(const char* name, const char* suffix)
 {
-   // Checks to see if midas file has suffix.
+   /// Checks to see if midas file has suffix.
    const char* s = strstr(name, suffix);
    if(s == nullptr) {
       return 0;
@@ -332,18 +336,18 @@ int TMidasFile::Read(std::shared_ptr<TRawEvent> event)
       return 0;
    }
 
-   size_t event_size = midasEvent->GetDataSize();
-   size_t total_size = sizeof(TMidas_EVENT_HEADER) + event_size;
+   size_t eventSize = midasEvent->GetDataSize();
+   size_t totalSize = sizeof(TMidas_EVENT_HEADER) + eventSize;
 
-   if(BufferSize() < total_size) {
-      ReadMoreBytes(total_size - BufferSize());
+   if(BufferSize() < totalSize) {
+      ReadMoreBytes(totalSize - BufferSize());
    }
 
-   if(BufferSize() < total_size) {
+   if(BufferSize() < totalSize) {
       return 0;
    }
 
-   memcpy(midasEvent->GetData(), BufferData() + sizeof(TMidas_EVENT_HEADER), event_size);
+   memcpy(midasEvent->GetData(), BufferData() + sizeof(TMidas_EVENT_HEADER), eventSize);
    midasEvent->SwapBytes(false);
 
    size_t bytesRead = BufferSize();
@@ -410,20 +414,20 @@ void TMidasFile::Skip(size_t nofEvents)
 
 void TMidasFile::ReadMoreBytes(size_t bytes)
 {
-   size_t initial_size = BufferSize();
-   ResizeBuffer(initial_size + bytes);
+   size_t initialSize = BufferSize();
+   ResizeBuffer(initialSize + bytes);
    size_t rd = 0;
    if(fGzFile != nullptr) {
 #ifdef HAVE_ZLIB
-      rd = gzread(*(gzFile*)fGzFile, BufferData() + initial_size, bytes);
+      rd = gzread(*(gzFile*)fGzFile, BufferData() + initialSize, bytes);
 #else
       assert(!"Cannot get here");
 #endif
    } else {
-      rd = readpipe(fFile, BufferData() + initial_size, bytes);
+      rd = readpipe(fFile, BufferData() + initialSize, bytes);
    }
 
-   ResizeBuffer(initial_size + rd);
+   ResizeBuffer(initialSize + rd);
 
    if(rd == 0) {
       fLastErrno = 0;
@@ -436,7 +440,7 @@ void TMidasFile::ReadMoreBytes(size_t bytes)
 
 void TMidasFile::FillBuffer(const std::shared_ptr<TMidasEvent>& midasEvent, Option_t*)
 {
-   // Fills a buffer to be written to a midas file.
+   /// Fills a buffer to be written to a midas file.
 
    // Not the prettiest way to do this but it works.
    // It seems to be filling in the wrong order of bits, but this does it correctly
@@ -476,7 +480,7 @@ void TMidasFile::FillBuffer(const std::shared_ptr<TMidasEvent>& midasEvent, Opti
 
 bool TMidasFile::WriteBuffer()
 {
-   // Writes a buffer of TMidasEvents to the output file.
+   /// Writes a buffer of TMidasEvents to the output file.
    int wr = -2;
 
    if(fOutGzFile != nullptr) {
@@ -496,8 +500,8 @@ bool TMidasFile::WriteBuffer()
 
 bool TMidasFile::Write(const std::shared_ptr<TMidasEvent>& midasEvent, Option_t* opt)
 {
-   // Writes an individual TMidasEvent to the output TMidasFile. This will
-   // write to a zipped file if the output file is defined as a zipped file.
+   /// Writes an individual TMidasEvent to the output TMidasFile. This will
+   /// write to a zipped file if the output file is defined as a zipped file.
    int wr = -2;
 
    if(fOutGzFile != nullptr) {
@@ -538,15 +542,15 @@ bool TMidasFile::Write(const std::shared_ptr<TMidasEvent>& midasEvent, Option_t*
 
 void TMidasFile::SetMaxBufferSize(int maxsize)
 {
-   // Sets the maximum buffer size for the TMidasEvents to be written to
-   // an output TMidasFile.
+   /// Sets the maximum buffer size for the TMidasEvents to be written to
+   /// an output TMidasFile.
    fMaxBufferSize = maxsize;
 }
 
 void TMidasFile::Close()
 {
-   // Closes the input midas file. Use OutClose() to close the output
-   // Midas File.
+   /// Closes the input midas file. Use OutClose() to close the output
+   /// Midas File.
    if(fPoFile != nullptr) {
       pclose(reinterpret_cast<FILE*>(fPoFile));
    }
@@ -565,7 +569,7 @@ void TMidasFile::Close()
 
 void TMidasFile::OutClose()
 {
-   // Closes the output midas file. Use Close() to close the read-in midas file
+   /// Closes the output midas file. Use Close() to close the read-in midas file
 
    if(static_cast<unsigned int>(!fWriteBuffer.empty()) != 0u) {
       WriteBuffer();
@@ -586,8 +590,8 @@ void TMidasFile::OutClose()
 
 int TMidasFile::GetRunNumber()
 {
-   // Parse the run number from the current TMidasFile. This assumes a format of
-   // run#####_###.mid or run#####.mid.
+   /// Parse the run number from the current TMidasFile. This assumes a format of
+   /// run#####_###.mid or run#####.mid.
    if(Filename().length() == 0) {
       return 0;
    }
@@ -1062,6 +1066,7 @@ void TMidasFile::SetTIGDAQOdb()   // Basically a copy of the GRIFFIN one without
          tempChan->AddENGCoefficient(static_cast<Float_t>(offsets.at(x)));
          tempChan->AddENGCoefficient(static_cast<Float_t>(gains.at(x)));
          if(x < quads.size()) { tempChan->AddENGCoefficient(static_cast<Float_t>(quads.at(x))); }   //Assuming this means quad terms won't be added if not there.
+         TChannel::AddChannel(tempChan, "overwrite");
       }
       std::cout << TChannel::GetNumberOfChannels() << "\t TChannels created." << std::endl;
    } else {
