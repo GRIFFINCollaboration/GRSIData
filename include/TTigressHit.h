@@ -39,8 +39,8 @@ public:
    void CopyFragment(const TFragment&);
 
 private:
-   Int_t                   fFilter{0};                    ///<  The Filter Word
-   TTransientBits<UChar_t> fTigressHitBits;               ///<  Transient Member Flags
+   Int_t                   fFilter{0};        ///<  The Filter Word
+   TTransientBits<UChar_t> fTigressHitBits;   ///<  Transient Member Flags
 
    // copied from old TTigressHit
    std::vector<TDetectorHit> fSegments;
@@ -57,7 +57,7 @@ public:
       core.Copy(*this);
       fCoreSet = true;
    }
-   void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); }   //!<!
+   void    AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); }   //!<!
    void    SetWavefit(const TFragment&);
    void    SetWavefit();
    Float_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
@@ -84,7 +84,7 @@ public:
    int GetSegmentMultiplicity() const { return fSegments.size(); }   //!<!
    int GetNSegments() const { return fSegments.size(); }             //!<!
 
-   const TDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); }   //!<!
+   const TDetectorHit&              GetSegmentHit(int i) const { return fSegments.at(i); }   //!<!
    const std::vector<TDetectorHit>& GetSegments() const { return fSegments; }
    int                              GetFirstSegment() const
    {
@@ -107,8 +107,8 @@ public:
    void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
 
    /////////////////////////  Getters	/////////////////////////////////////
-   Int_t GetFilterPattern() const { return fFilter; }   //!<!
-   Double_t     GetNoCTEnergy(Option_t* opt = "") const;
+   Int_t    GetFilterPattern() const { return fFilter; }   //!<!
+   Double_t GetNoCTEnergy(Option_t* opt = "") const;
 
    /////////////////////////  Recommended Functions/////////////////////////
 
@@ -125,7 +125,7 @@ public:
 
    bool InFilter(Int_t);   //!<!
 
-   static bool Compare(const TTigressHit*, const TTigressHit*);   //!<!
+   static bool Compare(const TTigressHit*, const TTigressHit*);         //!<!
    static bool CompareEnergy(const TTigressHit*, const TTigressHit*);   //!<!
    void        Add(const TDetectorHit*) override;                       //!<!
 
@@ -136,7 +136,7 @@ public:
    void Copy(TObject&, bool) const override;        //!<!
 
    TVector3 GetPosition(double dist) const override;   //!<!
-   TVector3 GetLastPosition(double dist) const;   //!<!
+   TVector3 GetLastPosition(double dist) const;        //!<!
    TVector3 GetPosition() const override;
 
 private:
