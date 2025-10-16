@@ -62,8 +62,8 @@ void TTigressHit::Clear(Option_t* opt)
 {
    // Clears the information stored in the TTigressHit.
    TDetectorHit::Clear(opt);   // clears the base (address, position and waveform)
-   fFilter              = 0;
-   fTigressHitBits      = 0;
+   fFilter         = 0;
+   fTigressHitBits = 0;
 
    fTimeFit   = 0.0;
    fSig2Noise = 0.0;

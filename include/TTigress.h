@@ -49,7 +49,7 @@ public:
    TTigressHit* GetTigressHit(const int& i);   //!<!
 
    static TVector3    GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 110.0, bool smear = false);   //!<!
-   static TVector3    GetPosition(const TTigressHit* hit, double dist = 110.0, bool smear = false);   //!<!
+   static TVector3    GetPosition(const TTigressHit* hit, double dist = 110.0, bool smear = false);               //!<!
    static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
@@ -136,7 +136,7 @@ private:
    // Vectors constructed from segment array and manual adjustments once at start of sort
    static std::array<std::array<std::array<std::array<TVector3, 9>, 4>, 17>, 2> fPositionVectors;   //!<!
 
-   static std::array<TVector3, 17> fCloverRadial;                            //!<! direction vector of each HPGe Clover
+   static std::array<TVector3, 17>                fCloverRadial;   //!<! direction vector of each HPGe Clover
    static std::array<std::array<TVector3, 2>, 17> fCloverCross;    //!<!  clover perpendicular vectors, for smearing
 
    // These array contain the original data that is used
@@ -149,8 +149,8 @@ private:
    static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPositionBack;     //!<!
    static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePositionBack;   //!<!
 
-   static TTransientBits<uint8_t> fGlobalTigressBits;   //!<!
-   mutable TTransientBits<uint8_t> fTigressBits;   // Transient member flags
+   static TTransientBits<uint8_t>  fGlobalTigressBits;   //!<!
+   mutable TTransientBits<uint8_t> fTigressBits;         // Transient member flags
 
    mutable std::vector<TDetectorHit*> fAddbackHits;    //!<! Used to create addback hits on the fly
    mutable std::vector<UShort_t>      fAddbackFrags;   //!<! Number of crystals involved in creating in the addback hit
@@ -161,19 +161,19 @@ private:
    mutable std::vector<UShort_t>      fSuppressedAddbackFrags;   //!<! Number of crystals involved in creating in the suppressed addback hit
 
    // This is where the general untouchable functions live.
-   void   ClearStatus() const { fTigressBits = 0; }   //!<!
-   void   SetBitNumber(ETigressBits bit, Bool_t set) const;
-   Bool_t TestBitNumber(ETigressBits bit) const { return fTigressBits.TestBit(bit); }
+   void          ClearStatus() const { fTigressBits = 0; }   //!<!
+   void          SetBitNumber(ETigressBits bit, Bool_t set) const;
+   Bool_t        TestBitNumber(ETigressBits bit) const { return fTigressBits.TestBit(bit); }
    static void   SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fGlobalTigressBits.SetBit(bit, set); }
    static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fGlobalTigressBits.TestBit(bit)); }
 
-   void   SetAddback(bool flag = true) const;
-   void   SetSuppressed(bool flag = true) const;
-   void   SetSuppressedAddback(bool flag = true) const;
+   void SetAddback(bool flag = true) const;
+   void SetSuppressed(bool flag = true) const;
+   void SetSuppressedAddback(bool flag = true) const;
 
    void SetCrossTalk(bool flag = true) const;
 
-   static void BuildVectors(); 
+   static void BuildVectors();
 
 public:
    void Copy(TObject&) const override;              //!<!

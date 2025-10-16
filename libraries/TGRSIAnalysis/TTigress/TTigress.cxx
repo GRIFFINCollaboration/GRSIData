@@ -240,7 +240,7 @@ void TTigress::BuildHits()
          tigressHit->SetWavefit();
       }
    }
-   std::sort(Hits().begin(), Hits().end()); // sorting an empty vector is fine, no need to check for that
+   std::sort(Hits().begin(), Hits().end());   // sorting an empty vector is fine, no need to check for that
 }
 
 void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
@@ -320,7 +320,7 @@ void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    std::cout << ALERTTEXT << "failed to build!" << RESET_COLOR << std::endl;
    frag->Print();
 }
- 
+
 void TTigress::ResetFlags() const
 {
    fTigressBits = 0;
@@ -583,7 +583,7 @@ TVector3 TTigress::GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist, 
 }
 
 void TTigress::BuildVectors()
-{  
+{
    for(int position = 0; position < 2; position++) {
       for(int DetNbr = 0; DetNbr < 17; DetNbr++) {
          for(int CryNbr = 0; CryNbr < 4; CryNbr++) {
@@ -595,49 +595,49 @@ void TTigress::BuildVectors()
 
                if(position == 1) {   // distance=145.0
                   switch(CryNbr) {
-                     case 0:
-                              xx = fGeBluePositionBack[DetNbr][SegNbr][0];
-                              yy = fGeBluePositionBack[DetNbr][SegNbr][1];
-                              zz = fGeBluePositionBack[DetNbr][SegNbr][2];
-                              break;
-                     case 1:
-                              xx = fGeGreenPositionBack[DetNbr][SegNbr][0];
-                              yy = fGeGreenPositionBack[DetNbr][SegNbr][1];
-                              zz = fGeGreenPositionBack[DetNbr][SegNbr][2];
-                              break;
-                     case 2:
-                              xx = fGeRedPositionBack[DetNbr][SegNbr][0];
-                              yy = fGeRedPositionBack[DetNbr][SegNbr][1];
-                              zz = fGeRedPositionBack[DetNbr][SegNbr][2];
-                              break;
-                     case 3:
-                              xx = fGeWhitePositionBack[DetNbr][SegNbr][0];
-                              yy = fGeWhitePositionBack[DetNbr][SegNbr][1];
-                              zz = fGeWhitePositionBack[DetNbr][SegNbr][2];
-                              break;
+                  case 0:
+                     xx = fGeBluePositionBack[DetNbr][SegNbr][0];
+                     yy = fGeBluePositionBack[DetNbr][SegNbr][1];
+                     zz = fGeBluePositionBack[DetNbr][SegNbr][2];
+                     break;
+                  case 1:
+                     xx = fGeGreenPositionBack[DetNbr][SegNbr][0];
+                     yy = fGeGreenPositionBack[DetNbr][SegNbr][1];
+                     zz = fGeGreenPositionBack[DetNbr][SegNbr][2];
+                     break;
+                  case 2:
+                     xx = fGeRedPositionBack[DetNbr][SegNbr][0];
+                     yy = fGeRedPositionBack[DetNbr][SegNbr][1];
+                     zz = fGeRedPositionBack[DetNbr][SegNbr][2];
+                     break;
+                  case 3:
+                     xx = fGeWhitePositionBack[DetNbr][SegNbr][0];
+                     yy = fGeWhitePositionBack[DetNbr][SegNbr][1];
+                     zz = fGeWhitePositionBack[DetNbr][SegNbr][2];
+                     break;
                   };
                } else {
                   switch(CryNbr) {
-                     case 0:
-                              xx = fGeBluePosition[DetNbr][SegNbr][0];
-                              yy = fGeBluePosition[DetNbr][SegNbr][1];
-                              zz = fGeBluePosition[DetNbr][SegNbr][2];
-                              break;
-                     case 1:
-                              xx = fGeGreenPosition[DetNbr][SegNbr][0];
-                              yy = fGeGreenPosition[DetNbr][SegNbr][1];
-                              zz = fGeGreenPosition[DetNbr][SegNbr][2];
-                              break;
-                     case 2:
-                              xx = fGeRedPosition[DetNbr][SegNbr][0];
-                              yy = fGeRedPosition[DetNbr][SegNbr][1];
-                              zz = fGeRedPosition[DetNbr][SegNbr][2];
-                              break;
-                     case 3:
-                              xx = fGeWhitePosition[DetNbr][SegNbr][0];
-                              yy = fGeWhitePosition[DetNbr][SegNbr][1];
-                              zz = fGeWhitePosition[DetNbr][SegNbr][2];
-                              break;
+                  case 0:
+                     xx = fGeBluePosition[DetNbr][SegNbr][0];
+                     yy = fGeBluePosition[DetNbr][SegNbr][1];
+                     zz = fGeBluePosition[DetNbr][SegNbr][2];
+                     break;
+                  case 1:
+                     xx = fGeGreenPosition[DetNbr][SegNbr][0];
+                     yy = fGeGreenPosition[DetNbr][SegNbr][1];
+                     zz = fGeGreenPosition[DetNbr][SegNbr][2];
+                     break;
+                  case 2:
+                     xx = fGeRedPosition[DetNbr][SegNbr][0];
+                     yy = fGeRedPosition[DetNbr][SegNbr][1];
+                     zz = fGeRedPosition[DetNbr][SegNbr][2];
+                     break;
+                  case 3:
+                     xx = fGeWhitePosition[DetNbr][SegNbr][0];
+                     yy = fGeWhitePosition[DetNbr][SegNbr][1];
+                     zz = fGeWhitePosition[DetNbr][SegNbr][2];
+                     break;
                   };
                }
 
