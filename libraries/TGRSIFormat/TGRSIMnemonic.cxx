@@ -6,6 +6,7 @@
 #include "TGriffin.h"
 #include "TSceptar.h"
 #include "TTigress.h"
+#include "TTigressBgo.h"
 #include "TTip.h"
 #include "TTAC.h"
 #include "TLaBr.h"
@@ -40,7 +41,11 @@ void TGRSIMnemonic::EnumerateSystem()
    // Enumerating the fSystemString must come after the total mnemonic has been parsed as the details of other parts of
    // the mnemonic must be known
    if(SystemString() == "TI") {
-      fSystem = ESystem::kTigress;
+      if(SubSystem() == EMnemonic::kS) {
+         fSystem = ESystem::kTigressBgo;
+      } else {
+         fSystem = ESystem::kTigress;
+      }
    } else if(SystemString() == "SH") {
       fSystem = ESystem::kSharc;
    } else if(SystemString() == "TR") {
@@ -180,6 +185,7 @@ TClass* TGRSIMnemonic::GetClassType() const
 
    switch(System()) {
    case ESystem::kTigress: SetClassType(TTigress::Class()); break;
+   case ESystem::kTigressBgo: SetClassType(TTigressBgo::Class()); break;
    case ESystem::kSharc: SetClassType(TSharc::Class()); break;
    case ESystem::kTriFoil: SetClassType(TTriFoil::Class()); break;
    case ESystem::kRF: SetClassType(TRF::Class()); break;

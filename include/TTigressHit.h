@@ -7,34 +7,42 @@
 
 #include <cstdio>
 #include <cmath>
-#if !defined(__CINT__) && !defined(__CLING__)
-#include <tuple>
-#endif
 
-#include "TMath.h"
 #include "TVector3.h"
 
 #include "TFragment.h"
-#include "TChannel.h"
-#include "TPulseAnalyzer.h"
 
 #include "TDetectorHit.h"
 
 class TTigressHit : public TDetectorHit {
 public:
+   enum class ETigressHitBits : std::uint8_t {
+      kTotalPU1    = 1 << 0,
+      kTotalPU2    = 1 << 1,
+      kPUHitOffset = kTotalPU2,
+      kPUHit1      = 1 << 2,
+      kPUHit2      = 1 << 3,
+      kBit4        = 1 << 4,
+      kBit5        = 1 << 5,
+      kBit6        = 1 << 6,
+      kBit7        = 1 << 7
+   };
+
    TTigressHit();
    TTigressHit(const TTigressHit&);
    TTigressHit(TTigressHit&&) noexcept            = default;
    TTigressHit& operator=(const TTigressHit&)     = default;
    TTigressHit& operator=(TTigressHit&&) noexcept = default;
-   explicit TTigressHit(const TFragment& frag);
-   void CopyFragment(const TFragment& frag);
+   explicit TTigressHit(const TFragment&);
    ~TTigressHit() override = default;
 
-private:
-   // UShort_t fFirstSegment;
-   // Float_t  fFirstSegmentCharge; //!<!
+   void CopyFragment(const TFragment&);
 
+private:
+   Int_t                   fFilter{0};                    ///<  The Filter Word
+   TTransientBits<UChar_t> fTigressHitBits;               ///<  Transient Member Flags
+
+   // copied from old TTigressHit
    std::vector<TDetectorHit> fSegments;
 
    bool    fCoreSet{false};
@@ -42,41 +50,28 @@ private:
    Float_t fTimeFit{0.};
    Float_t fSig2Noise{0.};
 
-   // need to do sudo tracking to build addback. do not remove.  pcb. */
-   // TVector3 fLastHit;                //!   <! */
-
 public:
-   void SetHit() {}
-   /////////////////////////    /////////////////////////////////////
+   // copied from old TTigressHit
    void SetCore(const TTigressHit& core)
    {
       core.Copy(*this);
       fCoreSet = true;
-   }   //!<!
+   }
    void AddSegment(const TDetectorHit& seg) { fSegments.push_back(seg); }   //!<!
-   //    void AddBGO(const TDetectorHit& bgo)        { fBgos.push_back(bgo);  }     //!<!
-   // void SetInitalHit(const int &i)     { fFirstSegment = i; }        //!<!
+   void    SetWavefit(const TFragment&);
+   void    SetWavefit();
+   Float_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
+   Float_t GetFitTime() const { return fTimeFit; }           //!<!
 
-   /////////////////////////    /////////////////////////////////////
-   // int GetCrystal()   const;           //{  return crystal;      }    //!<!
-   // int GetInitialHit() const           {  return fFirstSegment;  }      //!<!
-
-   void     SetWavefit(const TFragment&);
-   void     SetWavefit();
-   Double_t GetSignalToNoise() const { return fSig2Noise; }   //!<!
-   Double_t GetFitTime() const { return fTimeFit; }           //!<!
-
-   UShort_t GetArrayNumber() const override { return 4 * (GetDetector() - 1) + GetCrystal(); }
-
-   inline double GetDoppler(double beta, TVector3* vec = nullptr)
+   double GetDoppler(double beta, TVector3* vec = nullptr)
    {
       if(vec == nullptr) {
          vec = GetBeamDirection();
       }
-      double tmp   = 0;
-      double gamma = 1 / (sqrt(1 - pow(beta, 2)));
-      tmp          = this->GetEnergy() * gamma * (1 - beta * TMath::Cos(GetPosition().Angle(*vec)));
-      return tmp;
+      double result = 0;
+      double gamma  = 1 / (sqrt(1 - pow(beta, 2)));
+      result        = GetEnergy() * gamma * (1 - beta * TMath::Cos(GetPosition().Angle(*vec)));
+      return result;
    }
 
    bool CoreSet() const { return fCoreSet; }
@@ -88,27 +83,17 @@ public:
 
    int GetSegmentMultiplicity() const { return fSegments.size(); }   //!<!
    int GetNSegments() const { return fSegments.size(); }             //!<!
-   /* int GetBGOMultiplicity()            const { return fBgos.size();     }  //!<! */
-   /* int GetNBGOs()                      const { return fBgos.size();     }  //!<! */
 
    const TDetectorHit& GetSegmentHit(int i) const { return fSegments.at(i); }   //!<!
-   /* const TDetectorHit& GetBGO(int i)     const { return fBgos.at(i);      }  //!<! */
-   const TDetectorHit& GetCore() const { return *this; }   //!<!
-
-   const std::vector<TDetectorHit>& GetSegmentVec() const { return fSegments; }
-   /* const std::vector<TDetectorHit>& GetBGOVec()     const { return fBgos; } */
-
-   /* modified by Momiyama and Niikura on Aug. 23, 2016 */
-   /* int GetFirstSeg() const { if(fSegments.size()>0) return fSegments.front().GetSegment(); return -1; } */
-   /* int GetLastSeg()  const { if(fSegments.size()>0) return fSegments.back().GetSegment(); return -1; } */
-   int GetFirstSeg() const
+   const std::vector<TDetectorHit>& GetSegments() const { return fSegments; }
+   int                              GetFirstSegment() const
    {
       if(!fSegments.empty()) {
          return fSegments.front().GetSegment();
       }
       return 0;
    }
-   int GetLastSeg() const
+   int GetLastSegment() const
    {
       if(!fSegments.empty()) {
          return fSegments.back().GetSegment();
@@ -116,24 +101,50 @@ public:
       return 0;
    }
 
-   static bool Compare(const TTigressHit& lhs, const TTigressHit& rhs);         //!<!
-   static bool CompareEnergy(const TTigressHit& lhs, const TTigressHit& rhs);   //!<!
-
-   void SumHit(TTigressHit*);   //!<!
-
-   TVector3 GetPosition(Double_t dist = 0.) const override;
-   TVector3 GetLastPosition(Double_t dist = 0.) const;
-
-   void Clear(Option_t* opt = "") override;         //!<!
-   void Copy(TObject&) const override;              //!<!
-   void Copy(TObject&, bool) const override;        //!<!
-   void Print(Option_t* opt = "") const override;   //!<!
-   void Print(std::ostream& out) const override;    //!<!
-
    void SortSegments() { std::sort(fSegments.begin(), fSegments.end()); }   //!<!
 
+   /////////////////////////  Setters	/////////////////////////////////////
+   void SetFilterPattern(const int& x) { fFilter = x; }   //!<!
+
+   /////////////////////////  Getters	/////////////////////////////////////
+   Int_t GetFilterPattern() const { return fFilter; }   //!<!
+   Double_t     GetNoCTEnergy(Option_t* opt = "") const;
+
+   /////////////////////////  Recommended Functions/////////////////////////
+
+   /////////////////////////  TChannel Helpers /////////////////////////////////////
+   UShort_t NPileUps() const;
+   UShort_t PUHit() const;
+   void     SetNPileUps(UChar_t npileups);
+   void     SetPUHit(UChar_t puhit);
+
+   /////////////////////////		/////////////////////////////////////
+
+   UShort_t GetArrayNumber() const override { return (4 * (GetDetector() - 1) + (GetCrystal() + 1)); }   //!<!
+   // returns a number 1-64 ( 1 = Detector 1 blue;  64 =  Detector 16 white; )
+
+   bool InFilter(Int_t);   //!<!
+
+   static bool Compare(const TTigressHit*, const TTigressHit*);   //!<!
+   static bool CompareEnergy(const TTigressHit*, const TTigressHit*);   //!<!
+   void        Add(const TDetectorHit*) override;                       //!<!
+
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
+   void Copy(TObject&) const override;              //!<!
+   void Copy(TObject&, bool) const override;        //!<!
+
+   TVector3 GetPosition(double dist) const override;   //!<!
+   TVector3 GetLastPosition(double dist) const;   //!<!
+   TVector3 GetPosition() const override;
+
+private:
+   void     SetTigressFlag(ETigressHitBits, Bool_t set);
+   Double_t GetDefaultDistance() const { return 110.; }
+
    /// \cond CLASSIMP
-   ClassDefOverride(TTigressHit, 4)   // NOLINT(readability-else-after-return)
+   ClassDefOverride(TTigressHit, 8);   // Information about a GRIFFIN Hit // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */

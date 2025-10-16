@@ -7,40 +7,34 @@
 
 #include <utility>
 #include <vector>
-#include <iostream>
-#include <set>
 #include <cstdio>
 #include <functional>
 
-#include "TMath.h"
 #include "TVector3.h"
-#include "TObject.h"
-#include "TClonesArray.h"
-#include "TRandom2.h"
 
-#include "TDetector.h"
 #include "TTigressHit.h"
-#include "TBgoHit.h"
+#include "TSuppressed.h"
+#include "TTransientBits.h"
 
-class TTigress : public TDetector {
+class TTigress : public TSuppressed {
 public:
-   enum class ETigressBits {
-      kAddbackSet  = BIT(0),
-      kSuppression = BIT(1),
-      kBit2        = BIT(2),
-      kBit3        = BIT(3),
-      kBit4        = BIT(4),
-      kBit5        = BIT(5),
-      kBit6        = BIT(6),
-      kBit7        = BIT(7)
+   enum class ETigressBits : std::uint8_t {
+      kIsAddbackSet           = 1 << 0,
+      kSpare1                 = 1 << 1,
+      kIsCrossTalkSet         = 1 << 2,
+      kSpare3                 = 1 << 3,
+      kIsSuppressed           = 1 << 4,
+      kSpare5                 = 1 << 5,
+      kIsSuppressedAddbackSet = 1 << 6,
+      kSpare7                 = 1 << 7
    };
 
-   enum class ETigressGlobalBits {
-      kSetBGOWave   = BIT(0),
+   enum class ETigressGlobalBits : std::uint8_t {
+      kSpare0       = BIT(0),
       kSetCoreWave  = BIT(1),
       kSetSegWave   = BIT(2),
-      kSetBGOHits   = BIT(3),
-      kForceCrystal = BIT(4),
+      kSpare3       = BIT(3),
+      kSpare4       = BIT(4),
       kArrayBackPos = BIT(5),
       kVectorsBuilt = BIT(6)   // 110 or 145
    };
@@ -50,26 +44,13 @@ public:
    TTigress(TTigress&&) noexcept = default;
    TTigress& operator=(const TTigress&);   //!<!
    TTigress& operator=(TTigress&&) noexcept = default;
-   ~TTigress() override                     = default;
+   ~TTigress() override;
 
-   // Dont know why these were changes to return by reference rather than pointer
-   // The tigress group prefer them the old way
-   TTigressHit*    GetTigressHit(const int& i) const { return static_cast<TTigressHit*>(GetHit(i)); }
-   static TVector3 GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 0., bool smear = false);   //!<!
-   static TVector3 GetPosition(const TTigressHit&, double dist = 0., bool smear = false);                   //!<!
+   TTigressHit* GetTigressHit(const int& i);   //!<!
 
-   std::vector<TBgoHit> fBgos;
-   void                 AddBGO(TBgoHit& bgo) { fBgos.push_back(bgo); }        //!<!
-   Short_t              GetBGOMultiplicity() const { return fBgos.size(); }   //!<!
-   int                  GetNBGOs() const { return fBgos.size(); }             //!<!
-   TBgoHit              GetBGO(int& i) const { return fBgos.at(i); }          //!<!
-   TBgoHit&             GetBGO(int& i) { return fBgos.at(i); }                //!<!
-
-   Int_t        GetAddbackMultiplicity();
-   TTigressHit* GetAddbackHit(const int&);
-   void         ResetAddback();   //!<!
-   UShort_t     GetNAddbackFrags(size_t idx) const;
-
+   static TVector3    GetPosition(int DetNbr, int CryNbr, int SegNbr, double dist = 110.0, bool smear = false);   //!<!
+   static TVector3    GetPosition(const TTigressHit* hit, double dist = 110.0, bool smear = false);   //!<!
+   static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
@@ -77,32 +58,77 @@ public:
 
    void ClearTransients() override
    {
-      fTigressBits = 0;
       TDetector::ClearTransients();
+      fTigressBits = 0;
    }
+   void ResetFlags() const;
 
 #if !defined(__CINT__) && !defined(__CLING__)
-   void SetAddbackCriterion(std::function<bool(TDetectorHit*, TDetectorHit*)> criterion)
+   void SetAddbackCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
    {
       fAddbackCriterion = std::move(criterion);
    }
+   std::function<bool(const TDetectorHit*, const TDetectorHit*)> GetAddbackCriterion() const { return fAddbackCriterion; }
 
-   std::function<bool(TDetectorHit*, TDetectorHit*)> GetAddbackCriterion() const { return fAddbackCriterion; }
-   void                                              SetSuppressionCriterion(std::function<bool(TDetectorHit*, TBgoHit&)> criterion)
+   bool AddbackCriterion(const TDetectorHit* hit1, const TDetectorHit* hit2) override { return fAddbackCriterion(hit1, hit2); }
+#endif
+
+   Short_t      GetAddbackMultiplicity();
+   TTigressHit* GetAddbackHit(const int& i);
+   bool         IsAddbackSet() const;
+   void         ResetAddback();   //!<!
+   UShort_t     GetNAddbackFrags(const size_t& idx);
+
+#if !defined(__CINT__) && !defined(__CLING__)
+   void SetSuppressionCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
    {
       fSuppressionCriterion = std::move(criterion);
    }
-   std::function<bool(TDetectorHit*, TBgoHit&)> GetSuppressionCriterion() const { return fSuppressionCriterion; }
+   std::function<bool(const TDetectorHit*, const TDetectorHit*)> GetSuppressionCriterion() const { return fSuppressionCriterion; }
+
+   bool SuppressionCriterion(const TDetectorHit* hit, const TDetectorHit* bgoHit) override { return fSuppressionCriterion(hit, bgoHit); }
 #endif
+
+   TTigressHit* GetSuppressedHit(const int& i);   //!<!
+   Short_t      GetSuppressedMultiplicity(const TBgo* bgo);
+   bool         IsSuppressed() const;
+   void         ResetSuppressed();
+
+   Short_t      GetSuppressedAddbackMultiplicity(const TBgo* bgo);
+   TTigressHit* GetSuppressedAddbackHit(const int& i);
+   bool         IsSuppressedAddbackSet() const;
+   void         ResetSuppressedAddback();
+   UShort_t     GetNSuppressedAddbackFrags(const size_t& idx);
+
+   // Cross-Talk stuff
+   static Double_t CTCorrectedEnergy(const TTigressHit* hit_to_correct, const TTigressHit* other_hit, bool time_constraint = true);
+   Bool_t          IsCrossTalkSet() const;
+   void            FixCrossTalk();
+
+   static void SetTargetOffset(double offset)
+   {
+      fTargetOffset = offset;
+      BuildVectors();
+   }
+   static void SetRadialOffset(double offset)
+   {
+      fRadialOffset = offset;
+      BuildVectors();
+   }
+
+   static double GetFaceDistance()
+   {
+      if(TestGlobalBit(ETigressGlobalBits::kArrayBackPos)) {
+         return 145;
+      }
+      return 110;
+   }
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
-   std::vector<std::vector<std::shared_ptr<const TFragment>>> SegmentFragments;
-   static std::function<bool(TDetectorHit*, TDetectorHit*)>   fAddbackCriterion;
-   static std::function<bool(TDetectorHit*, TBgoHit&)>        fSuppressionCriterion;
+   static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fAddbackCriterion;
+   static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fSuppressionCriterion;
 #endif
-   static TTransientBits<UShort_t> fGlobalTigressBits;   //!<!
-   TTransientBits<UShort_t>        fTigressBits;
 
    static double fTargetOffset;   //!<!
    static double fRadialOffset;   //!<!
@@ -110,7 +136,7 @@ private:
    // Vectors constructed from segment array and manual adjustments once at start of sort
    static std::array<std::array<std::array<std::array<TVector3, 9>, 4>, 17>, 2> fPositionVectors;   //!<!
 
-   static std::array<TVector3, 17>                fCloverRadial;   //!<!  clover direction vectors
+   static std::array<TVector3, 17> fCloverRadial;                            //!<! direction vector of each HPGe Clover
    static std::array<std::array<TVector3, 2>, 17> fCloverCross;    //!<!  clover perpendicular vectors, for smearing
 
    // These array contain the original data that is used
@@ -123,85 +149,41 @@ private:
    static std::array<std::array<std::array<double, 3>, 9>, 17> fGeRedPositionBack;     //!<!
    static std::array<std::array<std::array<double, 3>, 9>, 17> fGeWhitePositionBack;   //!<!
 
-   //    void ClearStatus();                      // WARNING: this will change the building behavior!
-   //		void ClearGlobalStatus() { fGlobalTigressBits = 0; }
+   static TTransientBits<uint8_t> fGlobalTigressBits;   //!<!
+   mutable TTransientBits<uint8_t> fTigressBits;   // Transient member flags
+
+   mutable std::vector<TDetectorHit*> fAddbackHits;    //!<! Used to create addback hits on the fly
+   mutable std::vector<UShort_t>      fAddbackFrags;   //!<! Number of crystals involved in creating in the addback hit
+
+   std::vector<TDetectorHit*> fSuppressedHits;   //!<!  The set of suppressed crystal hits
+
+   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;    //!<! Used to create suppressed addback hits on the fly
+   mutable std::vector<UShort_t>      fSuppressedAddbackFrags;   //!<! Number of crystals involved in creating in the suppressed addback hit
+
+   // This is where the general untouchable functions live.
+   void   ClearStatus() const { fTigressBits = 0; }   //!<!
+   void   SetBitNumber(ETigressBits bit, Bool_t set) const;
+   Bool_t TestBitNumber(ETigressBits bit) const { return fTigressBits.TestBit(bit); }
    static void   SetGlobalBit(ETigressGlobalBits bit, Bool_t set = true) { fGlobalTigressBits.SetBit(bit, set); }
    static Bool_t TestGlobalBit(ETigressGlobalBits bit) { return (fGlobalTigressBits.TestBit(bit)); }
 
-   std::vector<TDetectorHit*> fAddbackHits;    //!<! Used to create addback hits on the fly
-   std::vector<UShort_t>      fAddbackFrags;   //!<! Number of crystals involved in creating in the addback hit
+   void   SetAddback(bool flag = true) const;
+   void   SetSuppressed(bool flag = true) const;
+   void   SetSuppressedAddback(bool flag = true) const;
 
-   static void BuildVectors();   //!<!
+   void SetCrossTalk(bool flag = true) const;
+
+   static void BuildVectors(); 
 
 public:
-   // Naming convention was off, couldnt find anything that used them in grsisort
-   // Left them as return bool to not break external code
-   static bool SetCoreWave(bool set = true)
-   {
-      SetGlobalBit(ETigressGlobalBits::kSetCoreWave, set);
-      return set;
-   }   //!<!
-   static bool SetSegmentWave(bool set = true)
-   {
-      SetGlobalBit(ETigressGlobalBits::kSetSegWave, set);
-      return set;
-   }   //!<!
-   static bool SetBGOWave(bool set = true)
-   {
-      SetGlobalBit(ETigressGlobalBits::kSetBGOWave, set);
-      return set;
-   }   //!<!
-   static bool SetForceCrystal(bool set = true)
-   {
-      SetGlobalBit(ETigressGlobalBits::kForceCrystal, set);
-      return set;
-   }   //!<!
-   static bool SetArrayBackPos(bool set = true)
-   {
-      SetGlobalBit(ETigressGlobalBits::kArrayBackPos, set);
-      BuildVectors();
-      return set;
-   }   //!<!
-
-   static bool GetCoreWave() { return TestGlobalBit(ETigressGlobalBits::kSetCoreWave); }        //!<!
-   static bool GetSegmentWave() { return TestGlobalBit(ETigressGlobalBits::kSetSegWave); }      //!<!
-   static bool GetBGOWave() { return TestGlobalBit(ETigressGlobalBits::kSetBGOWave); }          //!<!
-   static bool GetForceCrystal() { return TestGlobalBit(ETigressGlobalBits::kForceCrystal); }   //!<!
-   static bool GetArrayBackPos() { return TestGlobalBit(ETigressGlobalBits::kArrayBackPos); }   //!<!
-   static bool GetVectorsBuilt() { return TestGlobalBit(ETigressGlobalBits::kVectorsBuilt); }   //!<!
-
-   static std::array<std::array<std::array<bool, 5>, 4>, 4> fBGOSuppression;   //!<!
-
-   static void SetTargetOffset(double offset)
-   {
-      fTargetOffset = offset;
-      BuildVectors();
-   }   //!<!
-   static void SetRadialOffset(double offset)
-   {
-      fRadialOffset = offset;
-      BuildVectors();
-   }   //!<!
-
-   static double GetFaceDistance()
-   {
-      if(GetArrayBackPos()) {
-         return 145;
-      }
-      return 110;
-   }
-
-   void Clear(Option_t* opt = "") override;         //!<!
+   void Copy(TObject&) const override;              //!<!
+   void Clear(Option_t* opt = "all") override;      //!<!
    void Print(Option_t* opt = "") const override;   //!<!
    void Print(std::ostream& out) const override;    //!<!
-   void Copy(TObject&) const override;              //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TTigress, 7)   // Tigress Physics structure // NOLINT(readability-else-after-return)
    /// \endcond
 };
-
-std::underlying_type<TTigress::ETigressGlobalBits>::type operator|(TTigress::ETigressGlobalBits lhs, TTigress::ETigressGlobalBits rhs);
-
 /*! @} */
 #endif
