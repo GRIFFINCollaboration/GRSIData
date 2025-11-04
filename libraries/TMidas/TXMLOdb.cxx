@@ -15,7 +15,7 @@ TXMLOdb::TXMLOdb(char* buffer, int size)
    /// Creator, tries to open buffer as input file and parse it, if that fails, parses size bytes of the buffer.
 
    // trim empty new-line from end of buffer if needed
-   while(buffer[size-1] == '\0') {
+   while(buffer[size - 1] == '\0') {
       // std::cout << "Found null-character at " << size - 1 << ", decrementing size from " << size;
       --size;
       // std::cout << " to " << size << std::endl;
