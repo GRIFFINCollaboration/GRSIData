@@ -684,16 +684,16 @@ void TMidasFile::SetFileOdb()
       node = node->GetNextNode();
    }
    if(expt == "tigress") {
-		if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
-			SetTIGOdb();
-		}
+      if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
+         SetTIGOdb();
+      }
    } else if(expt.find("grif") != std::string::npos) {
       // for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
    } else if(expt == "tigdaq") {   //New TIGRESS DAQ
-		if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
-			SetTIGDAQOdb();
-		}
+      if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
+         SetTIGDAQOdb();
+      }
    } else {
       std::cerr << RED << "Unknown experiment name \"" << expt << "\", ODB won't be read!" << RESET_COLOR << std::endl;
    }
@@ -744,7 +744,7 @@ void TMidasFile::SetGRIFFOdb()
    // "/Experiment/Edit on start/PPG Cycle" is a link to the PPG cycle used (always "/PPG/Current"???)
    // "/PPG/Current" gives the current PPG cycle used, e.g. 146Cs_S1468
    // "/PPG/Cycles/146Cs_S1468" then has N PPGcodes and N durations, where N is in most cases 4
-	TXMLNode* node = fOdb->FindPath("/PPG/Current");
+   TXMLNode*   node = fOdb->FindPath("/PPG/Current");
    std::string temp;
    if(node == nullptr) {
       std::cerr << R"(Failed to find "/PPG/Current" in ODB!)" << std::endl;
