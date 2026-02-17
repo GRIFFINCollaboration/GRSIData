@@ -31,6 +31,7 @@ public:
    // These separations exist only to easily see the difference when looking at the code here.
    enum class ESystem {
       kTigress,   //0
+      kTigressBgo,
       kSharc,
       kTriFoil,
       kRF,
@@ -39,8 +40,8 @@ public:
       kSiLiS3,
       kGeneric,
       kS3,
-      kBambino,
-      kTip,   //10
+      kBambino,   //10
+      kTip,
       kGriffin,
       kSceptar,
       kPaces,
@@ -49,8 +50,8 @@ public:
       kZeroDegree,
       kDescant,
       kGriffinBgo,
-      kLaBrBgo,
-      kFipps,   //20
+      kLaBrBgo,   //20
+      kFipps,
       kBgo,
       kTdrClover,
       kTdrCloverBgo,
@@ -59,8 +60,8 @@ public:
       kTdrSiLi,
       kTdrPlastic,
       kEmma,
-      kEmmaS3,
-      kTrific,   //30
+      kEmmaS3,   //30
+      kTrific,
       kSharc2,
       kRcmp,
       kAries,

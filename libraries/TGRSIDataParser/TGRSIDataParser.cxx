@@ -580,7 +580,7 @@ int TGRSIDataParser::GriffinDataToFragment(uint32_t* data, int size, EBank bank,
 
    // We can get multiple filter ids (one fragment can pass multiple filter conditions)
    // so we have to loop until we don't find one
-   while(SetGRIFPrimaryFilterId(data[x], eventFrag)) {
+   while(x < size && SetGRIFPrimaryFilterId(data[x], eventFrag)) {
       ++x;
    }
 
