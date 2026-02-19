@@ -16,3 +16,4 @@ EXCLUDED_DIRECTORIES:
   - myAnalysis
 # do not ignore files in .gitignore
 IGNORE_GITIGNORED_FILES: false
+FLAVOR_SUGGESTIONS: false

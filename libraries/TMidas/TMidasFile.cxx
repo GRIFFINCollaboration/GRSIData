@@ -665,11 +665,6 @@ void TMidasFile::SetFileOdb()
    // Check for EPICS variables
    SetEPICSOdb();
 
-   if(TGRSIOptions::Get()->IgnoreOdbChannels()) {
-      std::cout << DYELLOW << "\tskipping odb channel information stored in file." << RESET_COLOR << std::endl;
-      return;
-   }
-
    // Check to see if we are running a GRIFFIN or TIGRESS experiment
    TXMLNode* node = fOdb->FindPath("/Experiment");
    if(!node->HasChildren()) {
@@ -689,12 +684,16 @@ void TMidasFile::SetFileOdb()
       node = node->GetNextNode();
    }
    if(expt == "tigress") {
-      SetTIGOdb();
+      if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
+         SetTIGOdb();
+      }
    } else if(expt.find("grif") != std::string::npos) {
       // for GRIFFIN the experiment name might be griffin, grifstor, grifalt, etc.
       SetGRIFFOdb();
    } else if(expt == "tigdaq") {   //New TIGRESS DAQ
-      SetTIGDAQOdb();
+      if(!TGRSIOptions::Get()->IgnoreOdbChannels()) {
+         SetTIGDAQOdb();
+      }
    } else {
       std::cerr << RED << "Unknown experiment name \"" << expt << "\", ODB won't be read!" << RESET_COLOR << std::endl;
    }
@@ -741,10 +740,65 @@ void TMidasFile::SetEPICSOdb()
 void TMidasFile::SetGRIFFOdb()
 {
 #ifdef HAS_XML
+   // get cycle information
+   // "/Experiment/Edit on start/PPG Cycle" is a link to the PPG cycle used (always "/PPG/Current"???)
+   // "/PPG/Current" gives the current PPG cycle used, e.g. 146Cs_S1468
+   // "/PPG/Cycles/146Cs_S1468" then has N PPGcodes and N durations, where N is in most cases 4
+   TXMLNode*   node = fOdb->FindPath("/PPG/Current");
+   std::string temp;
+   if(node == nullptr) {
+      std::cerr << R"(Failed to find "/PPG/Current" in ODB!)" << std::endl;
+      return;
+   }
+
+   if(!node->HasChildren()) {
+      std::cout << "Node has no children, can't read ODB cycle" << std::endl;
+      return;
+   }
+   std::string currentCycle = "/PPG/Cycles/";
+   currentCycle.append(node->GetChildren()->GetContent());
+   temp = currentCycle;
+   temp.append("/PPGcodes");
+   node = fOdb->FindPath(temp.c_str());
+   if(node == nullptr) {
+      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
+      return;
+   }
+   std::vector<int> tmpCodes = fOdb->ReadIntArray(node);
+   // the codes are 32bit with the 16 high bits being the same as the 16 low bits
+   // we check this and only keep the low 16 bits
+   std::vector<int16_t> ppgCodes;
+   for(auto& code : tmpCodes) {
+      if(((code >> 16) & 0xffff) != (code & 0xffff)) {
+         std::cout << DRED << "Found ppg code in the ODB with high bits (0x" << std::hex << (code >> 16)
+                   << ") != low bits (" << (code & 0xffff) << std::dec << ")" << RESET_COLOR << std::endl;
+      }
+      ppgCodes.push_back(code & 0xffff);
+   }
+   temp = currentCycle;
+   temp.append("/durations");
+   node = fOdb->FindPath(temp.c_str());
+   if(node == nullptr) {
+      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
+      return;
+   }
+   std::vector<int> durations = fOdb->ReadIntArray(node);
+
+   if(durations.size() != ppgCodes.size()) {
+      std::cerr << "Mismatching sizes of ppg codes (" << ppgCodes.size() << ") and duration (" << durations.size() << "), not setting ODB cycle!" << std::endl;
+      return;
+   }
+
+   TPPG::Get()->SetOdbCycle(ppgCodes, durations);
+
+   if(TGRSIOptions::Get()->IgnoreOdbChannels()) {
+      std::cout << DYELLOW << "\tskipping odb channel information stored in file." << RESET_COLOR << std::endl;
+      return;
+   }
+
    // get calibrations
    // check if we can find new /DAQ/PSC path, otherwise default back to old /DAQ/MSC path
    std::string path = "/DAQ/PSC";
-   std::string temp;
    if(fOdb->FindPath(path.c_str()) != nullptr) {
       std::cout << "using GRIFFIN path to analyzer info: " << path << "..." << std::endl;
 
@@ -757,7 +811,7 @@ void TMidasFile::SetGRIFFOdb()
       temp = path;
       temp.append("/MSC");
    }
-   TXMLNode*        node    = fOdb->FindPath(temp.c_str());
+   node                     = fOdb->FindPath(temp.c_str());
    std::vector<int> address = fOdb->ReadIntArray(node);
 
    temp = path;
@@ -827,56 +881,6 @@ void TMidasFile::SetGRIFFOdb()
    } else {
       std::cout << BG_WHITE DRED << "problem parsing odb data, arrays are different sizes, channels not set." << RESET_COLOR << std::endl;
    }
-
-   // get cycle information
-   // "/Experiment/Edit on start/PPG Cycle" is a link to the PPG cycle used (always "/PPG/Current"???)
-   // "/PPG/Current" gives the current PPG cycle used, e.g. 146Cs_S1468
-   // "/PPG/Cycles/146Cs_S1468" then has four PPGcodes and four durations
-   node = fOdb->FindPath("/PPG/Current");
-   if(node == nullptr) {
-      std::cerr << R"(Failed to find "/PPG/Current" in ODB!)" << std::endl;
-      return;
-   }
-
-   if(!node->HasChildren()) {
-      std::cout << "Node has no children, can't read ODB cycle" << std::endl;
-      return;
-   }
-   std::string currentCycle = "/PPG/Cycles/";
-   currentCycle.append(node->GetChildren()->GetContent());
-   temp = currentCycle;
-   temp.append("/PPGcodes");
-   node = fOdb->FindPath(temp.c_str());
-   if(node == nullptr) {
-      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
-      return;
-   }
-   std::vector<int> tmpCodes = fOdb->ReadIntArray(node);
-   // the codes are 32bit with the 16 high bits being the same as the 16 low bits
-   // we check this and only keep the low 16 bits
-   std::vector<int16_t> ppgCodes;
-   for(auto& code : tmpCodes) {
-      if(((code >> 16) & 0xffff) != (code & 0xffff)) {
-         std::cout << DRED << "Found ppg code in the ODB with high bits (0x" << std::hex << (code >> 16)
-                   << ") != low bits (" << (code & 0xffff) << std::dec << ")" << RESET_COLOR << std::endl;
-      }
-      ppgCodes.push_back(code & 0xffff);
-   }
-   temp = currentCycle;
-   temp.append("/durations");
-   node = fOdb->FindPath(temp.c_str());
-   if(node == nullptr) {
-      std::cerr << R"(Failed to find ")" << temp << R"(" in ODB!)" << std::endl;
-      return;
-   }
-   std::vector<int> durations = fOdb->ReadIntArray(node);
-
-   if(durations.size() != ppgCodes.size()) {
-      std::cerr << "Mismatching sizes of ppg codes (" << ppgCodes.size() << ") and duration (" << durations.size() << ")" << std::endl;
-      return;
-   }
-
-   TPPG::Get()->SetOdbCycle(ppgCodes, durations);
 #endif
 }
 

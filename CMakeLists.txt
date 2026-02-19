@@ -222,8 +222,10 @@ target_link_libraries(TTAC ${GRSI_LIBRARIES})
 add_library(TTigress SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigress.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigressHit.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigressBgo.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/TTigressBgoHit.cxx
 	)
-root_generate_dictionary(G__TTigress TTigress.h TTigressHit.h MODULE TTigress LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/LinkDef.h)
+root_generate_dictionary(G__TTigress TTigress.h TTigressHit.h TTigressBgo.h TTigressBgoHit.h MODULE TTigress LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TTigress/LinkDef.h)
 target_link_libraries(TTigress ${GRSI_LIBRARIES})
 
 add_library(TTip SHARED
