@@ -28,7 +28,7 @@ int main(int argc, char** argv)
    double                                  minEnergy      = 0.;
    double                                  maxEnergy      = 2000.;
    std::vector<int>                        excludedDetectors;
-   int                                     verboseLevel   = 0;
+   int                                     verboseLevel = 0;
    std::string                             settingsFile;
 
    // read command line arguments
@@ -156,10 +156,10 @@ int main(int argc, char** argv)
       try {
          singleCrystal = settings.GetBool("SingleCrystal", true);
       } catch(std::out_of_range&) {}
-      distance     = settings.GetDouble("Distance", distance);
-      bins         = settings.GetInt("Bins", bins);
-      minEnergy    = settings.GetDouble("Energy.Minimum", minEnergy);
-      maxEnergy    = settings.GetDouble("Energy.Minimum", maxEnergy);
+      distance  = settings.GetDouble("Distance", distance);
+      bins      = settings.GetInt("Bins", bins);
+      minEnergy = settings.GetDouble("Energy.Minimum", minEnergy);
+      maxEnergy = settings.GetDouble("Energy.Minimum", maxEnergy);
       if(!excludedDetectors.empty()) {
          std::cerr << "Warning, already got " << excludedDetectors.size() << " excluded detectors from command line, not going to try and read them from settings file!" << std::endl;
       } else {
