@@ -15,7 +15,6 @@
 
 int main(int argc, char** argv)
 {
-   // TODO: add user settings file, make all input parameter available via settings and command line
    bool printUsage = (argc == 1);
 
    std::array<std::vector<std::string>, 3> inputFilenames;
@@ -28,6 +27,7 @@ int main(int argc, char** argv)
    int                                     bins           = 2000;
    double                                  minEnergy      = 0.;
    double                                  maxEnergy      = 2000.;
+   std::vector<int>                        excludedDetectors;
    int                                     verboseLevel   = 0;
    std::string                             settingsFile;
 
@@ -87,6 +87,21 @@ int main(int argc, char** argv)
             std::cout << "Error, -d flag needs an argument!" << std::endl;
             printUsage = true;
          }
+      } else if(strcmp(argv[i], "-ed") == 0) {
+         if(!excludedDetectors.empty()) {
+            std::cerr << "Warning, already got " << excludedDetectors.size() << " excluded detectors (?, this should not happen):";
+            for(auto bin : excludedDetectors) { std::cerr << "   " << bin; }
+            std::cerr << std::endl;
+            std::cerr << "What is read from command line will not overwrite these but be added to them!" << std::endl;
+         }
+         // if we have a next argument, check if it starts with '-'
+         while(i + 1 < argc) {
+            if(argv[i + 1][0] == '-') {
+               break;
+            }
+            // if we get here we can add the next argument to the list of energies
+            excludedDetectors.push_back(std::atoi(argv[++i]));
+         }
       } else if(strcmp(argv[i], "-vl") == 0) {
          if(i + 1 < argc) {
             verboseLevel = std::atoi(argv[++i]);
@@ -145,6 +160,13 @@ int main(int argc, char** argv)
       bins         = settings.GetInt("Bins", bins);
       minEnergy    = settings.GetDouble("Energy.Minimum", minEnergy);
       maxEnergy    = settings.GetDouble("Energy.Minimum", maxEnergy);
+      if(!excludedDetectors.empty()) {
+         std::cerr << "Warning, already got " << excludedDetectors.size() << " excluded detectors from command line, not going to try and read them from settings file!" << std::endl;
+      } else {
+         try {
+            excludedDetectors = settings.GetIntVector("ExcludedBins", true);
+         } catch(std::out_of_range&) {}
+      }
       verboseLevel = settings.GetInt("Verbosity", verboseLevel);
    }
 
@@ -194,6 +216,9 @@ int main(int argc, char** argv)
    // create angle map, never use folding and/or grouping, that is done in the AngularCorrelations program
    if(verboseLevel > 0) { TGriffinAngles::Verbosity(EVerbosity::kAll); }
    TGriffinAngles angles(distance, false, false, addback);
+   for(auto& det : excludedDetectors) {
+      angles.ExcludeDetector(det);
+   }
    // intermediate storage of hits
    std::map<uint32_t, TFragment> fragments;
    TGriffin                      griffin;
@@ -279,6 +304,9 @@ int main(int argc, char** argv)
 
             for(auto& frag : fragmentCopy) {
                channel = TChannel::GetChannel(frag.GetAddress());
+               if(std::any_of(excludedDetectors.begin(), excludedDetectors.end(), [&channel](int det) { return channel->GetDetectorNumber() == det; })) {
+                  continue;
+               }
                switch(frag.GetAddress() / 1000) {
                case 0:   // Griffin
                   griffin.AddFragment(std::make_shared<TFragment>(frag), channel);
@@ -296,6 +324,7 @@ int main(int argc, char** argv)
                std::cout << "From " << fragments.size() << " fragments in the map, we got " << fragmentCopy.size() << " time sorted fragments, and " << griffin.GetMultiplicity() << " griffin hits, " << grifBgo.GetMultiplicity() << " BGO hits, " << griffin.GetSuppressedMultiplicity(&grifBgo) << " suppressed griffin hits, and " << griffin.GetSuppressedAddbackMultiplicity(&grifBgo) << " suppressed addback hits" << std::endl;
             }
             // now we have the detectors filled so we can simply loop over the suppressed hits we want (addback or not)
+            // we've already excluded the detectors we don't want when filling this, so we don't need to check here
             for(int g1 = 0; g1 < (addback ? griffin.GetSuppressedAddbackMultiplicity(&grifBgo) : griffin.GetSuppressedMultiplicity(&grifBgo)); ++g1) {
                if(singleCrystal && griffin.GetNSuppressedAddbackFrags(g1) > 1) { continue; }
                auto* grif1 = (addback ? griffin.GetSuppressedAddbackHit(g1) : griffin.GetSuppressedHit(g1));
