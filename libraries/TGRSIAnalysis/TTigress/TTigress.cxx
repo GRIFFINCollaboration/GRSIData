@@ -6,7 +6,7 @@
 
 #include "TInterpreter.h"
 #include "TMnemonic.h"
-
+#include "TDetectorHit.h"
 #include "TGRSIOptions.h"
 #include "TSortingDiagnostics.h"
 
@@ -41,7 +41,7 @@ std::function<bool(const TDetectorHit*, const TDetectorHit*)> TTigress::fSuppres
 double TTigress::fTargetOffset = 0.;
 double TTigress::fRadialOffset = 0.;
 
-TTransientBits<uint8_t> TTigress::fGlobalTigressBits(std::underlying_type_t<TTigress::ETigressGlobalBits>(TTigress::ETigressGlobalBits::kSetCoreWave));
+TTransientBits<uint8_t> TTigress::fGlobalTigressBits = TTransientBits<uint8_t>(static_cast<std::underlying_type_t<TTigress::ETigressGlobalBits>>(TTigress::ETigressGlobalBits::kSetCoreWave));
 
 TTigress::TTigress()
 {
