@@ -245,7 +245,7 @@ int main(int argc, char** argv)
       // resize and allocate histograms and graphs
       angleMatrix[c].resize(angles.NumberOfAngles());
       for(auto angle = angles.begin(); angle != angles.end(); ++angle) {
-         int i       = std::distance(angles.begin(), angle);
+         int i             = std::distance(angles.begin(), angle);
          angleMatrix[c][i] = new TH2D(Form("AngularCorrelation%d_%d", c, i), Form("%.1f^{o}: Simulated suppressed #gamma-#gamma %s", *angle, conditions.c_str()), bins, minEnergy, maxEnergy, bins, minEnergy, maxEnergy);
       }
       graph[c].Set(angles.NumberOfAngles());
@@ -433,15 +433,15 @@ int main(int argc, char** argv)
       }   // end of entry loop
 
       switch(c) {
-         case 0:
-            std::cout << "000 coeff. ";
-            break;
-         case 1:
-            std::cout << "100 coeff. ";
-            break;
-         case 2:
-            std::cout << "010 coeff. ";
-            break;
+      case 0:
+         std::cout << "000 coeff. ";
+         break;
+      case 1:
+         std::cout << "100 coeff. ";
+         break;
+      case 2:
+         std::cout << "010 coeff. ";
+         break;
       };
       std::cout << "100% done" << std::endl;
 
