@@ -11,8 +11,6 @@
 //
 ////////////////////////////////////////////////////////////
 
-bool TPaces::fSetCoreWave = false;
-
 std::array<ROOT::Math::Polar3DVector, 6> TPaces::fDetectorPosition = {
    ROOT::Math::Polar3DVector(1., 0., 0.),
    ROOT::Math::Polar3DVector(1., 120.178 / 180. * TMath::Pi(), 21. / 180. * TMath::Pi()),
@@ -55,7 +53,7 @@ TPaces& TPaces::operator=(const TPaces& rhs)
    return *this;
 }
 
-void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TPaces::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TPacesHit(*frag);
    AddHit(hit);

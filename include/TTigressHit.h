@@ -46,7 +46,6 @@ private:
    std::vector<TDetectorHit> fSegments;
 
    bool    fCoreSet{false};
-   bool    fBgoFired{false};
    Float_t fTimeFit{0.};
    Float_t fSig2Noise{0.};
 
@@ -76,8 +75,6 @@ public:
 
    bool CoreSet() const { return fCoreSet; }
    void CoreSet(bool val) { fCoreSet = val; }
-   bool BGOFired() const { return fBgoFired; }
-   void SetBGOFired(bool fired) { fBgoFired = fired; }
 
    int GetTimeToTrigger() { return (GetTimeStamp() & 0x7fffff) - (static_cast<Int_t>(GetCfd()) >> 4); }
 

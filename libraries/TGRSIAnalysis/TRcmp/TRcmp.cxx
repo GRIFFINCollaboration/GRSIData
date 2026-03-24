@@ -95,7 +95,7 @@ void TRcmp::Clear(Option_t* opt)
    fZeroMultiplicity = 0;
 }
 
-void TRcmp::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TRcmp::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    /// this function takes the fragments and stores them into separate front and back vectors
 

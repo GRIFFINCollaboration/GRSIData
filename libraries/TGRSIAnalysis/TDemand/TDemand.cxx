@@ -50,7 +50,7 @@ TDemand& TDemand::operator=(const TDemand& rhs)
    return *this;
 }
 
-void TDemand::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TDemand::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TDemandHit(*frag);
    AddHit(hit);

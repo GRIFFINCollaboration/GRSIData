@@ -40,7 +40,6 @@ void TTigressHit::Copy(TObject& rhs) const
    static_cast<TTigressHit&>(rhs).fTimeFit        = fTimeFit;
    static_cast<TTigressHit&>(rhs).fSegments       = fSegments;
    static_cast<TTigressHit&>(rhs).fCoreSet        = fCoreSet;
-   static_cast<TTigressHit&>(rhs).fBgoFired       = fBgoFired;
 }
 
 void TTigressHit::Copy(TObject& obj, bool waveform) const
@@ -69,7 +68,6 @@ void TTigressHit::Clear(Option_t* opt)
    fSig2Noise = 0.0;
 
    fCoreSet  = false;
-   fBgoFired = false;
    fSegments.clear();
 }
 
@@ -88,7 +86,6 @@ void TTigressHit::Print(std::ostream& out) const
        << "\tEnergy:    " << GetEnergy() << std::endl
        << "\tTime:      " << GetTime() << std::endl
        << "\tCore set:  " << (CoreSet() ? "true" : "false") << std::endl
-       << "\tBGO Fired: " << (BGOFired() ? "true" : "false") << std::endl
        << "\tTime:      " << GetTimeStamp() << std::endl
        << "\thit contains " << GetNSegments() << " segments:" << std::endl;
    str << "Name           Charge" << std::endl;
@@ -104,7 +101,7 @@ void TTigressHit::Print(std::ostream& out) const
 
 TVector3 TTigressHit::GetPosition(double dist) const
 {
-   return TTigress::GetPosition(GetDetector(), GetCrystal(), GetSegment(), dist);
+   return TTigress::GetPosition(GetDetector(), GetCrystal(), GetFirstSegment(), dist);
 }
 
 TVector3 TTigressHit::GetLastPosition(double dist) const

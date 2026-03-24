@@ -73,7 +73,7 @@ TTrific& TTrific::operator=(const TTrific& rhs)
    return *this;
 }
 
-void TTrific::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TTrific::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    auto* hit = new TTrificHit(*frag);
 

@@ -62,7 +62,7 @@ TEmma& TEmma::operator=(const TEmma& rhs)
    return *this;
 }
 
-void TEmma::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TEmma::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    if(frag == nullptr || chan == nullptr) {
       return;

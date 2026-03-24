@@ -134,7 +134,7 @@ void TDescant::Print(std::ostream& out) const
    out << str.str();
 }
 
-void TDescant::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TDescant::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    /// Builds the DESCANT Hits directly from the TFragment. Basically, loops through the data for an event and sets
    /// observables.

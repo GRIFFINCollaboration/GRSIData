@@ -243,7 +243,7 @@ void TTigress::BuildHits()
    std::sort(Hits().begin(), Hits().end());   // sorting an empty vector is fine, no need to check for that
 }
 
-void TTigress::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TTigress::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    /// Builds the TIGRESS Hits directly from the TFragment. Basically, loops through the hits for an event and sets
    /// observables.

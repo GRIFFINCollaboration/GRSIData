@@ -19,7 +19,7 @@ TRF::TRF(const TRF& rhs) : TDetector(rhs)
    rhs.Copy(*this);
 }
 
-void TRF::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TRF::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
 
    fMidasTime = frag->GetDaqTimeStamp();

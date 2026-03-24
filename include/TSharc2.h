@@ -54,7 +54,7 @@ public:
    void Print(std::ostream& out) const override;   //!<!
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
+   void AddFragment(const std::shared_ptr<TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override;
 

@@ -38,8 +38,6 @@ bool DefaultGriffinSuppression(const TDetectorHit* hit, const TDetectorHit* bgoH
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TGriffin::fSuppressionCriterion = DefaultGriffinSuppression;
 
-bool TGriffin::fSetCoreWave = false;
-
 // This seems unnecessary, and why 17?;//  they are static members, and need
 //  to be defined outside the header
 //  17 is to have the detectors go from 1-16
@@ -295,7 +293,7 @@ TGriffinHit* TGriffin::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TGriffin::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    // Builds the GRIFFIN Hits directly from the TFragment. Basically, loops through the hits for an event and sets
    // observables.
@@ -318,7 +316,7 @@ void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChanne
    switch(mnemonic->OutputSensor()) {
    case TMnemonic::EMnemonic::kA: {
       auto* hit = new TGriffinHit(*frag);
-      Hits().push_back(hit);
+      AddHit(hit);
    } break;
    case TMnemonic::EMnemonic::kB:
       break;
