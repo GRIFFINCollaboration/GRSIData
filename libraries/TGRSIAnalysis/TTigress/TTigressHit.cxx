@@ -67,7 +67,7 @@ void TTigressHit::Clear(Option_t* opt)
    fTimeFit   = 0.0;
    fSig2Noise = 0.0;
 
-   fCoreSet  = false;
+   fCoreSet = false;
    fSegments.clear();
 }
 
