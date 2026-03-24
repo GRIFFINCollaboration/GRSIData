@@ -22,7 +22,7 @@ TGenericDetector::TGenericDetector(const TGenericDetector& rhs) : TDetector(rhs)
    rhs.Copy(*this);
 }
 
-void TGenericDetector::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TGenericDetector::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
 
    /// This function creates TGenericDetectorHits for each fragment and stores them in separate front and back vectors

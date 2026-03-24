@@ -49,7 +49,7 @@ TSceptar& TSceptar::operator=(const TSceptar& rhs)
    return *this;
 }
 
-void TSceptar::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TSceptar::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TSceptarHit(*frag);   // Construction of TSceptarHit is handled in the constructor
    AddHit(hit);

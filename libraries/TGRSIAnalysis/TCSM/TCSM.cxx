@@ -11,7 +11,7 @@ TCSM::TCSM()
 {
 }
 
-void TCSM::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TCSM::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    /// This function just stores the fragments and mnemonics in vectors, separated by detector number and type
    /// (horizontal/vertical strip or pad).

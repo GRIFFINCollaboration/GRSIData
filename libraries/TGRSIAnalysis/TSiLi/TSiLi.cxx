@@ -62,7 +62,7 @@ void TSiLi::Print(std::ostream& out) const
    out << str.str();
 }
 
-void TSiLi::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TSiLi::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    if(frag == nullptr || chan == nullptr) {
       return;

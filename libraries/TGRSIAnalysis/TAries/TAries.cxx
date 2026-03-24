@@ -106,7 +106,7 @@ TAries& TAries::operator=(const TAries& rhs)
    return *this;
 }
 
-void TAries::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TAries::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TAriesHit(*frag);   // Construction of TAriesHit is handled in the constructor
    AddHit(hit);

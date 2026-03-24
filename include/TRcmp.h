@@ -57,7 +57,7 @@ public:
    ~TRcmp() override;   ///< destructor
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<! //adds front and back fragments to their respective fragment vectors
+   void AddFragment(const std::shared_ptr<TFragment>&, TChannel*) override;   //!<! //adds front and back fragments to their respective fragment vectors
 #endif
    void BuildHits() override {}   ///< even though we are not using this function, we still need to override it to avoid warning during the sorting process
 

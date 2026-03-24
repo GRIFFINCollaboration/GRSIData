@@ -52,7 +52,7 @@ public:
    static TVector3    GetPosition(const TTigressHit* hit, double dist = 110.0, bool smear = false);               //!<!
    static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
+   void AddFragment(const std::shared_ptr<TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override;
 

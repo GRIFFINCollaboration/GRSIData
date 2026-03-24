@@ -53,7 +53,7 @@ TPaces& TPaces::operator=(const TPaces& rhs)
    return *this;
 }
 
-void TPaces::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TPaces::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TPacesHit(*frag);
    AddHit(hit);

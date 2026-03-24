@@ -293,7 +293,7 @@ TGriffinHit* TGriffin::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-void TGriffin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TGriffin::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    // Builds the GRIFFIN Hits directly from the TFragment. Basically, loops through the hits for an event and sets
    // observables.

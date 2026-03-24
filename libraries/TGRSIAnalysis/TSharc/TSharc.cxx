@@ -83,7 +83,7 @@ TSharc::TSharc(const TSharc& rhs) : TDetector(rhs)
    rhs.Copy(*this);
 }
 
-void TSharc::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TSharc::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    if(frag == nullptr || chan == nullptr) {
       return;

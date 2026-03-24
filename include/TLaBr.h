@@ -65,7 +65,7 @@ public:
    void      ResetSuppressed();
 
 #if !defined(__CINT__) && !defined(__CLING__)
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
+   void AddFragment(const std::shared_ptr<TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 

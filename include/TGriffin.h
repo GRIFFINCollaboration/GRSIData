@@ -45,7 +45,7 @@ public:
    static TVector3    GetDetectorPosition(int DetNbr);                                //!<!
    static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
+   void AddFragment(const std::shared_ptr<TFragment>&, TChannel*) override;   //!<!
 #endif
    void BuildHits() override {}   // no need to build any hits, everything already done in AddFragment
 

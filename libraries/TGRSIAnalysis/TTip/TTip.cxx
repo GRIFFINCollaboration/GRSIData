@@ -149,7 +149,7 @@ TTip& TTip::operator=(const TTip& rhs)
    return *this;
 }
 
-void TTip::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TTip::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel* chan)
 {
    if(frag == nullptr || chan == nullptr) {
       return;

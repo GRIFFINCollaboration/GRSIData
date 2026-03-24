@@ -34,7 +34,7 @@ void TTAC::Print(std::ostream& out) const
    out << str.str();
 }
 
-void TTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
+void TTAC::AddFragment(const std::shared_ptr<TFragment>& frag, TChannel*)
 {
    auto* hit = new TTACHit(*frag);
    AddHit(hit);
