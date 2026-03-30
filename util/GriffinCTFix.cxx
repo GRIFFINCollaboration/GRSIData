@@ -28,7 +28,7 @@ double CrossTalkFit(double* x, double* par)   // NOLINT(readability-non-const-pa
    return x[0] * slope + intercept;
 }
 
-double* CrossTalkFix(int det, double energy, TFile* inputFile)
+double* CrossTalkFix(int det, double energy, TFile* inputFile, int minimumCounts)
 {
    // The outfile is implicit since it was the last file that was open.
    static double largestCorrection = 0.0;
@@ -83,6 +83,7 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
          fitGraph->SetNameTitle(Form("%s_graph", mat->GetName()), "Graph");
 
          // This loop turns the addback plot and TCut into the TGraphErrors
+         int rejectedBins = 0;
          for(int i = 1; i <= xbins; i++) {
             bool insideYet = false;
             for(int j = 1; j <= ybins; j++) {
@@ -100,14 +101,25 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
             // but that requires more 60Co statistics. The reason I do this is because RMS and SD of the mean really only
             // works for us if we have enough counts that the mean is actually a good representation of the true value.
             // This is something TProfile does not do for us, and seems to skew the result a bit.
-            if(cmat->Integral() > 6) {
+            if(cmat->Integral() > minimumCounts) {
                fitGraph->SetPoint(fitGraph->GetN(), cmat->GetYaxis()->GetBinCenter(i), cmat->GetMean(2));
                fitGraph->SetPointError(fitGraph->GetN() - 1, cmat->GetXaxis()->GetBinWidth(i), cmat->GetMeanError(2));
+            } else {
+               ++rejectedBins;
             }
          }
          // unzoom the x-axis
          cmat->GetXaxis()->SetRange(1, cmat->GetXaxis()->GetNbins());
          cmat->Write();
+
+         if(rejectedBins > 0) {
+            std::cout << name << ": rejected " << rejectedBins << " bins out of " << xbins << " bins, because the number of counts in the projection of this bin is less than " << minimumCounts << std::endl;
+         }
+
+         if(fitGraph->GetN() <= 0) {
+            std::cout << name << ": graph doesn't have any data points (" << fitGraph->GetN() << "), going to skip fitting it" << std::endl;
+            continue;
+         }
 
          // This fits the TGraph
          auto* fpx = new TF1(Form("pxfit_%i_%i_%i", det, crystal1, crystal2), CrossTalkFit, 6, 1167, 3);
@@ -207,12 +219,16 @@ double* CrossTalkFix(int det, double energy, TFile* inputFile)
    return d;
 }
 
-void FixAll(TFile* inputFile, double energy)
+void FixAll(TFile* inputFile, double energy, int minimumCounts, std::vector<int> excludedDetectors)
 {
    // This function loops over 16 clovers (always does) and by default uses the 1332 keV gamma ray in 60Co
    for(int d = 1; d <= 16; d++) {
-      std::cout << "Starting CrossTalkFix for detector " << d << ", using energy " << energy << std::endl;
-      CrossTalkFix(d, energy, inputFile);
+      if(!excludedDetectors.empty() && std::find(excludedDetectors.begin(), excludedDetectors.end(), d) != excludedDetectors.end()) {
+         std::cout << "Skipping excluded detector " << d << std::endl;
+         continue;
+      }
+      std::cout << "Starting CrossTalkFix for detector " << d << ", using energy " << energy << ", and minimum counts " << minimumCounts << std::endl;
+      CrossTalkFix(d, energy, inputFile, minimumCounts);
    }
 }
 
@@ -222,6 +238,7 @@ int main(int argc, char** argv)
    // Do basic file checks
    if(argc != 3 && argc != 4) {
       std::cout << "Usage: " << argv[0] << " <matrix file> <cal file> <user settings (optional)>" << std::endl;
+      std::cout << "User settings available: CrossTalkEnergy (double), MinimumCounts (int), and ExcludedDetectors (int vector, 1-16)" << std::endl;
       return 1;
    }
 
@@ -253,7 +270,13 @@ int main(int argc, char** argv)
 
    auto* outputFile = new TFile(outputFileName.c_str(), "recreate");
 
-   FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.));
+   std::vector<int> excludedDetectors;
+   try {
+      excludedDetectors = userSettings->GetIntVector("ExcludedDetectors", true);
+   } catch(std::out_of_range& e) {
+   }
+
+   FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.), userSettings->GetInt("MinimumCounts", 10), excludedDetectors);
 
    // This function writes a corrections cal_file which can be loaded in with your normal cal file.
    TChannel::WriteCTCorrections("ct_correction.cal");
