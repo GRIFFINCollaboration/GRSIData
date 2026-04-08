@@ -273,7 +273,7 @@ int main(int argc, char** argv)
    std::vector<int> excludedDetectors;
    try {
       excludedDetectors = userSettings->GetIntVector("ExcludedDetectors", true);
-   } catch (std::out_of_range& e) {
+   } catch(std::out_of_range& e) {
    }
 
    FixAll(inputFile, userSettings->GetDouble("CrossTalkEnergy", 1332.), userSettings->GetInt("MinimumCounts", 10), excludedDetectors);
