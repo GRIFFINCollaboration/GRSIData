@@ -9,6 +9,7 @@
 #include "TFragment.h"
 #include "TDetectorHit.h"
 #include "TMnemonic.h"
+#include "TSRIM.h"
 
 class TS3Hit : public TDetectorHit {
 public:
@@ -23,6 +24,7 @@ public:
    Short_t GetRing() const { return fRing; }
    Short_t GetSector() const { return fSector; }
    Bool_t  GetIsDownstream() const { return fIsDownstream; }
+   Bool_t  GetIsSRIMSet() const { return fIsSRIMSet; }
    Int_t   GetArrayPosition() const
    {
       if(GetChannel() != nullptr) {
@@ -50,6 +52,7 @@ public:
    void SetRingNumber(Short_t rn) { fRing = rn; }
    void SetSectorNumber(Short_t sn) { fSector = sn; }
    void SetIsDownstream(Bool_t dwnstrm) { fIsDownstream = dwnstrm; }
+   void SetIsSRIMSet(Bool_t srm) { fIsSRIMSet = srm; }
 
    void SetRingNumber(TFragment& frag) { fRing = frag.GetSegment(); }
    void SetSectorNumber(TFragment& frag) { fSector = frag.GetSegment(); }
@@ -57,6 +60,14 @@ public:
    void SetSectorNumber() { fSector = GetSegment(); }
    void SetSectorNumber(int n) { fSector = n; }
    void SetRingNumber(int n) { fRing = n; }
+
+   void SetEDiff(double de) { fEDiff = de; }
+   Double_t GetEDiff() { return fEDiff; }
+   void SetTDiff(double dt) { fTDiff = dt; }
+   Double_t GetTDiff() { return fTDiff; }
+
+   void SetSRIMTable(TSRIM* srimTable);
+   Double_t GetCorrectedEnergy(double s3DL);
 
    void SetWavefit(const TFragment&);
    void SetTimeFit(Double_t time) { fTimeFit = time; }
@@ -69,8 +80,8 @@ public:
    Double_t GetTheta(double offset = 0, TVector3* vec = nullptr) const
    {
       if(vec == nullptr) {
-         vec = new TVector3();
-         vec->SetXYZ(0, 0, 1);
+         TVector3 beam(0, 0, 1); // allocate on stack to avoid memory leak
+         return GetPosition(offset).Angle(beam);
       }
       return GetPosition(offset).Angle(*vec);
    }
@@ -88,6 +99,11 @@ private:
    Bool_t  fIsDownstream{false};   // Downstream check
    Short_t fRing{0};               // front
    Short_t fSector{0};             // back
+   Double_t fEDiff{-10000}; // Front-back energy difference
+   Double_t fTDiff{-10000}; // Front-back time difference
+   
+   Bool_t fIsSRIMSet{false}; // SRIM Table check
+   TSRIM* fSRIMTable{nullptr};
 
    Double_t fTimeFit{0.};
    Double_t fSig2Noise{0.};
