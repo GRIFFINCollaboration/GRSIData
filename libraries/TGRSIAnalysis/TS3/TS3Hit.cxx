@@ -38,6 +38,10 @@ void TS3Hit::Copy(TObject& rhs) const
    static_cast<TS3Hit&>(rhs).fIsDownstream = fIsDownstream;
    static_cast<TS3Hit&>(rhs).fTimeFit      = fTimeFit;
    static_cast<TS3Hit&>(rhs).fSig2Noise    = fSig2Noise;
+	static_cast<TS3Hit&>(rhs).fEDiff        = fEDiff;
+	static_cast<TS3Hit&>(rhs).fTDiff        = fTDiff;
+   static_cast<TS3Hit&>(rhs).fIsSRIMSet    = fIsSRIMSet;
+	static_cast<TS3Hit&>(rhs).fSRIMTable    = fSRIMTable;
 }
 
 void TS3Hit::Copy(TObject& rhs, bool waveform) const
@@ -54,6 +58,10 @@ void TS3Hit::Clear(Option_t* opt)
    fRing         = -1;
    fSector       = -1;
    fIsDownstream = false;
+	fEDiff        = -10000;
+	fTDiff        = -10000;
+   fIsSRIMSet    = false;
+	fSRIMTable    = nullptr;
 }
 
 void TS3Hit::SetWavefit(const TFragment& frag)
@@ -142,4 +150,25 @@ Double_t TS3Hit::GetDefaultDistance() const
    }
 
    return z;
+}
+
+void TS3Hit::SetSRIMTable(TSRIM* srimTable)
+{
+	fSRIMTable = srimTable;
+	SetIsSRIMSet(true);
+}
+
+Double_t TS3Hit::GetCorrectedEnergy(double s3DL)
+{
+  if(!GetIsSRIMSet()){
+		std::cerr<<"Error in TS3Hit::GetCorrectedEnergy - Please load SRIMTable"<<std::endl;
+		return -1;
+	}
+
+	TVector3 vec(0, 0, -1); // S3 is at backward angles w.r.t beam axis. 
+												  // z=-1 to get correct positive angles of rings.
+	double theta = GetTheta(0, &vec);
+	double eCor = GetEnergy() + fSRIMTable->GetEnergyLost(GetEnergy(), s3DL/TMath::Cos(theta));
+	
+	return eCor;
 }
