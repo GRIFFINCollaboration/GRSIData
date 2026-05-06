@@ -93,13 +93,22 @@ public:
    void         ResetSuppressedAddback();
    UShort_t     GetNSuppressedAddbackFrags(const size_t& idx);
 
+   // Cross-Talk stuff
+   static Double_t CTCorrectedEnergy(const TGriffinHit* hit_to_correct, const TGriffinHit* other_hit, bool time_constraint = true);
+   Bool_t          IsCrossTalkSet() const;
+   void            FixCrossTalk();
+
+   // overrides for basic TObject/TDetector functions
+   void Copy(TObject&) const override;              //!<!
+   void Clear(Option_t* opt = "all") override;      //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
+
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
    static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fAddbackCriterion;
    static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fSuppressionCriterion;
 #endif
-
-   static bool fSetCoreWave;   //!<!  Flag for Waveforms ON/OFF
 
    int64_t                         fCycleStart;    //!<!  The start of the cycle
    mutable TTransientBits<UChar_t> fGriffinBits;   // Transient member flags
@@ -112,34 +121,17 @@ private:
    mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;    //!<! Used to create suppressed addback hits on the fly
    mutable std::vector<UShort_t>      fSuppressedAddbackFrags;   //!<! Number of crystals involved in creating in the suppressed addback hit
 
-public:
-   static bool SetCoreWave() { return fSetCoreWave; }   //!<!
-
-private:
    static std::array<TVector3, 17> fCloverPosition;                            //!<! Position of each HPGe Clover
    void                            ClearStatus() const { fGriffinBits = 0; }   //!<!
    void                            SetBitNumber(EGriffinBits bit, Bool_t set) const;
    Bool_t                          TestBitNumber(EGriffinBits bit) const { return fGriffinBits.TestBit(bit); }
 
-   // Cross-Talk stuff
-public:
-   static Double_t CTCorrectedEnergy(const TGriffinHit* hit_to_correct, const TGriffinHit* other_hit, bool time_constraint = true);
-   Bool_t          IsCrossTalkSet() const;
-   void            FixCrossTalk();
-
-private:
    // This is where the general untouchable functions live.
    void SetAddback(bool flag = true) const;
    void SetSuppressed(bool flag = true) const;
    void SetSuppressedAddback(bool flag = true) const;
 
    void SetCrossTalk(bool flag = true) const;
-
-public:
-   void Copy(TObject&) const override;              //!<!
-   void Clear(Option_t* opt = "all") override;      //!<!
-   void Print(Option_t* opt = "") const override;   //!<!
-   void Print(std::ostream& out) const override;    //!<!
 
    /// \cond CLASSIMP
    ClassDefOverride(TGriffin, 7)   // Griffin Physics structure // NOLINT(readability-else-after-return)

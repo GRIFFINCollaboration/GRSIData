@@ -38,12 +38,12 @@ int main(int argc, char** argv)
          int coefficent = -1;
          if(strcmp(&argv[i][3], "000") == 0) {
             coefficent = 0;
-         } else if(strcmp(&argv[i][3], "010") == 0) {
-            coefficent = 1;
          } else if(strcmp(&argv[i][3], "100") == 0) {
+            coefficent = 1;
+         } else if(strcmp(&argv[i][3], "010") == 0) {
             coefficent = 2;
          } else {
-            std::cerr << "Unknown -if* command line flag " << argv[i] << ", should be -if000, -if010, or -if100!" << std::endl;
+            std::cerr << "Unknown -if* command line flag " << argv[i] << ", should be -if000, -if100, or -if010!" << std::endl;
             printUsage = true;
             break;
          }
@@ -131,10 +131,10 @@ int main(int argc, char** argv)
          inputFilenames[0] = settings.GetStringVector("Coefficient.000.Files");
       }
       if(inputFilenames[1].empty()) {
-         inputFilenames[1] = settings.GetStringVector("Coefficient.010.Files");
+         inputFilenames[1] = settings.GetStringVector("Coefficient.100.Files");
       }
       if(inputFilenames[2].empty()) {
-         inputFilenames[2] = settings.GetStringVector("Coefficient.100.Files");
+         inputFilenames[2] = settings.GetStringVector("Coefficient.010.Files");
       }
       if(outputFilename == "SimulatedAngularCorrelation.root") {
          outputFilename = settings.GetString("OutputFilename", "SimulatedAngularCorrelation.root");
@@ -188,8 +188,8 @@ int main(int argc, char** argv)
    if(printUsage) {
       std::cerr << "Arguments for " << argv[0] << ":" << std::endl
                 << "-if000 <input files>                                (required, geant4 simulation files for parameters 000)" << std::endl
-                << "-if010 <input files>                                (required, geant4 simulation files for parameters 010)" << std::endl
                 << "-if100 <input files>                                (required, geant4 simulation files for parameters 100)" << std::endl
+                << "-if010 <input files>                                (required, geant4 simulation files for parameters 010)" << std::endl
                 << "-g     <gate energy>                                (required)" << std::endl
                 << "-f     <fit energy>                                 (required)" << std::endl
                 << "-of    <output filename>                            (optional, default = \"SimulatedAngularCorrelation.root\")" << std::endl
@@ -228,25 +228,25 @@ int main(int argc, char** argv)
    std::string conditions = addback ? "using addback" : "without addback";
    conditions += singleCrystal ? " single crystal" : "";
 
-   std::array<std::vector<TH2D*>, 3> hists;
+   std::array<std::vector<TH2D*>, 3> angleMatrix;
    std::array<TGraphErrors, 3>       graph;
 
    graph[0].SetName("graph000");
    graph[0].SetTitle(Form("Simulated angular correlation coeff. 000, using %s;angle [#circ]", conditions.c_str()));
 
-   graph[1].SetName("graph010");
-   graph[1].SetTitle(Form("Simulated angular correlation coeff. 010, using %s;angle [#circ]", conditions.c_str()));
+   graph[1].SetName("graph100");
+   graph[1].SetTitle(Form("Simulated angular correlation coeff. 100, using %s;angle [#circ]", conditions.c_str()));
 
-   graph[2].SetName("graph100");
-   graph[2].SetTitle(Form("Simulated angular correlation coeff. 100, using %s;angle [#circ]", conditions.c_str()));
+   graph[2].SetName("graph010");
+   graph[2].SetTitle(Form("Simulated angular correlation coeff. 010, using %s;angle [#circ]", conditions.c_str()));
 
    // loop over the three coefficents
    for(int c = 0; c < 3; ++c) {
       // resize and allocate histograms and graphs
-      hists[c].resize(angles.NumberOfAngles());
+      angleMatrix[c].resize(angles.NumberOfAngles());
       for(auto angle = angles.begin(); angle != angles.end(); ++angle) {
          int i       = std::distance(angles.begin(), angle);
-         hists[c][i] = new TH2D(Form("AngularCorrelation%d_%d", c, i), Form("%.1f^{o}: Simulated suppressed #gamma-#gamma %s", *angle, conditions.c_str()), bins, minEnergy, maxEnergy, bins, minEnergy, maxEnergy);
+         angleMatrix[c][i] = new TH2D(Form("AngularCorrelation%d_%d", c, i), Form("%.1f^{o}: Simulated suppressed #gamma-#gamma %s", *angle, conditions.c_str()), bins, minEnergy, maxEnergy, bins, minEnergy, maxEnergy);
       }
       graph[c].Set(angles.NumberOfAngles());
 
@@ -347,8 +347,8 @@ int main(int argc, char** argv)
                      std::cout << "Filling histograms at index " << angleIndex << " = " << angle << " degree, with " << grif1->GetEnergy() << ", " << grif2->GetEnergy() << std::endl;
                   }
                   if(angleIndex >= 0) {
-                     hists[c].at(angleIndex)->Fill(grif1->GetEnergy(), grif2->GetEnergy());
-                     hists[c].at(angleIndex)->Fill(grif2->GetEnergy(), grif1->GetEnergy());
+                     angleMatrix[c].at(angleIndex)->Fill(grif1->GetEnergy(), grif2->GetEnergy());
+                     angleMatrix[c].at(angleIndex)->Fill(grif2->GetEnergy(), grif1->GetEnergy());
                   } else {
                      unknownAngles[angle]++;
                      if(verboseLevel > 4) {
@@ -432,6 +432,17 @@ int main(int argc, char** argv)
          }
       }   // end of entry loop
 
+      switch(c) {
+         case 0:
+            std::cout << "000 coeff. ";
+            break;
+         case 1:
+            std::cout << "100 coeff. ";
+            break;
+         case 2:
+            std::cout << "010 coeff. ";
+            break;
+      };
       std::cout << "100% done" << std::endl;
 
       if(verboseLevel > 0) {
@@ -446,14 +457,14 @@ int main(int argc, char** argv)
       }
 
       // create the graphs by getting the bin contents of the 2D matrix
-      for(size_t i = 0; i < hists[c].size(); ++i) {
-         auto counts = hists[c][i]->GetBinContent(hists[c][i]->GetXaxis()->FindBin(gateEnergy), hists[c][i]->GetYaxis()->FindBin(fitEnergy));
+      for(size_t i = 0; i < angleMatrix[c].size(); ++i) {
+         auto counts = angleMatrix[c][i]->GetBinContent(angleMatrix[c][i]->GetXaxis()->FindBin(gateEnergy), angleMatrix[c][i]->GetYaxis()->FindBin(fitEnergy));
          graph[c].SetPoint(i, angles.Angle(i), counts / angles.Count(angles.Angle(i)));
          graph[c].SetPointError(i, 0., TMath::Sqrt(counts) / angles.Count(angles.Angle(i)));
       }
 
       // write histograms and graph
-      for(auto* hist : hists[c]) {
+      for(auto* hist : angleMatrix[c]) {
          hist->Write();
          delete hist;
       }
