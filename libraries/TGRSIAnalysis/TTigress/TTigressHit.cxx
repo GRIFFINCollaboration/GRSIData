@@ -104,7 +104,7 @@ void TTigressHit::Print(std::ostream& out) const
 
 TVector3 TTigressHit::GetPosition(double dist) const
 {
-   return TTigress::GetPosition(GetDetector(), GetCrystal(), GetSegment(), dist);
+   return TTigress::GetPosition(GetDetector(), GetCrystal(), GetFirstSegment(), dist);
 }
 
 TVector3 TTigressHit::GetLastPosition(double dist) const
