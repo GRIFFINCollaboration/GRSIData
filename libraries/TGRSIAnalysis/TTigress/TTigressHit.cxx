@@ -143,14 +143,15 @@ void TTigressHit::Add(const TDetectorHit* hit)
 
    const auto* tigressHit = dynamic_cast<const TTigressHit*>(hit);
    if(tigressHit == nullptr) {
-      throw std::runtime_error("trying to add non-griffin hit to griffin hit!");
+      throw std::runtime_error("trying to add non-tigress hit to tigress hit!");
    }
-   // add another griffin hit to this one (for addback),
+   // add another tigress hit to this one (for addback),
    // using the time and position information of the one with the higher energy
    if(!CompareEnergy(this, tigressHit)) {
       SetCfd(tigressHit->GetCfd());
       SetTime(tigressHit->GetTime());
       SetAddress(tigressHit->GetAddress());
+      fSegments = tigressHit->fSegments;
    } else {
       SetTime(GetTime());
    }
@@ -168,7 +169,7 @@ void TTigressHit::Add(const TDetectorHit* hit)
    } else {
       SetPUHit(3);
    }
-   // KValue is somewhat meaningless in addback, so I am using it as an indicator that a piledup griffinHit was added-back RD
+   // KValue is somewhat meaningless in addback, so I am using it as an indicator that a piledup tigressHit was added-back RD
    if(GetKValue() > tigressHit->GetKValue()) {
       SetKValue(tigressHit->GetKValue());
    }
