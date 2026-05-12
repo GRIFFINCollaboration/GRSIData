@@ -21,12 +21,12 @@
 #include <string>
 #include <vector>
 
-#include "Globals.h"
-
 #ifdef HAS_XML
 #include "TXMLNode.h"
 #include "TXMLDocument.h"
 #include "TDOMParser.h"
+
+#include "Globals.h"
 
 class TXMLOdb {
 public:

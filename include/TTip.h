@@ -15,6 +15,8 @@
 ///
 /////////////////////////////////////////////////////////////
 
+#include "TVector3.h"
+
 #include "Globals.h"
 #include "TDetector.h"
 #include "TTipHit.h"
