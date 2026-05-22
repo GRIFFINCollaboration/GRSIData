@@ -15,6 +15,9 @@
 ///
 /////////////////////////////////////////////////////////////////
 
+#include "TROOT.h"
+#include "RtypesCore.h"
+
 #include "Globals.h"
 
 #include "TDetectorInformation.h"
@@ -35,62 +38,62 @@ public:
    void Clear(Option_t* = "") override;
    void Set() override;
 
-   inline void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
-   inline bool DescantAncillary() const { return fDescantAncillary; }
-   inline void SetDescantWall(bool flag = true) { fDescantWall = flag; }
-   inline bool DescantWall() const { return fDescantWall; }
+   void SetDescantAncillary(bool flag = true) { fDescantAncillary = flag; }
+   bool DescantAncillary() const { return fDescantAncillary; }
+   void SetDescantWall(bool flag = true) { fDescantWall = flag; }
+   bool DescantWall() const { return fDescantWall; }
 
-   inline void SetTigress(bool flag = true) { fTigress = flag; }
-   inline void SetSharc(bool flag = true) { fSharc = flag; }
-   inline void SetTriFoil(bool flag = true) { fTriFoil = flag; }
-   inline void SetRF(bool flag = true) { fRf = flag; }
-   inline void SetCSM(bool flag = true) { fCSM = flag; }
-   inline void SetSpice(bool flag = true) { fSpice = flag; }
-   inline void SetS3(bool flag = true) { fS3 = flag; }
-   inline void SetGeneric(bool flag = true) { fGeneric = flag; }
-   inline void SetTip(bool flag = true) { fTip = flag; }
-   inline void SetBambino(bool flag = true) { fBambino = flag; }
-   inline void SetEmma(bool flag = true) { fEmma = flag; }
-   inline void SetTrific(bool flag = true) { fTrific = flag; }
-   inline void SetSharc2(bool flag = true) { fSharc2 = flag; }
+   void SetTigress(bool flag = true) { fTigress = flag; }
+   void SetSharc(bool flag = true) { fSharc = flag; }
+   void SetTriFoil(bool flag = true) { fTriFoil = flag; }
+   void SetRF(bool flag = true) { fRf = flag; }
+   void SetCSM(bool flag = true) { fCSM = flag; }
+   void SetSpice(bool flag = true) { fSpice = flag; }
+   void SetS3(bool flag = true) { fS3 = flag; }
+   void SetGeneric(bool flag = true) { fGeneric = flag; }
+   void SetTip(bool flag = true) { fTip = flag; }
+   void SetBambino(bool flag = true) { fBambino = flag; }
+   void SetEmma(bool flag = true) { fEmma = flag; }
+   void SetTrific(bool flag = true) { fTrific = flag; }
+   void SetSharc2(bool flag = true) { fSharc2 = flag; }
 
-   inline void SetGriffin(bool flag = true) { fGriffin = flag; }
-   inline void SetSceptar(bool flag = true) { fSceptar = flag; }
-   inline void SetPaces(bool flag = true) { fPaces = flag; }
-   inline void SetDante(bool flag = true) { fDante = flag; }
-   inline void SetZeroDegree(bool flag = true) { fZeroDegree = flag; }
-   inline void SetDescant(bool flag = true) { fDescant = flag; }
-   inline void SetRcmp(bool flag = true) { fRcmp = flag; }
-   inline void SetAries(bool flag = true) { fAries = flag; }
-   inline void SetDemand(bool flag = true) { fDemand = flag; }
+   void SetGriffin(bool flag = true) { fGriffin = flag; }
+   void SetSceptar(bool flag = true) { fSceptar = flag; }
+   void SetPaces(bool flag = true) { fPaces = flag; }
+   void SetDante(bool flag = true) { fDante = flag; }
+   void SetZeroDegree(bool flag = true) { fZeroDegree = flag; }
+   void SetDescant(bool flag = true) { fDescant = flag; }
+   void SetRcmp(bool flag = true) { fRcmp = flag; }
+   void SetAries(bool flag = true) { fAries = flag; }
+   void SetDemand(bool flag = true) { fDemand = flag; }
 
-   inline void SetBgo(bool flag = true) { fBgo = flag; }
+   void SetBgo(bool flag = true) { fBgo = flag; }
 
-   inline bool Tigress() const { return fTigress; }
-   inline bool Sharc() const { return fSharc; }
-   inline bool TriFoil() const { return fTriFoil; }
-   inline bool RF() const { return fRf; }
-   inline bool CSM() const { return fCSM; }
-   inline bool Spice() const { return fSpice; }
-   inline bool Bambino() const { return fBambino; }
-   inline bool Tip() const { return fTip; }
-   inline bool S3() const { return fS3; }
-   inline bool Emma() const { return fEmma; }
-   inline bool Trific() const { return fTrific; }
-   inline bool Sharc2() const { return fSharc2; }
-   inline bool Generic() const { return fGeneric; }
+   bool Tigress() const { return fTigress; }
+   bool Sharc() const { return fSharc; }
+   bool TriFoil() const { return fTriFoil; }
+   bool RF() const { return fRf; }
+   bool CSM() const { return fCSM; }
+   bool Spice() const { return fSpice; }
+   bool Bambino() const { return fBambino; }
+   bool Tip() const { return fTip; }
+   bool S3() const { return fS3; }
+   bool Emma() const { return fEmma; }
+   bool Trific() const { return fTrific; }
+   bool Sharc2() const { return fSharc2; }
+   bool Generic() const { return fGeneric; }
 
-   inline bool Griffin() const { return fGriffin; }
-   inline bool Sceptar() const { return fSceptar; }
-   inline bool Paces() const { return fPaces; }
-   inline bool Dante() const { return fDante; }
-   inline bool ZeroDegree() const { return fZeroDegree; }
-   inline bool Descant() const { return fDescant; }
-   inline bool Rcmp() const { return fRcmp; }
-   inline bool Aries() const { return fAries; }
-   inline bool Demand() const { return fDemand; }
+   bool Griffin() const { return fGriffin; }
+   bool Sceptar() const { return fSceptar; }
+   bool Paces() const { return fPaces; }
+   bool Dante() const { return fDante; }
+   bool ZeroDegree() const { return fZeroDegree; }
+   bool Descant() const { return fDescant; }
+   bool Rcmp() const { return fRcmp; }
+   bool Aries() const { return fAries; }
+   bool Demand() const { return fDemand; }
 
-   inline bool Bgo() const { return fBgo; }
+   bool Bgo() const { return fBgo; }
 
 private:
    //  detector types to switch over in Set()
