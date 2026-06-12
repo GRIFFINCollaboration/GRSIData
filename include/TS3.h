@@ -53,20 +53,42 @@ public:
    {
       fFrontBackEnergy = de;
       SetPixels(false);
-   }   ///< Set fractional allowed energy difference
+   }   ///< Set allowed fractional energy difference
+   void SetFrontBackOffset(double de) // for backwards compatibility
+   {
+      SetFrontBackEOffset(de);
+   }   ///< Set front-back energy offset
    void SetFrontBackEOffset(double de)
    {
-      fFrontBackOffset = de;
+      fFrontBackEOffset = de;
       SetPixels(false);
-   }   ///< Set fractional allowed energy difference
+   }   ///< Set front-back energy offset
    void SetFrontBackTime(int time)
    {
       fFrontBackTime = time;
       SetPixels(false);
    }   ///< Set absolute allow time difference
+   void SetFrontBackTOffset(int dt)
+   {
+      fFrontBackTOffset = dt;
+      SetPixels(false);
+   } ///< Set absolute time offset
+
+   void UseFrontBackEAbs(bool opt)
+   {
+      fUseEAbs = opt;
+      SetPixels(false);
+   } ///< Use absolute energy differences
+   void SetFrontBackEnergyAbs(double de)
+   {
+      fFrontBackEnergyAbs = de;
+      SetPixels(false);
+   } ///< Set absolute allowed energy difference
+
    static Int_t  GetFrontBackTime() { return fFrontBackTime; }       //!<!
+   static Int_t GetFrontBackTOffset() { return fFrontBackTOffset; }   //!<!
    static double GetFrontBackEnergy() { return fFrontBackEnergy; }   //!<!
-   static double GetFrontBackOffset() { return fFrontBackOffset; }   //!<!
+   static double GetFrontBackEOffset() { return fFrontBackEOffset; }   //!<!
 
    TS3Hit* GetS3Hit(const int& i) const { return static_cast<TS3Hit*>(GetHit(i)); }
    TS3Hit* GetRingHit(const int& i);
@@ -149,9 +171,13 @@ private:
    static double fTargetDistance;   //!<!
 
    //In cfd units for historic reasons
-   static Int_t  fFrontBackTime;     //!<!
-   static double fFrontBackEnergy;   //!<!
-   static double fFrontBackOffset;   //!<!
+   static Int_t  fFrontBackTime;   //!<!
+   static Int_t  fFrontBackTOffset; //!<!
+   static double fFrontBackEnergyAbs; //!<!
+   static double fFrontBackEnergy; //!<!
+   static double fFrontBackEOffset; //!<!
+
+   static bool fUseEAbs; 
 
    /// \cond CLASSIMP
    ClassDefOverride(TS3, 4)   // NOLINT(readability-else-after-return)
