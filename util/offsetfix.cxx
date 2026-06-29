@@ -429,7 +429,7 @@ void GetRoughTimeDiff(std::vector<TEventTime*>* eventQ)
                dynamic_cast<TH1D*>(roughlist->At((*hit2)->DigIndex()));   // This is where that pointer comes in handy
             int64_t time2 = static_cast<int64_t>((*hit2)->GetTimeStamp()) -
                             TEventTime::correctionmap.find((*hit2)->Digitizer())->second;
-            auto bin = static_cast<Int_t>(time2 - time1);
+            auto    bin   = static_cast<Int_t>(time2 - time1);
 
             if((fillhist->FindBin(bin) > 0) && (fillhist->FindBin(bin) < fillhist->GetNbinsX())) {
                fillhist->Fill(bin);

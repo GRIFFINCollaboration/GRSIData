@@ -147,10 +147,10 @@ public:
                                                                    std::vector<Int_t>&    distances,
                                                                    std::vector<Double_t>& anglemap);
    static std::vector<Int_t>                      GenerateWeights(
-                           std::vector<Int_t>& arraynumbers, std::vector<Int_t>& distances,
-                           std::map<Int_t, std::map<Int_t, Int_t>>& indexmap);   // with input of array number array (crystals that were
-                                                                                 // present in data collection), generates the weights for each
-                                                                                 // angular index (no input generates weights for 16 detectors)
+      std::vector<Int_t>& arraynumbers, std::vector<Int_t>& distances,
+      std::map<Int_t, std::map<Int_t, Int_t>>& indexmap);   // with input of array number array (crystals that were
+                                                            // present in data collection), generates the weights for each
+                                                            // angular index (no input generates weights for 16 detectors)
    Int_t GenerateMaps(std::vector<Int_t>& arraynumbers, std::vector<Int_t>& distances);
    Int_t GenerateMaps(Int_t detectors, Int_t distance);
 
