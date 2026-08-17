@@ -19,9 +19,13 @@ double TS3::fTargetDistance = 31.;
 // Default tigress unpacking settings
 TTransientBits<UShort_t> TS3::fGlobalS3Bits = TTransientBits<UShort_t>(static_cast<std::underlying_type_t<TS3::ES3GlobalBits>>(TS3::ES3GlobalBits::kMultHit));
 
-Int_t  TS3::fFrontBackTime   = 75;
+Int_t  TS3::fFrontBackTime = 75;
+Int_t  TS3::fFrontBackTOffset = 0;
 double TS3::fFrontBackEnergy = 0.9;
-double TS3::fFrontBackOffset = 0;
+double TS3::fFrontBackEOffset = 0;
+
+bool TS3::fUseEAbs = false;
+double TS3::fFrontBackEnergyAbs = 400; // keV
 
 TS3::TS3()
 {
@@ -104,7 +108,7 @@ void TS3::BuildPixels()
    if(!fS3Bits.TestBit(ES3Bits::kPixelsSet)) {
       fS3PixelHits.clear();
    }
-
+	
    if(fS3RingHits.empty() || fS3SectorHits.empty()) {
       return;
    }
@@ -113,10 +117,8 @@ void TS3::BuildPixels()
 
       // We are going to want energies several times
       // So build a quick vector
-      std::vector<double> EneR;
-      std::vector<double> EneS;
-      std::vector<bool>   UsedRing;
-      std::vector<bool>   UsedSector;
+      std::vector<double> EneR, EneS;
+      std::vector<bool>   UsedRing, UsedSector;
       for(auto& fS3RingHit : fS3RingHits) {
          EneR.push_back(fS3RingHit.GetEnergy());
          UsedRing.push_back(false);
@@ -130,20 +132,33 @@ void TS3::BuildPixels()
       /// Loop over two vectors and build energy+time matching hits
       for(size_t i = 0; i < fS3RingHits.size(); ++i) {
          for(size_t j = 0; j < fS3SectorHits.size(); ++j) {
-            if(fS3RingHits[i].GetArrayPosition() != fS3SectorHits[j].GetArrayPosition()) { continue; }
+	         if(fS3RingHits[i].GetArrayPosition()!=fS3SectorHits[j].GetArrayPosition()) continue;
 
-            if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime()) * 1.6 < fFrontBackTime) {   // check time
-               if((EneR[i] - fFrontBackOffset) * fFrontBackEnergy < EneS[j] &&
-                  (EneS[j] - fFrontBackOffset) * fFrontBackEnergy < EneR[i]) {   // if time is good check energy
+            if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime() + fFrontBackTOffset)*1.6 < fFrontBackTime) { // check time
+
+               bool goodE = false; // if time is good check energy
+               if(fUseEAbs == false){ // Use fractional energy 
+                  if((EneR[i] - fFrontBackEOffset) * fFrontBackEnergy < EneS[j] &&
+                     (EneS[j] - fFrontBackEOffset) * fFrontBackEnergy < EneR[i]) { goodE = true; }
+               }
+               else if(fUseEAbs == true){ // Use absolute energy
+                  if(abs(EneR[i] - EneS[j] - fFrontBackEOffset) < fFrontBackEnergyAbs) { goodE = true; }
+               }
+
+               if(goodE){ 
 
                   // Now we have accepted a good event, build it
                   if(SectorPreference()) {
-                     TS3Hit dethit = fS3SectorHits[j];   // Sector defines all data ring just gives position
+                     TS3Hit dethit = fS3SectorHits[j]; // Sector defines all data ring just gives position
                      dethit.SetRingNumber(fS3RingHits[i].GetRing());
+                     dethit.SetEDiff(EneR[i] - EneS[j]);
+                     dethit.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime());
                      fS3PixelHits.push_back(dethit);
                   } else {
-                     TS3Hit dethit = fS3RingHits[i];   // Ring defines all data sector just gives position (default)
+                     TS3Hit dethit = fS3RingHits[i]; // Ring defines all data sector just gives position (default)
                      dethit.SetSectorNumber(fS3SectorHits[j].GetSector());
+                     dethit.SetEDiff(EneR[i] - EneS[j]);
+                     dethit.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime());
                      fS3PixelHits.push_back(dethit);
                   }
 
@@ -185,18 +200,27 @@ void TS3::BuildPixels()
                   if(UsedSector.at(j)) {
                      continue;
                   }
-                  if(fS3RingHits[i].GetArrayPosition() != fS3SectorHits[j].GetArrayPosition()) { continue; }
-
+                  if(fS3RingHits[i].GetArrayPosition()!=fS3SectorHits[j].GetArrayPosition())continue;
+                  
                   for(size_t k = j + 1; k < fS3SectorHits.size(); ++k) {
                      if(UsedSector.at(k)) {
                         continue;
                      }
-                     if(fS3SectorHits[j].GetArrayPosition() != fS3SectorHits[k].GetArrayPosition()) { continue; }
+                     if(fS3SectorHits[j].GetArrayPosition()!=fS3SectorHits[k].GetArrayPosition()) continue;
 
-                     if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime()) * 1.6 < fFrontBackTime &&
-                        abs(fS3RingHits[i].GetTime() - fS3SectorHits[k].GetTime()) * 1.6 < fFrontBackTime) {   // check time
-                        if((EneR[i] - fFrontBackOffset) * fFrontBackEnergy < (EneS[j] + EneS[k]) &&
-                           (EneS[j] + EneS[k] - fFrontBackOffset) * fFrontBackEnergy < EneR[i]) {   // if time is good check energy
+                     if(abs(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime()  + fFrontBackTOffset)*1.6 < fFrontBackTime &&
+                        abs(fS3RingHits[i].GetTime() - fS3SectorHits[k].GetTime()  + fFrontBackTOffset)*1.6 < fFrontBackTime) { // check time
+
+                        bool goodE = false; // if time is good check energy
+                        if(fUseEAbs == false){ // Use fractional energy 
+                           if((EneR[i] - fFrontBackEOffset) * fFrontBackEnergy < (EneS[j] + EneS[k]) &&
+                              (EneS[j] + EneS[k] - fFrontBackEOffset) * fFrontBackEnergy < EneR[i]) { goodE = true; }
+                        }
+                        else if(fUseEAbs == true){ // Use absolute energy
+                           if(abs(EneR[i] - (EneS[j] + EneS[k]) - fFrontBackEOffset) < fFrontBackEnergyAbs) { goodE = true; }
+                        }
+
+                        if(goodE) { 
 
                            int SectorSep = fS3SectorHits[j].GetSector() - fS3SectorHits[k].GetSector();
                            if(abs(SectorSep) == 1 || abs(SectorSep) == fSectorNumber) {
@@ -206,27 +230,34 @@ void TS3::BuildPixels()
                               // sharing
 
                               if(KeepShared()) {
-                                 TS3Hit dethit = fS3RingHits[i];   // Ring defines all data sector just gives position
+                                 TS3Hit dethit = fS3RingHits[i]; // Ring defines all data sector just gives position
                                  // Selecting one of the sectors is currently the best class allows, some loss of
                                  // position information
                                  if(fS3SectorHits[k].GetEnergy() < fS3SectorHits[j].GetEnergy()) {
                                     dethit.SetSectorNumber(fS3SectorHits[j].GetSector());
+                                    dethit.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime());
                                  } else {
                                     dethit.SetSectorNumber(fS3SectorHits[k].GetSector());
+                                    dethit.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[k].GetTime());
                                  }
+                                 dethit.SetEDiff(EneR[i] - (EneS[j] + EneS[k]));
                                  fS3PixelHits.push_back(dethit);
                               }
                            } else {
                               // 2 separate hits with shared ring
 
                               // Now we have accepted a good event, build it
-                              TS3Hit dethit = fS3SectorHits[j];   // Sector now defines all data ring just gives position
+                              TS3Hit dethit = fS3SectorHits[j]; // Sector now defines all data ring just gives position
                               dethit.SetRingNumber(fS3RingHits[i].GetRing());
+                              dethit.SetEDiff(EneR[i] - EneS[j]);
+                              dethit.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[j].GetTime());
                               fS3PixelHits.push_back(dethit);
 
                               // Now we have accepted a good event, build it
-                              TS3Hit dethitB = fS3SectorHits[k];   // Sector now defines all data ring just gives position
+                              TS3Hit dethitB = fS3SectorHits[k]; // Sector now defines all data ring just gives position
                               dethitB.SetRingNumber(fS3RingHits[i].GetRing());
+                              dethitB.SetEDiff(EneR[i] - EneS[k]);
+                              dethitB.SetTDiff(fS3RingHits[i].GetTime() - fS3SectorHits[k].GetTime());
                               fS3PixelHits.push_back(dethitB);
                            }
 
@@ -237,7 +268,7 @@ void TS3::BuildPixels()
                      }
                   }
                }
-            }   // End Shared Ring loop
+            } // End Shared Ring loop
          }
 
          ringcount   = 0;
@@ -264,18 +295,27 @@ void TS3::BuildPixels()
                   if(UsedRing.at(j)) {
                      continue;
                   }
-                  if(fS3SectorHits[i].GetArrayPosition() != fS3RingHits[j].GetArrayPosition()) { continue; }
-
+                  if(fS3SectorHits[i].GetArrayPosition()!=fS3RingHits[j].GetArrayPosition())continue;
+		  
                   for(size_t k = j + 1; k < fS3RingHits.size(); ++k) {
                      if(UsedRing.at(k)) {
                         continue;
                      }
-                     if(fS3RingHits[j].GetArrayPosition() != fS3RingHits[k].GetArrayPosition()) { continue; }
+                     if(fS3RingHits[j].GetArrayPosition()!=fS3RingHits[k].GetArrayPosition())continue;
 
-                     if(abs(fS3SectorHits[i].GetTime() - fS3RingHits[j].GetTime()) * 1.6 < fFrontBackTime &&
-                        abs(fS3SectorHits[i].GetTime() - fS3RingHits[k].GetTime()) * 1.6 < fFrontBackTime) {   // first check time
-                        if((EneS[i] - fFrontBackOffset) * fFrontBackEnergy < (EneR[j] + EneR[k]) &&
-                           (EneR[j] + EneR[k] - fFrontBackOffset) * fFrontBackEnergy < EneS[i]) {   // if time is good check energy
+                     if(abs(fS3SectorHits[i].GetTime() - fS3RingHits[j].GetTime() + fFrontBackTOffset)*1.6 < fFrontBackTime &&
+                        abs(fS3SectorHits[i].GetTime() - fS3RingHits[k].GetTime() + fFrontBackTOffset)*1.6 < fFrontBackTime) { // first check time
+
+                        bool goodE = false; // if time is good check energy
+                        if(fUseEAbs == false){ // Use fractional energy 
+                           if((EneS[i] - fFrontBackEOffset) * fFrontBackEnergy < (EneR[j] + EneR[k]) &&
+                              (EneR[j] + EneR[k] - fFrontBackEOffset) * fFrontBackEnergy < EneS[i]) { goodE = true; }
+                        }
+                        else if(fUseEAbs == true){ // Use absolute energy
+                           if(abs((EneR[j] + EneR[k]) - EneS[i] - fFrontBackEOffset) < fFrontBackEnergyAbs) { goodE = true; }
+                        }
+
+                        if(goodE) { 
 
                            if(abs(fS3RingHits[j].GetRing() - fS3RingHits[k].GetRing()) == 1) {
                               // Same sector and neighbour rings, almost certainly charge sharing
@@ -284,28 +324,35 @@ void TS3::BuildPixels()
                               // sharing
 
                               if(KeepShared()) {
-                                 TS3Hit dethit = fS3SectorHits[i];   // Sector defines all data ring just gives position
+                                 TS3Hit dethit = fS3SectorHits[i]; // Sector defines all data ring just gives position
                                  // Selecting one of the sectors is currently the best class allows, some
                                  // loss of
                                  // position information
                                  if(fS3RingHits[k].GetEnergy() < fS3RingHits[j].GetEnergy()) {
                                     dethit.SetRingNumber(fS3RingHits[j].GetRing());
+                                    dethit.SetTDiff(fS3RingHits[j].GetTime() - fS3SectorHits[i].GetTime());
                                  } else {
                                     dethit.SetRingNumber(fS3RingHits[k].GetRing());
+                                    dethit.SetTDiff(fS3RingHits[k].GetTime() - fS3SectorHits[i].GetTime());
                                  }
+                                 dethit.SetEDiff((EneR[j] + EneR[k]) - EneS[i]);
                                  fS3PixelHits.push_back(dethit);
                               }
                            } else {
                               // 2 separate hits with shared sector
 
                               // Now we have accepted a good event, build it
-                              TS3Hit dethit = fS3RingHits[j];   // Ring defines all data sector just gives position
+                              TS3Hit dethit = fS3RingHits[j]; // Ring defines all data sector just gives position
                               dethit.SetSectorNumber(fS3SectorHits[i].GetSector());
+                              dethit.SetEDiff(EneR[j] - EneS[i]);
+                              dethit.SetTDiff(fS3RingHits[j].GetTime() - fS3SectorHits[i].GetTime());
                               fS3PixelHits.push_back(dethit);
 
                               // Now we have accepted a good event, build it
-                              TS3Hit dethitB = fS3RingHits[k];   // Ring defines all data sector just gives position
+                              TS3Hit dethitB = fS3RingHits[k]; // Ring defines all data sector just gives position
                               dethitB.SetSectorNumber(fS3SectorHits[i].GetSector());
+                              dethitB.SetEDiff(EneR[k] - EneS[i]);
+                              dethitB.SetTDiff(fS3RingHits[k].GetTime() - fS3SectorHits[i].GetTime());
                               fS3PixelHits.push_back(dethitB);
                            }
 
@@ -316,7 +363,7 @@ void TS3::BuildPixels()
                      }
                   }
                }
-            }   // End Shared Sector loop
+            } // End Shared Sector loop
          }
       }
 
