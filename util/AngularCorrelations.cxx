@@ -190,7 +190,7 @@ int main(int argc, char** argv)
          }
          // read low and high limit for this background peak, defaults to -1 if not set in the settings file
          auto low  = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
-         auto high = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
+         auto high = settings->GetDouble(Form("Background.Peak.%d.High", i), -1.);
          bgPeakPos.emplace_back(pos, low, high);
       } catch(std::out_of_range&) {
          break;

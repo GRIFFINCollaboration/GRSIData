@@ -19,6 +19,7 @@
 #include <set>
 #include <map>
 #include <functional>
+#include <cmath>
 
 #include "TCollection.h"
 #include "TNamed.h"

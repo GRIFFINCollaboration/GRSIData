@@ -90,7 +90,6 @@ void TSharc2::BuildHits()
 {
    std::vector<TFragment>::iterator front;
    std::vector<TFragment>::iterator back;
-   std::vector<TFragment>::iterator pad;
 
    for(front = fFrontFragments.begin(); front != fFrontFragments.end();) {
       bool front_used = false;
