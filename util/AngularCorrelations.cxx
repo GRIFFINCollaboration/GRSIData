@@ -25,7 +25,7 @@
 #include "TRedirect.h"
 #include "TGRSIFunctions.h"
 
-std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile);
+std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double>                A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 double GetYError(TGraphErrors* graph, const double& x)
@@ -268,6 +268,10 @@ int main(int argc, char** argv)
    std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
    std::vector<int> twoJMiddle = settings->GetIntVector("TwoJ.Middle");
    std::vector<int> twoJHigh   = settings->GetIntVector("TwoJ.High");
+
+   // mixing angles (1 = high to middle, 2 = middle to low)
+   double mixingAngle1 = settings->GetDouble("MixingAngle.1", std::numeric_limits<double>::quiet_NaN());
+   double mixingAngle2 = settings->GetDouble("MixingAngle.2", std::numeric_limits<double>::quiet_NaN());
 
    // confidence level (this value is used to draw a line at the confidence level for the mixing method)
    double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535);   // 1.535 is 99% confidence level for 48 degrees of freedom
@@ -606,7 +610,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngle1, mixingAngle2, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
@@ -614,7 +618,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
@@ -622,14 +626,14 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJHigh) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
                   output.cd();
-                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), parameters.back(), logFile));
+                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
 
@@ -893,7 +897,7 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    return multiGraph;
 }
 
-std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile)
+std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
    logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
@@ -977,10 +981,16 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
    if(l1a == l1b) {
       mixingAngle1Minimum = 0;
       steps1              = 1;
+   } else if(!std::isnan(mixingAngle1)) {
+      mixingAngle1Minimum = mixingAngle1;
+      steps1              = 1;
    }
    if(l2a == l2b) {
       mixingAngle2Minimum = 0;
       steps2              = 1;
+   } else if(!std::isnan(mixingAngle2)) {
+      mixingAngle2Minimum = mixingAngle2;
+      steps1              = 1;
    }
 
    std::get<0>(result)         = new TGraph(steps1);
