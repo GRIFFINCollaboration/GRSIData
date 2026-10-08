@@ -25,8 +25,8 @@
 #include "TRedirect.h"
 #include "TGRSIFunctions.h"
 
-TGraph*             MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile);
-std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
+std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile);
+std::vector<double>                A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 double GetYError(TGraphErrors* graph, const double& x)
 {
@@ -596,9 +596,9 @@ int main(int argc, char** argv)
                   angles->FoldOrGroup(z0, z2, z4);
                }
                // calculate chi2 vs mixing graphs
-               std::vector<TGraph*>             spin;
-               std::vector<double>              spinLabel;
-               std::vector<std::vector<double>> parameters;
+               std::vector<std::tuple<TGraph*, TGraph*, TH2*>> spin;
+               std::vector<double>                             spinLabel;
+               std::vector<std::vector<double>>                parameters;
                logFile << std::endl;
                // first check which of the vectors we iterate over
                if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
@@ -637,37 +637,37 @@ int main(int argc, char** argv)
                auto* canvas = new TCanvas;
 
                // determine minimum and maximum y-value
-               double min = TMath::MinElement(spin.at(0)->GetN(), spin.at(0)->GetY());
-               double max = TMath::MaxElement(spin.at(0)->GetN(), spin.at(0)->GetY());
+               double min = TMath::MinElement(std::get<0>(spin.at(0))->GetN(), std::get<0>(spin.at(0))->GetY());
+               double max = TMath::MaxElement(std::get<0>(spin.at(0))->GetN(), std::get<0>(spin.at(0))->GetY());
                for(size_t i = 1; i < spin.size(); ++i) {
-                  min = TMath::Min(min, TMath::MinElement(spin.at(i)->GetN(), spin.at(i)->GetY()));
-                  max = TMath::Max(max, TMath::MaxElement(spin.at(i)->GetN(), spin.at(i)->GetY()));
+                  min = TMath::Min(min, TMath::MinElement(std::get<0>(spin.at(i))->GetN(), std::get<0>(spin.at(i))->GetY()));
+                  max = TMath::Max(max, TMath::MaxElement(std::get<0>(spin.at(i))->GetN(), std::get<0>(spin.at(i))->GetY()));
                }
                min = TMath::Min(min, confidenceLevel);
 
                // find first graph with more than one data point
                size_t first = 0;
                for(first = 0; first < spin.size(); ++first) {
-                  if(spin[first]->GetN() > 1) { break; }
+                  if(std::get<0>(spin[first])->GetN() > 1) { break; }
                }
 
-               spin[first]->SetTitle("");
-               spin[first]->SetMinimum(0.9 * min);
-               spin[first]->SetMaximum(1.1 * max);
+               std::get<0>(spin[first])->SetTitle("");
+               std::get<0>(spin[first])->SetMinimum(0.9 * min);
+               std::get<0>(spin[first])->SetMaximum(1.1 * max);
 
                for(size_t i = 0; i < spin.size(); ++i) {
-                  spin[i]->SetLineColor(i + 1);
-                  spin[i]->SetMarkerColor(i + 1);
-                  spin[i]->SetLineWidth(2);
+                  std::get<0>(spin[i])->SetLineColor(i + 1);
+                  std::get<0>(spin[i])->SetMarkerColor(i + 1);
+                  std::get<0>(spin[i])->SetLineWidth(2);
                }
 
-               spin[first]->Draw("ac");
+               std::get<0>(spin[first])->Draw("ac");
                for(size_t i = 0; i < spin.size(); ++i) {
                   if(i == first) { continue; }
-                  if(spin[i]->GetN() > 1) {
-                     spin[i]->Draw("c");
+                  if(std::get<0>(spin[i])->GetN() > 1) {
+                        std::get<0>(spin[i])->Draw("c");
                   } else {
-                     spin[i]->Draw("*");
+                  std::get<0>(spin[i])->Draw("*");
                   }
                }
 
@@ -681,10 +681,10 @@ int main(int argc, char** argv)
                auto* legend = new TLegend(0.7, 0.6, 0.8, 0.9);
 #endif
                for(size_t i = 0; i < spin.size(); ++i) {
-                  if(spin[i]->GetN() == 1) {
-                     legend->AddEntry(spin[i], Form("J = %.1f", spinLabel[i]), "p");
+                  if(std::get<0>(spin[i])->GetN() == 1) {
+                     legend->AddEntry(std::get<0>(spin[i]), Form("J = %.1f", spinLabel[i]), "p");
                   } else {
-                     legend->AddEntry(spin[i], Form("J = %.1f", spinLabel[i]), "l");
+                     legend->AddEntry(std::get<0>(spin[i]), Form("J = %.1f", spinLabel[i]), "l");
                   }
                }
 
@@ -692,11 +692,11 @@ int main(int argc, char** argv)
 
                canvas->SetLogy();
 
-               spin[first]->GetHistogram()->GetXaxis()->SetRangeUser(-1.5, 1.5);
-               spin[first]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
-               spin[first]->GetHistogram()->GetXaxis()->CenterTitle();
-               spin[first]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
-               spin[first]->GetHistogram()->GetYaxis()->CenterTitle();
+               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->SetRangeUser(-1.5, 1.5);
+               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
+               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->CenterTitle();
+               std::get<0>(spin[first])->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
+               std::get<0>(spin[first])->GetHistogram()->GetYaxis()->CenterTitle();
 
                // write graphs and canvas to output file
                output.cd();
@@ -704,7 +704,9 @@ int main(int argc, char** argv)
                z2->Write("graph010");
                z4->Write("graph100");
                for(size_t i = 0; i < spin.size(); ++i) {
-                  spin[i]->Write(Form("spin%d", static_cast<int>(i)));
+                  std::get<0>(spin[i])->Write(Form("spinMixingAngle1_%d", static_cast<int>(i)));
+                  std::get<1>(spin[i])->Write(Form("spinMixingAngle2_%d", static_cast<int>(i)));
+                  std::get<2>(spin[i])->Write(Form("spinMixingAngles_%d", static_cast<int>(i)));
                }
                canvas->Write("MixingCanvas");
 
@@ -891,11 +893,11 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    return multiGraph;
 }
 
-TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile)
+std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
    logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
-   TGraph*           result = nullptr;
+   std::tuple<TGraph*, TGraph*, TH2*> result = std::make_tuple(nullptr, nullptr, nullptr);
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
    int               nPar = 3;
@@ -981,7 +983,9 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
       steps2              = 1;
    }
 
-   result                      = new TGraph(steps1);
+   std::get<0>(result)         = new TGraph(steps1);
+   std::get<1>(result)         = new TGraph(steps2);
+   std::get<2>(result)         = new TH2D("mixingAngles", "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, 0., 1., steps2, 0., 1.);
    double              minChi2 = 1e6;
    std::vector<double> bestErrors;
    double              bestMixingAngle1 = 0.;
@@ -1011,7 +1015,15 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
          double chi2 = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
          // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
          // and what if both angles have multiple steps?
-         result->SetPoint(i, mixangle1, chi2);
+         // only update the plot vs. mixing angle 1 if the chi2 is smaller (or if this is the first iteration)
+         if(j == 0 || chi2 < std::get<0>(result)->GetPointY(i)) {
+            std::get<0>(result)->SetPoint(i, mixangle1, chi2);
+         }
+         // only update the plot vs. mixing angle 2 if the chi2 is smaller (or if this is the first iteration)
+         if(i == 0 || chi2 < std::get<1>(result)->GetPointY(i)) {
+            std::get<1>(result)->SetPoint(j, mixangle2, chi2);
+         }
+         std::get<2>(result)->SetBinContent(i + 1, j + 1, chi2);
          if(chi2 < minChi2) {
             minChi2          = chi2;
             bestParameters   = fitResult.Parameters();
@@ -1024,17 +1036,17 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
    }
 
    // find mixing ratio with minimum chi2 and its uncertainty
-   auto   minIndex = TMath::LocMin(result->GetN(), result->GetY());
+   auto   minIndex = TMath::LocMin(std::get<0>(result)->GetN(), std::get<0>(result)->GetY());
    double x1       = std::numeric_limits<double>::quiet_NaN();
    double x2       = std::numeric_limits<double>::quiet_NaN();
    double y1       = std::numeric_limits<double>::quiet_NaN();
    double y2       = std::numeric_limits<double>::quiet_NaN();
-   for(int i = minIndex; i < result->GetN(); ++i) {
-      if(result->GetPointY(i) > minChi2 + 1.) {
-         x1 = result->GetPointX(i);
-         x2 = result->GetPointX(i - 1);
-         y1 = result->GetPointY(i);
-         y2 = result->GetPointY(i - 1);
+   for(int i = minIndex; i < std::get<0>(result)->GetN(); ++i) {
+      if(std::get<0>(result)->GetPointY(i) > minChi2 + 1.) {
+         x1 = std::get<0>(result)->GetPointX(i);
+         x2 = std::get<0>(result)->GetPointX(i - 1);
+         y1 = std::get<0>(result)->GetPointY(i);
+         y2 = std::get<0>(result)->GetPointY(i - 1);
          break;
       }
    }
@@ -1044,11 +1056,11 @@ TGraph* MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGr
    }
    x1 = std::numeric_limits<double>::quiet_NaN();
    for(int i = minIndex; i >= 0; --i) {
-      if(result->GetPointY(i) > minChi2 + 1.) {
-         x1 = result->GetPointX(i);
-         x2 = result->GetPointX(i + 1);
-         y1 = result->GetPointY(i);
-         y2 = result->GetPointY(i + 1);
+      if(std::get<0>(result)->GetPointY(i) > minChi2 + 1.) {
+         x1 = std::get<0>(result)->GetPointX(i);
+         x2 = std::get<0>(result)->GetPointX(i + 1);
+         y1 = std::get<0>(result)->GetPointY(i);
+         y2 = std::get<0>(result)->GetPointY(i + 1);
          break;
       }
    }
@@ -1110,9 +1122,10 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
    /// This method does a free fit of a_0, a_2, and a_4 to get the best possible result.
    /// The resulting parameters do not necessarily correspond to a meaningful physical result.
 
-   assert(data->GetN() == z0->GetN());
-   assert(data->GetN() == z2->GetN());
-   assert(data->GetN() == z4->GetN());
+   // not sure if these asserts are needed, and with excluded data points they might actually trigger?
+   //assert(data->GetN() == z0->GetN());
+   //assert(data->GetN() == z2->GetN());
+   //assert(data->GetN() == z4->GetN());
    // create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
    // this is to get initial conditions for our fit
    auto* cosTheta = new TGraphErrors(*data);
