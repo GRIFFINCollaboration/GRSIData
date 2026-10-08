@@ -260,6 +260,9 @@ int main(int argc, char** argv)
       }
    }
 
+   // angles to exclude from the fit
+   std::vector<double> excludedAngles = settings->GetDoubleVector("ExcludedAngles");
+
    // the spins of the low, middle, and high levels, to be used for the mixing method
    // two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
    std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
@@ -311,6 +314,18 @@ int main(int argc, char** argv)
       return 1;
    }
 
+   // get the excluded indices from the excluded angles
+   std::vector<int> excludedIndices;
+   for(const auto& angle : excludedAngles) {
+      int index = angles->Index(angle);
+      if(index >= 0) {
+         excludedIndices.push_back(index);
+      } else {
+         std::cout << "Requested to exclude angle " << angle << ", but this angle was not found:" << std::endl;
+         angles->Print();
+      }
+   }
+
    // get the log file name from the output file name
    auto          logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
    std::ofstream logFile(logFileName.c_str());
@@ -322,15 +337,15 @@ int main(int argc, char** argv)
    // open output file and create graphs
    TFile output(outputFile.c_str(), "recreate");
 
-   auto* rawAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
+   auto* rawAngularDistribution = new TGraphErrors(angles->NumberOfAngles() - excludedIndices.size());
    rawAngularDistribution->SetName("RawAngularDistribution");
-   auto* angularDistribution = new TGraphErrors(angles->NumberOfAngles());
+   auto* angularDistribution = new TGraphErrors(angles->NumberOfAngles() - excludedIndices.size());
    angularDistribution->SetName("AngularDistribution");
-   auto* mixedAngularDistribution = new TGraphErrors(angles->NumberOfAngles());
+   auto* mixedAngularDistribution = new TGraphErrors(angles->NumberOfAngles() - excludedIndices.size());
    mixedAngularDistribution->SetName("MixedAngularDistribution");
-   auto* rawChiSquares = new TGraph(angles->NumberOfAngles());
+   auto* rawChiSquares = new TGraph(angles->NumberOfAngles() - excludedIndices.size());
    rawChiSquares->SetName("RawChiSquares");
-   auto* mixedChiSquares = new TGraph(angles->NumberOfAngles());
+   auto* mixedChiSquares = new TGraph(angles->NumberOfAngles() - excludedIndices.size());
    mixedChiSquares->SetName("MixedChiSquares");
 
    // write the user settings to the output file
@@ -346,7 +361,12 @@ int main(int argc, char** argv)
            << "#ID p/m     centroid +- uncertainty         area +- uncertainty         FWHM +- uncertainty    red. chi^2" << std::endl;
 
    // loop over all matrices
+   int currentIndex = 0; // need this if we skip some excluded indices
    for(int i = 0; i < angles->NumberOfAngles(); ++i) {
+      if(std::any_of(excludedIndices.begin(), excludedIndices.end(), [&i](auto index) { return index == i; })) {
+         std::cout << "Skipping excluded index " << i << std::endl;
+         continue;
+      }
       // get the three histograms we need: prompt, time random, and event mixed
       auto* prompt = static_cast<TH2*>(input.Get(Form("%s%d", baseName.c_str(), i)));
       if(prompt == nullptr) {
@@ -491,17 +511,18 @@ int main(int argc, char** argv)
       projMixed->Write();
 
       // TODO: set an error for the angles?
-      rawAngularDistribution->SetPoint(i, angles->AverageAngle(i), peak.Area());
-      rawAngularDistribution->SetPointError(i, 0., peak.AreaErr());
-      mixedAngularDistribution->SetPoint(i, angles->AverageAngle(i), peakMixed.Area());
-      mixedAngularDistribution->SetPointError(i, 0., peakMixed.AreaErr());
-      angularDistribution->SetPoint(i, angles->AverageAngle(i), peak.Area() / peakMixed.Area());
-      angularDistribution->SetPointError(i, 0., peak.Area() / peakMixed.Area() * TMath::Sqrt(TMath::Power(peak.AreaErr() / peak.Area(), 2) + TMath::Power(peakMixed.AreaErr() / peakMixed.Area(), 2)));
+      rawAngularDistribution->SetPoint(currentIndex, angles->AverageAngle(i), peak.Area());
+      rawAngularDistribution->SetPointError(currentIndex, 0., peak.AreaErr());
+      mixedAngularDistribution->SetPoint(currentIndex, angles->AverageAngle(i), peakMixed.Area());
+      mixedAngularDistribution->SetPointError(currentIndex, 0., peakMixed.AreaErr());
+      angularDistribution->SetPoint(currentIndex, angles->AverageAngle(i), peak.Area() / peakMixed.Area());
+      angularDistribution->SetPointError(currentIndex, 0., peak.Area() / peakMixed.Area() * TMath::Sqrt(TMath::Power(peak.AreaErr() / peak.Area(), 2) + TMath::Power(peakMixed.AreaErr() / peakMixed.Area(), 2)));
 
-      rawChiSquares->SetPoint(i, angles->AverageAngle(i), peak.GetReducedChi2());
-      mixedChiSquares->SetPoint(i, angles->AverageAngle(i), peakMixed.GetReducedChi2());
+      rawChiSquares->SetPoint(currentIndex, angles->AverageAngle(i), peak.GetReducedChi2());
+      mixedChiSquares->SetPoint(currentIndex, angles->AverageAngle(i), peakMixed.GetReducedChi2());
 
       std::cout << "Angle " << std::setw(3) << i << " of " << angles->NumberOfAngles() << " done\r" << std::flush;
+      ++currentIndex;
    }
    std::cout << "Fitting of projections done." << std::endl;
 
