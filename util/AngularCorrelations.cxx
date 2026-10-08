@@ -365,7 +365,7 @@ int main(int argc, char** argv)
            << "#ID p/m     centroid +- uncertainty         area +- uncertainty         FWHM +- uncertainty    red. chi^2" << std::endl;
 
    // loop over all matrices
-   int currentIndex = 0; // need this if we skip some excluded indices
+   int currentIndex = 0;   // need this if we skip some excluded indices
    for(int i = 0; i < angles->NumberOfAngles(); ++i) {
       if(std::any_of(excludedIndices.begin(), excludedIndices.end(), [&i](auto index) { return index == i; })) {
          std::cout << "Skipping excluded index " << i << std::endl;
@@ -669,9 +669,9 @@ int main(int argc, char** argv)
                for(size_t i = 0; i < spin.size(); ++i) {
                   if(i == first) { continue; }
                   if(std::get<0>(spin[i])->GetN() > 1) {
-                        std::get<0>(spin[i])->Draw("c");
+                     std::get<0>(spin[i])->Draw("c");
                   } else {
-                  std::get<0>(spin[i])->Draw("*");
+                     std::get<0>(spin[i])->Draw("*");
                   }
                }
 
@@ -902,9 +902,9 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
    logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
    std::tuple<TGraph*, TGraph*, TH2*> result = std::make_tuple(nullptr, nullptr, nullptr);
-   Ac                ac(data, z0, z2, z4);
-   ROOT::Fit::Fitter fitter;
-   int               nPar = 3;
+   Ac                                 ac(data, z0, z2, z4);
+   ROOT::Fit::Fitter                  fitter;
+   int                                nPar = 3;
    fitter.SetFCN(nPar, ac);
    for(int i = 0; i < nPar; ++i) {
       // parameter settings arguments are parameter name, initial value, step size, minimum, and maximum
