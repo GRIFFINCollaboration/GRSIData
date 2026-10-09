@@ -376,7 +376,7 @@ int main(int argc, char** argv)
            << "#ID p/m     centroid +- uncertainty         area +- uncertainty         FWHM +- uncertainty    red. chi^2" << std::endl;
 
    // loop over all matrices
-   int currentIndex = 0; // need this if we skip some excluded indices
+   int currentIndex = 0;   // need this if we skip some excluded indices
    for(int i = 0; i < angles->NumberOfAngles(); ++i) {
       if(std::any_of(excludedIndices.begin(), excludedIndices.end(), [&i](auto index) { return index == i; })) {
          std::cout << "Skipping excluded index " << i << std::endl;
