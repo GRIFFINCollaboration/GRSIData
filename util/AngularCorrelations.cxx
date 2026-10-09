@@ -25,8 +25,15 @@
 #include "TRedirect.h"
 #include "TGRSIFunctions.h"
 
-std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
+struct mixingResult {
+   std::array<TGraph*, 2> fMixingAngles{nullptr, nullptr};
+   TH2* fMixingAnglesHistogram{nullptr};
+};
+
+mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double>                A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
+
+void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
 
 double GetYError(TGraphErrors* graph, const double& x)
 {
@@ -196,6 +203,10 @@ int main(int argc, char** argv)
          break;
       }
    }
+   // event mixed background-peak position can only be set via settings file (we expect only one additional peak)
+   double mixedBackgroundPeakPosition = settings->GetDouble("Mixed.Background.Peak.Position", std::numeric_limits<double>::quiet_NaN());
+   double mixedBackgroundPeakLow      = settings->GetDouble("Mixed.Background.Peak.Low", std::numeric_limits<double>::quiet_NaN());
+   double mixedBackgroundPeakHigh     = settings->GetDouble("Mixed.Background.Peak.High", std::numeric_limits<double>::quiet_NaN());
 
    // parameter limits and fixed parameters for the peak and the background peaks
    // if the limits are the same, the parameter is fixed to that value, if the high limit is lower than the low limit there is no limit
@@ -490,6 +501,17 @@ int main(int argc, char** argv)
          }
          pfMixed.AddPeak(bgP);
       }
+      // if we have an extra background peak for the mixed spectra, add it now
+      if(!std::isnan(mixedBackgroundPeakPosition)) {
+         auto* mixedPeak = new TRWPeak(mixedBackgroundPeakPosition);
+         if(!std::isnan(mixedBackgroundPeakLow) && !std::isnan(mixedBackgroundPeakHigh)) {
+            if(mixedBackgroundPeakLow == mixedBackgroundPeakHigh) {
+               mixedPeak->GetFitFunction()->FixParameter(1, mixedBackgroundPeakLow);
+            } else if(mixedBackgroundPeakLow < mixedBackgroundPeakHigh) {
+               mixedPeak->GetFitFunction()->SetParLimits(1, mixedBackgroundPeakLow, mixedBackgroundPeakHigh);
+            }
+         }
+      }
       for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
          if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
             pfMixed.GetBackground()->FixParameter(p, backgroundParameter[p]);
@@ -600,9 +622,9 @@ int main(int argc, char** argv)
                   angles->FoldOrGroup(z0, z2, z4);
                }
                // calculate chi2 vs mixing graphs
-               std::vector<std::tuple<TGraph*, TGraph*, TH2*>> spin;
-               std::vector<double>                             spinLabel;
-               std::vector<std::vector<double>>                parameters;
+               std::vector<mixingResult>        spin;
+               std::vector<double>              spinLabel;
+               std::vector<std::vector<double>> parameters;
                logFile << std::endl;
                // first check which of the vectors we iterate over
                if(twoJLow.size() > 1 && twoJMiddle.size() == 1 && twoJHigh.size() == 1) {
@@ -637,82 +659,27 @@ int main(int argc, char** argv)
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
 
+               // write graphs and canvas to output file
+               output.cd();
                // create canvas and plot graphs on it
-               auto* canvas = new TCanvas;
-
-               // determine minimum and maximum y-value
-               double min = TMath::MinElement(std::get<0>(spin.at(0))->GetN(), std::get<0>(spin.at(0))->GetY());
-               double max = TMath::MaxElement(std::get<0>(spin.at(0))->GetN(), std::get<0>(spin.at(0))->GetY());
-               for(size_t i = 1; i < spin.size(); ++i) {
-                  min = TMath::Min(min, TMath::MinElement(std::get<0>(spin.at(i))->GetN(), std::get<0>(spin.at(i))->GetY()));
-                  max = TMath::Max(max, TMath::MaxElement(std::get<0>(spin.at(i))->GetN(), std::get<0>(spin.at(i))->GetY()));
-               }
-               min = TMath::Min(min, confidenceLevel);
-
-               // find first graph with more than one data point
-               size_t first = 0;
-               for(first = 0; first < spin.size(); ++first) {
-                  if(std::get<0>(spin[first])->GetN() > 1) { break; }
-               }
-
-               std::get<0>(spin[first])->SetTitle("");
-               std::get<0>(spin[first])->SetMinimum(0.9 * min);
-               std::get<0>(spin[first])->SetMaximum(1.1 * max);
-
-               for(size_t i = 0; i < spin.size(); ++i) {
-                  std::get<0>(spin[i])->SetLineColor(i + 1);
-                  std::get<0>(spin[i])->SetMarkerColor(i + 1);
-                  std::get<0>(spin[i])->SetLineWidth(2);
-               }
-
-               std::get<0>(spin[first])->Draw("ac");
-               for(size_t i = 0; i < spin.size(); ++i) {
-                  if(i == first) { continue; }
-                  if(std::get<0>(spin[i])->GetN() > 1) {
-                        std::get<0>(spin[i])->Draw("c");
-                  } else {
-                  std::get<0>(spin[i])->Draw("*");
-                  }
-               }
-
-               auto* confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
-
-               confidenceLevelLine->Draw();
-
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-               auto* legend = new TLegend(0.1, 0.3);
-#else
-               auto* legend = new TLegend(0.7, 0.6, 0.8, 0.9);
-#endif
-               for(size_t i = 0; i < spin.size(); ++i) {
-                  if(std::get<0>(spin[i])->GetN() == 1) {
-                     legend->AddEntry(std::get<0>(spin[i]), Form("J = %.1f", spinLabel[i]), "p");
-                  } else {
-                     legend->AddEntry(std::get<0>(spin[i]), Form("J = %.1f", spinLabel[i]), "l");
-                  }
-               }
-
-               legend->Draw();
+               auto* canvas = new TCanvas("MixingCanvas");
 
                canvas->SetLogy();
 
-               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->SetRangeUser(-1.5, 1.5);
-               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
-               std::get<0>(spin[first])->GetHistogram()->GetXaxis()->CenterTitle();
-               std::get<0>(spin[first])->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
-               std::get<0>(spin[first])->GetHistogram()->GetYaxis()->CenterTitle();
+               PlotMixingCanvas(spin, 0, confidenceLevel, spinLabel);
+               canvas->Write("MixingCanvas1");
 
-               // write graphs and canvas to output file
-               output.cd();
+               PlotMixingCanvas(spin, 1, confidenceLevel, spinLabel);
+               canvas->Write("MixingCanvas2");
+
                z0->Write("graph000");
                z2->Write("graph010");
                z4->Write("graph100");
                for(size_t i = 0; i < spin.size(); ++i) {
-                  std::get<0>(spin[i])->Write(Form("spinMixingAngle1_%d", static_cast<int>(i)));
-                  std::get<1>(spin[i])->Write(Form("spinMixingAngle2_%d", static_cast<int>(i)));
-                  std::get<2>(spin[i])->Write(Form("spinMixingAngles_%d", static_cast<int>(i)));
+                  spin[i].fMixingAngles[0]->Write(Form("spinMixingAngle1_%d", static_cast<int>(i)));
+                  spin[i].fMixingAngles[1]->Write(Form("spinMixingAngle2_%d", static_cast<int>(i)));
+                  spin[i].fMixingAnglesHistogram->Write(Form("spinMixingAngles_%d", static_cast<int>(i)));
                }
-               canvas->Write("MixingCanvas");
 
                // create theory graphs with best fit for each spin, and write them to file
                std::vector<TGraphErrors*> spinFit(spin.size(), new TGraphErrors(angularDistribution->GetN()));
@@ -897,11 +864,76 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    return multiGraph;
 }
 
-std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile)
+void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel)
+{
+   /// plots the selected index/mixing angle (should be 0 or 1) on the current canvas
+
+   // determine minimum and maximum y-value
+   double min = TMath::MinElement(spin.at(0).fMixingAngles[index]->GetN(), spin.at(0).fMixingAngles[index]->GetY());
+   double max = TMath::MaxElement(spin.at(0).fMixingAngles[index]->GetN(), spin.at(0).fMixingAngles[index]->GetY());
+   for(size_t i = 1; i < spin.size(); ++i) {
+      min = TMath::Min(min, TMath::MinElement(spin.at(i).fMixingAngles[index]->GetN(), spin.at(i).fMixingAngles[index]->GetY()));
+      max = TMath::Max(max, TMath::MaxElement(spin.at(i).fMixingAngles[index]->GetN(), spin.at(i).fMixingAngles[index]->GetY()));
+   }
+   min = TMath::Min(min, confidenceLevel);
+
+   // find first graph with more than one data point
+   size_t first = 0;
+   for(first = 0; first < spin.size(); ++first) {
+      if(spin[first].fMixingAngles[index]->GetN() > 1) { break; }
+   }
+
+   spin[first].fMixingAngles[index]->SetTitle("");
+   spin[first].fMixingAngles[index]->SetMinimum(0.9 * min);
+   spin[first].fMixingAngles[index]->SetMaximum(1.1 * max);
+
+   for(size_t i = 0; i < spin.size(); ++i) {
+      spin[i].fMixingAngles[index]->SetLineColor(i + 1);
+      spin[i].fMixingAngles[index]->SetMarkerColor(i + 1);
+      spin[i].fMixingAngles[index]->SetLineWidth(2);
+   }
+
+   spin[first].fMixingAngles[index]->Draw("ac");
+   for(size_t i = 0; i < spin.size(); ++i) {
+      if(i == first) { continue; }
+      if(spin[i].fMixingAngles[index]->GetN() > 1) {
+         spin[i].fMixingAngles[index]->Draw("c");
+      } else {
+         spin[i].fMixingAngles[index]->Draw("*");
+      }
+   }
+
+   auto* confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
+
+   confidenceLevelLine->Draw();
+
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
+   auto* legend = new TLegend(0.1, 0.3);
+#else
+   auto* legend = new TLegend(0.7, 0.6, 0.8, 0.9);
+#endif
+   for(size_t i = 0; i < spin.size(); ++i) {
+      if(spin[i].fMixingAngles[index]->GetN() == 1) {
+         legend->AddEntry(spin[i].fMixingAngles[index], Form("J = %.1f", spinLabel[i]), "p");
+      } else {
+         legend->AddEntry(spin[i].fMixingAngles[index], Form("J = %.1f", spinLabel[i]), "l");
+      }
+   }
+
+   legend->Draw();
+
+   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetRangeUser(-TMath::Pi()/2., TMath::Pi()/2.);
+   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
+   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->CenterTitle();
+   spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
+   spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->CenterTitle();
+}
+
+mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
    logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
-   std::tuple<TGraph*, TGraph*, TH2*> result = std::make_tuple(nullptr, nullptr, nullptr);
+   mixingResult      result;
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
    int               nPar = 3;
@@ -993,9 +1025,9 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
       steps1              = 1;
    }
 
-   std::get<0>(result)         = new TGraph(steps1);
-   std::get<1>(result)         = new TGraph(steps2);
-   std::get<2>(result)         = new TH2D("mixingAngles", "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, 0., 1., steps2, 0., 1.);
+   result.fMixingAngles[0]       = new TGraph(steps1);
+   result.fMixingAngles[1]       = new TGraph(steps2);
+   result.fMixingAnglesHistogram = new TH2D("mixingAngles", "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, -TMath::Pi() / 2., TMath::Pi() / 2., steps2, -TMath::Pi() / 2., TMath::Pi() / 2.);
    double              minChi2 = 1e6;
    std::vector<double> bestErrors;
    double              bestMixingAngle1 = 0.;
@@ -1026,14 +1058,14 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
          // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
          // and what if both angles have multiple steps?
          // only update the plot vs. mixing angle 1 if the chi2 is smaller (or if this is the first iteration)
-         if(j == 0 || chi2 < std::get<0>(result)->GetPointY(i)) {
-            std::get<0>(result)->SetPoint(i, mixangle1, chi2);
+         if(j == 0 || chi2 < result.fMixingAngles[0]->GetPointY(i)) {
+            result.fMixingAngles[0]->SetPoint(i, mixangle1, chi2);
          }
          // only update the plot vs. mixing angle 2 if the chi2 is smaller (or if this is the first iteration)
-         if(i == 0 || chi2 < std::get<1>(result)->GetPointY(i)) {
-            std::get<1>(result)->SetPoint(j, mixangle2, chi2);
+         if(i == 0 || chi2 < result.fMixingAngles[1]->GetPointY(i)) {
+            result.fMixingAngles[1]->SetPoint(j, mixangle2, chi2);
          }
-         std::get<2>(result)->SetBinContent(i + 1, j + 1, chi2);
+         result.fMixingAnglesHistogram->SetBinContent(i + 1, j + 1, chi2);
          if(chi2 < minChi2) {
             minChi2          = chi2;
             bestParameters   = fitResult.Parameters();
@@ -1046,17 +1078,17 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
    }
 
    // find mixing ratio with minimum chi2 and its uncertainty
-   auto   minIndex = TMath::LocMin(std::get<0>(result)->GetN(), std::get<0>(result)->GetY());
+   auto   minIndex = TMath::LocMin(result.fMixingAngles[0]->GetN(), result.fMixingAngles[0]->GetY());
    double x1       = std::numeric_limits<double>::quiet_NaN();
    double x2       = std::numeric_limits<double>::quiet_NaN();
    double y1       = std::numeric_limits<double>::quiet_NaN();
    double y2       = std::numeric_limits<double>::quiet_NaN();
-   for(int i = minIndex; i < std::get<0>(result)->GetN(); ++i) {
-      if(std::get<0>(result)->GetPointY(i) > minChi2 + 1.) {
-         x1 = std::get<0>(result)->GetPointX(i);
-         x2 = std::get<0>(result)->GetPointX(i - 1);
-         y1 = std::get<0>(result)->GetPointY(i);
-         y2 = std::get<0>(result)->GetPointY(i - 1);
+   for(int i = minIndex; i < result.fMixingAngles[0]->GetN(); ++i) {
+      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1.) {
+         x1 = result.fMixingAngles[0]->GetPointX(i);
+         x2 = result.fMixingAngles[0]->GetPointX(i - 1);
+         y1 = result.fMixingAngles[0]->GetPointY(i);
+         y2 = result.fMixingAngles[0]->GetPointY(i - 1);
          break;
       }
    }
@@ -1066,11 +1098,11 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
    }
    x1 = std::numeric_limits<double>::quiet_NaN();
    for(int i = minIndex; i >= 0; --i) {
-      if(std::get<0>(result)->GetPointY(i) > minChi2 + 1.) {
-         x1 = std::get<0>(result)->GetPointX(i);
-         x2 = std::get<0>(result)->GetPointX(i + 1);
-         y1 = std::get<0>(result)->GetPointY(i);
-         y2 = std::get<0>(result)->GetPointY(i + 1);
+      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1.) {
+         x1 = result.fMixingAngles[0]->GetPointX(i);
+         x2 = result.fMixingAngles[0]->GetPointX(i + 1);
+         y1 = result.fMixingAngles[0]->GetPointY(i);
+         y2 = result.fMixingAngles[0]->GetPointY(i + 1);
          break;
       }
    }
@@ -1100,7 +1132,7 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
       residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
    }
 
-   auto*        canvas     = new TCanvas;
+   auto*        canvas     = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
    TMultiGraph* multiGraph = nullptr;
 
    if(steps1 == 1 && steps2 == 1) {
@@ -1108,21 +1140,21 @@ std::tuple<TGraph*, TGraph*, TH2*> MixingMethod(TGraphErrors* data, TGraphErrors
       multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
    } else {
       if(steps1 == 1) {
-         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (high -> mid) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f", bestMixingAngle2));
       } else if(steps2 == 1) {
-         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (mid -> low) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - lowerLimit, upperLimit - bestMixingAngle1));
       } else {
-         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f/%f", bestMixingAngle1, bestMixingAngle2));
       }
    }
 
-   fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-   residual->Write(Form("Residual%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-   multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh, twoJmid, twoJlow));
-   canvas->Write(Form("Canvas%d_%d_%d", twoJhigh, twoJmid, twoJlow));
+   fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
+   residual->Write(Form("Residual%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
+   multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
+   canvas->Write(Form("Canvas%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
 
    return result;
 }
@@ -1200,7 +1232,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
 
    double redChiSquare = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
 
-   auto* canvas     = new TCanvas;
+   auto* canvas     = new TCanvas("A2a4Canvas");
    auto* multiGraph = PlotCanvas(data, fit, residual, parameters, errors, redChiSquare);
 
    fit->Write("A2a4Fit");
