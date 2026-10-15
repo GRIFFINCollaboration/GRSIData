@@ -27,11 +27,11 @@
 
 struct mixingResult {
    std::array<TGraph*, 2> fMixingAngles{nullptr, nullptr};
-   TH2* fMixingAnglesHistogram{nullptr};
+   TH2*                   fMixingAnglesHistogram{nullptr};
 };
 
-mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
-std::vector<double>                A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
+mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
+std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
 
@@ -973,7 +973,7 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
 
    legend->Draw();
 
-   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetRangeUser(-TMath::Pi()/2., TMath::Pi()/2.);
+   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetRangeUser(-TMath::Pi() / 2., TMath::Pi() / 2.);
    spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
    spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->CenterTitle();
    spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
@@ -1186,7 +1186,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
    }
 
-   auto*        canvas     = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
+   auto*        canvas     = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
    TMultiGraph* multiGraph = nullptr;
 
    if(steps1 == 1 && steps2 == 1) {
@@ -1205,10 +1205,10 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       }
    }
 
-   fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
-   residual->Write(Form("Residual%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
-   multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
-   canvas->Write(Form("Canvas%d_%d_%d", twoJhigh/2, twoJmid/2, twoJlow/2));
+   fit->Write(Form("BestMixingFit%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
+   residual->Write(Form("Residual%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
+   multiGraph->Write(Form("FitComparison%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
+   canvas->Write(Form("Canvas%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
 
    return result;
 }
