@@ -990,7 +990,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 {
    static int index = 0;
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
-   logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
+   logFile << "#       a0        a2        a4        red.chi^2 chi^2" << std::endl;
    mixingResult      result;
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
@@ -1056,6 +1056,10 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
    // delta runs from -infinity to infinity (unless constrained by known physics)
    // in this case, it then makes more sense to sample evenly from tan^{-1}(delta)
 
+   // our # of degrees of freedom is the number of data points (ac.Np()), minus a_0 (which we fit), and minus the two mixing angle which we vary
+   // if one (or both) of the mixing angles is fixed (due to physics or user input), we increment the number of degrees of freedom later
+   int numberOfDegreesOfFreedom = ac.Np() - 3;
+
    // mixing for the high-middle transition
    double mixingAngle1Minimum = -TMath::Pi() / 2;
    double mixingAngle1Maximum = TMath::Pi() / 2;
@@ -1073,22 +1077,29 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       steps1              = 1;
    }
    if(l1a == l1b) {
-      if(!std::isnan(mixingAngleHighToMid)) {
+      if(!std::isnan(mixingAngleHighToMid) && mixingAngleHighToMid != 0.) {
          std::cout << "High to middle transition from " << twoJhigh / 2 << " to " << twoJmid / 2 << " has fixed mixing angle 0, can't be set to " << mixingAngleHighToMid << std::endl;
       }
       mixingAngle1Minimum = 0;
       steps1              = 1;
    }
+   if(steps1 == 1) {
+      ++numberOfDegreesOfFreedom;
+   }
+
    if(!std::isnan(mixingAngleMidToLow)) {
       mixingAngle2Minimum = mixingAngleMidToLow;
       steps2              = 1;
    }
    if(l2a == l2b) {
-      if(!std::isnan(mixingAngleMidToLow)) {
+      if(!std::isnan(mixingAngleMidToLow) && mixingAngleMidToLow != 0.) {
          std::cout << "Middle to low transition from " << twoJmid / 2 << " to " << twoJlow / 2 << " has fixed mixing angle 0, can't be set to " << mixingAngleMidToLow << std::endl;
       }
       mixingAngle2Minimum = 0;
       steps2              = 1;
+   }
+   if(steps2 == 1) {
+      ++numberOfDegreesOfFreedom;
    }
 
    result.fMixingAngles[0]       = new TGraph(steps1);
@@ -1119,8 +1130,8 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
             continue;
          }
          auto fitResult = fitter.Result();
-         // MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
-         double chi2 = fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters());
+         // MinFcnValue() is the minimum chi2, number of degrees of freedom was calculated earlier
+         double chi2 = fitResult.MinFcnValue() / numberOfDegreesOfFreedom;
          // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
          // and what if both angles have multiple steps?
          // only update the plot vs. mixing angle 1 if the chi2 is smaller (or if this is the first iteration)
@@ -1139,9 +1150,9 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
             bestMixingAngle1 = mixangle1;
             bestMixingAngle2 = mixangle2;
          }
-         logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
+         logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << chi2 << " " << std::setw(10) << fitResult.MinFcnValue() << std::endl;
       }
-   }
+   } // end of fitting loops
 
    // find mixing ratio with minimum chi2 and its uncertainty
    auto   minIndex = TMath::LocMin(result.fMixingAngles[0]->GetN(), result.fMixingAngles[0]->GetY());
@@ -1149,8 +1160,9 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
    double x2       = std::numeric_limits<double>::quiet_NaN();
    double y1       = std::numeric_limits<double>::quiet_NaN();
    double y2       = std::numeric_limits<double>::quiet_NaN();
+   // find upper limit, we want to find where chi^2 reaches the minimum plus one, but we have the reduced chi^2, so we want to find the minimum plus 1/NDF!
    for(int i = minIndex; i < result.fMixingAngles[0]->GetN(); ++i) {
-      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1.) {
+      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1. / static_cast<double>(numberOfDegreesOfFreedom)) {
          x1 = result.fMixingAngles[0]->GetPointX(i);
          x2 = result.fMixingAngles[0]->GetPointX(i - 1);
          y1 = result.fMixingAngles[0]->GetPointY(i);
@@ -1162,9 +1174,10 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
    if(!std::isnan(x1)) {
       upperLimit = x1 - (x2 - x1) / (y2 - y1) * y1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1.);
    }
+   // find lower limit
    x1 = std::numeric_limits<double>::quiet_NaN();
    for(int i = minIndex; i >= 0; --i) {
-      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1.) {
+      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1. / static_cast<double>(numberOfDegreesOfFreedom)) {
          x1 = result.fMixingAngles[0]->GetPointX(i);
          x2 = result.fMixingAngles[0]->GetPointX(i + 1);
          y1 = result.fMixingAngles[0]->GetPointY(i);
@@ -1206,10 +1219,10 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
    } else {
       if(steps1 == 1) {
-         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (high -> mid) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f", bestMixingAngle2));
       } else if(steps2 == 1) {
-         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (mid -> low) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - lowerLimit, upperLimit - bestMixingAngle1));
       } else {
          std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
