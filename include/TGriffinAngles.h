@@ -61,6 +61,9 @@ public:
    std::set<double>::iterator begin() const { return fAngles.begin(); }
    std::set<double>::iterator end() const { return fAngles.end(); }
 
+   void ApplyFolding(bool grouping = false);
+   std::vector<int> FoldedAndGroupedIndices(int index) const { return fFoldedAndGroupedIndices.at(index); }
+
    bool ExcludeDetector(int detector) const;
    bool ExcludeCrystal(int detector, int crystal) const;
 
@@ -81,18 +84,19 @@ public:
 private:
    void Add(TGriffinAngles* griffinAngles);
 
-   static EVerbosity     fVerbosity;           ///< verbosity level
-   double                fDistance{145.};      ///< distance of detector from center of array in mmm
-   bool                  fFolding{false};      ///< flag indicating whether we fold our distribution around 90 degree
-   bool                  fGrouping{false};     ///< flag indicating whether we group close angles together
-   bool                  fAddback{true};       ///< flag indicating whether we use addback
-   static double         fRounding;            ///< we consider any angles whose difference is less than this to be equal
-   std::vector<int>      fExcludedDetectors;   ///< list of detectors that are excluded in calculating the angles
-   std::vector<int>      fExcludedCrystals;    ///< list of crystals that are excluded in calculating the angles, the crystals are numbered as 4*(det-1)+cry, so start at 0 and go up to 63
-   std::vector<int>      fCustomGrouping;      ///< list of custom groups
-   std::set<double>      fAngles;              ///< set of unique angles, when grouping is used, the largest angle of the group is used!
-   std::map<double, int> fAngleMap;            ///< Maps angles to indices. This is fairly straight forward without grouping, but if grouping is used multiple angles can be mapped to the same index.
-   std::map<int, int>    fAngleCount;          ///< Maps angles (divided by rounding and cast to integers) to number of combinations contributing to it.
+   static EVerbosity             fVerbosity;                 ///< verbosity level
+   double                        fDistance{145.};            ///< distance of detector from center of array in mmm
+   bool                          fFolding{false};            ///< flag indicating whether we fold our distribution around 90 degree
+   bool                          fGrouping{false};           ///< flag indicating whether we group close angles together
+   bool                          fAddback{true};             ///< flag indicating whether we use addback
+   static double                 fRounding;                  ///< we consider any angles whose difference is less than this to be equal
+   std::vector<int>              fExcludedDetectors;         ///< list of detectors that are excluded in calculating the angles
+   std::vector<int>              fExcludedCrystals;          ///< list of crystals that are excluded in calculating the angles, the crystals are numbered as 4*(det-1)+cry, so start at 0 and go up to 63
+   std::vector<int>              fCustomGrouping;            ///< list of custom groups
+   std::set<double>              fAngles;                    ///< set of unique angles, when grouping is used, the largest angle of the group is used!
+   std::map<double, int>         fAngleMap;                  ///< Maps angles to indices. This is fairly straight forward without grouping, but if grouping is used multiple angles can be mapped to the same index.
+   std::map<int, int>            fAngleCount;                ///< Maps angles (divided by rounding and cast to integers) to number of combinations contributing to it.
+   std::vector<std::vector<int>> fFoldedAndGroupedIndices;   ///< this gives for each folded (and grouped) index the list of original indices contained
 
    /// \cond CLASSIMP
    ClassDefOverride(TGriffinAngles, 5)   // NOLINT(readability-else-after-return)
