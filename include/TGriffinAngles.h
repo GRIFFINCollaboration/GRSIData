@@ -61,7 +61,7 @@ public:
    std::set<double>::iterator begin() const { return fAngles.begin(); }
    std::set<double>::iterator end() const { return fAngles.end(); }
 
-   void ApplyFolding(bool grouping = false);
+   void             ApplyFolding(bool grouping = false);
    std::vector<int> FoldedAndGroupedIndices(int index) const { return fFoldedAndGroupedIndices.at(index); }
 
    bool ExcludeDetector(int detector) const;
