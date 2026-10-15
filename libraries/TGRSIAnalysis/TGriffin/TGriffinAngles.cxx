@@ -482,3 +482,30 @@ void TGriffinAngles::Add(TGriffinAngles* griffinAngles)
       std::cerr << ">" << std::endl;
    }
 }
+
+void TGriffinAngles::ApplyFolding(bool grouping)
+{
+   /// function that calculates which original indices belong to the new folded (and grouped) list of indices
+
+   // apply folding first by looping over all angles, and if they are above 90 degrees, add them to the corresponding one below 90 degrees
+   for(const auto& it : fAngleMap) {
+      if(it.first > 90.) {
+         int newIndex = Index(180. - it.first); 
+         if(newIndex < 0) {
+            // we assume that this can only happen for the 180 degree point which would be mapped to the non-existent zero degree point
+            // in this case we need to insert the index of the 180 degree point as a new index 0
+            fFoldedAndGroupedIndices.emplace(fFoldedAndGroupedIndices.begin(), it.second);
+         } else {
+            // add the current index to the list of indices for the new index
+            // if new index is out of bounds .at will throw an exception
+            fFoldedAndGroupedIndices.at(newIndex).push_back(it.second);
+         }
+      } else {
+         fFoldedAndGroupedIndices.emplace_back(it.second);
+      }
+   }
+   // if requested also apply grouping
+   if(grouping) {
+   }
+}
+

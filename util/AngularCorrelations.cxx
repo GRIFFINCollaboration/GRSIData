@@ -33,7 +33,7 @@ struct mixingResult {
 mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
-void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
+bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
 
 double GetYError(TGraphErrors* graph, const double& x)
 {
@@ -84,6 +84,8 @@ int main(int argc, char** argv)
    std::string theoryFile;
    std::string outputFile = "AngularCorrelations.root";
    std::string settingsFile;
+   bool        applyFolding  = false;
+   bool        applyGrouping = false;
 
    // set up the argument parser
    ArgParser parser;
@@ -103,6 +105,8 @@ int main(int argc, char** argv)
    parser.option("input", &inputFile, true).description("Input file with gamma-gamma matrices for each angle (coincident, time-random, and event mixed).");
    parser.option("theory", &theoryFile, true).description("File with simulated z0-, z2-, and z4-graphs.");
    parser.option("output", &outputFile, true).description("Name of output file, default is \"AngularCorrelations.root\".");
+   parser.option("apply-folding", &applyFolding, true).description("Apply folding to matrices w/o folding.");
+   parser.option("apply-grouping", &applyGrouping, true).description("Apply grouping to matrices w/o grouping (requires/activates folding as well).");
 
    parser.parse(argc, argv, true);
 
@@ -271,8 +275,11 @@ int main(int argc, char** argv)
       }
    }
 
-   // angles to exclude from the fit
-   std::vector<double> excludedAngles = settings->GetDoubleVector("ExcludedAngles");
+   // angles to exclude from the fit, we read it quietly and catch any exception from it not being there
+   std::vector<double> excludedAngles;
+   try {
+      excludedAngles = settings->GetDoubleVector("ExcludedAngles", true);
+   } catch(std::out_of_range& e) {}
 
    // the spins of the low, middle, and high levels, to be used for the mixing method
    // two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
@@ -340,6 +347,28 @@ int main(int argc, char** argv)
          angles->Print();
       }
    }
+   // sort the indices just in case someone provided them out of order (removing the points from the theory graphs wouldn't work otherwise)
+   std::sort(excludedIndices.begin(), excludedIndices.end());
+
+   // check that the apply-folding and apply-grouping options are correct
+   if(applyFolding && angles->Folding()) {
+      std::cout << DRED << "Can't apply folding to already folded data! Setting apply-folding option to false." << RESET_COLOR << std::endl;
+      applyFolding = false;
+   }
+   if(applyGrouping && angles->Grouping()) {
+      std::cout << DRED << "Can't apply grouping to already grouped data! Setting apply-grouping option to false." << RESET_COLOR << std::endl;
+      applyGrouping = false;
+   }
+   if(applyGrouping && !applyFolding) {
+      // this means we do not group data that has already been folded
+      std::cout << DRED << "Can't apply grouping w/o applying folding as well!" << RESET_COLOR << std::endl;
+      return 1;
+   }
+
+   // have the GriffinAngles class compute the folded (and potentially grouped) indices
+   if(applyFolding) {
+      angles->ApplyFolding(applyGrouping);
+   }
 
    // get the log file name from the output file name
    auto          logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
@@ -352,6 +381,7 @@ int main(int argc, char** argv)
    // open output file and create graphs
    TFile output(outputFile.c_str(), "recreate");
 
+   // it's not easy to calculate the new size in case we apply folding and grouping, so we just create the graphs with the maximum size and resize them later
    auto* rawAngularDistribution = new TGraphErrors(angles->NumberOfAngles() - excludedIndices.size());
    rawAngularDistribution->SetName("RawAngularDistribution");
    auto* angularDistribution = new TGraphErrors(angles->NumberOfAngles() - excludedIndices.size());
@@ -401,6 +431,16 @@ int main(int argc, char** argv)
          std::cout << parser << std::endl;
          return 1;
       }
+
+      // if we want to apply grouping now, we also need to apply folding, so we can check just for that
+      //if(applyFolding) {
+      //   // we loop over all indices that are folded/grouped into this one
+      //   for(const auto& index : angles->FoldedAndGroupedIndices(i)) {
+      //      prompt->Add(static_cast<TH2*>(input.Get(Form("%s%d", baseName.c_str(), index)));
+      //      bg->Add(static_cast<TH2*>(input.Get(Form("%s%d", bgName.c_str(), index)));
+      //      mixed->Add(static_cast<TH2*>(input.Get(Form("%s%d", mixedName.c_str(), index)));
+      //   }
+      //}
 
       // first subtract time random background from prompt data and enable proper error propagation for prompt and mixed data
       prompt->Sumw2();
@@ -511,6 +551,7 @@ int main(int argc, char** argv)
                mixedPeak->GetFitFunction()->SetParLimits(1, mixedBackgroundPeakLow, mixedBackgroundPeakHigh);
             }
          }
+         pfMixed.AddPeak(mixedPeak);
       }
       for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
          if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
@@ -616,10 +657,16 @@ int main(int argc, char** argv)
             // check if the sizes of the provided graphs match what we expect:
             // if we have folding and grouping enabled we either need the graphs to match the angular distribution or have a size of either 51 (singles) or 49 (addback)
             // otherwise the size needs to match the angular distribution
-            if(z0->GetN() == angularDistribution->GetN() || ((angles->Grouping() || angles->Folding()) && z0->GetN() == (angles->Addback() ? 49 : 51))) {
+            if(z0->GetN() == angularDistribution->GetN() + static_cast<int>(excludedIndices.size()) || ((angles->Grouping() || angles->Folding()) && z0->GetN() == (angles->Addback() ? 49 : 51))) {
                // if the theory needs to be folded and/or grouped, do so now
                if(z0->GetN() != angularDistribution->GetN()) {
                   angles->FoldOrGroup(z0, z2, z4);
+               }
+               for(size_t i = 0; i < excludedIndices.size(); ++i) {
+                  // after the first index has been removed, all subsequent ones will be moved down by one spot
+                  z0->RemovePoint(excludedIndices[i] - i);
+                  z2->RemovePoint(excludedIndices[i] - i);
+                  z4->RemovePoint(excludedIndices[i] - i);
                }
                // calculate chi2 vs mixing graphs
                std::vector<mixingResult>        spin;
@@ -666,11 +713,11 @@ int main(int argc, char** argv)
 
                canvas->SetLogy();
 
-               PlotMixingCanvas(spin, 0, confidenceLevel, spinLabel);
-               canvas->Write("MixingCanvas1");
-
-               PlotMixingCanvas(spin, 1, confidenceLevel, spinLabel);
-               canvas->Write("MixingCanvas2");
+               for(int i = 0; i < 2; ++i) {
+                  if(PlotMixingCanvas(spin, i, confidenceLevel, spinLabel)) {
+                     canvas->Write(Form("MixingCanvas%d", i));
+                  }
+               }
 
                z0->Write("graph000");
                z2->Write("graph010");
@@ -864,7 +911,7 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    return multiGraph;
 }
 
-void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel)
+bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel)
 {
    /// plots the selected index/mixing angle (should be 0 or 1) on the current canvas
 
@@ -881,6 +928,10 @@ void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
    size_t first = 0;
    for(first = 0; first < spin.size(); ++first) {
       if(spin[first].fMixingAngles[index]->GetN() > 1) { break; }
+   }
+   if(first == spin.size()) {
+      std::cout << "Failed to find any graph with more than 1 point for mixing angle " << index + 1 << ", not plotting mixing canvas " << index << std::endl;
+      return false;
    }
 
    spin[first].fMixingAngles[index]->SetTitle("");
@@ -927,10 +978,13 @@ void PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
    spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->CenterTitle();
    spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
    spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->CenterTitle();
+
+   return true;
 }
 
 mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
+   static int index = 0;
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
    logFile << "#       a0        a2        a4 red.chi^2" << std::endl;
    mixingResult      result;
@@ -1027,8 +1081,8 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 
    result.fMixingAngles[0]       = new TGraph(steps1);
    result.fMixingAngles[1]       = new TGraph(steps2);
-   result.fMixingAnglesHistogram = new TH2D("mixingAngles", "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, -TMath::Pi() / 2., TMath::Pi() / 2., steps2, -TMath::Pi() / 2., TMath::Pi() / 2.);
-   double              minChi2   = 1e6;
+   result.fMixingAnglesHistogram = new TH2D(Form("mixingAngles%d", index++), "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, -TMath::Pi() / 2., TMath::Pi() / 2., steps2, -TMath::Pi() / 2., TMath::Pi() / 2.);
+   double              minChi2 = 1e6;
    std::vector<double> bestErrors;
    double              bestMixingAngle1 = 0.;
    double              bestMixingAngle2 = 0.;
