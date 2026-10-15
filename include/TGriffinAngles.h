@@ -99,7 +99,7 @@ private:
    std::vector<std::vector<int>> fFoldedAndGroupedIndices;   ///< this gives for each folded (and grouped) index the list of original indices contained
 
    /// \cond CLASSIMP
-   ClassDefOverride(TGriffinAngles, 5)   // NOLINT(readability-else-after-return)
+   ClassDefOverride(TGriffinAngles, 6)   // NOLINT(readability-else-after-return)
    /// \endcond
 };
 /*! @} */
