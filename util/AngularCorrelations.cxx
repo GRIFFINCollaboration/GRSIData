@@ -289,7 +289,7 @@ int main(int argc, char** argv)
 
    // mixing angles (1 = high to middle, 2 = middle to low)
    double mixingAngleHighToMid = settings->GetDouble("MixingAngleHighToMid", std::numeric_limits<double>::quiet_NaN());
-   double mixingAngleMidToLow = settings->GetDouble("MixingAngleMidToLow", std::numeric_limits<double>::quiet_NaN());
+   double mixingAngleMidToLow  = settings->GetDouble("MixingAngleMidToLow", std::numeric_limits<double>::quiet_NaN());
 
    // confidence level (this value is used to draw a line at the confidence level for the mixing method)
    double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535);   // 1.535 is 99% confidence level for 48 degrees of freedom
