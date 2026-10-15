@@ -490,7 +490,7 @@ void TGriffinAngles::ApplyFolding(bool grouping)
    // apply folding first by looping over all angles, and if they are above 90 degrees, add them to the corresponding one below 90 degrees
    for(const auto& it : fAngleMap) {
       if(it.first > 90.) {
-         int newIndex = Index(180. - it.first); 
+         int newIndex = Index(180. - it.first);
          if(newIndex < 0) {
             // we assume that this can only happen for the 180 degree point which would be mapped to the non-existent zero degree point
             // in this case we need to insert the index of the 180 degree point as a new index 0
@@ -506,6 +506,68 @@ void TGriffinAngles::ApplyFolding(bool grouping)
    }
    // if requested also apply grouping
    if(grouping) {
+      // try and read custom grouping settings
+      if(TGRSIOptions::Get() != nullptr) {
+         auto* settings = TGRSIOptions::UserSettings();
+         if(settings != nullptr) {
+            try {
+               fCustomGrouping = settings->GetIntVector("CustomGrouping", true);
+               std::sort(fCustomGrouping.begin(), fCustomGrouping.end());
+            } catch(std::out_of_range&) {}
+         }
+      }
+      // check if we have custom grouping supplied and its format
+      if(!fCustomGrouping.empty()) {
+         if(fCustomGrouping.size() != fFoldedAndGroupedIndices.size()) {
+            std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but we have " << fFoldedAndGroupedIndices.size() << " folded angles?" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+         }
+         if(fCustomGrouping[0] != 0) {
+            std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but the first entry is " << fCustomGrouping[0] << ", not 0!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+         }
+         if(!std::is_sorted(fCustomGrouping.begin(), fCustomGrouping.end())) {
+            std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries is not sorted!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+         }
+         auto tmp = fCustomGrouping;
+         auto end = std::unique(tmp.begin(), tmp.end());
+         if(fCustomGrouping.back() != end - tmp.begin() - 1) {
+            std::ostringstream str;
+            str << DRED << "Custom grouping with " << fCustomGrouping.size() << " entries supplied, but the last entry is " << fCustomGrouping[0] << " which does not match the number of unique groups minus one (" << end - tmp.begin() - 1 << ")!" << RESET_COLOR;
+            throw std::runtime_error(str.str());
+         }
+      } else if(fDistance == 110.) {
+         fCustomGrouping = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10};
+      } else if(fDistance == 145.) {
+         fCustomGrouping = {0, 1, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11};
+      } else {
+         std::ostringstream str;
+         str << DRED << "No custom grouping supplied and distance is not 110 mm or 145 mm, but " << fDistance << "!" << RESET_COLOR;
+         throw std::runtime_error(str.str());
+      }
+
+      // after folding, we should have two entries for almost all new indices (one below and one above 90 degrees), except for the first one which is the 180 degree point
+      // when going through the grouping vector, we only want to update if there is more than one angle in the group
+      // might be possible to do this in place, but creating a new copy seems easier and less error prone for now
+      std::vector<std::vector<int>> tmp;
+      tmp.reserve(fCustomGrouping.back());
+      tmp.push_back(fFoldedAndGroupedIndices[0]);
+      for(size_t i = 1; i < fFoldedAndGroupedIndices.size() && i < fCustomGrouping.size(); ++i) {
+         if(fCustomGrouping[i] == fCustomGrouping[i - 1]) {   // same group, so add this vector to the already existing one
+            tmp.back().insert(tmp.back().end(), fFoldedAndGroupedIndices[i].begin(), fFoldedAndGroupedIndices[i].end());
+         } else {   // new group. so push this back on the tmp object
+            tmp.push_back(fFoldedAndGroupedIndices[i]);
+         }
+      }
+
+      if(static_cast<int>(tmp.size()) != fCustomGrouping.back() + 1) {
+         std::cout << "Error, mismatch between the number of new indices " << tmp.size() << ", and the last entry of the grouping " << fCustomGrouping.back() + 1 << ", should not ahve gotten here, won't apply grouping, only folding!" << std::endl;
+      } else {
+         fFoldedAndGroupedIndices = tmp;
+      }
    }
 }
-

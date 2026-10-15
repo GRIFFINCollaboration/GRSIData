@@ -30,7 +30,7 @@ struct mixingResult {
    TH2*                   fMixingAnglesHistogram{nullptr};
 };
 
-mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile);
+mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
@@ -288,8 +288,8 @@ int main(int argc, char** argv)
    std::vector<int> twoJHigh   = settings->GetIntVector("TwoJ.High");
 
    // mixing angles (1 = high to middle, 2 = middle to low)
-   double mixingAngle1 = settings->GetDouble("MixingAngle.1", std::numeric_limits<double>::quiet_NaN());
-   double mixingAngle2 = settings->GetDouble("MixingAngle.2", std::numeric_limits<double>::quiet_NaN());
+   double mixingAngleHighToMid = settings->GetDouble("MixingAngleHighToMid", std::numeric_limits<double>::quiet_NaN());
+   double mixingAngleMidToLow = settings->GetDouble("MixingAngleMidToLow", std::numeric_limits<double>::quiet_NaN());
 
    // confidence level (this value is used to draw a line at the confidence level for the mixing method)
    double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535);   // 1.535 is 99% confidence level for 48 degrees of freedom
@@ -679,7 +679,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngle1, mixingAngle2, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
@@ -687,7 +687,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
@@ -695,14 +695,14 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJHigh) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
                   output.cd();
-                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngle1, mixingAngle2, parameters.back(), logFile));
+                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
 
@@ -723,8 +723,8 @@ int main(int argc, char** argv)
                z2->Write("graph010");
                z4->Write("graph100");
                for(size_t i = 0; i < spin.size(); ++i) {
-                  spin[i].fMixingAngles[0]->Write(Form("spinMixingAngle1_%d", static_cast<int>(i)));
-                  spin[i].fMixingAngles[1]->Write(Form("spinMixingAngle2_%d", static_cast<int>(i)));
+                  spin[i].fMixingAngles[0]->Write(Form("spinMixingAngleHighToMid_%d", static_cast<int>(i)));
+                  spin[i].fMixingAngles[1]->Write(Form("spinMixingAngleMidToLow_%d", static_cast<int>(i)));
                   spin[i].fMixingAnglesHistogram->Write(Form("spinMixingAngles_%d", static_cast<int>(i)));
                }
 
@@ -974,7 +974,11 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
    legend->Draw();
 
    spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetRangeUser(-TMath::Pi() / 2., TMath::Pi() / 2.);
-   spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta) [rad]");
+   if(index == 0) {
+      spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta_{high->mid}) [rad]");
+   } else {
+      spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->SetTitle("atan(#delta_{mid->low}) [rad]");
+   }
    spin[first].fMixingAngles[index]->GetHistogram()->GetXaxis()->CenterTitle();
    spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->SetTitle("red. #chi^{2}");
    spin[first].fMixingAngles[index]->GetHistogram()->GetYaxis()->CenterTitle();
@@ -982,7 +986,7 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
    return true;
 }
 
-mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngle1, double mixingAngle2, std::vector<double>& bestParameters, std::ofstream& logFile)
+mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    static int index = 0;
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
@@ -1064,25 +1068,33 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
    double stepSize2           = (mixingAngle2Maximum - mixingAngle2Minimum) / steps2;
 
    // if appropriate, constrain the delta values
-   if(l1a == l1b) {
-      mixingAngle1Minimum = 0;
-      steps1              = 1;
-   } else if(!std::isnan(mixingAngle1)) {
-      mixingAngle1Minimum = mixingAngle1;
+   if(!std::isnan(mixingAngleHighToMid)) {
+      mixingAngle1Minimum = mixingAngleHighToMid;
       steps1              = 1;
    }
+   if(l1a == l1b) {
+      if(!std::isnan(mixingAngleHighToMid)) {
+         std::cout << "High to middle transition from " << twoJhigh / 2 << " to " << twoJmid / 2 << " has fixed mixing angle 0, can't be set to " << mixingAngleHighToMid << std::endl;
+      }
+      mixingAngle1Minimum = 0;
+      steps1              = 1;
+   }
+   if(!std::isnan(mixingAngleMidToLow)) {
+      mixingAngle2Minimum = mixingAngleMidToLow;
+      steps2              = 1;
+   }
    if(l2a == l2b) {
+      if(!std::isnan(mixingAngleMidToLow)) {
+         std::cout << "Middle to low transition from " << twoJmid / 2 << " to " << twoJlow / 2 << " has fixed mixing angle 0, can't be set to " << mixingAngleMidToLow << std::endl;
+      }
       mixingAngle2Minimum = 0;
       steps2              = 1;
-   } else if(!std::isnan(mixingAngle2)) {
-      mixingAngle2Minimum = mixingAngle2;
-      steps1              = 1;
    }
 
    result.fMixingAngles[0]       = new TGraph(steps1);
    result.fMixingAngles[1]       = new TGraph(steps2);
-   result.fMixingAnglesHistogram = new TH2D(Form("mixingAngles%d", index++), "#Chi^{2} for mixing angle 2 vs mixing angle 1", steps1, -TMath::Pi() / 2., TMath::Pi() / 2., steps2, -TMath::Pi() / 2., TMath::Pi() / 2.);
-   double              minChi2 = 1e6;
+   result.fMixingAnglesHistogram = new TH2D(Form("mixingAngles%d", index++), "#Chi^{2} for mixing angle mid->low vs mixing angle high->mid;atan(#delta_{high->mid}) [rad];atan(#delta_{mid->low}) [rad]", steps1, -TMath::Pi() / 2., TMath::Pi() / 2., steps2, -TMath::Pi() / 2., TMath::Pi() / 2.);
+   double              minChi2   = 1e6;
    std::vector<double> bestErrors;
    double              bestMixingAngle1 = 0.;
    double              bestMixingAngle2 = 0.;
