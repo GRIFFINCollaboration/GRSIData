@@ -986,6 +986,58 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
    return true;
 }
 
+std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int degreesOfFreedom)
+{
+   /// calculates the limits for a graph of reduced chi squares using the provided minimum reduced chi square and degrees of freedom
+   
+   // find mixing ratio with minimum chi2 and its uncertainty
+   auto   minIndex = TMath::LocMin(redChi2Graph->GetN(), redChi2Graph->GetY());
+   // do a double check that this minimum matches the minimum reduced chi square
+   if(std::fabs(minChi2 - redChi2Graph->GetPointY(minIndex)) > 0.001) {
+      std::cout << DYELLOW << "Warning, the provided minimum reduced chi square (" << minChi2 << ") and the value of the graph at the index with the lowest y-value (" << redChi2Graph->GetPointY(minIndex) << " @ " << minIndex << ") differ." << std::endl;
+   }
+
+   double x1       = std::numeric_limits<double>::quiet_NaN();
+   double x2       = std::numeric_limits<double>::quiet_NaN();
+   double y1       = std::numeric_limits<double>::quiet_NaN();
+   double y2       = std::numeric_limits<double>::quiet_NaN();
+   // find upper limit, we want to find where chi^2 reaches the minimum plus one, but we have the reduced chi^2, so we want to find the minimum plus 1/NDF!
+   for(int i = minIndex; 0 < i && i < redChi2Graph->GetN(); ++i) {
+      if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
+         x1 = redChi2Graph->GetPointX(i);
+         x2 = redChi2Graph->GetPointX(i - 1);
+         y1 = redChi2Graph->GetPointY(i);
+         y2 = redChi2Graph->GetPointY(i - 1);
+         break;
+      }
+   }
+   double upperLimit = std::numeric_limits<double>::quiet_NaN();
+   if(!std::isnan(x1)) {
+      upperLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
+   }
+   // find lower limit
+   x1 = std::numeric_limits<double>::quiet_NaN();
+   for(int i = minIndex; redChi2Graph->GetN() > i + 1 && i >= 0; --i) {
+      if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
+         x1 = redChi2Graph->GetPointX(i);
+         x2 = redChi2Graph->GetPointX(i + 1);
+         y1 = redChi2Graph->GetPointY(i);
+         y2 = redChi2Graph->GetPointY(i + 1);
+         break;
+      }
+   }
+   double lowerLimit = std::numeric_limits<double>::quiet_NaN();
+   if(!std::isnan(x1)) {
+      lowerLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
+   }
+
+   if(lowerLimit >= minChi2 || minChi2 >= upperLimit) {
+      std::cout << DYELLOW << "Warning, lower and/or upper limit of minimum chi square failed. Lower limit " << lowerLimit << ", minimum chi square " << minChi2 << ", and upper limit " << upperLimit << RESET_COLOR << std::endl;
+   }
+
+   return std::make_pair(lowerLimit, upperLimit);
+}
+
 mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    static int index = 0;
@@ -1058,7 +1110,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 
    // our # of degrees of freedom is the number of data points (ac.Np()), minus a_0 (which we fit), and minus the two mixing angle which we vary
    // if one (or both) of the mixing angles is fixed (due to physics or user input), we increment the number of degrees of freedom later
-   int numberOfDegreesOfFreedom = ac.Np() - 3;
+   int degreesOfFreedom = ac.Np() - 3;
 
    // mixing for the high-middle transition
    double mixingAngle1Minimum = -TMath::Pi() / 2;
@@ -1084,7 +1136,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       steps1              = 1;
    }
    if(steps1 == 1) {
-      ++numberOfDegreesOfFreedom;
+      ++degreesOfFreedom;
    }
 
    if(!std::isnan(mixingAngleMidToLow)) {
@@ -1099,7 +1151,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       steps2              = 1;
    }
    if(steps2 == 1) {
-      ++numberOfDegreesOfFreedom;
+      ++degreesOfFreedom;
    }
 
    result.fMixingAngles[0]       = new TGraph(steps1);
@@ -1131,7 +1183,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
          }
          auto fitResult = fitter.Result();
          // MinFcnValue() is the minimum chi2, number of degrees of freedom was calculated earlier
-         double chi2 = fitResult.MinFcnValue() / numberOfDegreesOfFreedom;
+         double chi2 = fitResult.MinFcnValue() / degreesOfFreedom;
          // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
          // and what if both angles have multiple steps?
          // only update the plot vs. mixing angle 1 if the chi2 is smaller (or if this is the first iteration)
@@ -1153,42 +1205,6 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
          logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << chi2 << " " << std::setw(10) << fitResult.MinFcnValue() << std::endl;
       }
    } // end of fitting loops
-
-   // find mixing ratio with minimum chi2 and its uncertainty
-   auto   minIndex = TMath::LocMin(result.fMixingAngles[0]->GetN(), result.fMixingAngles[0]->GetY());
-   double x1       = std::numeric_limits<double>::quiet_NaN();
-   double x2       = std::numeric_limits<double>::quiet_NaN();
-   double y1       = std::numeric_limits<double>::quiet_NaN();
-   double y2       = std::numeric_limits<double>::quiet_NaN();
-   // find upper limit, we want to find where chi^2 reaches the minimum plus one, but we have the reduced chi^2, so we want to find the minimum plus 1/NDF!
-   for(int i = minIndex; i < result.fMixingAngles[0]->GetN(); ++i) {
-      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1. / static_cast<double>(numberOfDegreesOfFreedom)) {
-         x1 = result.fMixingAngles[0]->GetPointX(i);
-         x2 = result.fMixingAngles[0]->GetPointX(i - 1);
-         y1 = result.fMixingAngles[0]->GetPointY(i);
-         y2 = result.fMixingAngles[0]->GetPointY(i - 1);
-         break;
-      }
-   }
-   double upperLimit = std::numeric_limits<double>::quiet_NaN();
-   if(!std::isnan(x1)) {
-      upperLimit = x1 - (x2 - x1) / (y2 - y1) * y1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1.);
-   }
-   // find lower limit
-   x1 = std::numeric_limits<double>::quiet_NaN();
-   for(int i = minIndex; i >= 0; --i) {
-      if(result.fMixingAngles[0]->GetPointY(i) > minChi2 + 1. / static_cast<double>(numberOfDegreesOfFreedom)) {
-         x1 = result.fMixingAngles[0]->GetPointX(i);
-         x2 = result.fMixingAngles[0]->GetPointX(i + 1);
-         y1 = result.fMixingAngles[0]->GetPointY(i);
-         y2 = result.fMixingAngles[0]->GetPointY(i + 1);
-         break;
-      }
-   }
-   double lowerLimit = std::numeric_limits<double>::quiet_NaN();
-   if(!std::isnan(x1)) {
-      lowerLimit = x1 - (x2 - x1) / (y2 - y1) * y1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1.);
-   }
 
    // plot the best fit, if there are multiple minima this is most likely the first one found
    auto* fit = static_cast<TGraphErrors*>(z0->Clone("fit"));
@@ -1219,14 +1235,21 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
    } else {
       if(steps1 == 1) {
+         std::pair<double, double> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
+
          std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f", bestMixingAngle2));
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle1));
       } else if(steps2 == 1) {
+         std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
+
          std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - lowerLimit, upperLimit - bestMixingAngle1));
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1));
       } else {
+         std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
+         std::pair<double, double> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
+
          std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f/%f", bestMixingAngle1, bestMixingAngle2));
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle 1 = %f (-%f/+%f)\nmixing angle 2 = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1, bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2));
       }
    }
 
