@@ -996,6 +996,7 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
    if(std::fabs(minChi2 - redChi2Graph->GetPointY(minIndex)) > 0.001) {
       std::cout << DYELLOW << "Warning, the provided minimum reduced chi square (" << minChi2 << ") and the value of the graph at the index with the lowest y-value (" << redChi2Graph->GetPointY(minIndex) << " @ " << minIndex << ") differ." << std::endl;
    }
+   std::cout << "Calculating limits of mixing angle using minimum reduced chi square " << minChi2 << ", " << degreesOfFreedom << " degrees of freedom, index of best mixing angle " << redChi2Graph->GetPointX(minIndex) << " is " << minIndex << std::endl;
 
    double x1 = std::numeric_limits<double>::quiet_NaN();
    double x2 = std::numeric_limits<double>::quiet_NaN();
@@ -1015,6 +1016,8 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
    if(!std::isnan(x1)) {
       upperLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
    }
+   std::cout << "From points " << x1 << ", " << y1 << " and " << x2 << ", " << y2 << " we get an upper limit of " << upperLimit << std::endl;
+
    // find lower limit
    x1 = std::numeric_limits<double>::quiet_NaN();
    for(int i = minIndex; redChi2Graph->GetN() > i + 1 && i >= 0; --i) {
@@ -1030,9 +1033,10 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
    if(!std::isnan(x1)) {
       lowerLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
    }
+   std::cout << "From points " << x1 << ", " << y1 << " and " << x2 << ", " << y2 << " we get a lower limit of " << lowerLimit << std::endl;
 
-   if(lowerLimit >= minChi2 || minChi2 >= upperLimit) {
-      std::cout << DYELLOW << "Warning, lower and/or upper limit of minimum chi square failed. Lower limit " << lowerLimit << ", minimum chi square " << minChi2 << ", and upper limit " << upperLimit << RESET_COLOR << std::endl;
+   if(lowerLimit >= redChi2Graph->GetPointX(minIndex) || redChi2Graph->GetPointX(minIndex) >= upperLimit) {
+      std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << RESET_COLOR << std::endl;
    }
 
    return std::make_pair(lowerLimit, upperLimit);
