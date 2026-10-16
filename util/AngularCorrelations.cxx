@@ -384,7 +384,7 @@ int main(int argc, char** argv)
    std::ofstream logFile(logFileName.c_str());
 
    // get the pdf file name from the output file name
-   auto          pdfFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".pdf";
+   auto pdfFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".pdf";
 
    // read the number of steps to use for varying the mixing angle
    int numberOfSteps = settings->GetInt("NumberOfMixingAngleSteps", 100);
@@ -700,43 +700,43 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJMiddle.at(0)/2, twoJ/2), true);
+                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJMiddle.at(0) / 2, twoJ / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJMiddle.at(0)/2, twoJ/2));
+                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJMiddle.at(0) / 2, twoJ / 2));
 #endif
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << " - " << twoJMiddle.back() << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJ/2, twoJLow.at(0)/2), true);
+                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJ / 2, twoJLow.at(0) / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJ/2, twoJLow.at(0)/2));
+                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJ / 2, twoJLow.at(0) / 2));
 #endif
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << " - " << twoJHigh.back() << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJHigh) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJ/2, twoJMiddle.at(0)/2, twoJLow.at(0)/2), true);
+                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJ / 2, twoJMiddle.at(0) / 2, twoJLow.at(0) / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJ/2, twoJMiddle.at(0)/2, twoJLow.at(0)/2));
+                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJ / 2, twoJMiddle.at(0) / 2, twoJLow.at(0) / 2));
 #endif
                      dir->cd();
                      parameters.emplace_back();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
@@ -1284,9 +1284,9 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       residual->SetPointError(i, 0., TMath::Sqrt(TMath::Power(data->GetErrorY(i), 2) + TMath::Power(fit->GetErrorY(i), 2)));
    }
 
-   auto*        canvas     = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
-   TMultiGraph* multiGraph = nullptr;
-   TMultiGraph* lowLimitMultiGraph = nullptr;
+   auto*        canvas              = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
+   TMultiGraph* multiGraph          = nullptr;
+   TMultiGraph* lowLimitMultiGraph  = nullptr;
    TMultiGraph* highLimitMultiGraph = nullptr;
 
    if(steps1 == 1 && steps2 == 1) {
