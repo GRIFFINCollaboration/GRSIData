@@ -1009,18 +1009,18 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
       std::cout << DYELLOW << "Warning, the provided minimum reduced chi square (" << minChi2 << ") and the value of the graph at the index with the lowest y-value (" << redChi2Graph->GetPointY(minIndex) << " @ " << minIndex << ") differ." << std::endl;
    }
 
-   double x1 = std::numeric_limits<double>::quiet_NaN();
-   double x2 = std::numeric_limits<double>::quiet_NaN();
-   double y1 = std::numeric_limits<double>::quiet_NaN();
-   double y2 = std::numeric_limits<double>::quiet_NaN();
-   int upperIndex = std::numeric_limits<int>::quiet_NaN();
+   double x1         = std::numeric_limits<double>::quiet_NaN();
+   double x2         = std::numeric_limits<double>::quiet_NaN();
+   double y1         = std::numeric_limits<double>::quiet_NaN();
+   double y2         = std::numeric_limits<double>::quiet_NaN();
+   int    upperIndex = std::numeric_limits<int>::quiet_NaN();
    // find upper limit, we want to find where chi^2 reaches the minimum plus one, but we have the reduced chi^2, so we want to find the minimum plus 1/NDF!
    for(int i = minIndex; 0 < i && i < redChi2Graph->GetN(); ++i) {
       if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
-         x1 = redChi2Graph->GetPointX(i);
-         x2 = redChi2Graph->GetPointX(i - 1);
-         y1 = redChi2Graph->GetPointY(i);
-         y2 = redChi2Graph->GetPointY(i - 1);
+         x1         = redChi2Graph->GetPointX(i);
+         x2         = redChi2Graph->GetPointX(i - 1);
+         y1         = redChi2Graph->GetPointY(i);
+         y2         = redChi2Graph->GetPointY(i - 1);
          upperIndex = i - 1;
          break;
       }
@@ -1031,14 +1031,14 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
    }
 
    // find lower limit
-   x1 = std::numeric_limits<double>::quiet_NaN();
+   x1             = std::numeric_limits<double>::quiet_NaN();
    int lowerIndex = std::numeric_limits<int>::quiet_NaN();
    for(int i = minIndex; redChi2Graph->GetN() > i + 1 && i >= 0; --i) {
       if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
-         x1 = redChi2Graph->GetPointX(i);
-         x2 = redChi2Graph->GetPointX(i + 1);
-         y1 = redChi2Graph->GetPointY(i);
-         y2 = redChi2Graph->GetPointY(i + 1);
+         x1         = redChi2Graph->GetPointX(i);
+         x2         = redChi2Graph->GetPointX(i + 1);
+         y1         = redChi2Graph->GetPointY(i);
+         y2         = redChi2Graph->GetPointY(i + 1);
          lowerIndex = i + 1;
          break;
       }
@@ -1257,28 +1257,28 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
          std::pair<double, double> limitsMidLow = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
          std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         std::vector<const char*> text = { Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
-                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2)) };
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
+         std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
+                                          Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2))};
+         multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else if(steps2 == 1) {
          std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
 
          std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         std::vector<const char*> text = { Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
-                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1)) };
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
+         std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
+                                          Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1))};
+         multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else {
          std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
          std::pair<double, double> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
          std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) high -> mid  " << std::setw(12) << bestMixingAngle1 << ", mid ->low " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         std::vector<const char*> text = { "mixing angle high -> middle",
-                                           Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
-                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1)),
-                                           "mixing angle middle -> low",
-                                           Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
-                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2)) };
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
+         std::vector<const char*> text = {"mixing angle high -> middle",
+                                          Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
+                                          Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1)),
+                                          "mixing angle middle -> low",
+                                          Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
+                                          Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2))};
+         multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       }
    }
 
