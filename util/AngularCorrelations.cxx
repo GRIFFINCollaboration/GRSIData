@@ -30,7 +30,7 @@ struct mixingResult {
    TH2*                   fMixingAnglesHistogram{nullptr};
 };
 
-mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, std::vector<double>& bestParameters, std::ofstream& logFile);
+mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, int numberOfSteps, std::vector<double>& bestParameters, std::ofstream& logFile);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
 bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
@@ -275,12 +275,6 @@ int main(int argc, char** argv)
       }
    }
 
-   // angles to exclude from the fit, we read it quietly and catch any exception from it not being there
-   std::vector<double> excludedAngles;
-   try {
-      excludedAngles = settings->GetDoubleVector("ExcludedAngles", true);
-   } catch(std::out_of_range& e) {}
-
    // the spins of the low, middle, and high levels, to be used for the mixing method
    // two of these need to be vectors of length one (meaning the settings file should have an entry with "name: <value>,"), the third can have a length larger than 1
    std::vector<int> twoJLow    = settings->GetIntVector("TwoJ.Low");
@@ -336,15 +330,30 @@ int main(int argc, char** argv)
       return 1;
    }
 
-   // get the excluded indices from the excluded angles
+   // angles/indices to exclude from the fit, we read it quietly and catch any exception from it not being there
+   std::vector<double> excludedAngles;
+   try {
+      excludedAngles = settings->GetDoubleVector("ExcludedAngles", true);
+   } catch(std::out_of_range& e) {}
    std::vector<int> excludedIndices;
-   for(const auto& angle : excludedAngles) {
-      int index = angles->Index(angle);
-      if(index >= 0) {
-         excludedIndices.push_back(index);
-      } else {
-         std::cout << "Requested to exclude angle " << angle << ", but this angle was not found:" << std::endl;
-         angles->Print();
+   try {
+      excludedIndices = settings->GetIntVector("ExcludedIndices", true);
+   } catch(std::out_of_range& e) {}
+
+   if(!excludedAngles.empty() && !excludedIndices.empty()) {
+      std::cout << DYELLOW << "Warning, both excluded angles and excluded indices provided, only the latter will be used!" << RESET_COLOR << std::endl;
+   }
+
+   // get the excluded indices from the excluded angles
+   if(excludedIndices.empty()) {
+      for(const auto& angle : excludedAngles) {
+         int index = angles->Index(angle);
+         if(index >= 0) {
+            excludedIndices.push_back(index);
+         } else {
+            std::cout << "Requested to exclude angle " << angle << ", but this angle was not found:" << std::endl;
+            angles->Print();
+         }
       }
    }
    // sort the indices just in case someone provided them out of order (removing the points from the theory graphs wouldn't work otherwise)
@@ -373,6 +382,9 @@ int main(int argc, char** argv)
    // get the log file name from the output file name
    auto          logFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".log";
    std::ofstream logFile(logFileName.c_str());
+
+   // read the number of steps to use for varying the mixing angle
+   int numberOfSteps = settings->GetInt("NumberOfMixingAngleSteps", 100);
 
    // --------------------------------------------------------------------------------
    // Create the angular distribution.
@@ -679,7 +691,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
@@ -687,7 +699,7 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
@@ -695,14 +707,14 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJHigh) {
                      parameters.emplace_back();
                      output.cd();
-                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
+                     spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile));
                      spinLabel.push_back(twoJ / 2.);
                   }
                } else {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
                   output.cd();
-                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, parameters.back(), logFile));
+                  spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
                }
 
@@ -825,7 +837,7 @@ private:
    TGraphErrors* fZ4{nullptr};
 };
 
-TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* residual, const std::vector<double>& parameters, const std::vector<double>& errors, const double& redChiSquare, const char* extraText = nullptr)
+TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* residual, const std::vector<double>& parameters, const std::vector<double>& errors, const double& redChiSquare, const std::vector<const char*>& extraText = {})
 {
    /// This function plots the data with the fit and residuals on the currently active canvas.
 
@@ -847,8 +859,8 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
       }
    }
    stats->AddText(Form("#chi^{2}/NDF = %.2f", redChiSquare));
-   if(extraText != nullptr) {
-      stats->AddText(extraText);
+   for(const auto* text : extraText) {
+      stats->AddText(text);
    }
 
    // create canvas and two pads (big one for comparison and small one for residuals)
@@ -996,12 +1008,12 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
    if(std::fabs(minChi2 - redChi2Graph->GetPointY(minIndex)) > 0.001) {
       std::cout << DYELLOW << "Warning, the provided minimum reduced chi square (" << minChi2 << ") and the value of the graph at the index with the lowest y-value (" << redChi2Graph->GetPointY(minIndex) << " @ " << minIndex << ") differ." << std::endl;
    }
-   std::cout << "Calculating limits of mixing angle using minimum reduced chi square " << minChi2 << ", " << degreesOfFreedom << " degrees of freedom, index of best mixing angle " << redChi2Graph->GetPointX(minIndex) << " is " << minIndex << std::endl;
 
    double x1 = std::numeric_limits<double>::quiet_NaN();
    double x2 = std::numeric_limits<double>::quiet_NaN();
    double y1 = std::numeric_limits<double>::quiet_NaN();
    double y2 = std::numeric_limits<double>::quiet_NaN();
+   int upperIndex = std::numeric_limits<int>::quiet_NaN();
    // find upper limit, we want to find where chi^2 reaches the minimum plus one, but we have the reduced chi^2, so we want to find the minimum plus 1/NDF!
    for(int i = minIndex; 0 < i && i < redChi2Graph->GetN(); ++i) {
       if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
@@ -1009,40 +1021,43 @@ std::pair<double, double> FindLimits(TGraph* redChi2Graph, double minChi2, int d
          x2 = redChi2Graph->GetPointX(i - 1);
          y1 = redChi2Graph->GetPointY(i);
          y2 = redChi2Graph->GetPointY(i - 1);
+         upperIndex = i - 1;
          break;
       }
    }
    double upperLimit = std::numeric_limits<double>::quiet_NaN();
    if(!std::isnan(x1)) {
-      upperLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
+      upperLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom) - y1);
    }
-   std::cout << "From points " << x1 << ", " << y1 << " and " << x2 << ", " << y2 << " we get an upper limit of " << upperLimit << std::endl;
 
    // find lower limit
    x1 = std::numeric_limits<double>::quiet_NaN();
+   int lowerIndex = std::numeric_limits<int>::quiet_NaN();
    for(int i = minIndex; redChi2Graph->GetN() > i + 1 && i >= 0; --i) {
       if(redChi2Graph->GetPointY(i) > minChi2 + 1. / static_cast<double>(degreesOfFreedom)) {
          x1 = redChi2Graph->GetPointX(i);
          x2 = redChi2Graph->GetPointX(i + 1);
          y1 = redChi2Graph->GetPointY(i);
          y2 = redChi2Graph->GetPointY(i + 1);
+         lowerIndex = i + 1;
          break;
       }
    }
    double lowerLimit = std::numeric_limits<double>::quiet_NaN();
    if(!std::isnan(x1)) {
-      lowerLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom - y1));
+      lowerLimit = x1 + (x2 - x1) / (y2 - y1) * (minChi2 + 1. / static_cast<double>(degreesOfFreedom) - y1);
    }
-   std::cout << "From points " << x1 << ", " << y1 << " and " << x2 << ", " << y2 << " we get a lower limit of " << lowerLimit << std::endl;
 
    if(lowerLimit >= redChi2Graph->GetPointX(minIndex) || redChi2Graph->GetPointX(minIndex) >= upperLimit) {
-      std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << RESET_COLOR << std::endl;
+      std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best atan of mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << ", indices " << lowerIndex << "/" << minIndex << "/" << upperIndex << RESET_COLOR << std::endl;
+   } else if(upperLimit - lowerLimit < 4) {
+      std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle are very close to the minimum (lower index " << lowerIndex << ", minimum at " << minIndex << ", and upper index " << upperIndex << "), consider increasing the number of steps used to get a better estimate of the mixing angle and it's uncertainties." << RESET_COLOR << std::endl;
    }
 
    return std::make_pair(lowerLimit, upperLimit);
 }
 
-mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, std::vector<double>& bestParameters, std::ofstream& logFile)
+mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, int numberOfSteps, std::vector<double>& bestParameters, std::ofstream& logFile)
 {
    static int index = 0;
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
@@ -1119,12 +1134,12 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
    // mixing for the high-middle transition
    double mixingAngle1Minimum = -TMath::Pi() / 2;
    double mixingAngle1Maximum = TMath::Pi() / 2;
-   int    steps1              = 100;
+   int    steps1              = numberOfSteps;
    double stepSize1           = (mixingAngle1Maximum - mixingAngle1Minimum) / steps1;
    // mixing for the middle-low transition
    double mixingAngle2Minimum = -TMath::Pi() / 2;
    double mixingAngle2Maximum = TMath::Pi() / 2;
-   int    steps2              = 100;
+   int    steps2              = numberOfSteps;
    double stepSize2           = (mixingAngle2Maximum - mixingAngle2Minimum) / steps2;
 
    // if appropriate, constrain the delta values
@@ -1241,19 +1256,29 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       if(steps1 == 1) {
          std::pair<double, double> limitsMidLow = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle1));
+         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::vector<const char*> text = { Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
+                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2)) };
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else if(steps2 == 1) {
          std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1));
+         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::vector<const char*> text = { Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
+                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1)) };
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else {
          std::pair<double, double> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
          std::pair<double, double> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at mixing angle " << std::setw(12) << bestMixingAngle1 << " / " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
-         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, Form("mixing angle 1 = %f (-%f/+%f)\nmixing angle 2 = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1, bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2));
+         std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) high -> mid  " << std::setw(12) << bestMixingAngle1 << ", mid ->low " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::vector<const char*> text = { "mixing angle high -> middle",
+                                           Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - limitsHighMid.first, limitsHighMid.second - bestMixingAngle1),
+                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(limitsHighMid.first), TMath::Tan(limitsHighMid.second) - TMath::Tan(bestMixingAngle1)),
+                                           "mixing angle middle -> low",
+                                           Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - limitsMidLow.first, limitsMidLow.second - bestMixingAngle2),
+                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(limitsMidLow.first), TMath::Tan(limitsMidLow.second) - TMath::Tan(bestMixingAngle2)) };
+         multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       }
    }
 
