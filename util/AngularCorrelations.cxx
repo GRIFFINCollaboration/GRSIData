@@ -75,8 +75,8 @@ int main(int argc, char** argv)
    double      projBgHigh     = -1.;
    double      timeRandomNorm = -1.;
    double      peakPos        = -1.;
-   double      peakLow        = -1.;
-   double      peakHigh       = -1.;
+   double      rangeLow       = -1.;
+   double      rangeHigh      = -1.;
    std::string baseName       = "AngularCorrelation";
    std::string bgName         = baseName + "BG";
    std::string mixedName      = baseName + "Mixed";
@@ -99,8 +99,8 @@ int main(int argc, char** argv)
    parser.option("background-name", &bgName, true).description("Name of backround matrices.").default_value("AngularCorrelationBG");
    parser.option("mixed-name", &mixedName, true).description("Name of mixed matrices.").default_value("AngularCorrelationMixed");
    parser.option("peak-pos peak", &peakPos, true).description("Peak position (for multiple peaks use settings file).");
-   parser.option("peak-low", &peakLow, true).description("Low edge of peak fit.");
-   parser.option("peak-high", &peakHigh, true).description("High edge of peak fit.");
+   parser.option("peak-low", &rangeLow, true).description("Low edge of peak fit range.");
+   parser.option("peak-high", &rangeHigh, true).description("High edge of peak fit range.");
    parser.option("settings", &settingsFile, true).description("Settings file with user settings, these do not overwrite anything provided on command line!");
    parser.option("input", &inputFile, true).description("Input file with gamma-gamma matrices for each angle (coincident, time-random, and event mixed).");
    parser.option("theory", &theoryFile, true).description("File with simulated z0-, z2-, and z4-graphs.");
@@ -154,8 +154,8 @@ int main(int argc, char** argv)
    if(projGateHigh == -1.) { projGateHigh = settings->GetDouble("Projection.High"); }
    if(timeRandomNorm == -1.) { timeRandomNorm = settings->GetDouble("TimeRandomNormalization"); }
    if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
-   if(peakLow == -1.) { peakLow = settings->GetDouble("Peak.Low"); }
-   if(peakHigh == -1.) { peakHigh = settings->GetDouble("Peak.High"); }
+   if(rangeLow == -1.) { rangeLow = settings->GetDouble("FitRange.Low"); }
+   if(rangeHigh == -1.) { rangeHigh = settings->GetDouble("FitRange.High"); }
    if(baseName == "AngularCorrelation") { baseName = settings->GetString("Histograms.BaseName", "AngularCorrelation"); }
    if(bgName == "AngularCorrelationBG") { bgName = settings->GetString("Histograms.BackgroundName", "AngularCorrelationBG"); }
    if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
@@ -167,9 +167,9 @@ int main(int argc, char** argv)
    if(outputFile == "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
-   std::vector<std::tuple<double, double, double>> bgPeakPos;   // position, low, high
-   std::vector<double>                             bgLow;
-   std::vector<double>                             bgHigh;
+   std::vector<double> bgPeakPos;   // position, low, high
+   std::vector<double> bgLow;
+   std::vector<double> bgHigh;
    // we only fill the background gates from the settings if there were none provided on the command line
    if(projBgLow == -1. || projBgHigh == -1. || projBgLow >= projBgHigh) {
       for(int i = 1;; ++i) {
@@ -195,39 +195,40 @@ int main(int argc, char** argv)
    for(int i = 1;; ++i) {
       try {
          auto pos = settings->GetDouble(Form("Background.Peak.%d.Position", i), true);
-         if(pos <= peakLow || pos >= peakHigh) {
-            std::cout << i << ". background peak outside of fit range: " << pos << " <= " << peakLow << " or " << pos << " >= " << peakHigh << std::endl;
+         if(pos <= rangeLow || pos >= rangeHigh) {
+            std::cout << i << ". background peak outside of fit range: " << pos << " <= " << rangeLow << " or " << pos << " >= " << rangeHigh << std::endl;
             break;
          }
-         // read low and high limit for this background peak, defaults to -1 if not set in the settings file
-         auto low  = settings->GetDouble(Form("Background.Peak.%d.Low", i), -1.);
-         auto high = settings->GetDouble(Form("Background.Peak.%d.High", i), -1.);
-         bgPeakPos.emplace_back(pos, low, high);
+         bgPeakPos.push_back(pos);
       } catch(std::out_of_range&) {
          break;
       }
    }
    // event mixed background-peak position can only be set via settings file (we expect only one additional peak)
-   double mixedBackgroundPeakPosition = settings->GetDouble("Mixed.Background.Peak.Position", std::numeric_limits<double>::quiet_NaN());
-   double mixedBackgroundPeakLow      = settings->GetDouble("Mixed.Background.Peak.Low", std::numeric_limits<double>::quiet_NaN());
-   double mixedBackgroundPeakHigh     = settings->GetDouble("Mixed.Background.Peak.High", std::numeric_limits<double>::quiet_NaN());
+   double mixedPeakPosition = settings->GetDouble("Mixed.Peak.Position", std::numeric_limits<double>::quiet_NaN());
 
-   // parameter limits and fixed parameters for the peak and the background peaks
+   // parameter limits and fixed parameters for the peak, mixed peak, and the background peaks
    // if the limits are the same, the parameter is fixed to that value, if the high limit is lower than the low limit there is no limit
    // right now we are hard coded to use TRWPeaks which have 6 parameters
    std::vector<double> peakParameter(6, -2.);
    std::vector<double> peakParameterLow(6, 0.);
    std::vector<double> peakParameterHigh(6, -1.);
+   std::vector<double> mixedPeakParameter(6, -2.);
+   std::vector<double> mixedPeakParameterLow(6, 0.);
+   std::vector<double> mixedPeakParameterHigh(6, -1.);
    std::vector<double> bgPeakParameter(6, -2.);
    std::vector<double> bgPeakParameterLow(6, 0.);
    std::vector<double> bgPeakParameterHigh(6, -1.);
    for(size_t i = 0; i < peakParameterLow.size(); ++i) {
-      peakParameter[i]       = settings->GetDouble(Form("Peak.Parameter.%d", static_cast<int>(i)), -2.);
-      peakParameterLow[i]    = settings->GetDouble(Form("Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      peakParameterHigh[i]   = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
-      bgPeakParameter[i]     = settings->GetDouble(Form("Background.Peak.Parameter.%d", static_cast<int>(i)), -2.);
-      bgPeakParameterLow[i]  = settings->GetDouble(Form("Background.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      bgPeakParameterHigh[i] = settings->GetDouble(Form("Background.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
+      peakParameter[i]          = settings->GetDouble(Form("Peak.Parameter.%d", static_cast<int>(i)), -2.);
+      peakParameterLow[i]       = settings->GetDouble(Form("Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
+      peakParameterHigh[i]      = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
+      mixedPeakParameter[i]     = settings->GetDouble(Form("Mixed.Peak.Parameter.%d", static_cast<int>(i)), -2.);
+      mixedPeakParameterLow[i]  = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
+      mixedPeakParameterHigh[i] = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
+      bgPeakParameter[i]        = settings->GetDouble(Form("Background.Peak.Parameter.%d", static_cast<int>(i)), -2.);
+      bgPeakParameterLow[i]     = settings->GetDouble(Form("Background.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
+      bgPeakParameterHigh[i]    = settings->GetDouble(Form("Background.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
       // check that the result makes sense, i.e. if the limits are in the righ order that the parameter itself is within the limits
       // only output a warning that the parameter is changed if it's not the default value
       if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
@@ -235,6 +236,12 @@ int main(int argc, char** argv)
          if(output) { std::cout << "Warning, " << i << ". peak parameter (" << peakParameter[i] << ") is out of range " << peakParameterLow[i] << " - " << peakParameterHigh[i] << ", resetting it to "; }
          peakParameter[i] = (peakParameterHigh[i] + peakParameterLow[i]) / 2.;
          if(output) { std::cout << peakParameter[i] << std::endl; }
+      }
+      if(mixedPeakParameterLow[i] <= mixedPeakParameterHigh[i] && (mixedPeakParameter[i] < mixedPeakParameterLow[i] || mixedPeakParameterHigh[i] < mixedPeakParameter[i])) {
+         bool output = mixedPeakParameter[i] != -2.;
+         if(output) { std::cout << "Warning, " << i << ". peak parameter (" << mixedPeakParameter[i] << ") is out of range " << mixedPeakParameterLow[i] << " - " << mixedPeakParameterHigh[i] << ", resetting it to "; }
+         mixedPeakParameter[i] = (mixedPeakParameterHigh[i] + mixedPeakParameterLow[i]) / 2.;
+         if(output) { std::cout << mixedPeakParameter[i] << std::endl; }
       }
       if(bgPeakParameterLow[i] <= bgPeakParameterHigh[i] && (bgPeakParameter[i] < bgPeakParameterLow[i] || bgPeakParameterHigh[i] < bgPeakParameter[i])) {
          bool output = bgPeakParameter[i] != -2.;
@@ -295,14 +302,14 @@ int main(int argc, char** argv)
       return 1;
    }
 
-   if(peakLow >= peakHigh) {
-      std::cerr << "Need a fit range with a low edge that is smaller than the high edge, " << peakLow << " >= " << peakHigh << std::endl;
+   if(rangeLow >= rangeHigh) {
+      std::cerr << "Need a fit range with a low edge that is smaller than the high edge, " << rangeLow << " >= " << rangeHigh << std::endl;
       std::cout << parser << std::endl;
       return 1;
    }
 
-   if(peakPos >= peakHigh || peakPos <= peakLow) {
-      std::cerr << "Need a peak within the fit range, " << peakPos << " not within " << peakLow << " - " << peakHigh << std::endl;
+   if(peakPos >= rangeHigh || peakPos <= rangeLow) {
+      std::cerr << "Need a peak within the fit range, " << peakPos << " not within " << rangeLow << " - " << rangeHigh << std::endl;
       std::cout << parser << std::endl;
       return 1;
    }
@@ -387,7 +394,7 @@ int main(int argc, char** argv)
    auto          pdfFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".pdf";
 
    // read the number of steps to use for varying the mixing angle
-   int numberOfSteps = settings->GetInt("NumberOfMixingAngleSteps", 100);
+   int numberOfSteps = settings->GetInt("NumberOfMixingAngleSteps", 1000);
 
    // --------------------------------------------------------------------------------
    // Create the angular distribution.
@@ -483,7 +490,7 @@ int main(int argc, char** argv)
 
       // fit the projections, we create separate peak fitters and peaks for the prompt and mixed histograms
 
-      TPeakFitter pf(peakLow, peakHigh);
+      TPeakFitter pf(rangeLow, rangeHigh);
       TRWPeak     peak(peakPos);
       for(size_t p = 0; p < peakParameterLow.size(); ++p) {
          if(peakParameterLow[p] == peakParameterHigh[p]) {
@@ -495,11 +502,7 @@ int main(int argc, char** argv)
       }
       pf.AddPeak(&peak);
       for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(std::get<0>(bgPeak));
-         // if we have limits for the position of this peak, apply them
-         if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
-            bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
-         }
+         auto* bgP = new TRWPeak(bgPeak);
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -529,7 +532,7 @@ int main(int argc, char** argv)
               << std::setw(10) << peak.FWHM() << " +- " << std::setw(10) << peak.FWHMErr() << "    "
               << std::setw(10) << peak.GetReducedChi2() << std::endl;
 
-      TPeakFitter pfMixed(peakLow, peakHigh);
+      TPeakFitter pfMixed(rangeLow, rangeHigh);
       TRWPeak     peakMixed(peakPos);
       for(size_t p = 0; p < peakParameterLow.size(); ++p) {
          if(peakParameterLow[p] == peakParameterHigh[p]) {
@@ -541,11 +544,7 @@ int main(int argc, char** argv)
       }
       pfMixed.AddPeak(&peakMixed);
       for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(std::get<0>(bgPeak));
-         // if we have limits for the position of this peak, apply them
-         if(std::get<1>(bgPeak) != -1. && std::get<2>(bgPeak) != -1. && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
-            bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
-         }
+         auto* bgP = new TRWPeak(bgPeak);
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -557,17 +556,19 @@ int main(int argc, char** argv)
          pfMixed.AddPeak(bgP);
       }
       // if we have an extra background peak for the mixed spectra, add it now
-      if(!std::isnan(mixedBackgroundPeakPosition)) {
-         auto* mixedPeak = new TRWPeak(mixedBackgroundPeakPosition);
-         if(!std::isnan(mixedBackgroundPeakLow) && !std::isnan(mixedBackgroundPeakHigh)) {
-            if(mixedBackgroundPeakLow == mixedBackgroundPeakHigh) {
-               mixedPeak->GetFitFunction()->FixParameter(1, mixedBackgroundPeakLow);
-            } else if(mixedBackgroundPeakLow < mixedBackgroundPeakHigh) {
-               mixedPeak->GetFitFunction()->SetParLimits(1, mixedBackgroundPeakLow, mixedBackgroundPeakHigh);
+      if(!std::isnan(mixedPeakPosition)) {
+         TRWPeak mixedPeak(mixedPeakPosition);
+         for(size_t p = 0; p < mixedPeakParameterLow.size(); ++p) {
+            if(mixedPeakParameterLow[p] == mixedPeakParameterHigh[p]) {
+               mixedPeak.GetFitFunction()->FixParameter(p, mixedPeakParameter[p]);
+            } else if(mixedPeakParameterLow[p] < mixedPeakParameterHigh[p]) {
+               mixedPeak.GetFitFunction()->SetParameter(p, mixedPeakParameter[p]);
+               mixedPeak.GetFitFunction()->SetParLimits(p, mixedPeakParameterLow[p], mixedPeakParameterHigh[p]);
             }
          }
-         pfMixed.AddPeak(mixedPeak);
+         pfMixed.AddPeak(&mixedPeak);
       }
+      // set background parameters
       for(size_t p = 0; p < backgroundParameterLow.size(); ++p) {
          if(backgroundParameterLow[p] == backgroundParameterHigh[p]) {
             pfMixed.GetBackground()->FixParameter(p, backgroundParameter[p]);
@@ -1088,7 +1089,7 @@ std::tuple<double, double, int, int> FindLimits(TGraph* redChi2Graph, double min
 
    if(lowerLimit >= redChi2Graph->GetPointX(minIndex) || redChi2Graph->GetPointX(minIndex) >= upperLimit) {
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best atan of mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << ", indices " << lowerIndex << "/" << minIndex << "/" << upperIndex << RESET_COLOR << std::endl;
-   } else if(upperLimit - lowerLimit < 4) {
+   } else if(std::abs(upperIndex - lowerIndex) < 4) { // probably don't need the abs?
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle are very close to the minimum (lower index " << lowerIndex << ", minimum at " << minIndex << ", and upper index " << upperIndex << "), consider increasing the number of steps (parameter \"NumberOfMixingAngleSteps\") used to get a better estimate of the mixing angle and it's uncertainties." << RESET_COLOR << std::endl;
    }
 
