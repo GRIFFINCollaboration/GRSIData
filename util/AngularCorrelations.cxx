@@ -403,6 +403,8 @@ int main(int argc, char** argv)
    // Create the angular distribution.
    // --------------------------------------------------------------------------------
 
+   gErrorIgnoreLevel = kError;
+
    // open output file and create graphs
    TFile output(outputFile.c_str(), "recreate");
 
@@ -593,11 +595,11 @@ int main(int argc, char** argv)
          pfMixed.Fit(projMixed, "qretryfit");
       }
 
-      logFile << std::setw(2) << i << "    m    "
-              << std::setw(8) << peakMixed.Centroid() << " +- " << std::setw(8) << peakMixed.CentroidErr() << "        "
-              << std::setw(8) << peakMixed.Area() << " +- " << std::setw(8) << peakMixed.AreaErr() << "    "
-              << std::setw(8) << peakMixed.FWHM() << " +- " << std::setw(8) << peakMixed.FWHMErr() << "    "
-              << std::setw(8) << peakMixed.GetReducedChi2() << std::endl;
+      logFile << std::setw(2) << i << "    m  "
+              << std::setw(10) << peakMixed.Centroid() << " +- " << std::setw(10) << peakMixed.CentroidErr() << "        "
+              << std::setw(10) << peakMixed.Area() << " +- " << std::setw(10) << peakMixed.AreaErr() << "    "
+              << std::setw(10) << peakMixed.FWHM() << " +- " << std::setw(10) << peakMixed.FWHMErr() << "    "
+              << std::setw(10) << peakMixed.GetReducedChi2() << std::endl;
 
       // save the fitted histograms to the output file and the areas of the peaks
       fitDir->cd();
@@ -886,13 +888,15 @@ TMultiGraph* CreateMultigraph(TGraphErrors* data, TGraphErrors* fit)
    fit->SetLineColor(kRed);
    fit->SetFillColor(kRed);
    fit->SetMarkerColor(kRed);
+   fit->GetXaxis()->SetLimits(0., 180.);
    multiGraph->Add(fit, "l3");   // 3 = filled contour between upper and lower error bars
    data->SetMarkerStyle(kFullDotLarge);
+   data->GetXaxis()->SetLimits(0., 180.);
    multiGraph->Add(data, "p");
 
    multiGraph->SetTitle(";;Normalized Counts;");
 
-   multiGraph->GetXaxis()->SetRangeUser(0., 180.);
+   multiGraph->GetXaxis()->SetLimits(0., 180.);
 
    multiGraph->GetYaxis()->CenterTitle();
    multiGraph->GetYaxis()->SetTitleSize(0.05);
@@ -948,7 +952,11 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
 
    auto* multiGraph = CreateMultigraph(data, fit);
 
+   multiGraph->GetXaxis()->SetLimits(0., 180.);
    multiGraph->Draw("a");
+   multiGraph->GetXaxis()->SetLimits(0., 180.);
+   gPad->Modified();
+   gPad->Update();
 
    stats->Draw();
 
@@ -959,7 +967,7 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    residual->GetXaxis()->CenterTitle();
    residual->GetXaxis()->SetTitleSize(0.1);
    residual->GetXaxis()->SetLabelSize(0.1);
-   residual->GetXaxis()->SetRangeUser(0., 180.);
+   residual->GetXaxis()->SetLimits(0., 180.);
 
    residual->GetYaxis()->CenterTitle();
    residual->GetYaxis()->SetTitleSize(0.1);
@@ -1100,7 +1108,7 @@ std::tuple<double, double, int, int> FindLimits(TGraph* redChi2Graph, double min
 
    if(lowerLimit >= redChi2Graph->GetPointX(minIndex) || redChi2Graph->GetPointX(minIndex) >= upperLimit) {
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best atan of mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << ", indices " << lowerIndex << "/" << minIndex << "/" << upperIndex << RESET_COLOR << std::endl;
-   } else if(std::abs(upperIndex - lowerIndex) < 4) { // probably don't need the abs?
+   } else if(std::abs(upperIndex - lowerIndex) < 4 && minChi2 < 5.) { // probably don't need the abs?
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle are very close to the minimum (lower index " << lowerIndex << ", minimum at " << minIndex << ", and upper index " << upperIndex << "), consider increasing the number of steps (parameter \"NumberOfMixingAngleSteps\") used to get a better estimate of the mixing angle and it's uncertainties." << RESET_COLOR << std::endl;
    }
 
@@ -1111,7 +1119,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 {
    static int index = 0;
    logFile << "# high 2J " << twoJhigh << ", middle 2J " << twoJmid << ", low 2J " << twoJlow << std::endl;
-   logFile << "#       a0        a2        a4        red.chi^2 chi^2" << std::endl;
+   logFile << "# atan(delta1)  atan(delta2)          a0         a2         a4  red.chi^2      chi^2" << std::endl;
    mixingResult      result;
    Ac                ac(data, z0, z2, z4);
    ROOT::Fit::Fitter fitter;
@@ -1271,7 +1279,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
             bestMixingAngle1 = mixangle1;
             bestMixingAngle2 = mixangle2;
          }
-         logFile << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << chi2 << " " << std::setw(10) << fitResult.MinFcnValue() << std::endl;
+         logFile << std::setw(14) << mixangle1 << std::setw(14) << mixangle2 << std::setw(12) << fitResult.Parameter(0) << " " << std::setw(10) << a2 << " " << std::setw(10) << a4 << " " << std::setw(10) << chi2 << " " << std::setw(10) << fitResult.MinFcnValue() << std::endl;
       }
    }   // end of fitting loops
 
@@ -1298,8 +1306,6 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 
    auto*        canvas     = new TCanvas(Form("Canvas%d_%d_%d", twoJhigh / 2, twoJmid / 2, twoJlow / 2));
    TMultiGraph* multiGraph = nullptr;
-   TMultiGraph* lowLimitMultiGraph = nullptr;
-   TMultiGraph* highLimitMultiGraph = nullptr;
 
    if(steps1 == 1 && steps2 == 1) {
       std::cout << "Analyzed cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": red. chi^2 " << std::setw(12) << minChi2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
@@ -1308,14 +1314,14 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       if(steps1 == 1) {
          std::tuple<double, double, int, int> limitsMidLow = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied second mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - std::get<0>(limitsMidLow), std::get<1>(limitsMidLow) - bestMixingAngle2),
                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(std::get<0>(limitsMidLow)), TMath::Tan(std::get<1>(limitsMidLow)) - TMath::Tan(bestMixingAngle2))};
          multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else if(steps2 == 1) {
          std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied first mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - std::get<0>(limitsHighMid), std::get<1>(limitsHighMid) - bestMixingAngle1),
                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(std::get<0>(limitsHighMid)), TMath::Tan(std::get<1>(limitsHighMid)) - TMath::Tan(bestMixingAngle1))};
          multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
@@ -1323,7 +1329,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
          std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
          std::tuple<double, double, int, int> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
 
-         std::cout << "Varied both mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(mixing angle) high -> mid  " << std::setw(12) << bestMixingAngle1 << ", mid ->low " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
+         std::cout << "Varied mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) high -> mid  " << std::setw(12) << bestMixingAngle1 << ", mid ->low " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {"mixing angle high -> middle",
                                           Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - std::get<0>(limitsHighMid), std::get<1>(limitsHighMid) - bestMixingAngle1),
                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(std::get<0>(limitsHighMid)), TMath::Tan(std::get<1>(limitsHighMid)) - TMath::Tan(bestMixingAngle1)),
@@ -1352,7 +1358,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
    //assert(data->GetN() == z0->GetN());
    //assert(data->GetN() == z2->GetN());
    //assert(data->GetN() == z4->GetN());
-   // create a copy of the data with cos(theta) as x-axis and fit it with a legenre polynomial
+   // create a copy of the data with cos(theta) as x-axis and fit it with a legendre polynomial
    // this is to get initial conditions for our fit
    auto* cosTheta = new TGraphErrors(*data);
    auto* x        = cosTheta->GetX();
@@ -1360,8 +1366,8 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
       x[i] = TMath::Cos(x[i] / 180. * TMath::Pi());
    }
 
-   int   nPar     = 3;
-   auto* legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
+   const int nPar     = 3;
+   auto*     legendre = new TF1("legendre", TGRSIFunctions::LegendrePolynomial, -1., 1., nPar);
    legendre->SetParNames("a_{0}", "a_{2}", "a_{4}");
    legendre->SetParameters(1., 0.5, 0.5);
    cosTheta->Fit(legendre, "QN0");
@@ -1371,11 +1377,12 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
    ROOT::Fit::Fitter fitter;
    fitter.SetFCN(nPar, ac);
    // this is a good guess for the initial scale
-   fitter.Config().ParSettings(0) = ROOT::Fit::ParameterSettings("a_{0}", data->GetMaximum() / z0->GetMaximum(), 0.0001, -10., 10.);
+   fitter.Config().ParSettings(0) = ROOT::Fit::ParameterSettings("a_{0}", TMath::MaxElement(data->GetN(), data->GetY()) / TMath::MaxElement(z0->GetN(), z0->GetY()), 0.0001, -10., 10.);
    for(int i = 1; i < nPar; ++i) {
       // parameter settings arguments are parameter name, initial value, step size, minimum, and maximum
       fitter.Config().ParSettings(i) = ROOT::Fit::ParameterSettings(Form("a_{%d}", 2 * i), legendre->GetParameter(i), 0.0001, -10., 10.);
    }
+
    fitter.Config().MinimizerOptions().SetPrintLevel(0);
    fitter.Config().SetMinimizer("Minuit2", "Migrad");   // or simplex?
    if(!fitter.FitFCN()) {
@@ -1386,7 +1393,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
    // get the fit result and print chi^2 and parameters
    auto fitResult = fitter.Result();
    // MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
-   std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << std::endl;
+   std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << " = " << fitResult.MinFcnValue() <<" / " << (ac.Np() - fitResult.NFreeParameters()) << std::endl;
    auto parameters = fitResult.Parameters();
    auto errors     = fitResult.Errors();
    std::cout << "Parameters a_0: " << parameters[0] << " +- " << errors[0] << ", a_2: " << parameters[1] << " +- " << errors[1] << ", a_4: " << parameters[2] << " +- " << errors[2] << std::endl;
