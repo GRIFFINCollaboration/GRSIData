@@ -69,14 +69,14 @@ int main(int argc, char** argv)
 
    // input parameters
    bool        help           = false;
-   double      projGateLow    = -1.;
-   double      projGateHigh   = -1.;
-   double      projBgLow      = -1.;
-   double      projBgHigh     = -1.;
-   double      timeRandomNorm = -1.;
-   double      peakPos        = -1.;
-   double      rangeLow       = -1.;
-   double      rangeHigh      = -1.;
+   double      projGateLow    = std::numeric_limits<double>::quiet_NaN();
+   double      projGateHigh   = std::numeric_limits<double>::quiet_NaN();
+   double      projBgLow      = std::numeric_limits<double>::quiet_NaN();
+   double      projBgHigh     = std::numeric_limits<double>::quiet_NaN();
+   double      timeRandomNorm = std::numeric_limits<double>::quiet_NaN();
+   double      peakPos        = std::numeric_limits<double>::quiet_NaN();
+   double      rangeLow       = std::numeric_limits<double>::quiet_NaN();
+   double      rangeHigh      = std::numeric_limits<double>::quiet_NaN();
    std::string baseName       = "AngularCorrelation";
    std::string bgName         = baseName + "BG";
    std::string mixedName      = baseName + "Mixed";
@@ -150,12 +150,12 @@ int main(int argc, char** argv)
    }
 
    // set all variables from settings if they haven't been set from command line
-   if(projGateLow == -1.) { projGateLow = settings->GetDouble("Projection.Low"); }
-   if(projGateHigh == -1.) { projGateHigh = settings->GetDouble("Projection.High"); }
-   if(timeRandomNorm == -1.) { timeRandomNorm = settings->GetDouble("TimeRandomNormalization"); }
-   if(peakPos == -1.) { peakPos = settings->GetDouble("Peak.Position"); }
-   if(rangeLow == -1.) { rangeLow = settings->GetDouble("FitRange.Low"); }
-   if(rangeHigh == -1.) { rangeHigh = settings->GetDouble("FitRange.High"); }
+   if(std::isnan(projGateLow)) { projGateLow = settings->GetDouble("Projection.Low"); }
+   if(std::isnan(projGateHigh)) { projGateHigh = settings->GetDouble("Projection.High"); }
+   if(std::isnan(timeRandomNorm)) { timeRandomNorm = settings->GetDouble("TimeRandomNormalization"); }
+   if(std::isnan(peakPos)) { peakPos = settings->GetDouble("Peak.Position"); }
+   if(std::isnan(rangeLow)) { rangeLow = settings->GetDouble("FitRange.Low"); }
+   if(std::isnan(rangeHigh)) { rangeHigh = settings->GetDouble("FitRange.High"); }
    if(baseName == "AngularCorrelation") { baseName = settings->GetString("Histograms.BaseName", "AngularCorrelation"); }
    if(bgName == "AngularCorrelationBG") { bgName = settings->GetString("Histograms.BackgroundName", "AngularCorrelationBG"); }
    if(mixedName == "AngularCorrelationMixed") { mixedName = settings->GetString("Histograms.MixedName", "AngularCorrelationMixed"); }
@@ -167,11 +167,11 @@ int main(int argc, char** argv)
    if(outputFile == "AngularCorrelations.root") { outputFile = settings->GetString("Output", "AngularCorrelations.root"); }
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
-   std::vector<double> bgPeakPos;   // position, low, high
+   std::vector<std::tuple<double, double, double>> bgPeakPos;   // position, low, high
    std::vector<double> bgLow;
    std::vector<double> bgHigh;
    // we only fill the background gates from the settings if there were none provided on the command line
-   if(projBgLow == -1. || projBgHigh == -1. || projBgLow >= projBgHigh) {
+   if(std::isnan(projBgLow) || std::isnan(projBgHigh) || projBgLow >= projBgHigh) {
       for(int i = 1;; ++i) {
          try {
             auto low  = settings->GetDouble(Form("Background.%d.Low", i), true);
@@ -199,7 +199,10 @@ int main(int argc, char** argv)
             std::cout << i << ". background peak outside of fit range: " << pos << " <= " << rangeLow << " or " << pos << " >= " << rangeHigh << std::endl;
             break;
          }
-         bgPeakPos.push_back(pos);
+         // read low and high limit for this background peak, defaults to NaN if not set in the settings file
+         auto low  = settings->GetDouble(Form("Background.Peak.%d.Low", i), std::numeric_limits<double>::quiet_NaN());
+         auto high = settings->GetDouble(Form("Background.Peak.%d.High", i), std::numeric_limits<double>::quiet_NaN());
+         bgPeakPos.emplace_back(pos, low, high);
       } catch(std::out_of_range&) {
          break;
       }
@@ -210,47 +213,47 @@ int main(int argc, char** argv)
    // parameter limits and fixed parameters for the peak, mixed peak, and the background peaks
    // if the limits are the same, the parameter is fixed to that value, if the high limit is lower than the low limit there is no limit
    // right now we are hard coded to use TRWPeaks which have 6 parameters
-   std::vector<double> peakParameter(6, -2.);
-   std::vector<double> peakParameterLow(6, 0.);
-   std::vector<double> peakParameterHigh(6, -1.);
-   std::vector<double> mixedPeakParameter(6, -2.);
-   std::vector<double> mixedPeakParameterLow(6, 0.);
-   std::vector<double> mixedPeakParameterHigh(6, -1.);
-   std::vector<double> bgPeakParameter(6, -2.);
-   std::vector<double> bgPeakParameterLow(6, 0.);
-   std::vector<double> bgPeakParameterHigh(6, -1.);
+   std::vector<double> peakParameter(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> peakParameterLow(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> peakParameterHigh(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> mixedPeakParameter(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> mixedPeakParameterLow(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> mixedPeakParameterHigh(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> bgPeakParameter(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> bgPeakParameterLow(6, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> bgPeakParameterHigh(6, std::numeric_limits<double>::quiet_NaN());
    for(size_t i = 0; i < peakParameterLow.size(); ++i) {
-      peakParameter[i]          = settings->GetDouble(Form("Peak.Parameter.%d", static_cast<int>(i)), -2.);
-      peakParameterLow[i]       = settings->GetDouble(Form("Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      peakParameterHigh[i]      = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
-      mixedPeakParameter[i]     = settings->GetDouble(Form("Mixed.Peak.Parameter.%d", static_cast<int>(i)), -2.);
-      mixedPeakParameterLow[i]  = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      mixedPeakParameterHigh[i] = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
-      bgPeakParameter[i]        = settings->GetDouble(Form("Background.Peak.Parameter.%d", static_cast<int>(i)), -2.);
-      bgPeakParameterLow[i]     = settings->GetDouble(Form("Background.Peak.Parameter.%d.Low", static_cast<int>(i)), 0.);
-      bgPeakParameterHigh[i]    = settings->GetDouble(Form("Background.Peak.Parameter.%d.High", static_cast<int>(i)), -1.);
+      peakParameter[i]          = settings->GetDouble(Form("Peak.Parameter.%d", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      peakParameterLow[i]       = settings->GetDouble(Form("Peak.Parameter.%d.Low", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      peakParameterHigh[i]      = settings->GetDouble(Form("Peak.Parameter.%d.High", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      mixedPeakParameter[i]     = settings->GetDouble(Form("Mixed.Peak.Parameter.%d", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      mixedPeakParameterLow[i]  = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.Low", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      mixedPeakParameterHigh[i] = settings->GetDouble(Form("Mixed.Peak.Parameter.%d.High", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      bgPeakParameter[i]        = settings->GetDouble(Form("Background.Peak.Parameter.%d", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      bgPeakParameterLow[i]     = settings->GetDouble(Form("Background.Peak.Parameter.%d.Low", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
+      bgPeakParameterHigh[i]    = settings->GetDouble(Form("Background.Peak.Parameter.%d.High", static_cast<int>(i)), std::numeric_limits<double>::quiet_NaN());
       // check that the result makes sense, i.e. if the limits are in the righ order that the parameter itself is within the limits
       // only output a warning that the parameter is changed if it's not the default value
       if(peakParameterLow[i] <= peakParameterHigh[i] && (peakParameter[i] < peakParameterLow[i] || peakParameterHigh[i] < peakParameter[i])) {
-         bool output = peakParameter[i] != -2.;
+         bool output = !std::isnan(peakParameter[i]);
          if(output) { std::cout << "Warning, " << i << ". peak parameter (" << peakParameter[i] << ") is out of range " << peakParameterLow[i] << " - " << peakParameterHigh[i] << ", resetting it to "; }
          peakParameter[i] = (peakParameterHigh[i] + peakParameterLow[i]) / 2.;
          if(output) { std::cout << peakParameter[i] << std::endl; }
       }
       if(mixedPeakParameterLow[i] <= mixedPeakParameterHigh[i] && (mixedPeakParameter[i] < mixedPeakParameterLow[i] || mixedPeakParameterHigh[i] < mixedPeakParameter[i])) {
-         bool output = mixedPeakParameter[i] != -2.;
+         bool output = !std::isnan(mixedPeakParameter[i]);
          if(output) { std::cout << "Warning, " << i << ". peak parameter (" << mixedPeakParameter[i] << ") is out of range " << mixedPeakParameterLow[i] << " - " << mixedPeakParameterHigh[i] << ", resetting it to "; }
          mixedPeakParameter[i] = (mixedPeakParameterHigh[i] + mixedPeakParameterLow[i]) / 2.;
          if(output) { std::cout << mixedPeakParameter[i] << std::endl; }
       }
       if(bgPeakParameterLow[i] <= bgPeakParameterHigh[i] && (bgPeakParameter[i] < bgPeakParameterLow[i] || bgPeakParameterHigh[i] < bgPeakParameter[i])) {
-         bool output = bgPeakParameter[i] != -2.;
+         bool output = !std::isnan(bgPeakParameter[i]);
          if(output) { std::cout << "Warning, " << i << ". background peak parameter (" << bgPeakParameter[i] << ") is out of range " << bgPeakParameterLow[i] << " - " << bgPeakParameterHigh[i] << ", resetting it to "; }
          bgPeakParameter[i] = (bgPeakParameterHigh[i] + bgPeakParameterLow[i]) / 2.;
          if(output) { std::cout << bgPeakParameter[i] << std::endl; }
       }
       // if we don't have limits for the peak position, fix it
-      if(i == 1 && peakParameterLow[i] == 0. && peakParameterHigh[i] == -1.) {
+      if(i == 1 && std::isnan(peakParameterLow[i]) && std::isnan(peakParameterHigh[i])) {
          peakParameter[i]     = peakPos;
          peakParameterLow[i]  = peakPos;
          peakParameterHigh[i] = peakPos;
@@ -258,24 +261,24 @@ int main(int argc, char** argv)
    }
    // parameter limits for the background (A + B*(x-o) + C*(x-o)^2)
    // same idea as above, lower limit = higher limit means fixed parameter, higher limit < lower limit means parameter not set
-   std::vector<double> backgroundParameter(4, -2.);
-   std::vector<double> backgroundParameterLow(4, 0.);
-   std::vector<double> backgroundParameterHigh(4, -1.);
-   backgroundParameter[0]     = settings->GetDouble("Background.Offset", -2.);
-   backgroundParameterLow[0]  = settings->GetDouble("Background.Offset.Low", 0.);
-   backgroundParameterHigh[0] = settings->GetDouble("Background.Offset.High", -1.);
-   backgroundParameter[1]     = settings->GetDouble("Background.Linear", -2.);
-   backgroundParameterLow[1]  = settings->GetDouble("Background.Linear.Low", 0.);
-   backgroundParameterHigh[1] = settings->GetDouble("Background.Linear.High", -1.);
-   backgroundParameter[2]     = settings->GetDouble("Background.Quadratic", -2.);
-   backgroundParameterLow[2]  = settings->GetDouble("Background.Quadratic.Low", 0.);
-   backgroundParameterHigh[2] = settings->GetDouble("Background.Quadratic.High", -1.);
-   backgroundParameter[3]     = settings->GetDouble("Background.Xoffset", -2.);
-   backgroundParameterLow[3]  = settings->GetDouble("Background.Xoffset.Low", 0.);
-   backgroundParameterHigh[3] = settings->GetDouble("Background.Xoffset.High", -1.);
+   std::vector<double> backgroundParameter(4, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> backgroundParameterLow(4, std::numeric_limits<double>::quiet_NaN());
+   std::vector<double> backgroundParameterHigh(4, std::numeric_limits<double>::quiet_NaN());
+   backgroundParameter[0]     = settings->GetDouble("Background.Offset", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterLow[0]  = settings->GetDouble("Background.Offset.Low", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterHigh[0] = settings->GetDouble("Background.Offset.High", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameter[1]     = settings->GetDouble("Background.Linear", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterLow[1]  = settings->GetDouble("Background.Linear.Low", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterHigh[1] = settings->GetDouble("Background.Linear.High", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameter[2]     = settings->GetDouble("Background.Quadratic", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterLow[2]  = settings->GetDouble("Background.Quadratic.Low", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterHigh[2] = settings->GetDouble("Background.Quadratic.High", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameter[3]     = settings->GetDouble("Background.Xoffset", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterLow[3]  = settings->GetDouble("Background.Xoffset.Low", std::numeric_limits<double>::quiet_NaN());
+   backgroundParameterHigh[3] = settings->GetDouble("Background.Xoffset.High", std::numeric_limits<double>::quiet_NaN());
    for(size_t i = 0; i < backgroundParameter.size(); ++i) {
       if(backgroundParameterLow[i] <= backgroundParameterHigh[i] && (backgroundParameter[i] < backgroundParameterLow[i] || backgroundParameterHigh[i] < backgroundParameter[i])) {
-         bool output = backgroundParameter[i] != -2.;
+         bool output = !std::isnan(backgroundParameter[i]);
          if(output) { std::cout << "Warning, " << i << ". background parameter (" << backgroundParameter[i] << ") is out of range " << backgroundParameterLow[i] << " - " << backgroundParameterHigh[i] << ", resetting it to "; }
          backgroundParameter[i] = (backgroundParameterHigh[i] + backgroundParameterLow[i]) / 2.;
          if(output) { std::cout << backgroundParameter[i] << std::endl; }
@@ -501,8 +504,8 @@ int main(int argc, char** argv)
          }
       }
       pf.AddPeak(&peak);
-      for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(bgPeak);
+      for(auto bgPeak : bgPeakPos) { // pos, low, high
+         auto* bgP = new TRWPeak(std::get<0>(bgPeak));
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
                bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
@@ -510,6 +513,10 @@ int main(int argc, char** argv)
                bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
                bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
             }
+         }
+         // if we have limits for the position of this peak, apply them, and potentially overwrite the general limits for parameter #1
+         if(!std::isnan(std::get<1>(bgPeak)) && !std::isnan(std::get<2>(bgPeak)) && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+            bgP->GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
          }
          pf.AddPeak(bgP);
       }
@@ -544,16 +551,20 @@ int main(int argc, char** argv)
       }
       pfMixed.AddPeak(&peakMixed);
       for(auto bgPeak : bgPeakPos) {
-         auto* bgP = new TRWPeak(bgPeak);
+         TRWPeak bgP(std::get<0>(bgPeak));
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
-               bgP->GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
+               bgP.GetFitFunction()->FixParameter(p, bgPeakParameter[p]);
             } else if(bgPeakParameterLow[p] < bgPeakParameterHigh[p]) {
-               bgP->GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
-               bgP->GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
+               bgP.GetFitFunction()->SetParameter(p, bgPeakParameter[p]);
+               bgP.GetFitFunction()->SetParLimits(p, bgPeakParameterLow[p], bgPeakParameterHigh[p]);
             }
          }
-         pfMixed.AddPeak(bgP);
+         // if we have limits for the position of this peak, apply them, and potentially overwrite the general limits for parameter #1
+         if(!std::isnan(std::get<1>(bgPeak)) && !std::isnan(std::get<2>(bgPeak)) && std::get<1>(bgPeak) < std::get<2>(bgPeak)) {
+            bgP.GetFitFunction()->SetParLimits(1, std::get<1>(bgPeak), std::get<2>(bgPeak));
+         }
+         pfMixed.AddPeak(&bgP);
       }
       // if we have an extra background peak for the mixed spectra, add it now
       if(!std::isnan(mixedPeakPosition)) {
