@@ -169,8 +169,8 @@ int main(int argc, char** argv)
 
    // for the background-peak positions and background gates we could have multiple, so we create vectors for them
    std::vector<std::tuple<double, double, double>> bgPeakPos;   // position, low, high
-   std::vector<double> bgLow;
-   std::vector<double> bgHigh;
+   std::vector<double>                             bgLow;
+   std::vector<double>                             bgHigh;
    // we only fill the background gates from the settings if there were none provided on the command line
    if(std::isnan(projBgLow) || std::isnan(projBgHigh) || projBgLow >= projBgHigh) {
       for(int i = 1;; ++i) {
@@ -395,7 +395,7 @@ int main(int argc, char** argv)
    std::ofstream logFile(logFileName.c_str());
 
    // get the pdf file name from the output file name
-   auto          pdfFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".pdf";
+   auto pdfFileName = outputFile.substr(0, outputFile.find_last_of('.')) + ".pdf";
 
    // read the number of steps to use for varying the mixing angle
    int numberOfSteps = settings->GetInt("NumberOfMixingAngleSteps", 1000);
@@ -507,7 +507,7 @@ int main(int argc, char** argv)
          }
       }
       pf.AddPeak(&peak);
-      for(auto bgPeak : bgPeakPos) { // pos, low, high
+      for(auto bgPeak : bgPeakPos) {   // pos, low, high
          auto* bgP = new TRWPeak(std::get<0>(bgPeak));
          for(size_t p = 0; p < bgPeakParameterLow.size(); ++p) {
             if(bgPeakParameterLow[p] == bgPeakParameterHigh[p]) {
@@ -716,9 +716,9 @@ int main(int argc, char** argv)
                   for(auto twoJ : twoJLow) {
                      parameters.emplace_back();
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJMiddle.at(0)/2, twoJ/2), true);
+                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJMiddle.at(0) / 2, twoJ / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJMiddle.at(0)/2, twoJ/2));
+                     auto* dir = output.mkdir(Form("LowSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJMiddle.at(0) / 2, twoJ / 2));
 #endif
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
@@ -727,15 +727,15 @@ int main(int argc, char** argv)
                         degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
                      }
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << " - " << twoJMiddle.back() << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJMiddle) {
                      parameters.emplace_back();
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJ/2, twoJLow.at(0)/2), true);
+                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJ / 2, twoJLow.at(0) / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0)/2, twoJ/2, twoJLow.at(0)/2));
+                     auto* dir = output.mkdir(Form("MiddleSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJHigh.at(0) / 2, twoJ / 2, twoJLow.at(0) / 2));
 #endif
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
@@ -744,14 +744,14 @@ int main(int argc, char** argv)
                         degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
                      }
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << " - " << twoJHigh.back() << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   for(auto twoJ : twoJHigh) {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
-                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJ/2, twoJMiddle.at(0)/2, twoJLow.at(0)/2), true);
+                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJ / 2, twoJMiddle.at(0) / 2, twoJLow.at(0) / 2), true);
 #else
-                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ/2), Form("Cascade %d -> %d -> %d", twoJ/2, twoJMiddle.at(0)/2, twoJLow.at(0)/2));
+                     auto* dir = output.mkdir(Form("HighSpin_%d", twoJ / 2), Form("Cascade %d -> %d -> %d", twoJ / 2, twoJMiddle.at(0) / 2, twoJLow.at(0) / 2));
 #endif
                      dir->cd();
                      parameters.emplace_back();
@@ -761,7 +761,7 @@ int main(int argc, char** argv)
                         degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
                      }
                   }
-                  output.cd(); // switch back to output file
+                  output.cd();   // switch back to output file
                } else {
                   if(twoJLow.size() > 1 || twoJMiddle.size() > 1 || twoJHigh.size() > 1) {
                      // can only get here if more than one vector has a size > 1
@@ -785,7 +785,7 @@ int main(int argc, char** argv)
                std::vector<double> confidenceLevels;
                if(std::isnan(confidenceLevel)) {
                   for(const auto& dof : degreesOfFreedom) {
-                  confidenceLevels.push_back(TMath::ChisquareQuantile(0.99, static_cast<double>(dof))/static_cast<double>(dof));
+                     confidenceLevels.push_back(TMath::ChisquareQuantile(0.99, static_cast<double>(dof)) / static_cast<double>(dof));
                   }
                } else {
                   confidenceLevels.push_back(confidenceLevel);
@@ -1139,7 +1139,7 @@ std::tuple<double, double, int, int> FindLimits(TGraph* redChi2Graph, double min
 
    if(lowerLimit >= redChi2Graph->GetPointX(minIndex) || redChi2Graph->GetPointX(minIndex) >= upperLimit) {
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle failed. Lower limit " << lowerLimit << ", best atan of mixing angle " << redChi2Graph->GetPointX(minIndex) << ", and upper limit " << upperLimit << ", indices " << lowerIndex << "/" << minIndex << "/" << upperIndex << RESET_COLOR << std::endl;
-   } else if(std::abs(upperIndex - lowerIndex) < 4 && minChi2 < 5.) { // probably don't need the abs?
+   } else if(std::abs(upperIndex - lowerIndex) < 4 && minChi2 < 5.) {   // probably don't need the abs?
       std::cout << DYELLOW << "Warning, lower and/or upper limit of mixing angle are very close to the minimum (lower index " << lowerIndex << ", minimum at " << minIndex << ", and upper index " << upperIndex << "), consider increasing the number of steps (parameter \"NumberOfMixingAngleSteps\") used to get a better estimate of the mixing angle and it's uncertainties." << RESET_COLOR << std::endl;
    }
 
@@ -1424,7 +1424,7 @@ std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphError
    // get the fit result and print chi^2 and parameters
    auto fitResult = fitter.Result();
    // MinFcnValue() is the minimum chi2, ac.Np gives the number of data points
-   std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << " = " << fitResult.MinFcnValue() <<" / " << (ac.Np() - fitResult.NFreeParameters()) << std::endl;
+   std::cout << "Best reduced chi^2 from free fit at a2 and a4: " << fitResult.MinFcnValue() / (ac.Np() - fitResult.NFreeParameters()) << " = " << fitResult.MinFcnValue() << " / " << (ac.Np() - fitResult.NFreeParameters()) << std::endl;
    auto parameters = fitResult.Parameters();
    auto errors     = fitResult.Errors();
    std::cout << "Parameters a_0: " << parameters[0] << " +- " << errors[0] << ", a_2: " << parameters[1] << " +- " << errors[1] << ", a_4: " << parameters[2] << " +- " << errors[2] << std::endl;
