@@ -26,6 +26,7 @@
 #include "TGRSIFunctions.h"
 
 struct mixingResult {
+   int                    fDegreesOfFreedom{0};
    std::array<TGraph*, 2> fMixingAngles{nullptr, nullptr};
    TH2*                   fMixingAnglesHistogram{nullptr};
 };
@@ -33,7 +34,7 @@ struct mixingResult {
 mixingResult        MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4, int twoJhigh, int twoJmid, int twoJlow, double mixingAngleHighToMid, double mixingAngleMidToLow, int numberOfSteps, std::vector<double>& bestParameters, std::ofstream& logFile, const std::string& pdfFileName);
 std::vector<double> A2a4Method(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2, TGraphErrors* z4);
 
-bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel);
+bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const std::vector<double>& confidenceLevels, const std::vector<double>& spinLabel);
 
 double GetYError(TGraphErrors* graph, const double& x)
 {
@@ -296,7 +297,7 @@ int main(int argc, char** argv)
    double mixingAngleMidToLow  = settings->GetDouble("MixingAngleMidToLow", std::numeric_limits<double>::quiet_NaN());
 
    // confidence level (this value is used to draw a line at the confidence level for the mixing method)
-   double confidenceLevel = settings->GetDouble("ConfidenceLevel", 1.535);   // 1.535 is 99% confidence level for 48 degrees of freedom
+   double confidenceLevel = settings->GetDouble("ConfidenceLevel", std::numeric_limits<double>::quiet_NaN());   // calculated from degrees of freedom if not set
 
    // check if all necessary settings have been provided
    if(projGateLow >= projGateHigh) {
@@ -704,6 +705,7 @@ int main(int argc, char** argv)
                   z4->RemovePoint(excludedIndices[i] - i);
                }
                // calculate chi2 vs mixing graphs
+               std::vector<int>                 degreesOfFreedom;   // unique degrees of freedom
                std::vector<mixingResult>        spin;
                std::vector<double>              spinLabel;
                std::vector<std::vector<double>> parameters;
@@ -721,6 +723,9 @@ int main(int argc, char** argv)
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJ, mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
+                     if(std::find(degreesOfFreedom.begin(), degreesOfFreedom.end(), spin.back().fDegreesOfFreedom) == degreesOfFreedom.end()) {
+                        degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
+                     }
                   }
                   output.cd(); // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() > 1 && twoJHigh.size() == 1) {
@@ -735,6 +740,9 @@ int main(int argc, char** argv)
                      dir->cd();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJ, twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
+                     if(std::find(degreesOfFreedom.begin(), degreesOfFreedom.end(), spin.back().fDegreesOfFreedom) == degreesOfFreedom.end()) {
+                        degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
+                     }
                   }
                   output.cd(); // switch back to output file
                } else if(twoJLow.size() == 1 && twoJMiddle.size() == 1 && twoJHigh.size() > 1) {
@@ -749,13 +757,23 @@ int main(int argc, char** argv)
                      parameters.emplace_back();
                      spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJ, twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                      spinLabel.push_back(twoJ / 2.);
+                     if(std::find(degreesOfFreedom.begin(), degreesOfFreedom.end(), spin.back().fDegreesOfFreedom) == degreesOfFreedom.end()) {
+                        degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
+                     }
                   }
                   output.cd(); // switch back to output file
                } else {
+                  if(twoJLow.size() > 1 || twoJMiddle.size() > 1 || twoJHigh.size() > 1) {
+                     // can only get here if more than one vector has a size > 1
+                     std::cout << DYELLOW << "Warning, can't have more than one unknown spin (" << twoJHigh.size() << " high spins, " << twoJMiddle.size() << " middle spins, and " << twoJLow.size() << " low spins), going to run first provided spins only: " << twoJHigh.at(0) << " -> " << twoJMiddle.at(0) << " -> " << twoJLow.at(0) << RESET_COLOR << std::endl;
+                  }
                   logFile << "# Mixing method, high 2J = " << twoJHigh.at(0) << ", middle 2J = " << twoJMiddle.at(0) << ", low 2J = " << twoJLow.at(0) << std::endl;
                   parameters.emplace_back();
                   spin.push_back(MixingMethod(angularDistribution, z0, z2, z4, twoJHigh.at(0), twoJMiddle.at(0), twoJLow.at(0), mixingAngleHighToMid, mixingAngleMidToLow, numberOfSteps, parameters.back(), logFile, pdfFileName));
                   spinLabel.push_back(twoJHigh.at(0) / 2.);
+                  if(std::find(degreesOfFreedom.begin(), degreesOfFreedom.end(), spin.back().fDegreesOfFreedom) == degreesOfFreedom.end()) {
+                     degreesOfFreedom.push_back(spin.back().fDegreesOfFreedom);
+                  }
                }
 
                // write graphs and canvas to output file
@@ -764,8 +782,17 @@ int main(int argc, char** argv)
                canvas->cd();
                canvas->SetLogy();
 
+               std::vector<double> confidenceLevels;
+               if(std::isnan(confidenceLevel)) {
+                  for(const auto& dof : degreesOfFreedom) {
+                  confidenceLevels.push_back(TMath::ChisquareQuantile(0.99, static_cast<double>(dof))/static_cast<double>(dof));
+                  }
+               } else {
+                  confidenceLevels.push_back(confidenceLevel);
+               }
+               std::sort(confidenceLevels.begin(), confidenceLevels.end());
                for(int i = 0; i < 2; ++i) {
-                  if(PlotMixingCanvas(spin, i, confidenceLevel, spinLabel)) {
+                  if(PlotMixingCanvas(spin, i, confidenceLevels, spinLabel)) {
                      canvas->Write(Form("MixingCanvas%d", i));
                   }
                }
@@ -981,7 +1008,7 @@ TMultiGraph* PlotCanvas(TGraphErrors* data, TGraphErrors* fit, TGraphErrors* res
    return multiGraph;
 }
 
-bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const double& confidenceLevel, const std::vector<double>& spinLabel)
+bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, const std::vector<double>& confidenceLevels, const std::vector<double>& spinLabel)
 {
    /// plots the selected index/mixing angle (should be 0 or 1) on the current canvas
 
@@ -992,7 +1019,7 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
       min = TMath::Min(min, TMath::MinElement(spin.at(i).fMixingAngles[index]->GetN(), spin.at(i).fMixingAngles[index]->GetY()));
       max = TMath::Max(max, TMath::MaxElement(spin.at(i).fMixingAngles[index]->GetN(), spin.at(i).fMixingAngles[index]->GetY()));
    }
-   min = TMath::Min(min, confidenceLevel);
+   min = TMath::Min(min, confidenceLevels[0]);
 
    // find first graph with more than one data point
    size_t first = 0;
@@ -1024,9 +1051,13 @@ bool PlotMixingCanvas(std::vector<mixingResult>& spin, const size_t& index, cons
       }
    }
 
-   auto* confidenceLevelLine = new TLine(-1.5, confidenceLevel, 1.5, confidenceLevel);
+   Style_t lineStyle = 1;
+   for(const auto& confidenceLevel : confidenceLevels) {
+      auto* confidenceLevelLine = new TLine(-TMath::Pi() / 2., confidenceLevel, TMath::Pi() / 2., confidenceLevel);
+      confidenceLevelLine->SetLineStyle(lineStyle++);
 
-   confidenceLevelLine->Draw();
+      confidenceLevelLine->Draw();
+   }
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 20, 0)
    auto* legend = new TLegend(0.1, 0.3);
@@ -1187,7 +1218,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
 
    // our # of degrees of freedom is the number of data points (ac.Np()), minus a_0 (which we fit), and minus the two mixing angle which we vary
    // if one (or both) of the mixing angles is fixed (due to physics or user input), we increment the number of degrees of freedom later
-   int degreesOfFreedom = ac.Np() - 3;
+   result.fDegreesOfFreedom = ac.Np() - 3;
 
    // mixing for the high-middle transition
    double mixingAngle1Minimum = -TMath::Pi() / 2;
@@ -1213,7 +1244,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       steps1              = 1;
    }
    if(steps1 == 1) {
-      ++degreesOfFreedom;
+      ++result.fDegreesOfFreedom;
    }
 
    if(!std::isnan(mixingAngleMidToLow)) {
@@ -1228,7 +1259,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       steps2              = 1;
    }
    if(steps2 == 1) {
-      ++degreesOfFreedom;
+      ++result.fDegreesOfFreedom;
    }
 
    result.fMixingAngles[0]       = new TGraph(steps1);
@@ -1260,7 +1291,7 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
          }
          auto fitResult = fitter.Result();
          // MinFcnValue() is the minimum chi2, number of degrees of freedom was calculated earlier
-         double chi2 = fitResult.MinFcnValue() / degreesOfFreedom;
+         double chi2 = fitResult.MinFcnValue() / result.fDegreesOfFreedom;
          // is it correct to always plot vs mixangle1? Or should we use mixangle2 if mixangle1 had only 1 step?
          // and what if both angles have multiple steps?
          // only update the plot vs. mixing angle 1 if the chi2 is smaller (or if this is the first iteration)
@@ -1312,22 +1343,22 @@ mixingResult MixingMethod(TGraphErrors* data, TGraphErrors* z0, TGraphErrors* z2
       multiGraph = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2);
    } else {
       if(steps1 == 1) {
-         std::tuple<double, double, int, int> limitsMidLow = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
+         std::tuple<double, double, int, int> limitsMidLow = FindLimits(result.fMixingAngles[1], minChi2, result.fDegreesOfFreedom);
 
          std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) (mid -> low) " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle2, bestMixingAngle2 - std::get<0>(limitsMidLow), std::get<1>(limitsMidLow) - bestMixingAngle2),
                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle2), TMath::Tan(bestMixingAngle2) - TMath::Tan(std::get<0>(limitsMidLow)), TMath::Tan(std::get<1>(limitsMidLow)) - TMath::Tan(bestMixingAngle2))};
          multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else if(steps2 == 1) {
-         std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
+         std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, result.fDegreesOfFreedom);
 
          std::cout << "Varied mixing angle for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) (high -> mid) " << std::setw(12) << bestMixingAngle1 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {Form("atan(#delta) = %f (-%f/+%f)", bestMixingAngle1, bestMixingAngle1 - std::get<0>(limitsHighMid), std::get<1>(limitsHighMid) - bestMixingAngle1),
                                           Form("#delta = %f (-%f/+%f)", TMath::Tan(bestMixingAngle1), TMath::Tan(bestMixingAngle1) - TMath::Tan(std::get<0>(limitsHighMid)), TMath::Tan(std::get<1>(limitsHighMid)) - TMath::Tan(bestMixingAngle1))};
          multiGraph                    = PlotCanvas(data, fit, residual, bestParameters, bestErrors, minChi2, text);
       } else {
-         std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, degreesOfFreedom);
-         std::tuple<double, double, int, int> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, degreesOfFreedom);
+         std::tuple<double, double, int, int> limitsHighMid = FindLimits(result.fMixingAngles[0], minChi2, result.fDegreesOfFreedom);
+         std::tuple<double, double, int, int> limitsMidLow  = FindLimits(result.fMixingAngles[1], minChi2, result.fDegreesOfFreedom);
 
          std::cout << "Varied mixing angles for cascade " << twoJhigh / 2. << " -> " << twoJmid / 2. << " -> " << twoJlow / 2. << ": best red. chi^2 " << std::setw(12) << minChi2 << ", at atan(delta) high -> mid  " << std::setw(12) << bestMixingAngle1 << ", mid ->low " << std::setw(12) << bestMixingAngle2 << ", a0 " << std::setw(12) << bestParameters[0] << " +- " << std::setw(12) << bestErrors[0] << ", a2 " << std::setw(12) << bestParameters[1] << ", a4 " << std::setw(12) << bestParameters[2] << std::endl;
          std::vector<const char*> text = {"mixing angle high -> middle",
