@@ -78,7 +78,7 @@ public:
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
    using TDetectorHit::GetPosition;
    TVector3 GetPosition(Double_t phioffset, Double_t dist, bool smear = false) const;   //!
-   TVector3 GetPosition(Double_t phioffset, bool smear) const;                  //!
+   TVector3 GetPosition(Double_t phioffset, bool smear) const;                          //!
    TVector3 GetPosition(bool smear = false) const;                                      //!
 #pragma clang diagnostic pop
 
