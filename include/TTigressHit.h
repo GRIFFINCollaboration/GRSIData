@@ -125,8 +125,8 @@ public:
 
    bool InFilter(Int_t);   //!<!
 
+   using TObject::Compare;
    static bool Compare(const TTigressHit*, const TTigressHit*);         //!<!
-   static bool CompareEnergy(const TTigressHit*, const TTigressHit*);   //!<!
    void        Add(const TDetectorHit*) override;                       //!<!
 
    void Clear(Option_t* opt = "") override;         //!<!

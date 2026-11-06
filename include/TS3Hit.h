@@ -64,7 +64,7 @@ public:
 
    Bool_t SectorsDownstream() const;
 
-   Double_t GetPhi(double offset = 0) const { return GetPosition(offset).Phi(); }
+   Double_t GetPhi(double offset = 0) const { return GetPosition(offset, false).Phi(); }
 
    Double_t GetTheta(double offset = 0, TVector3* vec = nullptr) const
    {
@@ -72,12 +72,13 @@ public:
          vec = new TVector3();
          vec->SetXYZ(0, 0, 1);
       }
-      return GetPosition(offset).Angle(*vec);
+      return GetPosition(offset, false).Angle(*vec);
    }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
+   using TDetectorHit::GetPosition;
    TVector3 GetPosition(Double_t phioffset, Double_t dist, bool smear = false) const;   //!
-   TVector3 GetPosition(Double_t phioffset, bool smear = false) const;                  //!
+   TVector3 GetPosition(Double_t phioffset, bool smear) const;                  //!
    TVector3 GetPosition(bool smear = false) const;                                      //!
 #pragma clang diagnostic pop
 
