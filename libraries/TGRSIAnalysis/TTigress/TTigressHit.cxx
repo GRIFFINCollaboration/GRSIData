@@ -124,11 +124,6 @@ TVector3 TTigressHit::GetPosition() const
    return GetPosition(GetDefaultDistance());
 }
 
-bool TTigressHit::CompareEnergy(const TTigressHit* lhs, const TTigressHit* rhs)
-{
-   return lhs->GetEnergy() > rhs->GetEnergy();
-}
-
 bool TTigressHit::Compare(const TTigressHit* lhs, const TTigressHit* rhs)
 {
    if(lhs->GetDetector() == rhs->GetDetector()) {
